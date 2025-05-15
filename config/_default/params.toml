@@ -77,7 +77,7 @@ enabled = true
 ## Comments
 [comments]
 enabled = true
-provider = "disqus"
+provider = "giscus"
 
 [comments.disqusjs]
 shortname = ""
@@ -128,15 +128,18 @@ serverName = "cactus.chat"
 siteName = ""
 
 [comments.giscus]
-repo = ""
-repoID = ""
-category = ""
-categoryID = ""
-mapping = ""
-lightTheme = ""
-darkTheme = ""
+repo = "nine-j/nine-j.github.io"
+repoID = "R_kgDOOqUgZw"
+category = "General"
+categoryID = "DIC_kwDOOqUgZ84CqLyQ"
+mapping = "url"
+lightTheme = "light"
+darkTheme = "noborder_gray"
 reactionsEnabled = 1
 emitMetadata = 0
+inputPosition = "top"
+dataLang = "ko"
+dataLoading = "lazy"
 
 [comments.gitalk]
 owner = ""
