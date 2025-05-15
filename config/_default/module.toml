@@ -1,2 +1,4 @@
 [[imports]]
+path = "github.com/KKKZOZ/hugo-admonitions"
+[[imports]]
 path = "github.com/CaiJimmy/hugo-theme-stack/v3"
