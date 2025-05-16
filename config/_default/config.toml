@@ -1,7 +1,7 @@
 timeZone = "Asia/Seoul"
 
 # Change baseurl before deploy
-baseurl = "https://demo.stack.jimmycai.com"
+baseurl = "https://b9f1.com"
 languageCode = "en-us"
 title = "B9F1"
 
