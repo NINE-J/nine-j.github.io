@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>기초 on B9F1</title><link>https://b9f1.com/categories/%EA%B8%B0%EC%B4%88/</link><description>Recent content in 기초 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 05 Jan 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/%EA%B8%B0%EC%B4%88/index.xml" rel="self" type="application/rss+xml"/><item><title>Java의 main 클래스</title><link>https://b9f1.com/p/2025-01-05-main-class-of-java/</link><pubDate>Sun, 05 Jan 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-01-05-main-class-of-java/</guid><description>&lt;img src="https://b9f1.com/p/2025-01-05-main-class-of-java/cover.png" alt="Featured image of post Java의 main 클래스" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Java의 &lt;code>public static void main(String[] args)&lt;/code>&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;p>Java 프로젝트를 생성하고 IDE에서 제공하는 메인 템플릿을 생성하게 되면 아래와 같은 코드를 확인할 수 있다.&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;code>백준&lt;/code> 같은 알고리즘 풀이 사이트에선 채점 시 제출한 코드를 &lt;code>Main.java&lt;/code>로 가정하여 받는다.&lt;/p>&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">SampleProject&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>Java 는 애플리케이션이 실행되면 제일 먼저 메인(main)메소드를 실행한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;p>Java에서 &lt;code>public static void main(String[] args)&lt;/code> 메서드의 형태가 항상 동일한 이유는 &lt;strong>Java 언어 명세&lt;/strong>에 명시되어 있기 때문이다.
+이는 Java 프로그램의 시작 지점을 정의하기 위한 약속(규약, convention)이다.&lt;/p>
+&lt;h2 id="왜-main-메서드의-형태가-고정되어-있을까">📌왜 &lt;code>main&lt;/code> 메서드의 형태가 고정되어 있을까?
+&lt;/h2>&lt;h3 id="jvmjava-virtual-machine의-요구-사항">JVM(Java Virtual Machine)의 요구 사항
+&lt;/h3>&lt;p>Java 프로그램은 JVM에서 실행되며, JVM은 프로그램의 시작 지점을 찾기 위해 특정 형태의 메서드를 탐색한다.
+이때 &lt;code>main&lt;/code> 메서드는 반드시 아래와 같은 조건을 만족해야 한다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>public&lt;/code>: JVM이 프로그램 외부에서 호출할 수 있어야 함.&lt;/li>
+&lt;li>&lt;code>static&lt;/code>: JVM이 클래스의 인스턴스를 생성하지 않고도 호출할 수 있어야 함.&lt;/li>
+&lt;li>&lt;code>void&lt;/code>: 반환값이 필요하지 않음. 프로그램의 시작점으로 동작하기 때문.&lt;/li>
+&lt;li>&lt;code>String[] args&lt;/code>: 명령줄 인수를 받을 수 있어야 함.&lt;/li>
+&lt;/ul>
+&lt;h3 id="java-언어-명세-java-language-specification-jls">Java 언어 명세 (Java Language Specification, JLS)
+&lt;/h3>&lt;p>JLS의 &lt;strong>12.1.4 &amp;ldquo;Invoke the main Method&amp;rdquo;&lt;/strong> 섹션에 이 규칙이 명시되어 있다.
+JVM은 실행 시 지정된 클래스에서 다음과 같은 메서드를 찾아 호출한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="일관성-및-예측-가능성">일관성 및 예측 가능성
+&lt;/h3>&lt;p>프로그램의 진입점을 표준화함으로써 개발자들이 Java 프로그램의 구조를 쉽게 이해할 수 있다.
+다른 사람이 작성한 코드를 보더라도 어디에서 실행이 시작되는지 즉시 알 수 있다.&lt;/p>
+&lt;h2 id="변경하면-안-될까">📌변경하면 안 될까?
+&lt;/h2>&lt;ul>
+&lt;li>접근 제한자 변경: &lt;code>private&lt;/code> 또는 &lt;code>protected&lt;/code>로 바꾸면 JVM이 메서드를 찾지 못하고 &lt;code>NoSuchMethodError&lt;/code>가 발생한다.&lt;/li>
+&lt;li>static 제거: JVM은 클래스 인스턴스를 생성하지 않으므로 &lt;code>static&lt;/code>이 없으면 호출할 수 없다.&lt;/li>
+&lt;li>매개변수 변경: &lt;code>String[] args&lt;/code> 대신 다른 매개변수를 사용하면 JVM이 인식하지 못한다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="예외-사항">📌예외 사항
+&lt;/h2>&lt;h3 id="overloading">Overloading
+&lt;/h3>&lt;p>&lt;code>main&lt;/code> 메서드는 오버로딩할 수 있다.&lt;/p>
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>그러나 JVM은 여전히 &lt;code>public static void main(String[] args)&lt;/code>를 실행한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">SampleProject&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello, World!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;This won&amp;#39;t be called by JVM!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="entry-point-변경">Entry Point 변경
+&lt;/h3>&lt;p>Java 11 이상에서는 &lt;code>public static void main(String[] args)&lt;/code> 없이도 &lt;code>java.util.function&lt;/code> 인터페이스를 활용하여 프로그램을 실행할 수 있다.
+예를 들어, &lt;code>java -cp . MyProgram&lt;/code> 형태로 실행 가능하다.&lt;/p>
+&lt;h2 id="결론">📌결론
+&lt;/h2>&lt;p>&lt;code>public static void main(String[] args)&lt;/code>는 Java의 규약이며, Java 언어 명세에 명시된 내용이다.
+이 형태를 따르지 않으면 JVM이 프로그램의 진입점을 찾을 수 없으므로 반드시 이 구조를 따라야 한다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="main-메서드의-구성-요소">main 메서드의 구성 요소
+&lt;/h3>&lt;ol>
+&lt;li>&lt;code>public&lt;/code> (공개 접근 제어자)
+&lt;ul>
+&lt;li>JVM이 프로그램을 실행할 때 &lt;code>main&lt;/code> 메서드를 호출해야 하므로, 외부에서 접근 가능하도록 &lt;code>public&lt;/code>이어야 한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>static&lt;/code> (정적 메서드)
+&lt;ul>
+&lt;li>Java에서 메서드를 호출하려면 일반적으로 객체를 생성해야 하지만, &lt;code>main&lt;/code>은 프로그램 시작점이므로 객체 없이 호출 가능해야 한다.&lt;/li>
+&lt;li>따라서 &lt;code>static&lt;/code>으로 선언하여 JVM이 클래스 로딩 후 바로 실행할 수 있도록 한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>void&lt;/code> (반환 값 없음)
+&lt;ul>
+&lt;li>&lt;code>main&lt;/code> 메서드는 실행이 목적이므로 별도의 반환 값이 필요하지 않다.
+&lt;ul>
+&lt;li>필요한 경우 상황에 맞게 변경하여 사용한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>프로그램 종료 상태는 &lt;code>System.exit(status)&lt;/code>를 통해 반환할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>String[] args&lt;/code> (명령행 인자)
+&lt;ul>
+&lt;li>프로그램 실행 시 전달되는 명령행 인자(Arguments)를 배열로 받는다.&lt;/li>
+&lt;li>예를 들어, &lt;code>java Main hello world&lt;/code> 명령어를 실행하면 &lt;code>args[0] = &amp;quot;hello&amp;quot;&lt;/code>, &lt;code>args[1] = &amp;quot;world&amp;quot;&lt;/code>가 된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol></description></item></channel></rss>

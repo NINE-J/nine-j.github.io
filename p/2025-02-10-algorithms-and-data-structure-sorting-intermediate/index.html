@@ -1,0 +1,437 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="중급 정렬을 이해할 수 있다."><title>알고리즘과 자료구조: 중급 정렬</title>
+<link rel=canonical href=https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/><link rel=stylesheet href=/scss/style.min.9aedd38e0b2711a3d5dd08e3ec2262051b83bbfdfca1c8679e8df42d21cce0b0.css><meta property='og:title' content="알고리즘과 자료구조: 중급 정렬"><meta property='og:description' content="중급 정렬을 이해할 수 있다."><meta property='og:url' content='https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/'><meta property='og:site_name' content='B9F1'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='devlog'><meta property='article:tag' content='algorithms'><meta property='article:tag' content='알고리즘'><meta property='article:tag' content='이론'><meta property='article:tag' content='theory'><meta property='article:tag' content='선수학습'><meta property='article:tag' content='정렬'><meta property='article:tag' content='sort'><meta property='article:tag' content='merge-sort'><meta property='article:tag' content='quick-sort'><meta property='article:tag' content='heap-sort'><meta property='article:published_time' content='2025-02-10T00:00:00+09:00'><meta property='article:modified_time' content='2025-02-10T00:00:00+09:00'><meta property='og:image' content='https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover.png'><meta name=twitter:title content="알고리즘과 자료구조: 중급 정렬"><meta name=twitter:description content="중급 정렬을 이해할 수 있다."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover.png'><link rel="shortcut icon" href=/favicon.svg><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023370172872685" crossorigin=anonymous></script><script data-name=BMC-Widget data-cfasync=false src=https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js data-id=b9f1 data-description="Support me on Buy me a coffee!" data-message="👋 Glad to meet you.Buy me a coffee? 😊" data-color=#5F7FFF data-position=Right data-x_margin=18 data-y_margin=18></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_2f326f6839e2d588.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🤌</span></figure><div class=site-meta><h1 class=site-name><a href=/>B9F1</a></h1><h2 class=site-description>Nine's Devlog</h2></div></header><ol class=menu-social><li><a href=https://github.com/NINE-J target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://stackoverflow.com/users/17334807/nine target=_blank title=StackOverflow rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-stackoverflow"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><path d="M8 16h8"/><path d="M8.322 12.582l7.956.836"/><path d="M8.787 9.168l7.826 1.664"/><path d="M10.096 5.764l7.608 2.472"/></svg></a></li><li><a href=mailto:rnwo47@gmail.com target=_blank title=ZMail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/toys/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Toys</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#개요>📌개요</a></li><li><a href=#내용>📌내용</a><ol><li><a href=#병합-정렬merge-sort>병합 정렬(Merge Sort)</a><ol><li><a href=#특징>특징</a></li><li><a href=#실무-사용-예시>실무 사용 예시</a></li><li><a href=#pseudo-code>Pseudo Code</a></li><li><a href=#javascript-code>JavaScript Code</a></li></ol></li><li><a href=#퀵-정렬quick-sort>퀵 정렬(Quick Sort)</a><ol><li><a href=#특징-1>특징</a></li><li><a href=#실무-사용-예시-1>실무 사용 예시</a></li><li><a href=#pseudo-code-1>Pseudo Code</a></li><li><a href=#javascript-code-1>JavaScript Code</a></li></ol></li><li><a href=#힙-정렬heap-sort>힙 정렬(Heap Sort)</a><ol><li><a href=#특징-2>특징</a></li><li><a href=#실무-사용-예시-2>실무 사용 예시</a></li><li><a href=#pseudo-code-2>Pseudo Code</a></li><li><a href=#javascript-code-2>JavaScript Code</a></li></ol></li></ol></li><li><a href=#적절한-사용-전략>📌적절한 사용 전략</a></li><li><a href=#endnote>⚙️EndNote</a><ol><li><a href=#pseudo-code-3>Pseudo Code</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/><img src=/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover_hu_79d8cda61e233f1f.png srcset="/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover_hu_79d8cda61e233f1f.png 800w, /p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover_hu_8263ff32423517aa.png 1600w" width=800 height=450 loading=lazy alt="Featured image of post 알고리즘과 자료구조: 중급 정렬"></a></div><div class=article-details><header class=article-category><a href=/categories/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98/>알고리즘
+</a><a href=/categories/%EC%9D%B4%EB%A1%A0/>이론</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/>알고리즘과 자료구조: 중급 정렬</a></h2><h3 class=article-subtitle>중급 정렬을 이해할 수 있다.</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025년 02월 10일</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><h2 id=개요>📌개요</h2><p>더 효율적인 정렬 알고리즘을 이해하기 위해 중급 정렬 알고리즘을 살펴본다.</p><h2 id=내용>📌내용</h2><link rel=stylesheet href=/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm+a4QTy4no=" crossorigin=anonymous><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span>Info</span></div><div class=admonition-content><p><code>Heap Sort</code>, <code>Merge Sort</code>, <code>Quick Sort</code> 같은 중급 정렬 알고리즘은 실무에서도 많이 사용되며, 고급 정렬 알고리즘을 이해하는 데 중요한 개념을 제공한다.</p></div></div><h3 id=병합-정렬merge-sort>병합 정렬(Merge Sort)</h3><blockquote><p>시간 복잡도: O(n log n)</p></blockquote><p>분할 정복(Divide and Conquer) 방식을 사용하여 배열을 반씩 나누고 병합하며 정렬하는 알고리즘이다.</p><h4 id=특징>특징</h4><ul><li>안정적인 정렬 (Stable Sort) → 동일한 값의 상대적 순서 유지</li><li>외부 정렬(External Sort)에 적합하다. 디스크나 네트워크에서 데이터를 읽으며 정렬 가능하다.</li><li>데이터가 이미 정렬된 경우에도 성능을 유지한다.</li><li>연결 리스트(Linked List) 정렬에 유리하다. 연속된 메모리 공간을 필요로 하지 않는다.</li></ul><h4 id=실무-사용-예시>실무 사용 예시</h4><ul><li>안정성이 중요한 경우에 사용한다.<ul><li>데이터베이스에서 인덱스 정렬 등</li></ul></li><li>대용량 데이터 정렬.<ul><li>외부 정렬 알고리즘에서 많이 사용한다.</li></ul></li><li>연결 리스트 정렬<ul><li>배열보다 메모리 재배열이 어려운 경우</li></ul></li></ul><h4 id=pseudo-code>Pseudo Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Merge(left, right):
+</span></span><span class=line><span class=cl>	result = empty array
+</span></span><span class=line><span class=cl>	i = 0, j = 0
+</span></span><span class=line><span class=cl>	while i &lt; length(left) and j &lt; length(right):
+</span></span><span class=line><span class=cl>		if left[i] &lt; right[j]:
+</span></span><span class=line><span class=cl>			append left[i] to result
+</span></span><span class=line><span class=cl>			increment i
+</span></span><span class=line><span class=cl>		else:
+</span></span><span class=line><span class=cl>			append right[j] to result
+</span></span><span class=line><span class=cl>			increment j
+</span></span><span class=line><span class=cl>	append remaining elements of left to result (if any)
+</span></span><span class=line><span class=cl>	append remaining elements of right to result (if any)
+</span></span><span class=line><span class=cl>	return result
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>MergeSort(A, left, right):
+</span></span><span class=line><span class=cl>    if left &lt; right:
+</span></span><span class=line><span class=cl>        mid = (left + right) / 2
+</span></span><span class=line><span class=cl>        MergeSort(A, left, mid)
+</span></span><span class=line><span class=cl>        MergeSort(A, mid + 1, right)
+</span></span><span class=line><span class=cl>        Merge(A, left, mid, right)
+</span></span></code></pre></td></tr></table></div></div><h4 id=javascript-code>JavaScript Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>function</span> <span class=nx>merge</span><span class=p>(</span><span class=nx>left</span><span class=p>,</span> <span class=nx>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>result</span> <span class=o>=</span> <span class=p>[];</span>
+</span></span><span class=line><span class=cl>  <span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>j</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>while</span> <span class=p>(</span><span class=nx>i</span> <span class=o>&lt;</span> <span class=nx>left</span><span class=p>.</span><span class=nx>length</span> <span class=o>&amp;&amp;</span> <span class=nx>j</span> <span class=o>&lt;</span> <span class=nx>right</span><span class=p>.</span><span class=nx>length</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>left</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>&lt;</span> <span class=nx>right</span><span class=p>[</span><span class=nx>j</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>result</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>left</span><span class=p>[</span><span class=nx>i</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>i</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>result</span><span class=p>.</span><span class=nx>push</span><span class=p>(</span><span class=nx>right</span><span class=p>[</span><span class=nx>j</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>      <span class=nx>j</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=nx>result</span><span class=p>.</span><span class=nx>concat</span><span class=p>(</span><span class=nx>left</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=nx>i</span><span class=p>),</span> <span class=nx>right</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=nx>j</span><span class=p>));</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>mergeSort</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>length</span> <span class=o>&lt;</span> <span class=mi>2</span><span class=p>)</span> <span class=k>return</span> <span class=nx>A</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>mid</span> <span class=o>=</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>floor</span><span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>length</span> <span class=o>/</span> <span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>left</span> <span class=o>=</span> <span class=nx>mergeSort</span><span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=nx>mid</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>right</span> <span class=o>=</span> <span class=nx>mergeSort</span><span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=nx>mid</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>merge</span><span class=p>(</span><span class=nx>left</span><span class=p>,</span> <span class=nx>right</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=퀵-정렬quick-sort>퀵 정렬(Quick Sort)</h3><blockquote><p>시간 복잡도: 평균 O(n log n), 최악 O(n^2)</p></blockquote><p>피벗(Pivot)을 기준으로 작은 값과 큰 값으로 나누어 정렬하는 알고리즘이다.</p><ul><li><code>QuickSort</code> 함수는 배열을 재귀적으로 나누어 정렬한다.</li><li><code>Partition</code> 함수는 <code>pivot</code>을 기준으로 배열을 두 두분으로 분할하는 과정이다.<ul><li><code>pivot</code>보다 작은 값들은 왼쪽, 큰 값들은 오른쪽으로 이동시킨 후 새로운 <code>pivot</code>을 반환한다.</li></ul></li></ul><h4 id=특징-1>특징</h4><ul><li>비교 기반 정렬 중 가장 빠른 평균 속도</li><li>추가적인 메모리가 거의 필요 없다.</li><li>데이터가 랜덤하게 분포되어 있을 때 성능이 뛰어나다</li><li>병합 정렬보다 캐시 친화적이다.</li></ul><h4 id=실무-사용-예시-1>실무 사용 예시</h4><ul><li>대용량 데이터 정렬</li><li>일반적인 데이터 정렬 (데이터가 랜덤 분포일 경우)</li></ul><blockquote><p>정렬된 배열을 받는 경우 최악의 성능을 자랑한다. 최악의 케이스를 모두 피할 순 없지만, <code>pivot</code>을 작은 값 또는 큰 값이 아닌 중간 값 또는 랜덤 선택 등으로 지정하는 방법을 사용해볼 수 있다.
+{: .prompt-warning }</p></blockquote><h4 id=pseudo-code-1>Pseudo Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Partition(A, low, high):
+</span></span><span class=line><span class=cl>    pivot = A[high]
+</span></span><span class=line><span class=cl>    i = low - 1
+</span></span><span class=line><span class=cl>    for j = low to high - 1:
+</span></span><span class=line><span class=cl>        if A[j] &lt; pivot:
+</span></span><span class=line><span class=cl>            i += 1
+</span></span><span class=line><span class=cl>            swap(A[i], A[j])
+</span></span><span class=line><span class=cl>    swap(A[i + 1], A[high])
+</span></span><span class=line><span class=cl>    return i + 1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>QuickSort(A, low, high):
+</span></span><span class=line><span class=cl>    if low &lt; high:
+</span></span><span class=line><span class=cl>        pivotIndex = Partition(A, low, high)
+</span></span><span class=line><span class=cl>        QuickSort(A, low, pivotIndex - 1)
+</span></span><span class=line><span class=cl>        QuickSort(A, pivotIndex + 1, high)
+</span></span></code></pre></td></tr></table></div></div><h4 id=javascript-code-1>JavaScript Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>function</span> <span class=nx>partition</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>low</span><span class=p>,</span> <span class=nx>high</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>pivot</span> <span class=o>=</span> <span class=nx>A</span><span class=p>[</span><span class=nx>high</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=nx>low</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>j</span> <span class=o>=</span> <span class=nx>low</span><span class=p>;</span> <span class=nx>j</span> <span class=o>&lt;</span> <span class=nx>high</span><span class=p>;</span> <span class=nx>j</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>A</span><span class=p>[</span><span class=nx>j</span><span class=p>]</span> <span class=o>&lt;</span> <span class=nx>pivot</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>i</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>j</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>j</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>high</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>high</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>quickSort</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>length</span> <span class=o>&lt;=</span> <span class=mi>1</span><span class=p>)</span> <span class=k>return</span> <span class=nx>A</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kd>let</span> <span class=nx>pivotIndex</span> <span class=o>=</span> <span class=nx>partition</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>A</span><span class=p>.</span><span class=nx>length</span> <span class=o>-</span> <span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>...</span><span class=nx>quickSort</span><span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=nx>pivotIndex</span><span class=p>)),</span>
+</span></span><span class=line><span class=cl>        <span class=nx>A</span><span class=p>[</span><span class=nx>pivotIndex</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>        <span class=p>...</span><span class=nx>quickSort</span><span class=p>(</span><span class=nx>A</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=nx>pivotIndex</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)),</span>
+</span></span><span class=line><span class=cl>    <span class=p>];</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=힙-정렬heap-sort>힙 정렬(Heap Sort)</h3><blockquote><p>시간 복잡도: O(n log n)</p></blockquote><p>힙(Heap) 자료구조를 활용하여 최댓값 또는 최솟값을 빠르게 찾는 방식으로 정렬하는 알고리즘이다.</p><h4 id=특징-2>특징</h4><ul><li>최악의 경우에도 동일한 시간 복잡도를 보장한다.</li><li>추가적인 메모리 사용이 거의 없다.</li><li>우선순위 큐에서 응용 가능하다.</li></ul><h4 id=실무-사용-예시-2>실무 사용 예시</h4><ul><li>우선순위 큐 기반의 정렬<ul><li>최소/최대 힙을 이용한 정렬</li></ul></li><li>실시간 데이터 스트림 정렬<ul><li>항상 정렬된 상태를 유지해야 하는 경우</li></ul></li><li>메모리 사용을 최소화해야 하는 정렬</li></ul><h4 id=pseudo-code-2>Pseudo Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HEAP_SORT_ASCENDING(A):
+</span></span><span class=line><span class=cl>    BUILD_MAX_HEAP(A)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    FOR i FROM length(A) - 1 DOWNTO 1:
+</span></span><span class=line><span class=cl>        SWAP(A[0], A[i])
+</span></span><span class=line><span class=cl>        MAX_HEAPIFY(A, 0, i)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    RETURN A
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>BUILD_MAX_HEAP(A):
+</span></span><span class=line><span class=cl>    FOR i FROM FLOOR(length(A) / 2) - 1 DOWNTO 0:
+</span></span><span class=line><span class=cl>        MAX_HEAPIFY(A, i, length(A))
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>MAX_HEAPIFY(A, i, heapSize):
+</span></span><span class=line><span class=cl>    largest ← i
+</span></span><span class=line><span class=cl>    left ← 2 * i + 1
+</span></span><span class=line><span class=cl>    right ← 2 * i + 2
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    IF left &lt; heapSize AND A[left] &gt; A[largest]:
+</span></span><span class=line><span class=cl>        largest ← left
+</span></span><span class=line><span class=cl>    IF right &lt; heapSize AND A[right] &gt; A[largest]:
+</span></span><span class=line><span class=cl>        largest ← right
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    IF largest ≠ i:
+</span></span><span class=line><span class=cl>        SWAP(A[i], A[largest])
+</span></span><span class=line><span class=cl>        MAX_HEAPIFY(A, largest, heapSize)
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>HEAP_SORT_DESCENDING(A):
+</span></span><span class=line><span class=cl>    BUILD_MIN_HEAP(A)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    FOR i FROM length(A) - 1 DOWNTO 1:
+</span></span><span class=line><span class=cl>        SWAP(A[0], A[i])
+</span></span><span class=line><span class=cl>        MIN_HEAPIFY(A, 0, i)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    RETURN A
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>BUILD_MIN_HEAP(A):
+</span></span><span class=line><span class=cl>    FOR i FROM FLOOR(length(A) / 2) - 1 DOWNTO 0:
+</span></span><span class=line><span class=cl>        MIN_HEAPIFY(A, i, length(A))
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>MIN_HEAPIFY(A, i, heapSize):
+</span></span><span class=line><span class=cl>    smallest ← i
+</span></span><span class=line><span class=cl>    left ← 2 * i + 1
+</span></span><span class=line><span class=cl>    right ← 2 * i + 2
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    IF left &lt; heapSize AND A[left] &lt; A[smallest]:
+</span></span><span class=line><span class=cl>        smallest ← left
+</span></span><span class=line><span class=cl>    IF right &lt; heapSize AND A[right] &lt; A[smallest]:
+</span></span><span class=line><span class=cl>        smallest ← right
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    IF smallest ≠ i:
+</span></span><span class=line><span class=cl>        SWAP(A[i], A[smallest])
+</span></span><span class=line><span class=cl>        MIN_HEAPIFY(A, smallest, heapSize)
+</span></span></code></pre></td></tr></table></div></div><h4 id=javascript-code-2>JavaScript Code</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kd>function</span> <span class=nx>heapSortAscending</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>n</span> <span class=o>=</span> <span class=nx>A</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>buildMaxHeap</span><span class=p>(</span><span class=nx>A</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=nx>n</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=mi>0</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>		<span class=nx>maxHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>i</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>A</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>heapSortDescending</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>n</span> <span class=o>=</span> <span class=nx>A</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>buildMinHeap</span><span class=p>(</span><span class=nx>A</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=nx>n</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=mi>0</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>		<span class=nx>minHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>i</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>A</span><span class=p>;</span> 
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>buildMaxHeap</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>heapSize</span> <span class=o>=</span> <span class=nx>A</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>floor</span><span class=p>(</span><span class=nx>heapSize</span> <span class=o>/</span> <span class=mi>2</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&gt;=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>maxHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>buildMinHeap</span><span class=p>(</span><span class=nx>A</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>heapSize</span> <span class=o>=</span> <span class=nx>A</span><span class=p>.</span><span class=nx>length</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>(</span><span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=nb>Math</span><span class=p>.</span><span class=nx>floor</span><span class=p>(</span><span class=nx>heapSize</span> <span class=o>/</span> <span class=mi>2</span><span class=p>)</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&gt;=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>minHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>maxHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>largest</span> <span class=o>=</span> <span class=nx>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>left</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=nx>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>right</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=nx>i</span> <span class=o>+</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>left</span> <span class=o>&lt;</span> <span class=nx>heapSize</span> <span class=o>&amp;&amp;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>left</span><span class=p>]</span> <span class=o>&gt;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>largest</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>largest</span> <span class=o>=</span> <span class=nx>left</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>right</span> <span class=o>&lt;</span> <span class=nx>heapSize</span> <span class=o>&amp;&amp;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>right</span><span class=p>]</span> <span class=o>&gt;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>largest</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>largest</span> <span class=o>=</span> <span class=nx>right</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>largest</span> <span class=o>!==</span> <span class=nx>i</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>largest</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>largest</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>		<span class=nx>maxHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>largest</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>function</span> <span class=nx>minHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>i</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>smallest</span> <span class=o>=</span> <span class=nx>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>left</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=nx>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=kd>let</span> <span class=nx>right</span> <span class=o>=</span> <span class=mi>2</span> <span class=o>*</span> <span class=nx>i</span> <span class=o>+</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>left</span> <span class=o>&lt;</span> <span class=nx>heapSize</span> <span class=o>&amp;&amp;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>left</span><span class=p>]</span> <span class=o>&lt;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>smallest</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>smallest</span> <span class=o>=</span> <span class=nx>left</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>right</span> <span class=o>&lt;</span> <span class=nx>heapSize</span> <span class=o>&amp;&amp;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>right</span><span class=p>]</span> <span class=o>&lt;</span> <span class=nx>A</span><span class=p>[</span><span class=nx>smallest</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>smallest</span> <span class=o>=</span> <span class=nx>right</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>(</span><span class=nx>smallest</span> <span class=o>!==</span> <span class=nx>i</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>smallest</span><span class=p>]]</span> <span class=o>=</span> <span class=p>[</span><span class=nx>A</span><span class=p>[</span><span class=nx>smallest</span><span class=p>],</span> <span class=nx>A</span><span class=p>[</span><span class=nx>i</span><span class=p>]];</span>
+</span></span><span class=line><span class=cl>		<span class=nx>minHeapify</span><span class=p>(</span><span class=nx>A</span><span class=p>,</span> <span class=nx>smallest</span><span class=p>,</span> <span class=nx>heapSize</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=적절한-사용-전략>📌적절한 사용 전략</h2><ul><li>빠른 정렬이 필요하면? → 퀵 정렬 (일반적인 경우)</li><li>안정적인 정렬이 필요하면? → 병합 정렬 (데이터 정렬 순서를 유지해야 할 때)</li><li>메모리를 절약하면서 안정적인 성능을 원하면? → 힙 정렬</li></ul><div class=table-wrapper><table><thead><tr><th>정렬 알고리즘</th><th>평균 시간 복잡도</th><th>최악 시간 복잡도</th><th>공간 복잡도</th><th>안정성</th><th>특징 및 사용 사례</th></tr></thead><tbody><tr><td>퀵 정렬 (Quick Sort)</td><td>O(nlogn)</td><td>O(n2)</td><td>O(logn)</td><td>❌</td><td>가장 빠른 평균 속도, 제자리 정렬, 랜덤 데이터 정렬</td></tr><tr><td>병합 정렬 (Merge Sort)</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(n)</td><td>✅</td><td>안정적 정렬, 외부 정렬 및 연결 리스트 정렬</td></tr><tr><td>힙 정렬 (Heap Sort)</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(1)</td><td>❌</td><td>우선순위 큐 기반 정렬, 메모리 절약 필요 시</td></tr></tbody></table></div><h2 id=endnote>⚙️EndNote</h2><h3 id=pseudo-code-3>Pseudo Code</h3><p><code>Pseudo Code</code>는 실제 프로그래밍 언어의 구문과 유사하지만, 특정 프로그래밍 언어의 문법에 얽매이지 않고 알고리즘의 논리적인 흐름을 설명하는 데 사용되는 간단한 서술 형태다.</p><ol><li><strong>언어 독립성</strong>: 특정 프로그래밍 언어의 문법을 따르지 않으며, 누구나 쉽게 읽고 이해할 수 있다.</li><li><strong>간결함</strong>: 복잡한 문법 요소를 생략하고 핵심 알고리즘 로직만을 표현한다.</li><li><strong>가독성</strong>: 사람이 읽기 쉽게 작성되어, 알고리즘의 흐름과 동작을 쉽게 파악할 수 있다.</li></ol></section><footer class=article-footer><div style=margin-top:2rem;text-align:center><a href=https://www.buymeacoffee.com/b9f1 target=_blank><img src=https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png alt="Buy Me A Coffee" style=height:60px!important;width:217px!important></a></div><section class=article-tags><a href=/tags/devlog/>Devlog</a>
+<a href=/tags/algorithms/>Algorithms</a>
+<a href=/tags/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98/>알고리즘</a>
+<a href=/tags/%EC%9D%B4%EB%A1%A0/>이론</a>
+<a href=/tags/theory/>Theory</a>
+<a href=/tags/%EC%84%A0%EC%88%98%ED%95%99%EC%8A%B5/>선수학습</a>
+<a href=/tags/%EC%A0%95%EB%A0%AC/>정렬</a>
+<a href=/tags/sort/>Sort</a>
+<a href=/tags/merge-sort/>Merge-Sort</a>
+<a href=/tags/quick-sort/>Quick-Sort</a>
+<a href=/tags/heap-sort/>Heap-Sort</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=document.querySelector(".main-article");renderMathInElement(e,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/2025-02-22-algorithms-and-data-structure-sorting-advanced/><div class=article-image><img src=/p/2025-02-22-algorithms-and-data-structure-sorting-advanced/cover.819e9dc44f635b7c3639ca013fb026e1_hu_d11683af54e5d853.png width=250 height=150 loading=lazy alt="Featured image of post 알고리즘과 자료구조: 고급 정렬" data-hash="md5-gZ6dxE9jW3w2OcoBP7Am4Q=="></div><div class=article-details><h2 class=article-title>알고리즘과 자료구조: 고급 정렬</h2></div></a></article><article class=has-image><a href=/p/2025-02-09-algorithms-and-data-structure-sorting-basic/><div class=article-image><img src=/p/2025-02-09-algorithms-and-data-structure-sorting-basic/cover.5da06e6bf5484f5ab00119f837738bdb_hu_67d46b533435e57a.png width=250 height=150 loading=lazy alt="Featured image of post 알고리즘과 자료구조: 기초 정렬" data-hash="md5-XaBua/VIT1qwARn4N3OL2w=="></div><div class=article-details><h2 class=article-title>알고리즘과 자료구조: 기초 정렬</h2></div></a></article><article class=has-image><a href=/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/><div class=article-image><img src=/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/cover.31e6850c75f1b355d333031b8cbdb2e0_hu_64d9b221b1426a17.png width=250 height=150 loading=lazy alt="Featured image of post 알고리즘과 자료구조: 기본 개념 이해" data-hash="md5-MeaFDHXxs1XTMwMbjL2y4A=="></div><div class=article-details><h2 class=article-title>알고리즘과 자료구조: 기본 개념 이해</h2></div></a></article><article class=has-image><a href=/p/2025-01-28-algorithms-and-data-structure-roadmap/><div class=article-image><img src=/p/2025-01-28-algorithms-and-data-structure-roadmap/cover.24a64a09bb102efdc6b1b0001f048ad5_hu_a32071607eea8ccf.png width=250 height=150 loading=lazy alt="Featured image of post 알고리즘과 자료구조: 학습 로드맵" data-hash="md5-JKZKCbsQLv3GsbAAHwSK1Q=="></div><div class=article-details><h2 class=article-title>알고리즘과 자료구조: 학습 로드맵</h2></div></a></article><article class=has-image><a href=/p/2025-04-18-big-o-differences-in-performance-between-on-and-ologn/><div class=article-image><img src=/p/2025-04-18-big-o-differences-in-performance-between-on-and-ologn/cover.d508937ab7f8a4e1496a0e5115dcd75f_hu_573f3afbdf49bf94.png width=250 height=150 loading=lazy alt="Featured image of post O(n) VS O(log n)" data-hash="md5-1QiTerf4pOFJag5RFdzXXw=="></div><div class=article-details><h2 class=article-title>O(n) VS O(log n)</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=nine-j/nine-j.github.io data-repo-id=R_kgDOOqUgZw data-category=General data-category-id=DIC_kwDOOqUgZ84CqLyQ data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"noborder_gray")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 B9F1</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
