@@ -18,7 +18,7 @@
 ></script>
 
 {{ if .Store.Get "hasMermaid" }}
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/+esm"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@latest/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   {{ $renderMermaidWithZoom := resources.Get "js/render-mermaid-with-zoom.js" | js.Build }}
   <script src="{{ $renderMermaidWithZoom.RelPermalink }}"></script>
