@@ -11,7 +11,6 @@ tags:
   - Java
   - DTO
   - Record
-mermaid: true
 image: cover.png
 ---
 ## 📌개요

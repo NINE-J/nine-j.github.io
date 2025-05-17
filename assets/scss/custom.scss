@@ -1,3 +1,48 @@
 /*
     You can add your own custom styles here.
 */
+
+/* s: mermaid zoom */
+.mermaid-container.zoomable>.mermaid {
+    border: 1px solid transparent;
+}
+
+.mermaid-container.zoomable>.mermaid:hover {
+    border-color: rgba(134,134,134,.333)
+}
+
+.mermaid-container pre.mermaid {
+    position: relative;
+    overflow: hidden;
+}
+
+.mermaid-container pre.mermaid > svg {
+    display: block;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.mermaid-container pre.mermaid > .btn.reset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 4px;
+    opacity: .6;
+    background: #ff0000;
+    outline: none;
+    position: absolute;
+    top: var(--card-padding);
+    right: var(--card-padding);
+}
+
+.mermaid-container pre.mermaid > .btn.reset svg {
+    fill: #fff;
+}
+
+.mermaid-container pre.mermaid > .btn.reset:hover {
+    opacity: 1;
+}
+/* e: mermaid zoom */

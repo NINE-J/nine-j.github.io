@@ -12,7 +12,6 @@ tags:
   - trigonometric
   - 수학
   - 삼각함수
-math: true
 image: cover.png
 ---
 ## 📌개요

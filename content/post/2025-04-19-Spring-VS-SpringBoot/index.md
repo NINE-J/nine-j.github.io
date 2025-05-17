@@ -9,7 +9,6 @@ tags:
   - Spring
   - SpringBoot
   - devlog
-mermaid: true
 image: cover.png
 ---
 ## 📌개요
@@ -110,15 +109,15 @@ Spring Boot는 공식 문서의 **Getting Started**를 따라하면서 구조를
 
 ```mermaid
 graph TD
-    A[@SpringBootApplication]
-    A --> B[@ComponentScan]
-    A --> C[@SpringBootConfiguration]
-    C --> C1[@Configuration]
-    C1 --> C2[@Component]
-    A --> D[@EnableAutoConfiguration]
-    D --> D1[@Import]
-    D --> D2[@AutoConfigurationPackage]
-    D2 --> D3[@Import]
+    A["@SpringBootApplication"]
+    A --> B["@ComponentScan"]
+    A --> C["@SpringBootConfiguration"]
+    C --> C1["@Configuration"]
+    C1 --> C2["@Component"]
+    A --> D["@EnableAutoConfiguration"]
+    D --> D1["@Import"]
+    D --> D2["@AutoConfigurationPackage"]
+    D2 --> D3["@Import"]
 ```
 
 ```java

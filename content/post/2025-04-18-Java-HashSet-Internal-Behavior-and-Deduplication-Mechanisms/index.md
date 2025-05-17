@@ -11,7 +11,6 @@ tags:
   - Java
   - HashSet
   - 자료구조
-mermaid: true
 image: cover.png
 ---
 ## 📌개요

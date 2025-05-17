@@ -1,0 +1,6 @@
+<div class="mermaid-container zoomable">
+  <pre class="mermaid">
+    {{ .Inner | htmlUnescape | safeHTML }}
+  </pre>
+</div>
+{{ .Page.Store.Set "hasMermaid" true }}
