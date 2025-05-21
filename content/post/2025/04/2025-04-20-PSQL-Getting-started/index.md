@@ -253,8 +253,18 @@ Port [5432]
 
 #### 6.Advanced Options
 
-고급 옵션 설정.
-특별히 바꿀 것 없어서 기본 옵션으로 진행. Click Next
+Locale 설정 시 `DEFAULT` 값이 기본으로 설정되어 있을텐데 본인이 사용하고 있는 **운영체제의 시스템 로케일**을 그대로 사용하게 된다.
+
+한국어 Windows 기준으로는 `Korean_Korea.949`로 설정되고 한국어 macOS 기준으로는 `ko_KR.UTF-8`로 설정된다.
+이는 PostgreSQL에서 한글 정렬이나 `LIKE` 검색 시 예기치 않은 동작을 유발할 수 있다.
+
+AWS와 같은 클라우드 플랫폼을 사용해 배포를 진행하는 경우 실제 서버 운영 환경 배제할 수는 없다.
+Linux 기반의 서버, AWS RDS, Docker 컨테이너 등에서는 `en_US.UTF-8` Locale을 사용하는 점을 고려하자.
+
+나중에 서버 배포 하고 맞출 때 인코딩 불상사를 보고 싶지 않으면 미리 맞추는 게 좋고,
+이미 만들어진 데이터베이스의 로케일은 **변경할 수 없고**, **새 클러스터를 만들거나 데이터베이스를 새로 생성**해야 한다.
+
+잘 선택한 후 Click Next
 
 ```
 [Setup]
@@ -266,7 +276,7 @@ Advanced Options
 Select the locale to be used by the new database cluster.
 
 # 지역 [지역 선택 드롭다운]
-Locale [Default locale]
+Locale [en-US]
 ```
 
 #### 7.Pre Installation Summary
