@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Network on B9F1</title><link>https://b9f1.com/categories/network/</link><description>Recent content in Network on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 May 2025 13:23:57 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/network/index.xml" rel="self" type="application/rss+xml"/><item><title>웹 API 진화의 핵심 전환</title><link>https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</link><pubDate>Tue, 20 May 2025 13:23:57 +0900</pubDate><guid>https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/cover.png" alt="Featured image of post 웹 API 진화의 핵심 전환" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>과거 웹 서비스 API의 표준은 SOAP(Simple Object Access Protocol)였다.&lt;/p>
+&lt;p>그러나 2010년대를 지나며 REST(Representational State Transfer)가 빠르게 주류로 자리 잡았고 요즘 대부분의 공개 웹 API에서 RESTful API가 사실상의 표준으로 자리 잡고 있다.&lt;/p>
+&lt;p>웹 API의 발전 과정 속에서, SOAP에서 REST로의 전환이 일어난 배경과 그에 따른 장단점을 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="soap의-등장과-전성기">SOAP의 등장과 전성기
+&lt;/h3>&lt;p>SOAP은 WSDL(Web Service Definition Language), XML 기반 메시지 포맷 그리고 HTTP 외에도 SMTP나 FTP를 사용할 수 있는 유연성 덕분에 초기에는 대형 엔터프라이즈 시스템에서 주로 채택되었다.
+보안(SOAP Security), 트랜잭션, 메시지 무결성 등 강력한 스펙이 특징이었다.&lt;/p>
+&lt;p>그러나 SOAP은 다음과 같은 문제를 가지고 있었다.&lt;/p>
+&lt;ul>
+&lt;li>메시지 포맷이 무겁고 복잡함 (XML 기반)&lt;/li>
+&lt;li>학습 비용이 높고 구현이 어려움&lt;/li>
+&lt;li>브라우저, 모바일 등 가벼운 클라이언트 환경과 맞지 않음&lt;/li>
+&lt;/ul>
+&lt;h3 id="rest의-부상">REST의 부상
+&lt;/h3>&lt;p>2000년에 로이 필딩(Roy Fielding)이 논문에서 제시한 REST는 본래 HTTP의 아키텍처 스타일로 제안된 개념이었지만 시간이 지나며 &amp;ldquo;RESTful API&amp;quot;라는 개념으로 대중화되었다.&lt;/p>
+&lt;p>REST의 핵심은 자원(Resource) 지향 아키텍처와 표준 HTTP 메서드(GET, POST, PUT, DELETE)를 활용한 통신이다.&lt;/p>
+&lt;p>REST가 빠르게 채택된 이유는 다음과 같다.&lt;/p>
+&lt;ul>
+&lt;li>HTTP라는 웹의 표준을 그대로 활용&lt;/li>
+&lt;li>JSON 기반 경량 메시지 포맷 (브라우저/모바일 친화적)&lt;/li>
+&lt;li>상태 없는(stateless) 구조로 확장성 우수&lt;/li>
+&lt;li>클라이언트와 서버 간 결합도가 낮음&lt;/li>
+&lt;li>문서화가 간단하고 테스트/디버깅이 쉬움&lt;/li>
+&lt;/ul>
+&lt;h3 id="soap-vs-rest">SOAP VS REST
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>SOAP&lt;/th>
+&lt;th>REST&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>메시지 포맷&lt;/td>
+&lt;td>XML (무겁고 엄격)&lt;/td>
+&lt;td>JSON, XML (가볍고 유연)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>표준&lt;/td>
+&lt;td>WSDL 등 다양한 스펙 존재&lt;/td>
+&lt;td>명확한 표준 없음 (URI, HTTP 활용)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>보안, 트랜잭션&lt;/td>
+&lt;td>WS-Security, WS-Atomic 등 내장 지원&lt;/td>
+&lt;td>HTTP 보안 활용, 트랜잭션 미지원&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>상태성&lt;/td>
+&lt;td>상태 유지(Stateful) 가능&lt;/td>
+&lt;td>Stateless 기반&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>학습 곡선&lt;/td>
+&lt;td>높음 (설정과 구현 복잡)&lt;/td>
+&lt;td>낮음 (간단한 HTTP 인터페이스)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>확장성과 경량성&lt;/td>
+&lt;td>제한적&lt;/td>
+&lt;td>뛰어남&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="rest-이후의-대안이-있을까">REST 이후의 대안이 있을까?
+&lt;/h3>&lt;p>REST는 단순하고 확장 가능한 아키텍처지만, 다음과 같은 한계가 존재한다.&lt;/p>
+&lt;ul>
+&lt;li>과도한 데이터 전송 (Over-fetching/Under-fetching)&lt;/li>
+&lt;li>정적인 엔드포인트 설계&lt;/li>
+&lt;li>실시간 양방향 통신 미지원&lt;/li>
+&lt;li>리소스 간 관계 표현의 어려움&lt;/li>
+&lt;/ul>
+&lt;p>이러한 문제를 해결하기 위한 대안으로 다음 기술이 떠오르고 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>GraphQL&lt;/strong>: 클라이언트가 필요한 데이터만 요청할 수 있어 Over-fetching/Under-fetching 문제를 해소함.&lt;/li>
+&lt;li>&lt;strong>gRPC&lt;/strong>: HTTP/2 기반의 양방향 스트리밍과 낮은 대역폭, 빠른 응답속도를 제공하여 마이크로서비스 간 통신에 적합함.&lt;/li>
+&lt;li>&lt;strong>Async API, WebSocket 기반 API&lt;/strong>: 실시간 스트리밍 통신 및 이벤트 기반 시스템에 특화됨.&lt;/li>
+&lt;/ul>
+&lt;p>이렇듯 REST는 여전히 강력한 기본값이지만, 목적에 따라 더 나은 대안들이 상황별로 사용되고 있다.&lt;/p>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>페이스북, 트위터, 구글, 아마존 등 주요 플랫폼 API는 거의 모두 REST 기반이다.
+심지어 마이크로소프트도 SOAP에서 REST 기반 API로 점진적으로 이동하고 있다고 한다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 메서드(GET, POST, PUT, DELETE)&lt;/li>
+&lt;li>XML vs. JSON 포맷&lt;/li>
+&lt;li>클라이언트-서버 아키텍처&lt;/li>
+&lt;li>상태 유지(Stateful) vs 상태 없음(Stateless)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm" target="_blank" rel="noopener"
+>Architectural Styles and the Design of Network-based Software Architectures - Roy Thomas Fielding&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/api-management/restify-soap-api" target="_blank" rel="noopener"
+>Import a SOAP API to API Management and convert it to REST&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design" target="_blank" rel="noopener"
+>RESTful API 디자인 가이드 - Microsoft&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://blog.postman.com/soap-vs-rest/" target="_blank" rel="noopener"
+>SOAP vs REST 비교 블로그 - Postman&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://graphql.org/" target="_blank" rel="noopener"
+>GraphQL 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://grpc.io/" target="_blank" rel="noopener"
+>gRPC 공식 문서&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>URL 입력 후 ENTER 키</title><link>https://b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</link><pubDate>Tue, 08 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/cover.png" alt="Featured image of post URL 입력 후 ENTER 키" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>사용자가 브라우저에 URL을 입력하고 엔터를 누르면, 요청한 웹페이지를 가져와 화면에 표시하기까지 복잡한 일련의 과정이 진행된다.&lt;/p>
+&lt;p>이 과정은 여러 시스템, 프로토콜, 그리고 인터넷 스택의 다양한 계층을 포함한다.
+엔지니어에게 이 과정을 이해하는 것은 성능 최적화, 보안 강화, 문제 해결에 필수적이다.&lt;/p>
+&lt;p>이 과정을 기술적으로 상세히 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="네트워킹">네트워킹
+&lt;/h3>&lt;p>브라우저는 언제 URL을 분석해서 요청을 처리할 방법을 결정한다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>URL의 구성 요소&lt;/strong> (예: &lt;code>https://www.example.com:443/path?query=value#fragment&lt;/code>)
+&lt;ul>
+&lt;li>스키마/프로토콜: &lt;code>https&lt;/code>는 사용할 프로토콜(HTTP/HTTPS)을 나타낸다.&lt;/li>
+&lt;li>도메인: &lt;code>www.example.com&lt;/code>은 서버를 지정한다.&lt;/li>
+&lt;li>포트: &lt;code>:443&lt;/code>(선택 사항 HTTP는 기본 80, HTTPS는 443)&lt;/li>
+&lt;li>경로: &lt;code>/path&lt;/code>는 요청할 리소스를 식별한다.&lt;/li>
+&lt;li>쿼리: &lt;code>?query=value&lt;/code>는 추가 매개변수를 제공한다.&lt;/li>
+&lt;li>프래그먼트: &lt;code>#fragment&lt;/code>는 페이지 내 특정 섹션을 가리킨다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>유효성 검사&lt;/strong>: 브라우저는 URL의 문법이 올바른지 확인한다.
+&lt;ul>
+&lt;li>잘못된 경우 검색 쿼리로 처리할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>HSTS 확인&lt;/strong>
+&lt;ul>
+&lt;li>HTTPS 연결을 위해 브라우저는 HSTS(HTTP Strict Transport Security) 목록을 확인하여 도메인이 보안 연결을 요구하는지 확인한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>인코딩&lt;/strong>
+&lt;ul>
+&lt;li>특수 문자는 URL 인코딩 (예: 공백을 &lt;code>%20&lt;/code>으로 변환)을 통해 처리된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="dns-조회">DNS 조회
+&lt;/h3>&lt;p>도메인 이름을 실제 서버의 IP 주소로 변환하는 과정.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>로컬 캐시 확인&lt;/strong>
+&lt;ul>
+&lt;li>브라우저와 OS는 먼저 로컬 DNS 캐시를 확인한다.
+&lt;ul>
+&lt;li>예: 브라우저 캐시, &lt;code>/etc/hosts&lt;/code> 파일&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>재귀적 DNS 쿼리&lt;/strong>
+&lt;ul>
+&lt;li>캐시에 없으면 시스템은 ISP의 DNS 리졸버 또는 공용 DNS (예: 8.8.8.8)에 쿼리를 보낸다.
+&lt;ul>
+&lt;li>ISP: Internet Service Provider, DNS: Domain Name System&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>리졸버는 루트 DNS 서버, TLD(최상위 도메인, &lt;code>.com&lt;/code>) 서버, 권한 있는 네임 서버를 순차적으로 질의하여 IP 주소를 얻는다.
+&lt;ul>
+&lt;li>TLD: Top-Level Domain&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>DNS 레코드&lt;/strong>
+&lt;ul>
+&lt;li>&lt;code>A&lt;/code> 레코드(IPv4 주소) 또는 &lt;code>AAAA&lt;/code> 레코드(IPv6 주소)를 반환.&lt;/li>
+&lt;li>&lt;code>CNAME&lt;/code> 레코드가 있으면 추가 조회가 필요할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>DNS 캐싱&lt;/strong>
+&lt;ul>
+&lt;li>조회된 IP는 TTL에 따라 로컬에 캐싱되어 이후 요청을 가속화한다.
+&lt;ul>
+&lt;li>TTL: Time To Live&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>DNS 보안&lt;/strong>
+&lt;ul>
+&lt;li>DNSSEC을 사용하면 응답의 무결성을 보장한다.
+&lt;ul>
+&lt;li>DNSSEC: DNS Security Extensions&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="tcp-연결">TCP 연결
+&lt;/h3>&lt;p>브라우저는 서버와 안정적인 연결을 설정하기 위해 TCP 프로토콜을 사용한다.
+TCP: Transmission Control Protocol (전송 제어 프로토콜)&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>3 Way 핸드셰이크&lt;/strong>
+&lt;ul>
+&lt;li>클라이언트가 &lt;code>SYN&lt;/code> 패킷을 서버로 전송&lt;/li>
+&lt;li>서버가 &lt;code>SYN-ACK&lt;/code>로 응답&lt;/li>
+&lt;li>클라이언트가 &lt;code>ACK&lt;/code>로 보내 연결을 완료
+&lt;ul>
+&lt;li>SYN: SYNchronization (동기화), ACK: ACKnowledgement (확인)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>소켓 생성&lt;/strong>
+&lt;ul>
+&lt;li>클라이언트와 서버는 각각 소켓을 열어 데이터를 주고 받을 준비를 한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>지연 요소&lt;/strong>
+&lt;ul>
+&lt;li>네트워크 레이턴시와 패킷 손실은 연결 시간을 늘릴 수 있다.&lt;/li>
+&lt;li>TCP Slow Start는 초기 전송 속도를 조절한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Keep-Alive&lt;/strong>: HTTP/1.1부터는 연결을 재사용하여 오버헤드를 줄인다.&lt;/li>
+&lt;/ol>
+&lt;h3 id="tls-핸드셰이크-https">TLS 핸드셰이크 (HTTPS)
+&lt;/h3>&lt;p>HTTPS 요청의 경우 데이터 보안을 위해 TLS(Transport Layer Security) 연결을 설정한다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>TLS 협상&lt;/strong>
+&lt;ul>
+&lt;li>클라이언트는 &lt;code>ClientHello&lt;/code> 메시지로 지원하는 암호화 스위트와 TLS 버전을 전송.&lt;/li>
+&lt;li>서버는 &lt;code>SeverHello&lt;/code>로 선택한 암호화 방식과 인증서를 응답&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>인증서 검증&lt;/strong>
+&lt;ul>
+&lt;li>클라이언트는 서버의 인증서를 CA로 검증
+&lt;ul>
+&lt;li>CA: Certificate Authority&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>인증서의 도메인 일치 여부와 유효 기간을 확인&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>키 교환&lt;/strong>
+&lt;ul>
+&lt;li>Diffie-Hellman 또는 RSA를 사용해 세션 키를 생성&lt;/li>
+&lt;li>이후 데이터는 대칭 암호화(예: AES)로 보호&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>성능 고려사항&lt;/strong>
+&lt;ul>
+&lt;li>TLS 1.3은 핸드셰이크를 단순화하여 지연을 줄임&lt;/li>
+&lt;li>세션 재개는 이전 연결의 캐시를 활용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="http-통신">HTTP 통신
+&lt;/h3>&lt;h4 id="http-요청">HTTP 요청
+&lt;/h4>&lt;p>브라우저는 서버에 HTTP 요청을 보내 리소스를 요청한다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>요청 구성&lt;/strong>
+&lt;ul>
+&lt;li>메서드: &lt;code>GET&lt;/code>, &lt;code>POST&lt;/code> 등.&lt;/li>
+&lt;li>헤더: &lt;code>Host&lt;/code>, &lt;code>User-Agent&lt;/code>, &lt;code>Accept&lt;/code>, &lt;code>Cookie&lt;/code> 등.&lt;/li>
+&lt;li>바디: &lt;code>POST&lt;/code> 요청 시 데이터 포함 (예: JSON, Form 데이터).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>HTTP/2 및 HTTP/3&lt;/strong>
+&lt;ul>
+&lt;li>HTTP/2는 멀티플렉싱과 헤더 압축을 지원&lt;/li>
+&lt;li>HTTP/3는 UDP 기반 QUIC를 사용하여 성능을 개선&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>프록시 및 CDN&lt;/strong>
+&lt;ul>
+&lt;li>요청은 프록시 서버나 CDN(예: Cloudflare)을 거칠 수 있음&lt;/li>
+&lt;li>CDN은 캐싱된 콘텐츠를 제공해 지연을 줄임&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="서버-응답">서버 응답
+&lt;/h4>&lt;p>서버는 요청을 처리하고 응답을 반환한다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>응답 구성&lt;/strong>
+&lt;ul>
+&lt;li>상태 코드
+&lt;ul>
+&lt;li>&lt;code>200 OK&lt;/code>, &lt;code>404 Not Found&lt;/code>, &lt;code>301 Moved Permanently&lt;/code> 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>헤더
+&lt;ul>
+&lt;li>&lt;code>Content-Type&lt;/code>, &lt;code>Content-Length&lt;/code>, &lt;code>Cache-Control&lt;/code> 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>바디
+&lt;ul>
+&lt;li>HTML, JSON, 이미지 등의 콘텐츠&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>리다이렉션&lt;/strong>
+&lt;ul>
+&lt;li>&lt;code>301&lt;/code> 또는 &lt;code>302&lt;/code> 상태 코드는 브라우저를 다른 URL로 이동시킴&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>압축&lt;/strong>
+&lt;ul>
+&lt;li>&lt;code>gzip&lt;/code> 또는 &lt;code>brotli&lt;/code>로 콘텐츠를 압축해 전송 속도를 높임&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="렌더링">렌더링
+&lt;/h3>&lt;h4 id="html-파싱-및-dom-구축">HTML 파싱 및 DOM 구축
+&lt;/h4>&lt;p>브라우저는 서버에서 받은 HTML을 파싱하여 DOM을 생성한다.
+DOM: Document Object Model&lt;/p>
+&lt;ol>
+&lt;li>파싱 과정
+&lt;ul>
+&lt;li>HTML은 바이트 스트림에서 토큰으로 분해됨&lt;/li>
+&lt;li>토큰은 노드로 변환되어 DOM 트리로 조립&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>오류 처리
+&lt;ul>
+&lt;li>잘못된 HTML(예: 닫히지 않은 태그)도 최대한 파싱&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>비동기 로딩
+&lt;ul>
+&lt;li>&lt;code>&amp;lt;script&amp;gt;&lt;/code> 태그는 기본적으로 파싱을 차단하나, &lt;code>async&lt;/code> 또는 &lt;code>defer&lt;/code> 속성으로 최적화 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="css-파싱-및-렌더-트리">CSS 파싱 및 렌더 트리
+&lt;/h4>&lt;p>CSS는 스타일을 정의하고 렌더 트리를 생성해 화면에 표시할 요소를 결정한다.&lt;/p>
+&lt;ol>
+&lt;li>CSSOM 생성
+&lt;ul>
+&lt;li>CSS는 CSSOM으로 변환
+&lt;ul>
+&lt;li>CSSOM: CSS Object Model&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>렌더 트리
+&lt;ul>
+&lt;li>DOM과 CSSOM을 결합해 보이는 요소만 표함&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>리플로우
+&lt;ul>
+&lt;li>스타일 변경 시 레이아웃을 재계산&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="자바스크립트-실행">자바스크립트 실행
+&lt;/h4>&lt;p>자바스크립트는 동적 콘텐츠를 생성하고 페이지를 조작한다.&lt;/p>
+&lt;ol>
+&lt;li>엔진
+&lt;ul>
+&lt;li>V8(Chrome), SpiderMonkey(Firefox) 등.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>이벤트 루프
+&lt;ul>
+&lt;li>비동기 작업(예: &lt;code>setTimeout&lt;/code>, AJAX)을 처리.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>성능 병목
+&lt;ul>
+&lt;li>무거운 스크립트는 렌더링을 지연시킬 수 있음&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="화면-렌더링">화면 렌더링
+&lt;/h4>&lt;p>브라우저는 렌더 트리를 기반으로 픽셀을 화면에 그린다.&lt;/p>
+&lt;ol>
+&lt;li>레이아웃: 요소의 위치와 크기를 계산&lt;/li>
+&lt;li>페인팅: 계산된 스타일을 픽셀로 변환&lt;/li>
+&lt;li>합성: GPU를 활용해 레이어를 합성&lt;/li>
+&lt;li>최적화: 하드웨어 가속과 캐싱으로 성능 개선&lt;/li>
+&lt;/ol>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>URL 입력부터 화면 표시까지의 과정은 네트워킹(DNS, TCP, TLS, HTTP)과 웹 기술(파싱, 렌더링)의 긴밀한 협력으로 이루어진다.&lt;/p>
+&lt;p>각 단계는 성능, 보안, 사용자 경험에 직접적인 영향을 미치며 엔지니어는 이를 이해함으로써 최적화와 문제 해결의 기반을 마련할 수 있다.&lt;/p>
+&lt;h3 id="과정-요약">과정 요약
+&lt;/h3>&lt;ol>
+&lt;li>URL 파싱: 브라우저는 URL을 분석하여 프로토콜(예: HTTPS), 도메인, 경로 등을 식별하고 요청 준비를 한다.&lt;/li>
+&lt;li>DNS 조회: 도메인 이름을 IP 주소로 변환하며, 로컬 캐시 또는 DNS 서버를 통해 빠르게 처리된다.&lt;/li>
+&lt;li>TCP 연결: 클라이언트와 서버 간 안정적인 연결을 위해 3Way 핸드셰이크를 수행한다.&lt;/li>
+&lt;li>TLS 핸드셰이크 (HTTPS): 보안 연결을 위해 인증서 검증과 세션 키 교환을 통해 데이터를 암호화 한다.&lt;/li>
+&lt;li>HTTP 요청/응답: 브라우저가 서버에 리소스를 요청하고, 서버는 HTML, CSS, 이미지 등으로 응답한다.&lt;/li>
+&lt;li>렌더링
+&lt;ul>
+&lt;li>HTML을 파싱해 DOM을 구축하고 CSS를 적용해 렌더 트리를 생성&lt;/li>
+&lt;li>자바스크립트를 실행해 동적 콘텐츠를 처리&lt;/li>
+&lt;li>레이아웃 계산, 페인팅, 합성을 통해 화면에 페이지를 표시&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>OSI 7계층&lt;/strong>: DNS(TCP/UDP), HTTP, TLS는 응용/전송 계층에서 동작.&lt;/li>
+&lt;li>&lt;strong>TCP/IP 모델&lt;/strong>: 인터넷 프로토콜 스택의 기본 구조 이해.&lt;/li>
+&lt;li>&lt;strong>브라우저 엔진&lt;/strong>: Webkit, Blink, Gecko의 렌더링 방식 차이.&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알면-좋을-것들">더 알면 좋을 것들
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>웹 성능 최적화&lt;/strong>: Critical Rendering Path, Lazy Loading.&lt;/li>
+&lt;li>&lt;strong>보안&lt;/strong>: CORS, CSRF, XSS 방지 기법.&lt;/li>
+&lt;li>&lt;strong>모니터링&lt;/strong>: Lighthouse, Web Vitals로 성능 측정.&lt;/li>
+&lt;li>&lt;strong>프로그레시브 웹 앱(PWA)&lt;/strong>: 오프라인 캐싱과 빠른 로딩.&lt;/li>
+&lt;li>&lt;strong>브라우저 개발자 도구&lt;/strong>: 네트워크 탭과 성능 분석 활용.&lt;/li>
+&lt;/ul>
+&lt;h3 id="참조-자료">참조 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://velog.io/@forest_xox/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%A3%BC%EC%86%8C%EC%B0%BD%EC%97%90-URL%EC%9D%84-%EC%9E%85%EB%A0%A5%ED%95%98%EB%A9%B4-%EC%9D%BC%EC%96%B4%EB%82%98%EB%8A%94-%EC%9D%BC" target="_blank" rel="noopener"
+>[네트워크] 주소창에 URL을 입력하면 일어나는 일&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://medium.com/@alysachan830/what-happens-from-typing-in-a-url-to-displaying-a-website-part-1-dns-cache-and-dns-lookup-86441848ea59" target="_blank" rel="noopener"
+>DNS cache and DNS lookup: What happens from typing in a URL to displaying a website? (Part 1)&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://hyunki99.tistory.com/109" target="_blank" rel="noopener"
+>[네트워크] 브라우저 주소창에 URL을 입력 시 일어나는 일 정리 (DNS)&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

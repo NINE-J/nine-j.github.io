@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>자바 on B9F1</title><link>https://b9f1.com/tags/%EC%9E%90%EB%B0%94/</link><description>Recent content in 자바 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 05 May 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EC%9E%90%EB%B0%94/index.xml" rel="self" type="application/rss+xml"/><item><title>Java 예외 처리의 구조와 진화</title><link>https://b9f1.com/p/2025-05-05-java-checked-exception-vs-unchecked-exception/</link><pubDate>Mon, 05 May 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-05-05-java-checked-exception-vs-unchecked-exception/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-05-java-checked-exception-vs-unchecked-exception/cover.png" alt="Featured image of post Java 예외 처리의 구조와 진화" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Java 예외 처리는 프로그램의 안정성, 복원력, 유지보수성을 결정 짓는 핵심 설계 요소다.&lt;/p>
+&lt;p>예외는 크게 다음 세 가지로 구분된다.&lt;/p>
+&lt;ul>
+&lt;li>Checked Exception: 외부 자원 접근 등 복구 가능한 예외 상황을 명시적으로 선언 (컴파일 타임에 처리)&lt;/li>
+&lt;li>Unchecked Exception: 실행 중 발생하는 로직 오류, 주로 프로그래머의 실수에서 기인, 명시적 처리 강제가 없다.&lt;/li>
+&lt;li>Error: OutOfMemory, StackOverflowError와 같은 시스템 레벨의 치명적 오류&lt;/li>
+&lt;/ul>
+&lt;p>특히 Checked, Unchecked Exception 간의 선택은 단순한 문법 차원이 아니라 설계 전략과 깊은 연관이 있다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="java-예외-계층-구조">Java 예외 계층 구조
+&lt;/h3>&lt;p>해당 계보도가 전부는 아니며 필요한 부분만 그렸다는 점을 참고하자.&lt;/p>
+&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+classDiagram
+Object &lt;|-- Throwable
+Throwable &lt;|-- Exception
+Throwable &lt;|-- Error
+%% === Unchecked Exceptions
+Exception &lt;|-- RuntimeException
+RuntimeException &lt;|-- NullPointerException
+RuntimeException &lt;|-- IllegalArgumentException
+RuntimeException &lt;|-- ArithmeticException
+RuntimeException &lt;|-- IllegalStateException
+RuntimeException &lt;|-- UnsupportedOperationException
+%% === Checked Exceptions
+Exception ..> IOException : checked
+Exception ..> SQLException : checked
+IOException ..> FileNotFoundException : checked
+%% === Errors
+Error &lt;|-- OutOfMemoryError
+Error &lt;|-- StackOverflowError
+Error &lt;|-- LinkageError
+Error &lt;|-- VirtualMachineError
+&lt;/pre>
+&lt;/div>
+&lt;h3 id="checked-exception">Checked Exception
+&lt;/h3>&lt;ul>
+&lt;li>&lt;code>RuntimeException&lt;/code>을 상속하지 않는 예외&lt;/li>
+&lt;li>컴파일 시점에 강제적으로 처리 필요(&lt;code>try/catch&lt;/code> 또는 &lt;code>throws&lt;/code>)&lt;/li>
+&lt;li>복구 가능성이 있는 외부 자원 오류 등&lt;/li>
+&lt;/ul>
+&lt;h4 id="예시-코드">예시 코드
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">java.io.*&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">java.util.*&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">CheckedExceptionExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Scanner&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">scanner&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Scanner&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">File&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;example.txt&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">while&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scanner&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">hasNextLine&lt;/span>&lt;span class="p">())&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scanner&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">nextLine&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">scanner&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">close&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">FileNotFoundException&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;파일을 찾을 수 없습니다: &amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getMessage&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="unchecked-exception">Unchecked Exception
+&lt;/h3>&lt;ul>
+&lt;li>&lt;code>RuntimeException&lt;/code> 또는 그 하위 클래스&lt;/li>
+&lt;li>컴파일러 검사 없음, 개발자 의도에 따라 예외 처리 선택&lt;/li>
+&lt;li>대부분 개발자의 실수 또는 버그로 발생&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">UncheckedExceptionExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">numbers&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">3&lt;/span>&lt;span class="p">};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">10&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">numbers&lt;/span>&lt;span class="o">[&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="o">]&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ArrayIndexOutOfBoundsException&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;잘못된 인덱스 접근: &amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getMessage&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="언제-어떤-예외를-사용할까">언제 어떤 예외를 사용할까?
+&lt;/h3>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Effective Java &amp;gt; Item 70&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>복구 가능한 경우에만 Checked Exception을 사용하고 그렇지 않다면 RuntimeException을 사용하라.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>상황&lt;/th>
+&lt;th>추천 예외&lt;/th>
+&lt;th>이유&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>복구 가능한 외부 리소스 오류&lt;/td>
+&lt;td>Checked&lt;/td>
+&lt;td>IO, DB 등은 사용자 안내 및 재시도 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>프로그래머 실수나 버그&lt;/td>
+&lt;td>Unchecked&lt;/td>
+&lt;td>NPE, IllegalArgument 등 빠른 실패 유도&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>공통된 예외 추상화&lt;/td>
+&lt;td>Custom Unchecked&lt;/td>
+&lt;td>도메인 중심 예외 설계에 유리&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="예외-처리의-진화-흐름-요약">예외 처리의 진화 흐름 요약
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>시대/환경&lt;/th>
+&lt;th>트렌드&lt;/th>
+&lt;th>주요 배경 및 이유&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>초기 Java (JDK 1.0~1.4)&lt;/strong>&lt;/td>
+&lt;td>Checked 중심 설계&lt;/td>
+&lt;td>- 강력한 컴파일 타임 검사&lt;br>- API 사용자의 실수 방지&lt;br>- &amp;ldquo;복구 가능한 예외는 명시적으로 처리하라&amp;quot;는 철학&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>현업 개발자들의 반발 증가 (2000년대 중반)&lt;/strong>&lt;/td>
+&lt;td>Checked 회의론&lt;/td>
+&lt;td>- 반복적인 &lt;code>throws&lt;/code> 선언으로 &lt;strong>코드 노이즈 증가&lt;/strong>&lt;br>- 예외 처리 로직이 무분별해짐&lt;br>- 대부분의 클라이언트가 catch 후 무시하거나 로그만 남김&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Effective Java (2008~2018)&lt;/strong>&lt;/td>
+&lt;td>선택적 사용 권장&lt;/td>
+&lt;td>- Joshua Bloch: &amp;ldquo;복구 가능한 경우에만 Checked 사용하라&amp;rdquo;&lt;br>- &lt;code>RuntimeException&lt;/code> 기반 설계 권장&lt;br>- 예외는 &lt;strong>API 설계의 계약&lt;/strong>이므로 의미 있게 사용 권장&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Spring Framework 대중화 (2005~현재)&lt;/strong>&lt;/td>
+&lt;td>Unchecked 기반 설계&lt;/td>
+&lt;td>- 대부분의 Spring 예외는 &lt;code>RuntimeException&lt;/code> 기반&lt;br>- 선언적 트랜잭션, AOP 등과 결합해 Checked 예외가 불편함&lt;br>- 개발자에게 &lt;strong>선택적 예외 처리 자유&lt;/strong>를 부여&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>모던 자바 개발 &amp;amp; DDD 확산 (2010s~)&lt;/strong>&lt;/td>
+&lt;td>도메인 기반 Unchecked 전략&lt;/td>
+&lt;td>- 예외는 “도메인 규칙 위반”을 표현&lt;br>- 예외를 catch하지 말고 &lt;strong>전파 후 해석&lt;/strong>하는 방식 선호&lt;br>- API, 도메인, 인프라 계층별로 예외 책임 분리&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>지금의 흐름 (2020s~)&lt;/strong>&lt;/td>
+&lt;td>명확한 계층 전략 + RuntimeException 기반 커스터마이징&lt;/td>
+&lt;td>- 예외를 try-catch로 무조건 처리하는 시대는 끝남&lt;br>- Unchecked 중심이지만 무분별하지 않게 도메인화&lt;br>- 예외 메시지는 로깅, 사용자 응답, 추적 가능성까지 고려&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="예외를-설계-관점에서-본다는-것">예외를 설계 관점에서 본다는 것
+&lt;/h3>
+&lt;div class="admonition note">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">&lt;path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 125.7-86.8 86.8c-10.3 10.3-17.5 23.1-21 37.2l-18.7 74.9c-2.3 9.2-1.8 18.8 1.3 27.5L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128zM549.8 235.7l14.4 14.4c15.6 15.6 15.6 40.9 0 56.6l-29.4 29.4-71-71 29.4-29.4c15.6-15.6 40.9-15.6 56.6 0zM311.9 417L441.1 287.8l71 71L382.9 487.9c-4.1 4.1-9.2 7-14.9 8.4l-60.1 15c-5.5 1.4-11.2-.2-15.2-4.2s-5.6-9.7-4.2-15.2l15-60.1c1.4-5.6 4.3-10.8 8.4-14.9z"/>&lt;/svg>
+&lt;span>예외는 &amp;ldquo;실행 흐름의 탈출권&amp;quot;이다.&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;ul>
+&lt;li>예외는 단순한 코드 에러가 아니라 소프트웨어의 책임 구조를 드러내는 설계 도구다.&lt;/li>
+&lt;li>예외를 어디서 발생시키고 어디서 잡을지는 팀의 기술 철학과 도메인 전략이 반영되어야 한다.&lt;/li>
+&lt;li>결국 예외는 도메인의 경계를 지키는 마지막 방패 역할을 해야 한다.&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/div>&lt;p>누가, 언제, 어떤 책임을 갖고 이 탈출권을 행사해야 할까?&lt;/p>
+&lt;ul>
+&lt;li>사용자 입력 오류가 발생했을 때?&lt;/li>
+&lt;li>DB 연결 실패가 발생했을 때?&lt;/li>
+&lt;li>도메인 규칙을 어겼을 때?&lt;/li>
+&lt;/ul>
+&lt;p>&lt;del>···사람들에게서 잊혀졌을 때다···!!!&lt;/del>&lt;/p>
+&lt;p>모든 예외를 try-catch로 처리할 수도 있지만 그건 제어 흐름의 책임을 흐트러뜨리고 도메인의 진실을 숨기는 위험한 선택일 수 있다.&lt;/p>
+&lt;h4 id="예외-설계의-3요소">예외 설계의 3요소
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>요소&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;th>책임 주체&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>예외 발생 (throw)&lt;/strong>&lt;/td>
+&lt;td>어디에서, 어떤 상황에서 예외를 발생시킬 것인가&lt;/td>
+&lt;td>도메인, 인프라 계층&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>예외 전파 (throws)&lt;/strong>&lt;/td>
+&lt;td>예외를 호출자에게 넘길 것인가, wrapping할 것인가&lt;/td>
+&lt;td>서비스 계층&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>예외 처리 (catch)&lt;/strong>&lt;/td>
+&lt;td>예외를 어디에서 처리하고 사용자에게 어떤 메시지를 줄 것인가&lt;/td>
+&lt;td>API 계층 (Controller, Filter)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="예외는-무조건-처리하는-것이-아니라-올바른-계층에서-해석하는-것">예외는 무조건 처리하는 것이 아니라 올바른 계층에서 해석하는 것
+&lt;/h4>&lt;p>예외를 너무 빨리 처리해버리면 문제를 숨기게 된다.&lt;/p>
+&lt;ul>
+&lt;li>예시 코드
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">orderService&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">placeOrder&lt;/span>&lt;span class="p">(...);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">warn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;에러 발생&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 그리고 그냥 끗-⭐.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;p>이렇게 하면 실제로 어떤 문제가 발생했는지 알 수 없고 서비스 로직에서의 책임 분리가 흐려진다.
+반대로 모든 예외를 끝까지 전파하면 Controller, API 계층이 도메인의 모든 세부사항을 알아야 한다.&lt;/p>
+&lt;h4 id="좋은-예외-설계의-기준">좋은 예외 설계의 기준
+&lt;/h4>&lt;ol>
+&lt;li>도메인 계층에서는 의미 있는 커스텀 예외를 발생 시킨다.
+&lt;ul>
+&lt;li>예: &lt;code>InsufficientBalanceException&lt;/code>, &lt;code>InvalidCouponException&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>서비스 계층에서는 예외를 변환하거나 해석하지 않는다.
+&lt;ul>
+&lt;li>가능한 한 도메인 예외 그대로 전파 (또는 기술 예외를 도메인 예외로 래핑)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>컨트롤러/외부 인터페이스 계층에서 예외를 해석하고 사용자 메시지로 변환한다.
+&lt;ul>
+&lt;li>예: &lt;code>@ControllerAdvice&lt;/code>, &lt;code>@ExceptionHandler&lt;/code>, HTTP 상태 코드 매핑&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Java의 상속 구조 (&lt;code>Object&lt;/code>, &lt;code>Throwable&lt;/code>, &lt;code>Exception&lt;/code>)&lt;/li>
+&lt;li>try-catch-finally 구문 이해&lt;/li>
+&lt;li>&lt;code>throws&lt;/code>와 &lt;code>throw&lt;/code>의 차이&lt;/li>
+&lt;li>Java의 기본 예외 클래스 예시 (&lt;code>NullPointerException&lt;/code>, &lt;code>IOException&lt;/code> 등)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>Effective Java &amp;gt; Item 69~77: 예외 처리의 정석&lt;/li>
+&lt;li>Spring의 전역 예외 처리 방식: &lt;code>@ControllerAdvice&lt;/code>, &lt;code>@ExceptionHandler&lt;/code>&lt;/li>
+&lt;li>도메인 기반 예외 설계: &lt;code>BusinessException&lt;/code>, &lt;code>ValidationException&lt;/code>, &lt;code>PolicyViolationException&lt;/code>&lt;/li>
+&lt;li>DDD에서의 예외 처리 전략: 도메인 규칙 위반 표현, 계층 간 책임 분리&lt;/li>
+&lt;li>Exception vs Error: JVM에서의 메모리 관리와 예외 차이&lt;/li>
+&lt;li>로깅과 예외: &lt;code>log.warn&lt;/code>, &lt;code>log.error&lt;/code> 언제 쓰고, StackTrace는 어떻게 다룰 것인가&lt;/li>
+&lt;/ul>
+&lt;h3 id="참고-자료">참고 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://f-lab.kr/insight/java-exception-handling-evolution?gad_source=1&amp;amp;gad_campaignid=22368870602&amp;amp;gbraid=0AAAAACGgUFfN4ag4oS6KPd4XXwILthRon&amp;amp;gclid=CjwKCAjw56DBBhAkEiwAaFsG-gWjJJHmGm9P8UWourw-QNkxw5y5V-FkZftBiULc0i1Ta95GJRTaIxoCj_MQAvD_BwE" target="_blank" rel="noopener"
+>자바 예외 처리의 진화: Checked Exception에서 Unchecked Exception으로&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://seungjjun.tistory.com/250" target="_blank" rel="noopener"
+>[Java] Checked Exception과 Unchecked Exception&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
