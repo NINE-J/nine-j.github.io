@@ -1,0 +1,7 @@
+<!-- Load JS file if there is a meraid code block within the document  -->
+{{ if .Store.Get "hasMermaid" }}
+  <script src="https://cdn.jsdelivr.net/npm/d3@latest/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  {{ $renderMermaidWithZoom := resources.Get "js/render-mermaid-with-zoom.js" | js.Build | fingerprint }}
+  <script src="{{ $renderMermaidWithZoom.RelPermalink }}"></script>
+{{ end }}
