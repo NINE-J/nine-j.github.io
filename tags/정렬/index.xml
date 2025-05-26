@@ -1,0 +1,1599 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>정렬 on B9F1</title><link>https://b9f1.com/tags/%EC%A0%95%EB%A0%AC/</link><description>Recent content in 정렬 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 22 Feb 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EC%A0%95%EB%A0%AC/index.xml" rel="self" type="application/rss+xml"/><item><title>알고리즘과 자료구조: 고급 정렬</title><link>https://b9f1.com/p/2025-02-22-algorithms-and-data-structure-sorting-advanced/</link><pubDate>Sat, 22 Feb 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-02-22-algorithms-and-data-structure-sorting-advanced/</guid><description>&lt;img src="https://b9f1.com/p/2025-02-22-algorithms-and-data-structure-sorting-advanced/cover.png" alt="Featured image of post 알고리즘과 자료구조: 고급 정렬" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>고급 정렬 알고리즘을 이해하고, 더 복잡한 정렬 방식과 응용을 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>Counting Sort&lt;/code>, &lt;code>Radix Sort&lt;/code>, &lt;code>Tim Sort&lt;/code> 같은 고급 정렬 알고리즘은 특정한 상황에서 매우 효율적이며, 실무에서도 활용되는 경우가 많다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="계수-정렬counting-sort">계수 정렬(Counting Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n + k) (k는 최대값)&lt;/p>&lt;/blockquote>
+&lt;p>데이터의 크기를 기반으로 개수를 세어 정렬하는 알고리즘으로, 숫자의 범위가 제한적일 때 매우 효율적이다.&lt;/p>
+&lt;h4 id="pseudo-code">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">CountingSort(A, k):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> C = array of size k+1 initialized to 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B = array of size length(A)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 0 to length(A) - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> C[A[i]] += 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 1 to k:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> C[i] += C[i - 1]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from length(A) - 1 down to 0:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> B[C[A[i]] - 1] = A[i]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> C[A[i]] -= 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return B
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">countingSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">k&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">C&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">k&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">fill&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">B&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">C&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]]&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="nx">k&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">C&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">C&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">B&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">C&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">C&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]]&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">B&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="기수-정렬radix-sort">기수 정렬(Radix Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(nk) (k는 자릿수)&lt;/p>&lt;/blockquote>
+&lt;p>자릿수를 기준으로 정렬을 반복하여 전체 배열을 정렬하는 알고리즘이다.&lt;/p>
+&lt;h4 id="pseudo-code-1">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">RadixSort(A, d):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 0 to d - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A = StableCountingSort(A, i)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return A
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code-1">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">radixSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">maxNum&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">max&lt;/span>&lt;span class="p">(...&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">toString&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">divisor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">maxNum&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">buckets&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nb">Array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)].&lt;/span>&lt;span class="nx">map&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">[]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">num&lt;/span> &lt;span class="k">of&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nx">buckets&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">floor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">num&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="nx">divisor&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">%&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">].&lt;/span>&lt;span class="nx">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">num&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[].&lt;/span>&lt;span class="nx">concat&lt;/span>&lt;span class="p">(...&lt;/span>&lt;span class="nx">buckets&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">divisor&lt;/span> &lt;span class="o">*=&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="팀-정렬tim-sort">팀 정렬(Tim Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: 최악 O(n log n), 평균 O(n log n)&lt;/p>&lt;/blockquote>
+&lt;p>합병 정렬과 삽입 정렬을 조합하여 최적의 성능을 보장하는 정렬 알고리즘이다.&lt;/p>
+&lt;h4 id="pseudo-code-2">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">TimSort(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for each run in A:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sort run using InsertionSort
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> merge sorted runs using MergeSort
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code-2">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">timSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">const&lt;/span> &lt;span class="nx">RUN&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">32&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">function&lt;/span> &lt;span class="nx">insertionSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">temp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="nx">temp&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">j&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">temp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">RUN&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">insertionSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">min&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">RUN&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">RUN&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">size&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">size&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">mid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">size&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">min&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">size&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">merge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">mid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">size&lt;/span> &lt;span class="o">*=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="pseudo-code-3">Pseudo Code
+&lt;/h3>&lt;p>&lt;code>Pseudo Code&lt;/code>는 실제 프로그래밍 언어의 구문과 유사하지만, 특정 프로그래밍 언어의 문법에 얽매이지 않고 알고리즘의 논리적인 흐름을 설명하는 데 사용되는 간단한 서술 형태다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>언어 독립성&lt;/strong>: 특정 프로그래밍 언어의 문법을 따르지 않으며, 누구나 쉽게 읽고 이해할 수 있다.&lt;/li>
+&lt;li>&lt;strong>간결함&lt;/strong>: 복잡한 문법 요소를 생략하고 핵심 알고리즘 로직만을 표현한다.&lt;/li>
+&lt;li>&lt;strong>가독성&lt;/strong>: 사람이 읽기 쉽게 작성되어, 알고리즘의 흐름과 동작을 쉽게 파악할 수 있다.&lt;/li>
+&lt;/ol></description></item><item><title>알고리즘과 자료구조: 중급 정렬</title><link>https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/</link><pubDate>Mon, 10 Feb 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/</guid><description>&lt;img src="https://b9f1.com/p/2025-02-10-algorithms-and-data-structure-sorting-intermediate/cover.png" alt="Featured image of post 알고리즘과 자료구조: 중급 정렬" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>더 효율적인 정렬 알고리즘을 이해하기 위해 중급 정렬 알고리즘을 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>Heap Sort&lt;/code>, &lt;code>Merge Sort&lt;/code>, &lt;code>Quick Sort&lt;/code> 같은 중급 정렬 알고리즘은 실무에서도 많이 사용되며, 고급 정렬 알고리즘을 이해하는 데 중요한 개념을 제공한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="병합-정렬merge-sort">병합 정렬(Merge Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n log n)&lt;/p>&lt;/blockquote>
+&lt;p>분할 정복(Divide and Conquer) 방식을 사용하여 배열을 반씩 나누고 병합하며 정렬하는 알고리즘이다.&lt;/p>
+&lt;h4 id="특징">특징
+&lt;/h4>&lt;ul>
+&lt;li>안정적인 정렬 (Stable Sort) → 동일한 값의 상대적 순서 유지&lt;/li>
+&lt;li>외부 정렬(External Sort)에 적합하다. 디스크나 네트워크에서 데이터를 읽으며 정렬 가능하다.&lt;/li>
+&lt;li>데이터가 이미 정렬된 경우에도 성능을 유지한다.&lt;/li>
+&lt;li>연결 리스트(Linked List) 정렬에 유리하다. 연속된 메모리 공간을 필요로 하지 않는다.&lt;/li>
+&lt;/ul>
+&lt;h4 id="실무-사용-예시">실무 사용 예시
+&lt;/h4>&lt;ul>
+&lt;li>안정성이 중요한 경우에 사용한다.
+&lt;ul>
+&lt;li>데이터베이스에서 인덱스 정렬 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>대용량 데이터 정렬.
+&lt;ul>
+&lt;li>외부 정렬 알고리즘에서 많이 사용한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>연결 리스트 정렬
+&lt;ul>
+&lt;li>배열보다 메모리 재배열이 어려운 경우&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="pseudo-code">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Merge(left, right):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> result = empty array
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> i = 0, j = 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> while i &amp;lt; length(left) and j &amp;lt; length(right):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if left[i] &amp;lt; right[j]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> append left[i] to result
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> increment i
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> else:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> append right[j] to result
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> increment j
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> append remaining elements of left to result (if any)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> append remaining elements of right to result (if any)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return result
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MergeSort(A, left, right):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if left &amp;lt; right:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mid = (left + right) / 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MergeSort(A, left, mid)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MergeSort(A, mid + 1, right)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Merge(A, left, mid, right)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">merge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="kd">let&lt;/span> &lt;span class="nx">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">left&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">right&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">      &lt;span class="nx">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">  &lt;span class="k">return&lt;/span> &lt;span class="nx">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">concat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">mergeSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">mid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">floor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">mergeSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">mid&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">mergeSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">mid&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">merge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="퀵-정렬quick-sort">퀵 정렬(Quick Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: 평균 O(n log n), 최악 O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>피벗(Pivot)을 기준으로 작은 값과 큰 값으로 나누어 정렬하는 알고리즘이다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>QuickSort&lt;/code> 함수는 배열을 재귀적으로 나누어 정렬한다.&lt;/li>
+&lt;li>&lt;code>Partition&lt;/code> 함수는 &lt;code>pivot&lt;/code>을 기준으로 배열을 두 두분으로 분할하는 과정이다.
+&lt;ul>
+&lt;li>&lt;code>pivot&lt;/code>보다 작은 값들은 왼쪽, 큰 값들은 오른쪽으로 이동시킨 후 새로운 &lt;code>pivot&lt;/code>을 반환한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="특징-1">특징
+&lt;/h4>&lt;ul>
+&lt;li>비교 기반 정렬 중 가장 빠른 평균 속도&lt;/li>
+&lt;li>추가적인 메모리가 거의 필요 없다.&lt;/li>
+&lt;li>데이터가 랜덤하게 분포되어 있을 때 성능이 뛰어나다&lt;/li>
+&lt;li>병합 정렬보다 캐시 친화적이다.&lt;/li>
+&lt;/ul>
+&lt;h4 id="실무-사용-예시-1">실무 사용 예시
+&lt;/h4>&lt;ul>
+&lt;li>대용량 데이터 정렬&lt;/li>
+&lt;li>일반적인 데이터 정렬 (데이터가 랜덤 분포일 경우)&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>정렬된 배열을 받는 경우 최악의 성능을 자랑한다. 최악의 케이스를 모두 피할 순 없지만, &lt;code>pivot&lt;/code>을 작은 값 또는 큰 값이 아닌 중간 값 또는 랜덤 선택 등으로 지정하는 방법을 사용해볼 수 있다.
+{: .prompt-warning }&lt;/p>&lt;/blockquote>
+&lt;h4 id="pseudo-code-1">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Partition(A, low, high):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pivot = A[high]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> i = low - 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for j = low to high - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if A[j] &amp;lt; pivot:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> i += 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> swap(A[i], A[j])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> swap(A[i + 1], A[high])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return i + 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">QuickSort(A, low, high):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if low &amp;lt; high:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pivotIndex = Partition(A, low, high)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> QuickSort(A, low, pivotIndex - 1)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> QuickSort(A, pivotIndex + 1, high)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code-1">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">low&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">high&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">pivot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">high&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">low&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">low&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">high&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">pivot&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">high&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">high&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">pivotIndex&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>&lt;span class="nx">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">pivotIndex&lt;/span>&lt;span class="p">)),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">pivotIndex&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>&lt;span class="nx">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">pivotIndex&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="힙-정렬heap-sort">힙 정렬(Heap Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n log n)&lt;/p>&lt;/blockquote>
+&lt;p>힙(Heap) 자료구조를 활용하여 최댓값 또는 최솟값을 빠르게 찾는 방식으로 정렬하는 알고리즘이다.&lt;/p>
+&lt;h4 id="특징-2">특징
+&lt;/h4>&lt;ul>
+&lt;li>최악의 경우에도 동일한 시간 복잡도를 보장한다.&lt;/li>
+&lt;li>추가적인 메모리 사용이 거의 없다.&lt;/li>
+&lt;li>우선순위 큐에서 응용 가능하다.&lt;/li>
+&lt;/ul>
+&lt;h4 id="실무-사용-예시-2">실무 사용 예시
+&lt;/h4>&lt;ul>
+&lt;li>우선순위 큐 기반의 정렬
+&lt;ul>
+&lt;li>최소/최대 힙을 이용한 정렬&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>실시간 데이터 스트림 정렬
+&lt;ul>
+&lt;li>항상 정렬된 상태를 유지해야 하는 경우&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>메모리 사용을 최소화해야 하는 정렬&lt;/li>
+&lt;/ul>
+&lt;h4 id="pseudo-code-2">Pseudo Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">HEAP_SORT_ASCENDING(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> BUILD_MAX_HEAP(A)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FOR i FROM length(A) - 1 DOWNTO 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SWAP(A[0], A[i])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MAX_HEAPIFY(A, 0, i)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RETURN A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">BUILD_MAX_HEAP(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FOR i FROM FLOOR(length(A) / 2) - 1 DOWNTO 0:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MAX_HEAPIFY(A, i, length(A))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MAX_HEAPIFY(A, i, heapSize):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> largest ← i
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> left ← 2 * i + 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> right ← 2 * i + 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF left &amp;lt; heapSize AND A[left] &amp;gt; A[largest]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> largest ← left
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF right &amp;lt; heapSize AND A[right] &amp;gt; A[largest]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> largest ← right
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF largest ≠ i:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SWAP(A[i], A[largest])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MAX_HEAPIFY(A, largest, heapSize)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">HEAP_SORT_DESCENDING(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> BUILD_MIN_HEAP(A)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FOR i FROM length(A) - 1 DOWNTO 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SWAP(A[0], A[i])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MIN_HEAPIFY(A, 0, i)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> RETURN A
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">BUILD_MIN_HEAP(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FOR i FROM FLOOR(length(A) / 2) - 1 DOWNTO 0:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MIN_HEAPIFY(A, i, length(A))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MIN_HEAPIFY(A, i, heapSize):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> smallest ← i
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> left ← 2 * i + 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> right ← 2 * i + 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF left &amp;lt; heapSize AND A[left] &amp;lt; A[smallest]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> smallest ← left
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF right &amp;lt; heapSize AND A[right] &amp;lt; A[smallest]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> smallest ← right
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> IF smallest ≠ i:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SWAP(A[i], A[smallest])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MIN_HEAPIFY(A, smallest, heapSize)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="javascript-code-2">JavaScript Code
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;span class="lnt">69
+&lt;/span>&lt;span class="lnt">70
+&lt;/span>&lt;span class="lnt">71
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">heapSortAscending&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">buildMaxHeap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">maxHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">heapSortDescending&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">buildMinHeap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">minHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">buildMaxHeap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">floor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">heapSize&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">maxHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">buildMinHeap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">Math&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">floor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">heapSize&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">minHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">maxHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">largest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">largest&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">largest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">left&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">right&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">right&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">largest&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">largest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">largest&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">largest&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">largest&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">maxHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">largest&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">minHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">smallest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">left&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">left&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">left&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">smallest&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">smallest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">left&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">right&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">heapSize&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">right&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">smallest&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">smallest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">right&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">smallest&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">smallest&lt;/span>&lt;span class="p">]]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">smallest&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">minHeapify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">smallest&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">heapSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="적절한-사용-전략">📌적절한 사용 전략
+&lt;/h2>&lt;ul>
+&lt;li>빠른 정렬이 필요하면? → 퀵 정렬 (일반적인 경우)&lt;/li>
+&lt;li>안정적인 정렬이 필요하면? → 병합 정렬 (데이터 정렬 순서를 유지해야 할 때)&lt;/li>
+&lt;li>메모리를 절약하면서 안정적인 성능을 원하면? → 힙 정렬&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>정렬 알고리즘&lt;/th>
+&lt;th>평균 시간 복잡도&lt;/th>
+&lt;th>최악 시간 복잡도&lt;/th>
+&lt;th>공간 복잡도&lt;/th>
+&lt;th>안정성&lt;/th>
+&lt;th>특징 및 사용 사례&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>퀵 정렬 (Quick Sort)&lt;/td>
+&lt;td>O(nlogn)&lt;/td>
+&lt;td>O(n2)&lt;/td>
+&lt;td>O(logn)&lt;/td>
+&lt;td>❌&lt;/td>
+&lt;td>가장 빠른 평균 속도, 제자리 정렬, 랜덤 데이터 정렬&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>병합 정렬 (Merge Sort)&lt;/td>
+&lt;td>O(nlogn)&lt;/td>
+&lt;td>O(nlogn)&lt;/td>
+&lt;td>O(n)&lt;/td>
+&lt;td>✅&lt;/td>
+&lt;td>안정적 정렬, 외부 정렬 및 연결 리스트 정렬&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>힙 정렬 (Heap Sort)&lt;/td>
+&lt;td>O(nlogn)&lt;/td>
+&lt;td>O(nlogn)&lt;/td>
+&lt;td>O(1)&lt;/td>
+&lt;td>❌&lt;/td>
+&lt;td>우선순위 큐 기반 정렬, 메모리 절약 필요 시&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="pseudo-code-3">Pseudo Code
+&lt;/h3>&lt;p>&lt;code>Pseudo Code&lt;/code>는 실제 프로그래밍 언어의 구문과 유사하지만, 특정 프로그래밍 언어의 문법에 얽매이지 않고 알고리즘의 논리적인 흐름을 설명하는 데 사용되는 간단한 서술 형태다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>언어 독립성&lt;/strong>: 특정 프로그래밍 언어의 문법을 따르지 않으며, 누구나 쉽게 읽고 이해할 수 있다.&lt;/li>
+&lt;li>&lt;strong>간결함&lt;/strong>: 복잡한 문법 요소를 생략하고 핵심 알고리즘 로직만을 표현한다.&lt;/li>
+&lt;li>&lt;strong>가독성&lt;/strong>: 사람이 읽기 쉽게 작성되어, 알고리즘의 흐름과 동작을 쉽게 파악할 수 있다.&lt;/li>
+&lt;/ol></description></item><item><title>알고리즘과 자료구조: 기초 정렬</title><link>https://b9f1.com/p/2025-02-09-algorithms-and-data-structure-sorting-basic/</link><pubDate>Sun, 09 Feb 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-02-09-algorithms-and-data-structure-sorting-basic/</guid><description>&lt;img src="https://b9f1.com/p/2025-02-09-algorithms-and-data-structure-sorting-basic/cover.png" alt="Featured image of post 알고리즘과 자료구조: 기초 정렬" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>알고리즘과 자료구조의 기본 원리를 이해하기 위한 정렬의 기초를 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>Bubble Sort&lt;/code>, &lt;code>Selection Sort&lt;/code>, &lt;code>Insertion Sort&lt;/code> 같은 기초적인 정렬 알고리즘은 실제로 실무에서 거의 쓰이지 않지만, 더 효율적인 정렬 알고리즘을 이해하기 위한 기초 개념으로 중요한 역할을 한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="버블-정렬bubble-sort">버블 정렬(Bubble Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>인접한 요소들을 비교하여 정렬하는 알고리즘으로, 반복문을 통해 정렬이 완료될 때까지 계속 비교 및 교환한다.&lt;/p>
+&lt;h4 id="pseudo-code">Pseudo Code
+&lt;/h4>&lt;p>구현에 앞서 &lt;code>Pseudo Code&lt;/code>를 작성해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">BubbleSort(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 0 to length(A) - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for j from 0 to length(A) - i - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if A[j] &amp;gt; A[j + 1]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> swap(A[j], A[j + 1])
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>&lt;code>BubbleSort(A)&lt;/code>
+&lt;ul>
+&lt;li>정렬할 배열 &lt;code>A&lt;/code>를 인자로 받는 함수.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>for i from 0 to length(A) - 1&lt;/code>
+&lt;ul>
+&lt;li>바깥쪽 반복문은 배열 전체를 순회한다. &lt;code>i&lt;/code>는 0부터 배열의 길이-1까지 증가한다.&lt;/li>
+&lt;li>배열의 마지막 요소는 이미 정렬되었을 가능성이 높기 때문에, 매번 마지막 요소는 비교하지 않는다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>for j from 0 to length(A) - i - 1&lt;/code>
+&lt;ul>
+&lt;li>안쪽 반복문은 배열의 첫 번째 요소부터 배열의 마지막에서 &lt;code>i&lt;/code>번째 요소까지 순회한다.&lt;/li>
+&lt;li>&lt;code>i&lt;/code>가 증가할수록 비교해야 할 범위가 줄어든다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>if A[j] &amp;gt; A[j + 1]&lt;/code>
+&lt;ul>
+&lt;li>현재 요소 &lt;code>A[j]&lt;/code>가 다음 요소 &lt;code>A[j + 1]&lt;/code>보다 큰지 확인한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>swap(A[j], A[j + 1])&lt;/code>
+&lt;ul>
+&lt;li>만약 현재 요소가 다음 요소보다 크다면, 두 요소의 위치를 교환(swap)한다.&lt;/li>
+&lt;li>이 과정을 통해 큰 값이 점점 배열의 끝으로 이동하게 된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="javascript-code">JavaScript Code
+&lt;/h4>&lt;p>정렬할 배열: [5, 3, 8, 4, 2]&lt;/p>
+&lt;ul>
+&lt;li>1회차: [3, 5, 4, 2, 8]&lt;/li>
+&lt;li>2회차: [3, 4, 2, 5, 8]&lt;/li>
+&lt;li>3회차: [3, 2, 4, 5, 8]&lt;/li>
+&lt;li>4회차: [2, 3, 4, 5, 8]&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">bubbleSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// A[j]과 A[j + 1]의 위치를 변경한다.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kd">let&lt;/span> &lt;span class="nx">temp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">temp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="선택-정렬selection-sort">선택 정렬(Selection Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>매번 최솟값을 찾아서 정렬되지 않은 부분의 첫 번째 요소와 교환하는 알고리즘이다.&lt;/p>
+&lt;h4 id="pseudo-code-1">Pseudo Code
+&lt;/h4>&lt;p>구현에 앞서 &lt;code>Pseudo Code&lt;/code>를 작성해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">SelectionSort(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 0 to length(A) - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> minIndex = i
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for j from i + 1 to length(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if A[j] &amp;lt; A[minIndex]:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> minIndex = j
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if minIndex != i:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> swap(A[i], A[minIndex])
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>&lt;code>SelectionSort(A)&lt;/code>
+&lt;ul>
+&lt;li>정렬할 배열 &lt;code>A&lt;/code>를 인자로 받는 함수.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>for i from 0 to length(A) - 1&lt;/code>
+&lt;ul>
+&lt;li>바깥쪽 반복문은 배열 전체를 순회한다. &lt;code>i&lt;/code>는 0부터 배열의 길이-1까지 증가한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>minIndex = i&lt;/code>
+&lt;ul>
+&lt;li>현재 반복의 시작 위치를 최솟값 인덱스로 설정한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>for j from i + 1 to length(A)&lt;/code>
+&lt;ul>
+&lt;li>안쪽 반복문은 현재 요소의 다음 요소부터 배열의 끝까지 순회한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>if A[j] &amp;lt; A[minIndex]&lt;/code>
+&lt;ul>
+&lt;li>현재 요소 &lt;code>A[j]&lt;/code>가 현재까지의 최솟값 &lt;code>A[minIndex]&lt;/code>보다 작은지 확인한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>minIndex = j&lt;/code>
+&lt;ul>
+&lt;li>만약 현재 요소가 최솟값보다 작다면, 최솟값 인덱스를 현재 요소의 인덱스로 업데이트한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>if minIndex != i&lt;/code>
+&lt;ul>
+&lt;li>최솟값 인덱스가 현재 반복의 시작 인덱스와 다르다면, 두 요소의 위치를 교환(swap)한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="javascript-code-1">JavaScript Code
+&lt;/h4>&lt;p>정렬할 배열: [5, 3, 8, 4, 2]&lt;/p>
+&lt;ul>
+&lt;li>1회차: [2, 3, 8, 4, 5]&lt;/li>
+&lt;li>2회차: [2, 3, 8, 4, 5]&lt;/li>
+&lt;li>3회차: [2, 3, 4, 8, 5]&lt;/li>
+&lt;li>4회차: [2, 3, 4, 5, 8]&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">selectionSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">minIndex&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">minIndex&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">minIndex&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">j&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">minIndex&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// A[i]과 A[minIndex]의 위치를 변경한다.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kd">let&lt;/span> &lt;span class="nx">temp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">minIndex&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">minIndex&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">temp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="삽입-정렬insertion-sort">삽입 정렬(Insertion Sort)
+&lt;/h3>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>정렬된 부분과 정렬되지 않은 부분을 나누고, 정렬되지 않은 부분의 요소를 적절한 위치에 삽입하여 정렬한다.&lt;/p>
+&lt;h4 id="pseudo-code-2">Pseudo Code
+&lt;/h4>&lt;p>구현에 앞서 &lt;code>Pseudo Code&lt;/code>를 작성해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">InsertionSort(A):
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for i from 1 to length(A) - 1:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> key = A[i]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> j = i - 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> while j &amp;gt;= 0 and A[j] &amp;gt; key:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A[j + 1] = A[j]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> j = j - 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> A[j + 1] = key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>&lt;code>InsertionSort(A)&lt;/code>
+&lt;ul>
+&lt;li>정렬할 배열 &lt;code>A&lt;/code>를 인자로 받는 함수.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>for i from 1 to length(A) - 1&lt;/code>
+&lt;ul>
+&lt;li>바깥쪽 반복문은 배열의 두 번째 요소부터 마지막 요소까지 순회한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>key = A[i]&lt;/code>
+&lt;ul>
+&lt;li>현재 요소를 &lt;code>key&lt;/code> 변수에 저장한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>j = i - 1&lt;/code>
+&lt;ul>
+&lt;li>현재 요소의 이전 요소 인덱스를 &lt;code>j&lt;/code>에 저장한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>while j &amp;gt;= 0 and A[j] &amp;gt; key&lt;/code>
+&lt;ul>
+&lt;li>현재 요소의 이전 요소들이 &lt;code>key&lt;/code>보다 큰 동안 반복한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>A[j + 1] = A[j]&lt;/code>
+&lt;ul>
+&lt;li>현재 요소를 한 칸 뒤로 이동시킨다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>j = j - 1&lt;/code>
+&lt;ul>
+&lt;li>인덱스를 한 칸 앞으로 이동시킨다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>A[j + 1] = key&lt;/code>
+&lt;ul>
+&lt;li>&lt;code>key&lt;/code>를 올바른 위치에 삽입한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="javascript-code-2">JavaScript Code
+&lt;/h4>&lt;p>정렬할 배열: [5, 3, 8, 4, 2]&lt;/p>
+&lt;ul>
+&lt;li>1회차: [3, 5, 8, 4, 2]&lt;/li>
+&lt;li>2회차: [3, 5, 8, 4, 2]&lt;/li>
+&lt;li>3회차: [3, 4, 5, 8, 2]&lt;/li>
+&lt;li>4회차: [2, 3, 4, 5, 8]&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">function&lt;/span> &lt;span class="nx">insertionSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">A&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="nx">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">key&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">let&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="nx">key&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">j&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">A&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">key&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nx">A&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="pseudo-code-3">Pseudo Code
+&lt;/h3>&lt;p>&lt;code>Pseudo Code&lt;/code>는 실제 프로그래밍 언어의 구문과 유사하지만, 특정 프로그래밍 언어의 문법에 얽매이지 않고 알고리즘의 논리적인 흐름을 설명하는 데 사용되는 간단한 서술 형태다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>언어 독립성&lt;/strong>: 특정 프로그래밍 언어의 문법을 따르지 않으며, 누구나 쉽게 읽고 이해할 수 있다.&lt;/li>
+&lt;li>&lt;strong>간결함&lt;/strong>: 복잡한 문법 요소를 생략하고 핵심 알고리즘 로직만을 표현한다.&lt;/li>
+&lt;li>&lt;strong>가독성&lt;/strong>: 사람이 읽기 쉽게 작성되어, 알고리즘의 흐름과 동작을 쉽게 파악할 수 있다.&lt;/li>
+&lt;/ol></description></item><item><title>알고리즘과 자료구조: 기본 개념 이해</title><link>https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/</link><pubDate>Fri, 31 Jan 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/</guid><description>&lt;img src="https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/cover.png" alt="Featured image of post 알고리즘과 자료구조: 기본 개념 이해" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>알고리즘과 자료구조의 기본 원리를 이해하고 간단한 문제를 해결할 수 있다.&lt;/p>
+&lt;h2 id="자료구조">📌자료구조
+&lt;/h2>&lt;h3 id="배열과-문자열">배열과 문자열
+&lt;/h3>&lt;h4 id="배열array">배열(Array)
+&lt;/h4>&lt;p>동일한 타입의 요소들이 연속적으로 배치된 자료구조다.
+인덱스를 통해 접근할 수 있으며, 고정된 크기를 갖는다.&lt;/p>
+&lt;ul>
+&lt;li>장점: 인덱스를 통해 빠르게 접근 가능 (O(1))&lt;/li>
+&lt;li>단점: 크기가 고정되어 있으며, 요소의 삽입 및 삭제가 비효율적일 수 있음 (O(n))&lt;/li>
+&lt;/ul>
+&lt;h4 id="문자열string">문자열(String)
+&lt;/h4>&lt;p>문자의 배열로, 문자열의 길이에 따라 크기가 동적으로 변할 수 있다.&lt;/p>
+&lt;ul>
+&lt;li>장점: 문자열 연산(비교, 연결 등)이 간편&lt;/li>
+&lt;li>단점: 문자열의 길이에 따라 연산 시간이 증가&lt;/li>
+&lt;/ul>
+&lt;h3 id="연결-리스트linked-list">연결 리스트(Linked List)
+&lt;/h3>&lt;p>각 요소가 노드로 구성되며, 각 노드는 데이터와 다음 노드를 가리키는 포인터를 포함한다.
+크기가 동적으로 변한다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>단일 연결 리스트(Singly Linked List)&lt;/strong>: 각 노드가 다음 노드를 가리킨다.&lt;/li>
+&lt;li>&lt;strong>이중 연결 리스트(Doubly Linked List)&lt;/strong>: 각 노드가 이전 노드와 다음 노드를 가리킨다.&lt;/li>
+&lt;li>장점: 크기가 동적으로 변하며, 요소의 삽입 및 삭제가 용이 (O(1))&lt;/li>
+&lt;li>단점: 인덱스를 통한 접근이 비효율적 (O(n))&lt;/li>
+&lt;/ul>
+&lt;h3 id="스택stack과-큐queue">스택(Stack)과 큐(Queue)
+&lt;/h3>&lt;h4 id="스택stack">스택(Stack)
+&lt;/h4>&lt;p>LIFO(Last In, First Out) 구조로, 마지막에 삽입된 요소가 가장 먼저 제거된다.&lt;/p>
+&lt;ul>
+&lt;li>주요 연산: 삽입(push), 삭제(pop), 조회(peek)&lt;/li>
+&lt;li>장점: 구현이 간단하고, 함수 호출 스택 등에서 유용&lt;/li>
+&lt;li>단점: 특정 요소 접근이 비효율적 (O(n))&lt;/li>
+&lt;/ul>
+&lt;h4 id="큐queue">큐(Queue)
+&lt;/h4>&lt;p>FIFO(First In, First Out) 구조로, 처음에 삽입된 요소가 가장 먼저 제거된다.&lt;/p>
+&lt;ul>
+&lt;li>주요 연산: 삽입(enqueue), 삭제(dequeue), 조회(front)&lt;/li>
+&lt;li>장점: 구현이 간단하고, 작업 대기열 등에서 유용&lt;/li>
+&lt;li>단점: 특정 요소 접근이 비효율적 (O(n))&lt;/li>
+&lt;/ul>
+&lt;h3 id="해시-테이블hash-table">해시 테이블(Hash Table)
+&lt;/h3>&lt;p>키-값 쌍을 저장하는 자료구조로, 해시 함수를 사용하여 키를 인덱스로 변환하여 값을 저장한다.&lt;/p>
+&lt;ul>
+&lt;li>장점: 평균적으로 빠른 접근, 삽입, 삭제 가능 (O(1))&lt;/li>
+&lt;li>단점: 해시 충돌 가능성, 해시 함수의 성능에 따라 성능 차이 발생&lt;/li>
+&lt;/ul>
+&lt;h2 id="알고리즘">📌알고리즘
+&lt;/h2>&lt;h3 id="빅오-표기법big-o-notation">빅오 표기법(Big-O Notation)
+&lt;/h3>&lt;p>&lt;img src="https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/image-1.png"
+width="800"
+height="567"
+srcset="https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/image-1_hu_fb93a4f2dcf0bc6e.png 480w, https://b9f1.com/p/2025-01-31-algorithms-and-data-structure-understanding-basic-concepts/image-1_hu_8f9099bf1e9bd03a.png 1024w"
+loading="lazy"
+alt="Big-O Notation"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="338px"
+>&lt;/p>
+&lt;p>&lt;a class="link" href="https://www.bigocheatsheet.com/" target="_blank" rel="noopener"
+>bigocheatsheet&lt;/a>&lt;/p>
+&lt;p>알고리즘의 시간 복잡도와 공간 복잡도를 나타내는 표기법으로, 입력 크기 n에 대한 연산 횟수나 메모리 사용량을 표현한다.&lt;/p>
+&lt;ul>
+&lt;li>O(1): 상수 시간, 입력 크기에 상관없이 일정한 시간 소요&lt;/li>
+&lt;li>O(n): 선형 시간, 입력 크기에 비례하여 시간 소요&lt;/li>
+&lt;li>O(log n): 로그 시간, 입력 크기의 로그에 비례하여 시간 소요&lt;/li>
+&lt;li>O(n^2): 이차 시간, 입력 크기의 제곱에 비례하여 시간 소요&lt;/li>
+&lt;/ul>
+&lt;h4 id="common-data-structure-operations">Common Data Structure Operations
+&lt;/h4>&lt;style>
+.big-o-table-wrap {
+overflow-x: auto;
+}
+#big-o-table {
+width: 100%;
+overflow-x: auto;
+}
+table#big-o-table {
+border-collapse: separate;
+border-spacing: 0;
+position: relative;
+z-index: 0;
+}
+#big-o-table > thead > tr:first-child th {
+border-top: 1px solid #ddd;
+}
+#big-o-table th,
+#big-o-table td {
+border-bottom: 1px solid #ddd;
+border-left: 1px solid #ddd;
+padding: 8px;
+text-align: center;
+min-width: 100px;
+white-space: nowrap;
+color: #333;
+}
+#big-o-table th:last-child,
+#big-o-table td:last-child {
+border-right: 1px solid #ddd;
+}
+#big-o-table th {
+background-color: #f2f2f2;
+position: sticky;
+top: 0;
+z-index: 2;
+}
+#big-o-table .sticky-left {
+position: sticky;
+left: 0;
+background-color: #1B1B1E;
+color: #fff;
+z-index: 3;
+}
+/* 강조 색상 - 배경색으로 표현 */
+#big-o-table .excellent {
+background-color: #53D000;
+}
+#big-o-table .fair {
+background-color: #FFFF00;
+}
+#big-o-table .good {
+background-color: #C8EA00;
+}
+#big-o-table .bad {
+background-color: #FFC543;
+}
+#big-o-table .horrible {
+background-color: #FF8989;
+}
+#big-o-table .gray {
+background-color: #E3E3E3;
+}
+&lt;/style>
+&lt;div class="big-o-table-wrap">
+&lt;table id="big-o-table">
+&lt;thead>
+&lt;tr>
+&lt;th rowspan="2" class="sticky-left">Data Structure&lt;/th>
+&lt;th colspan="4">Average Time Complexity&lt;/th>
+&lt;th colspan="4">Worst Time Complexity&lt;/th>
+&lt;th rowspan="2">Worst Space Complexity&lt;/th>
+&lt;/tr>
+&lt;tr>
+&lt;th>Access&lt;/th>
+&lt;th>Search&lt;/th>
+&lt;th>Insertion&lt;/th>
+&lt;th>Deletion&lt;/th>
+&lt;th>Access&lt;/th>
+&lt;th>Search&lt;/th>
+&lt;th>Insertion&lt;/th>
+&lt;th>Deletion&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td class="sticky-left">Array&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Stack&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Queue&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Singly Linked List&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Doubly Linked List&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="fair">Θ(n)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Skip List&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="bad">O(n log(n))&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Hash Table&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="excellent">Θ(1)&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Binary Search Tree&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Cartesian Tree&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">B-Tree&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">horrible-Black Tree&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Splay Tree&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="gray">N/A&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">AVL Tree&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="good">O(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">KD Tree&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="good">Θ(log(n))&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;/div>
+&lt;h4 id="array-sorting-algorithms">Array Sorting Algorithms
+&lt;/h4>&lt;div class="big-o-table-wrap">
+&lt;table id="big-o-table">
+&lt;thead>
+&lt;tr>
+&lt;th rowspan="2" class="sticky-left">Algorithm&lt;/th>
+&lt;th colspan="3">Time Complexity&lt;/th>
+&lt;th rowspan="2">Space Complexity (Worst)&lt;/th>
+&lt;/tr>
+&lt;tr>
+&lt;th>Best&lt;/th>
+&lt;th>Average&lt;/th>
+&lt;th>Worst&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td class="sticky-left">Quicksort&lt;/td>
+&lt;td class="bad">Ω(n log n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="good">O(log n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Merge Sort&lt;/td>
+&lt;td class="bad">Ω(n log n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="bad">O(n log n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Timsort&lt;/td>
+&lt;td class="fair">Ω(n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="bad">O(n log n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Heapsort&lt;/td>
+&lt;td class="bad">Ω(n log n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="bad">O(n log n)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Bubble Sort&lt;/td>
+&lt;td class="fair">Ω(n)&lt;/td>
+&lt;td class="horrible">Θ(n^2)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Insertion Sort&lt;/td>
+&lt;td class="fair">Ω(n)&lt;/td>
+&lt;td class="horrible">Θ(n^2)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Selection Sort&lt;/td>
+&lt;td class="horrible">Ω(n^2)&lt;/td>
+&lt;td class="horrible">Θ(n^2)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Tree Sort&lt;/td>
+&lt;td class="bad">Ω(n log n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Shell Sort&lt;/td>
+&lt;td class="bad">Ω(n log n)&lt;/td>
+&lt;td class="horrible">Θ(n(log n)²)&lt;/td>
+&lt;td class="horrible">O(n(log n)²)&lt;/td>
+&lt;td class="excellent">O(1)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Bucket Sort&lt;/td>
+&lt;td class="excellent">Ω(n + k)&lt;/td>
+&lt;td class="excellent">Θ(n + k)&lt;/td>
+&lt;td class="horrible">O(n^2)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Radix Sort&lt;/td>
+&lt;td class="excellent">Ω(nk)&lt;/td>
+&lt;td class="excellent">Θ(nk)&lt;/td>
+&lt;td class="excellent">O(nk)&lt;/td>
+&lt;td class="fair">O(n + k)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Counting Sort&lt;/td>
+&lt;td class="excellent">Ω(n + k)&lt;/td>
+&lt;td class="excellent">Θ(n + k)&lt;/td>
+&lt;td class="excellent">O(n + k)&lt;/td>
+&lt;td class="fair">O(k)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td class="sticky-left">Cubesort&lt;/td>
+&lt;td class="fair">Ω(n)&lt;/td>
+&lt;td class="bad">Θ(n log n)&lt;/td>
+&lt;td class="bad">O(n log n)&lt;/td>
+&lt;td class="fair">O(n)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;/div>
+&lt;h3 id="재귀recursion-기본">재귀(Recursion) 기본
+&lt;/h3>&lt;p>함수가 자기 자신을 호출하는 기법으로, 문제를 작은 하위 문제로 분할하여 해결한다.&lt;/p>
+&lt;ul>
+&lt;li>장점: 코드가 간결해지고, 특정 문제(예: 트리 탐색)에서 유용&lt;/li>
+&lt;li>단점: 호출 스택의 크기가 커질 수 있으며, 무한 재귀를 방지하기 위해 종료 조건 필요&lt;/li>
+&lt;/ul>
+&lt;h3 id="정렬-알고리즘">정렬 알고리즘
+&lt;/h3>&lt;h4 id="버블-정렬bubble-sort">버블 정렬(Bubble Sort)
+&lt;/h4>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>인접한 요소들을 비교하여 정렬하는 알고리즘으로, 반복문을 통해 정렬이 완료될 때까지 계속 비교 및 교환한다.&lt;/p>
+&lt;h4 id="선택-정렬selection-sort">선택 정렬(Selection Sort)
+&lt;/h4>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>매번 최솟값을 찾아서 정렬되지 않은 부분의 첫 번째 요소와 교환하는 알고리즘이다.&lt;/p>
+&lt;h4 id="삽입-정렬insertion-sort">삽입 정렬(Insertion Sort)
+&lt;/h4>&lt;blockquote>
+&lt;p>시간 복잡도: O(n^2)&lt;/p>&lt;/blockquote>
+&lt;p>정렬된 부분과 정렬되지 않은 부분을 나누고, 정렬되지 않은 부분의 요소를 적절한 위치에 삽입하여 정렬한다.&lt;/p></description></item></channel></rss>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DispatcherServlet on B9F1</title><link>https://b9f1.com/tags/dispatcherservlet/</link><description>Recent content in DispatcherServlet on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 21 May 2025 21:28:02 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/dispatcherservlet/index.xml" rel="self" type="application/rss+xml"/><item><title>@RestController 요청이 응답으로 반환되기까지</title><link>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</link><pubDate>Wed, 21 May 2025 21:28:02 +0900</pubDate><guid>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/cover.png" alt="Featured image of post @RestController 요청이 응답으로 반환되기까지" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring Boot를 활용한 REST API 개발에서 &lt;code>@RestController&lt;/code>는 가장 많이 사용되는 어노테이션 중 하나다. 하지만 그 이면에서 실제 HTTP 요청이 어떻게 애플리케이션으로 전달되고, 어떤 과정을 거쳐 클라이언트에게 JSON 등으로 응답이 전달되는지는 자주 간과된다.&lt;/p>
+&lt;p>이번 글에서는 Spring MVC의 요청 처리 흐름을 DispatcherServlet을 기점으로 전반적으로 살펴보고, 특히 &lt;code>HttpMessageConverter&lt;/code>가 어떤 역할을 하며 언제 동작하는지 명확히 정리해본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="요청-처리-흐름-요약">요청 처리 흐름 요약
+&lt;/h3>&lt;p>Spring Boot 애플리케이션에서 HTTP 요청이 들어오면 다음과 같은 순서로 처리된다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>요청 수신 – &lt;code>DispatcherServlet&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>모든 HTTP 요청은 먼저 &lt;code>DispatcherServlet&lt;/code>에서 수신된다.&lt;/li>
+&lt;li>이 서블릿은 Front Controller로서 전체 요청의 진입점이며, Spring Boot에서는 자동으로 등록된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>핸들러 탐색 – &lt;code>HandlerMapping&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>어떤 컨트롤러 메서드가 이 요청을 처리할지 결정한다.&lt;/li>
+&lt;li>&lt;code>@RequestMapping&lt;/code>, &lt;code>@GetMapping&lt;/code> 등으로 설정된 경로 정보를 기반으로 매핑이 일어난다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>핸들러 실행 – &lt;code>HandlerAdapter&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>찾은 핸들러(즉, &lt;code>@RestController&lt;/code>의 메서드)를 실행하는 어댑터.&lt;/li>
+&lt;li>&lt;code>@RequestBody&lt;/code>가 선언되어 있다면 이 시점에 &lt;code>HttpMessageConverter&lt;/code>를 통해 JSON → 객체 변환이 이뤄진다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>응답 변환 – &lt;code>HttpMessageConverter&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>컨트롤러 메서드가 반환한 Java 객체는 &lt;code>HttpMessageConverter&lt;/code>를 통해 다시 JSON 등의 HTTP 응답 본문으로 변환된다.&lt;/li>
+&lt;li>이때 사용되는 대표적인 구현체로는 &lt;code>MappingJackson2HttpMessageConverter&lt;/code>가 있으며, 내부적으로 Jackson을 사용한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>응답 반환 – &lt;code>DispatcherServlet&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>변환된 응답은 다시 &lt;code>DispatcherServlet&lt;/code>을 통해 클라이언트에게 반환된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="httpmessageconverter의-동작-시점과-역할">&lt;code>HttpMessageConverter&lt;/code>의 동작 시점과 역할
+&lt;/h3>&lt;p>&lt;code>HttpMessageConverter&lt;/code>는 &lt;strong>요청과 응답의 바디(body)를 변환&lt;/strong>하는 컴포넌트로서 다음과 같은 역할을 한다:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>@RequestBody&lt;/code>가 있는 경우:
+&lt;ul>
+&lt;li>요청 바디를 JSON → Java 객체로 역직렬화 (ex. DTO로 바인딩)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>@ResponseBody&lt;/code> 또는 &lt;code>@RestController&lt;/code>가 있는 경우:
+&lt;ul>
+&lt;li>반환되는 객체를 Java 객체 → JSON으로 직렬화&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>이 변환은 &lt;code>RequestMappingHandlerAdapter&lt;/code>에 등록된 &lt;code>messageConverters&lt;/code> 리스트를 순회하며 타입과 Content-Type 헤더를 기반으로 적절한 컨버터를 찾아 자동으로 수행된다.&lt;/p>
+&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant HttpMessageConverter
+Client->>DispatcherServlet: HTTP 요청 전송
+DispatcherServlet->>HandlerMapping: 핸들러 조회
+HandlerMapping-->>DispatcherServlet: 핸들러 반환
+DispatcherServlet->>HandlerAdapter: 핸들러 실행 요청
+HandlerAdapter->>HttpMessageConverter: 요청 바디 역직렬화 (JSON → 객체)
+HttpMessageConverter-->>HandlerAdapter: 객체 반환
+HandlerAdapter->>Controller: 메서드 호출
+Controller-->>HandlerAdapter: 객체 반환
+HandlerAdapter->>HttpMessageConverter: 객체 직렬화 (객체 → JSON)
+HttpMessageConverter-->>HandlerAdapter: JSON 반환
+HandlerAdapter-->>DispatcherServlet: 응답 반환
+DispatcherServlet-->>Client: 응답 전송
+&lt;/pre>
+&lt;/div>
+&lt;h3 id="mappingjackson2httpmessageconverter">MappingJackson2HttpMessageConverter
+&lt;/h3>&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>Spring MVC의 요청 처리 흐름은 &lt;code>DispatcherServlet&lt;/code>에서 시작해 &lt;code>HandlerMapping&lt;/code>, &lt;code>HandlerAdapter&lt;/code>, &lt;code>HttpMessageConverter&lt;/code>를 통해 RESTful 서비스를 완성한다.&lt;/p>&lt;/blockquote>
+&lt;p>특히 &lt;code>HttpMessageConverter&lt;/code>는 요청과 응답을 Java 객체 ↔ JSON 사이에서 자동 변환해주는 핵심적인 컴포넌트로, 동작 시점과 역할을 명확히 이해하는 것이 REST API 개발의 안정성과 유지보수성을 높이는 데 매우 중요하다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>서블릿 기반 웹 애플리케이션 구조&lt;/li>
+&lt;li>Spring MVC의 &lt;code>@Controller&lt;/code>, &lt;code>@RestController&lt;/code> 어노테이션 차이&lt;/li>
+&lt;li>Jackson의 직렬화/역직렬화 개념&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc.html" target="_blank" rel="noopener"
+>Spring Web MVC 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/web.html#web.servlet.spring-mvc.message-converters" target="_blank" rel="noopener"
+>Spring Boot의 HttpMessageConverters 설정&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html" target="_blank" rel="noopener"
+>DispatcherServlet 내부 구조&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

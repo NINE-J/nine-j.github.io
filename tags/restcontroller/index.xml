@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>RestController on B9F1</title><link>https://b9f1.com/tags/restcontroller/</link><description>Recent content in RestController on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 21 May 2025 21:28:02 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/restcontroller/index.xml" rel="self" type="application/rss+xml"/><item><title>@RestController 요청이 응답으로 반환되기까지</title><link>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</link><pubDate>Wed, 21 May 2025 21:28:02 +0900</pubDate><guid>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/cover.png" alt="Featured image of post @RestController 요청이 응답으로 반환되기까지" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring Boot를 활용한 REST API 개발에서 &lt;code>@RestController&lt;/code>는 가장 많이 사용되는 어노테이션 중 하나다. 하지만 그 이면에서 실제 HTTP 요청이 어떻게 애플리케이션으로 전달되고, 어떤 과정을 거쳐 클라이언트에게 JSON 등으로 응답이 전달되는지는 자주 간과된다.&lt;/p>
+&lt;p>이번 글에서는 Spring MVC의 요청 처리 흐름을 DispatcherServlet을 기점으로 전반적으로 살펴보고, 특히 &lt;code>HttpMessageConverter&lt;/code>가 어떤 역할을 하며 언제 동작하는지 명확히 정리해본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="요청-처리-흐름-요약">요청 처리 흐름 요약
+&lt;/h3>&lt;p>Spring Boot 애플리케이션에서 HTTP 요청이 들어오면 다음과 같은 순서로 처리된다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>요청 수신 – &lt;code>DispatcherServlet&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>모든 HTTP 요청은 먼저 &lt;code>DispatcherServlet&lt;/code>에서 수신된다.&lt;/li>
+&lt;li>이 서블릿은 Front Controller로서 전체 요청의 진입점이며, Spring Boot에서는 자동으로 등록된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>핸들러 탐색 – &lt;code>HandlerMapping&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>어떤 컨트롤러 메서드가 이 요청을 처리할지 결정한다.&lt;/li>
+&lt;li>&lt;code>@RequestMapping&lt;/code>, &lt;code>@GetMapping&lt;/code> 등으로 설정된 경로 정보를 기반으로 매핑이 일어난다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>핸들러 실행 – &lt;code>HandlerAdapter&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>찾은 핸들러(즉, &lt;code>@RestController&lt;/code>의 메서드)를 실행하는 어댑터.&lt;/li>
+&lt;li>&lt;code>@RequestBody&lt;/code>가 선언되어 있다면 이 시점에 &lt;code>HttpMessageConverter&lt;/code>를 통해 JSON → 객체 변환이 이뤄진다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>응답 변환 – &lt;code>HttpMessageConverter&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>컨트롤러 메서드가 반환한 Java 객체는 &lt;code>HttpMessageConverter&lt;/code>를 통해 다시 JSON 등의 HTTP 응답 본문으로 변환된다.&lt;/li>
+&lt;li>이때 사용되는 대표적인 구현체로는 &lt;code>MappingJackson2HttpMessageConverter&lt;/code>가 있으며, 내부적으로 Jackson을 사용한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>응답 반환 – &lt;code>DispatcherServlet&lt;/code>&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>변환된 응답은 다시 &lt;code>DispatcherServlet&lt;/code>을 통해 클라이언트에게 반환된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="httpmessageconverter의-동작-시점과-역할">&lt;code>HttpMessageConverter&lt;/code>의 동작 시점과 역할
+&lt;/h3>&lt;p>&lt;code>HttpMessageConverter&lt;/code>는 &lt;strong>요청과 응답의 바디(body)를 변환&lt;/strong>하는 컴포넌트로서 다음과 같은 역할을 한다:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>@RequestBody&lt;/code>가 있는 경우:
+&lt;ul>
+&lt;li>요청 바디를 JSON → Java 객체로 역직렬화 (ex. DTO로 바인딩)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>@ResponseBody&lt;/code> 또는 &lt;code>@RestController&lt;/code>가 있는 경우:
+&lt;ul>
+&lt;li>반환되는 객체를 Java 객체 → JSON으로 직렬화&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>이 변환은 &lt;code>RequestMappingHandlerAdapter&lt;/code>에 등록된 &lt;code>messageConverters&lt;/code> 리스트를 순회하며 타입과 Content-Type 헤더를 기반으로 적절한 컨버터를 찾아 자동으로 수행된다.&lt;/p>
+&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant HttpMessageConverter
+Client->>DispatcherServlet: HTTP 요청 전송
+DispatcherServlet->>HandlerMapping: 핸들러 조회
+HandlerMapping-->>DispatcherServlet: 핸들러 반환
+DispatcherServlet->>HandlerAdapter: 핸들러 실행 요청
+HandlerAdapter->>HttpMessageConverter: 요청 바디 역직렬화 (JSON → 객체)
+HttpMessageConverter-->>HandlerAdapter: 객체 반환
+HandlerAdapter->>Controller: 메서드 호출
+Controller-->>HandlerAdapter: 객체 반환
+HandlerAdapter->>HttpMessageConverter: 객체 직렬화 (객체 → JSON)
+HttpMessageConverter-->>HandlerAdapter: JSON 반환
+HandlerAdapter-->>DispatcherServlet: 응답 반환
+DispatcherServlet-->>Client: 응답 전송
+&lt;/pre>
+&lt;/div>
+&lt;h3 id="mappingjackson2httpmessageconverter">MappingJackson2HttpMessageConverter
+&lt;/h3>&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>Spring MVC의 요청 처리 흐름은 &lt;code>DispatcherServlet&lt;/code>에서 시작해 &lt;code>HandlerMapping&lt;/code>, &lt;code>HandlerAdapter&lt;/code>, &lt;code>HttpMessageConverter&lt;/code>를 통해 RESTful 서비스를 완성한다.&lt;/p>&lt;/blockquote>
+&lt;p>특히 &lt;code>HttpMessageConverter&lt;/code>는 요청과 응답을 Java 객체 ↔ JSON 사이에서 자동 변환해주는 핵심적인 컴포넌트로, 동작 시점과 역할을 명확히 이해하는 것이 REST API 개발의 안정성과 유지보수성을 높이는 데 매우 중요하다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>서블릿 기반 웹 애플리케이션 구조&lt;/li>
+&lt;li>Spring MVC의 &lt;code>@Controller&lt;/code>, &lt;code>@RestController&lt;/code> 어노테이션 차이&lt;/li>
+&lt;li>Jackson의 직렬화/역직렬화 개념&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc.html" target="_blank" rel="noopener"
+>Spring Web MVC 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/web.html#web.servlet.spring-mvc.message-converters" target="_blank" rel="noopener"
+>Spring Boot의 HttpMessageConverters 설정&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html" target="_blank" rel="noopener"
+>DispatcherServlet 내부 구조&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Spring MVC</title><link>https://b9f1.com/p/2025-05-18-spring-mvc-controller-and-restcontroller/</link><pubDate>Sun, 18 May 2025 15:20:00 +0900</pubDate><guid>https://b9f1.com/p/2025-05-18-spring-mvc-controller-and-restcontroller/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-18-spring-mvc-controller-and-restcontroller/cover.png" alt="Featured image of post Spring MVC" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring MVC는 클라이언트의 요청을 처리하고 응답을 반환하는 웹 프레임워크다.
+이때 핵심적인 역할을 하는 것이 &lt;code>@Controller&lt;/code>, &lt;code>@RestController&lt;/code>이다.&lt;/p>
+&lt;p>두 어노테이션은 비슷해보이지만 응답 방식에서 중요한 차이를 가진다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="요청-처리-흐름">요청 처리 흐름
+&lt;/h3>&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant ViewResolver
+participant HttpMessageConverter
+Client->>DispatcherServlet: HTTP 요청
+DispatcherServlet->>HandlerMapping: 핸들러 탐색
+HandlerMapping-->>DispatcherServlet: 핸들러 반환
+DispatcherServlet->>HandlerAdapter: 핸들러 실행 위임
+HandlerAdapter->>Controller: 메서드 실행
+alt @Controller
+Controller-->>HandlerAdapter: View 이름 반환
+HandlerAdapter->>ViewResolver: View 이름으로 View 객체 생성
+ViewResolver-->>DispatcherServlet: View 객체 (HTML 포함)
+else @RestController
+Controller-->>HandlerAdapter: 객체 반환
+HandlerAdapter->>HttpMessageConverter: 객체를 JSON으로 직렬화
+HttpMessageConverter-->>DispatcherServlet: 직렬화된 JSON
+end
+DispatcherServlet-->>Client: 응답 전송
+&lt;/pre>
+&lt;/div>
+&lt;ol>
+&lt;li>&lt;code>Client&lt;/code>가 HTTP 요청을 하게 되면 &lt;code>DispatcherServlet&lt;/code>이 가로챔
+&lt;ul>
+&lt;li>모든 HTTP 요청은 &lt;code>DispatcherServlet&lt;/code>이 가로채며 시작된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>DispatcherServlet&lt;/code>은 &lt;code>HandlerMapping&lt;/code>을 통해 해당 요청을 처리할 Handler를 찾은 다음 HandlerAdapter에게 해당 핸들러를 실행하도록 위임한다.
+&lt;ul>
+&lt;li>실행을 위임한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>HandlerAdapter&lt;/code>는 &lt;code>Controller&lt;/code>의 메서드를 실행한다.
+&lt;ul>
+&lt;li>어떤 Handler가 됐든 &lt;code>HandlerAdapter&lt;/code>가 실제 메서드를 실행한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>@Controller&lt;/code>, &lt;code>@RestController&lt;/code> 케이스의 Resolver 호출
+&lt;ol>
+&lt;li>&lt;code>@Controller&lt;/code> 어노테이션으로 등록된 메서드의 경우 &lt;code>Controller&lt;/code>가 반환한 View 이름과 Model 데이터를 기반으로 &lt;code>DispatcherServlet&lt;/code>이 &lt;code>ViewResolver&lt;/code>를 통해 View 객체를 생성한 뒤 이를 렌더링하여 응답을 생성한다.
+&lt;ul>
+&lt;li>&lt;code>ViewResolver&lt;/code>는 단순히 View를 찾아주는 역할&lt;/li>
+&lt;li>실제 렌더링은 View 객체가 수행한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>@RestController&lt;/code> 어노테이션으로 등록된 메서드가 반환한 객체는 &lt;code>DispatcherServlet&lt;/code> → &lt;code>HandlerAdapter&lt;/code> → &lt;code>HttpMessageConverter&lt;/code>를 통해 JSON을 생성한 뒤 &lt;code>DispatcherServlet&lt;/code>에게 전달한다.
+&lt;ul>
+&lt;li>직렬화 처리를 위임한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;code>@Controller&lt;/code>, &lt;code>@RestController&lt;/code> 케이스의 응답 반환
+&lt;ol>
+&lt;li>&lt;code>@Controller&lt;/code>의 경우 &lt;code>ViewResolver&lt;/code>는 View 이름에 해당하는 View 객체를 찾는 역할만 하고 해당 View 객체가 DispatcherServlet의 호출에 의해 실제 HTML을 렌더링해 클라이언트에 전달한다.
+&lt;ul>
+&lt;li>ViewResolver → View 객체 탐색&lt;/li>
+&lt;li>View → HTML 렌더링&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>@RestController&lt;/code>의 경우 &lt;code>HttpMessageConverter&lt;/code>는 객체를 JSON으로 직렬화만 하고 직렬화된 결과는 &lt;code>DispatcherServelet&lt;/code>을 통해 클라이언트에게 반환된다.
+&lt;ul>
+&lt;li>&lt;code>DispatcherServlet&lt;/code>이 응답의 시작과 끝을 담당하며 &lt;code>HttpMessageConverter&lt;/code>는 응답 본문 생성을 돕는다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="controller">&lt;code>@Controller&lt;/code>
+&lt;/h3>&lt;ul>
+&lt;li>전통적인 MVC 구조에서 사용&lt;/li>
+&lt;li>&lt;code>Model&lt;/code>에 데이터를 담고 View 이름을 반환&lt;/li>
+&lt;li>View Resolver가 View 템플릿을 렌더링하여 응답&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Controller&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">HelloController&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@GetMapping&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/hello&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">hello&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Model&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">model&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">model&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">addAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Nine&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;hello&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// templates/hello.html&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>JSON 응답을 위해 &lt;code>@ResponseBody&lt;/code>와 함께 사용
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Controller&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">ApiController&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@ResponseBody&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@GetMapping&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/api/hello&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">apiHello&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Hello from Controller!&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h3 id="restcontroller">&lt;code>@RestController&lt;/code>
+&lt;/h3>&lt;ul>
+&lt;li>RESTful 웹 서비스에서 주로 사용&lt;/li>
+&lt;li>&lt;code>@Controller + @ResponseBody&lt;/code>의 조합&lt;/li>
+&lt;li>리턴값을 그대로 JSON 등으로 직렬화하여 Response Body로 전달&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@RestController&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">HelloRestController&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@GetMapping&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/hello&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">hello&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Hello, Nine!&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="차이점-비교">차이점 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분 항목&lt;/th>
+&lt;th>@Controller&lt;/th>
+&lt;th>@RestController&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>리턴 타입&lt;/td>
+&lt;td>View 이름 또는 ModelAndView 객체 / ResponseEntity 직접 직렬화한 데이터&lt;/td>
+&lt;td>객체 또는 문자열 (자동 JSON 직렬화됨)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>사용 목적&lt;/td>
+&lt;td>템플릿 렌더링 기반 웹 앱 (HTML) / 필요시 JSON 응답도 가능&lt;/td>
+&lt;td>API 응답을 위한 JSON/데이터 전송용&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>응답 처리&lt;/td>
+&lt;td>ViewResolver를 통해 HTML 렌더링&lt;/td>
+&lt;td>HttpMessageConverter를 통해 JSON 직렬화&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>조합 어노테이션&lt;/td>
+&lt;td>&lt;code>@Controller&lt;/code>, &lt;code>@ResponseBody&lt;/code> 필요&lt;/td>
+&lt;td>&lt;code>@RestController&lt;/code> 단독 사용 가능&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;ul>
+&lt;li>&lt;code>@Controller&lt;/code>는 View 기반 응답을 기본으로 하지만 &lt;code>@ResponseBody&lt;/code>나 &lt;code>ResponseEntity&lt;/code>를 사용하면 JSON 데이터도 응답할 수 있다.&lt;/li>
+&lt;li>&lt;code>@RestController&lt;/code>는 모든 메서드가 데이터(JSON 등) 응답을 기본으로 하며, API 서버 구현에 적합하다.&lt;/li>
+&lt;/ul>
+&lt;p>Spring MVC에서 클라이언트 요청을 처리하는 흐름을 이해하면, 상황에 맞는 어노테이션 선택이 쉬워진다. View 기반 웹 페이지와 RESTful API를 구분하여 설계하는 것이 핵심이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>MVC 디자인 패턴&lt;/li>
+&lt;li>Servlet과 DispatcherServlet의 역할&lt;/li>
+&lt;li>View Resolver, HttpMessageConverter 작동 원리&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc" target="_blank" rel="noopener"
+>Spring MVC Architecture&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RestController.html" target="_blank" rel="noopener"
+>@RestController Javadoc&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.baeldung.com/spring-controller-vs-restcontroller" target="_blank" rel="noopener"
+>Baeldung - Controller vs RestController&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://spring.io/guides/gs/rest-service" target="_blank" rel="noopener"
+>Spring 공식 가이드 - RESTful Web Service&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
