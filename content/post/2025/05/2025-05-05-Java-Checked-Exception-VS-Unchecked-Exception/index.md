@@ -183,6 +183,75 @@ public class UncheckedExceptionExample {
 3. 컨트롤러/외부 인터페이스 계층에서 예외를 해석하고 사용자 메시지로 변환한다.
     - 예: `@ControllerAdvice`, `@ExceptionHandler`, HTTP 상태 코드 매핑
 
+### 예외와 트랜잭션 롤백의 관계
+
+>[!QUOTE]
+>예외는 단순한 오류가 아니라, **트랜잭션의 커밋 여부를 결정짓는 시그널**이다.
+
+Spring에서는 `@Transactional`을 사용할 경우, 예외 발생 시 해당 트랜잭션의 **롤백 여부**는 예외의 종류에 따라 자동으로 결정된다.
+
+#### 용어 정리부터
+
+| 용어             | 설명                                                   |
+| -------------- | ---------------------------------------------------- |
+| **비즈니스 예외**    | 사용자의 입력 실수, 제약 조건 위반, 정책 위반 등 "업무 규칙을 어긴 것"을 의미함     |
+| **복구 가능한 예외**  | catch 후 재시도하거나 사용자 안내를 통해 정상 흐름으로 회복할 수 있는 예외        |
+| **복구 불가능한 예외** | 시스템 오류, null 포인터, DB 연결 끊김 등 외부적이거나 근본적으로 해결 불가능한 예외 |
+
+#### Spring의 기본 트랜잭션 롤백 규칙
+
+| 예외 유형                 | 롤백 여부  | 설명                  |
+| --------------------- | ------ | ------------------- |
+| `RuntimeException` 계열 | 롤백     | 기본적으로 트랜잭션을 롤백한다.   |
+| `Error` 계열            | 롤백     | 시스템 오류로 간주하고 롤백한다.  |
+| `Checked Exception`   | **커밋** | 기본적으로 롤백하지 않고 커밋된다. |
+
+>[!QUOTE]
+>In its default configuration, the Spring Framework’s transaction infrastructure code marks a transaction for rollback only in the case of runtime, unchecked exceptions. That is, when the thrown exception is an instance or subclass of `RuntimeException`. (`Error` instances also, by default, result in a rollback).
+>Checked exceptions that are thrown from a transactional method do not result in a rollback in the default configuration. You can configure exactly which `Exception` types mark a transaction for rollback, including checked exceptions by specifying _rollback rules_.
+>
+>"기본 설정에서, Spring Framework의 트랜잭션 인프라 코드는 런타임, 언체크 예외의 경우에만 트랜잭션을 롤백하도록 표시합니다. 즉, 발생한 예외가 `RuntimeException`의 인스턴스이거나 하위 클래스인 경우입니다. (`Error` 인스턴스도 기본적으로 롤백을 유발합니다). 체크 예외가 트랜잭션 메서드에서 발생하면 기본 설정에서는 롤백되지 않습니다.
+>롤백 규칙을 지정하여 확인된 예외를 포함하여 어떤 예외 유형이 트랜잭션을 롤백할지 정확하게 구성할 수 있습니다."
+
+#### 예시 코드
+
+```java
+@Transactional
+public void processPayment(Order order) throws PaymentException {
+    // ...
+    if (!paymentGateway.charge(order)) {
+        throw new PaymentException("결제 실패"); // Checked Exception
+    }
+}
+```
+
+위 예시는 기본적으로 트랜잭션이 커밋된다.
+하지만 결제 실패 시에도 롤백되길 원할 수 있다.
+
+#### 롤백 대상 명시 방법
+
+- `rollbackFor` 속성 사용
+    ```java
+    @Transactional(rollbackFor = PaymentException.class)
+    public void processPayment(Order order) throws PaymentException {
+        // ...
+    }
+    ```
+- `noRollbackFor`로 반대로 명시도 가능
+    ```java
+    @Transactional(noRollbackFor = ValidationException.class)
+    ```
+
+>[!TIP] 실무팁
+>- 비즈니스 로직에서 **롤백을 유도하고 싶다면** Unchecked Exception을 사용하거나, `rollbackFor`를 반드시 명시하자.
+>- `@Transactional`은 **프록시 기반**이므로 **public 메서드에서만 작동**하며 **내부 호출 시 적용되지 않는다**는 점도 주의해야 한다.
+
+## 🎯결론
+
+- Spring은 예외의 의미나 복구 가능성에 관계 없이 **예외의 타입**만을 기준으로 트랜잭션 롤백 여부를 결정한다.
+- 기본적으로 `RuntimeException` 및 `Error` 만 롤백 대상이며, **체크 예외**는 롤백되지 않는다.
+- 체크 예외에 대해서도 롤백이 필요하다면, `@Transactional` 애너테이션의 `rollbackFor` 속성을 사용하여 명시적으로 지정하거나, 언체크 예외로 감싸서 던져야 한다.
+
 ## ⚙️EndNote
 
 ### 사전 지식
@@ -205,3 +274,4 @@ public class UncheckedExceptionExample {
 
 - [자바 예외 처리의 진화: Checked Exception에서 Unchecked Exception으로](https://f-lab.kr/insight/java-exception-handling-evolution?gad_source=1&gad_campaignid=22368870602&gbraid=0AAAAACGgUFfN4ag4oS6KPd4XXwILthRon&gclid=CjwKCAjw56DBBhAkEiwAaFsG-gWjJJHmGm9P8UWourw-QNkxw5y5V-FkZftBiULc0i1Ta95GJRTaIxoCj_MQAvD_BwE)
 - [[Java] Checked Exception과 Unchecked Exception](https://seungjjun.tistory.com/250)
+- [Rolling Back a Declarative Transaction](https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/rolling-back.html)

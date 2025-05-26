@@ -81,6 +81,8 @@ sequenceDiagram
     DispatcherServlet-->>Client: 응답 전송
 ```
 
+### MappingJackson2HttpMessageConverter
+
 ## 🎯결론
 
 > Spring MVC의 요청 처리 흐름은 `DispatcherServlet`에서 시작해 `HandlerMapping`, `HandlerAdapter`, `HttpMessageConverter`를 통해 RESTful 서비스를 완성한다.

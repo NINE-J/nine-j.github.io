@@ -108,7 +108,7 @@ Spring은 내부적으로 프록시를 생성하여 트랜잭션을 관리한다
 
 [Marco Behler의 블로그](https://www.marcobehler.com/guides/spring-transaction-management-transactional-in-depth)에서는 이러한 동작을 다음과 같이 설명한다.
 
-> [!QOUTE]
+> [!QUOTE]
 > "Now whenever you are using `@Transactional` on a bean, Spring uses a tiny trick. It does not just instantiate a UserService, but also a transactional _proxy_ of that UserService."
 >
 > "이제 빈에서 `@Transactional`을 사용할 때마다 Spring은 작은 트릭을 사용합니다. 이는 단순히 사용자 서비스를 인스턴스화하는 것뿐만 아니라 해당 사용자 서비스의 트랜잭션 프록시도 사용합니다."
@@ -116,7 +116,7 @@ Spring은 내부적으로 프록시를 생성하여 트랜잭션을 관리한다
 [Stack Overflow의 질문: Spring - @Transactional - What happens in background?](https://stackoverflow.com/questions/1099025/spring-transactional-what-happens-in-background)에서도 이와 유사한 설명을 확인할 수 있었다.
 무려 15년 전 질문이다.
 
-> [!QOUTE]
+> [!QUOTE]
 > "But at a very high level, Spring creates proxies for classes that declare `@Transactional` on the class itself or on members. The proxy is mostly invisible at runtime. It provides a way for Spring to inject behaviors before, after, or around method calls into the object being proxied."
 >
 > "매우 높은 수준에서 Spring은 클래스 자체 또는 멤버에 `@Transactional`을 선언하는 클래스에 대한 프록시를 생성합니다. 프록시는 런타임에 대부분 보이지 않습니다. 이 프록시는 Spring이 메서드 호출 전후 또는 주변의 동작을 프록시 대상 객체에 주입할 수 있는 방법을 제공합니다."
