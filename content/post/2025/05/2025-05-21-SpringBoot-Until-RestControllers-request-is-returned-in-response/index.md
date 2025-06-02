@@ -83,6 +83,54 @@ sequenceDiagram
 
 ### MappingJackson2HttpMessageConverter
 
+`MappingJackson2HttpMessageConverter`는 Spring MVC에서 **Java 객체를 JSON으로 직렬화하거나 JSON을 Java 객체로 역직렬화할 때 사용되는 기본 `HttpMessageConverter`**이다. 내부적으로 [Jackson](https://github.com/FasterXML/jackson) 라이브러리를 활용하여 JSON 처리 기능을 수행한다.
+
+Spring Boot를 사용하면 기본적으로 Jackson이 의존성에 포함되며, 이로 인해 `MappingJackson2HttpMessageConverter`는 자동으로 등록되어 동작한다. 주로 다음과 같은 상황에서 사용된다:
+- 클라이언트가 `Content-Type: application/json`으로 JSON 요청을 보낼 경우, `@RequestBody`에 해당 JSON이 자동으로 매핑된다.
+- 컨트롤러가 객체를 반환할 때 `@ResponseBody` 또는 `@RestController`가 붙어 있으면, 해당 객체는 JSON으로 변환되어 응답된다.
+
+```java
+@PostMapping("/users")
+public ResponseEntity<UserResponse> createUser(@RequestBody UserCreateRequest request) {
+    User user = userService.create(request);
+    return ResponseEntity.ok(new UserResponse(user));
+}
+```
+
+위의 예시에서 `@RequestBody`를 통해 들어온 JSON은 Jackson이 `UserCreateRequest`로 역직렬화하며, 반환되는 `UserResponse`는 JSON으로 직렬화되어 클라이언트로 전달된다.
+
+#### 커스터마이징
+
+Jackson 설정은 다양하게 커스터마이징할 수 있다. 예를 들어:
+- `ObjectMapper`의 설정 변경 (`@JsonNaming`, `@JsonProperty`, `@JsonIgnore` 등)
+- 날짜 포맷 지정
+- `null` 필드 무시
+- 필드 snake_case ↔ camelCase 자동 변환
+
+```java
+@Bean
+public Jackson2ObjectMapperBuilderCustomizer customizer() {
+    return builder -> builder
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        .serializationInclusion(JsonInclude.Include.NON_NULL);
+}
+```
+
+이렇게 하면 `MappingJackson2HttpMessageConverter`에 연결된 `ObjectMapper`가 위 설정을 따라 동작하게 된다.
+
+#### 기타 팁
+
+- Spring Boot는 `spring.jackson.*` 속성을 통해 설정을 간편하게 지원한다.
+- 필요에 따라 `WebMvcConfigurer`에서 직접 `HttpMessageConverter`를 설정해 특정 타입만 Jackson 대신 다른 컨버터로 처리하게 할 수 있다.
+
+```java
+@Override
+public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    converters.add(new MappingJackson2HttpMessageConverter(myCustomObjectMapper()));
+}
+```
+
 ## 🎯결론
 
 > Spring MVC의 요청 처리 흐름은 `DispatcherServlet`에서 시작해 `HandlerMapping`, `HandlerAdapter`, `HttpMessageConverter`를 통해 RESTful 서비스를 완성한다.
