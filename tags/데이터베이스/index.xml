@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>데이터베이스 on B9F1</title><link>https://b9f1.com/tags/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4/</link><description>Recent content in 데이터베이스 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 02 Jun 2025 08:57:20 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>역정규화, 언제 그리고 왜 사용하는가?</title><link>https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</link><pubDate>Mon, 02 Jun 2025 08:57:20 +0900</pubDate><guid>https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/cover.png" alt="Featured image of post 역정규화, 언제 그리고 왜 사용하는가?" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>데이터베이스 정규화는 이상 현상을 방지하고 데이터 일관성을 보장하기 위한 핵심 원칙이다.&lt;/p>
+&lt;p>그러나 실전에서는 정규화된 모델이 항상 최고의 선택은 아니다.
+자세한 내용은 다음에 다뤄보고 이번엔 &lt;strong>역정규화(Denormalization)&lt;/strong> 가 필요하게 되는 상황과, 이를 적용할 때의 고려사항 및 장단점을 간단한 사례와 함께 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="정규화와-현실의-간극">정규화와 현실의 간극
+&lt;/h3>&lt;p>정규화는 테이블 간 중복을 줄이고 무결성을 유지하기 위한 훌륭한 이론이다.
+하지만 현실에서는 다음과 같은 상황에서 정규화된 모델이 병목이 되기도 한다.&lt;/p>
+&lt;h4 id="역정규화가-필요한-대표적인-상황">역정규화가 필요한 대표적인 상황
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>복잡한 조인이 빈번하게 발생하는 경우&lt;/strong>
+&lt;ul>
+&lt;li>예: 게시판 목록을 조회할 때 게시글, 작성자, 댓글 수 등 여러 테이블을 조인해야 하는 경우&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>실시간 조회 성능이 중요한 경우&lt;/strong>
+&lt;ul>
+&lt;li>OLTP 시스템 또는 사용자 피드, 홈화면 로딩 등 수 ms 단위 응답이 필요한 상황&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>읽기 비율이 매우 높은 경우&lt;/strong>
+&lt;ul>
+&lt;li>쓰기보다 읽기가 훨씬 많고, 동일한 데이터를 반복 조회하는 경우 캐싱 효과를 극대화하기 위해 역정규화를 적용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>집계 데이터가 자주 필요한 경우&lt;/strong>
+&lt;ul>
+&lt;li>주문 총액, 리뷰 수, 좋아요 수 등 매번 COUNT, SUM을 하지 않고 별도로 저장&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="역정규화-적용-시-고려사항">역정규화 적용 시 고려사항
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>고려 내용&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>데이터 정합성&lt;/td>
+&lt;td>중복된 컬럼이 여러 테이블에 있을 경우, 변경 시 일관성 유지가 어려움&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>유지보수 복잡도&lt;/td>
+&lt;td>역정규화된 필드는 직접 관리하거나 트리거, 애플리케이션 로직으로 동기화해야 함&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>성능 이점&lt;/td>
+&lt;td>조회 속도와 쿼리 단순화에는 확실한 효과가 있음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>데이터 증가&lt;/td>
+&lt;td>중복 데이터로 인해 테이블 크기가 커질 수 있음&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>→ &lt;strong>결국, ‘성능’과 ‘정합성’ 사이의 균형&lt;/strong>을 고려하여 설계해야 한다.&lt;/p>
+&lt;h3 id="장단점-비교">장단점 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>장점&lt;/th>
+&lt;th>단점&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>- 조인 최소화로 인한 속도 향상 &lt;br>- 쿼리 복잡도 감소 &lt;br>- 집계 데이터 미리 보관 가능&lt;/td>
+&lt;td>- 데이터 정합성 문제 가능성 &lt;br>- 유지보수 로직 증가 &lt;br>- 중복 데이터로 저장 공간 낭비&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="실무에서의-팁">실무에서의 팁
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>정규화된 모델로 먼저 설계하고&lt;/strong>, 필요한 곳에만 역정규화한다.&lt;/li>
+&lt;li>&lt;strong>집계용 컬럼은 write-through 방식&lt;/strong>으로 관리하거나, 이벤트 기반 비동기 처리도 고려한다.&lt;/li>
+&lt;li>&lt;strong>Redis, ElasticSearch와 같은 서브 시스템&lt;/strong>으로 조회 성능을 분산시키는 것도 대안이다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>“모든 데이터베이스는 처음엔 정규화로 시작하고, 결국엔 역정규화로 최적화된다.”&lt;/p>&lt;/blockquote>
+&lt;p>정규화와 역정규화는 대립이 아닌 균형의 문제다.
+목적에 맞는 데이터 구조 설계가 진짜 실력이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>제1정규형~제3정규형 이해&lt;/li>
+&lt;li>기본 SQL 조인과 인덱스 작동 방식&lt;/li>
+&lt;li>데이터베이스 성능 튜닝 기초&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://martinfowler.com/books/refactoringDatabases.html" target="_blank" rel="noopener"
+>Martin Fowler - Refactoring Databases&lt;/a>&lt;/li>
+&lt;li>PostgreSQL Performance Tuning&lt;/li>
+&lt;li>CQRS (Command Query Responsibility Segregation) 아키텍처&lt;/li>
+&lt;/ul></description></item><item><title>DDL VS DML</title><link>https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</link><pubDate>Mon, 02 Jun 2025 08:34:00 +0900</pubDate><guid>https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/cover.png" alt="Featured image of post DDL VS DML" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>SQL은 데이터베이스를 다루기 위한 언어지만, 그 목적에 따라 크게 두 가지로 나뉜다.&lt;/p>
+&lt;p>바로 &lt;strong>DDL(Data Definition Language)&lt;/strong> 과 &lt;strong>DML(Data Manipulation Language)&lt;/strong>&lt;/p>
+&lt;p>이 둘의 차이점을 명확히 정리하고, 각각의 대표적인 명령어와 그 용도를 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="ddl-데이터-정의-언어-data-definition-language">DDL: 데이터 정의 언어 (Data Definition Language)
+&lt;/h3>&lt;p>DDL은 데이터베이스의 구조를 정의하는 데 사용된다.
+즉, &lt;strong>테이블, 스키마, 인덱스, 뷰&lt;/strong> 등을 생성, 변경, 삭제할 때 사용하는 명령어들이다.
+이러한 작업은 데이터의 틀을 잡는 작업이므로, 주로 개발 초기나 데이터 모델링 단계에서 많이 사용된다.&lt;/p>
+&lt;h4 id="대표-명령어">대표 명령어
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>CREATE&lt;/strong>
+&lt;ul>
+&lt;li>테이블이나 데이터베이스 객체를 생성&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">CREATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">INT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">PRIMARY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">VARCHAR&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">50&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>ALTER&lt;/strong>
+&lt;ul>
+&lt;li>기존 테이블의 구조 변경 (컬럼 추가/수정/삭제 등)&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">ALTER&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">ADD&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">email&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">VARCHAR&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>DROP&lt;/strong>
+&lt;ul>
+&lt;li>테이블이나 객체를 삭제&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">DROP&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>TRUNCATE&lt;/strong>
+&lt;ul>
+&lt;li>테이블을 비우되, 테이블 구조는 남김&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">TRUNCATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>DDL 명령은 대부분 &lt;strong>자동 커밋(autocommit)&lt;/strong> 되어, 되돌릴 수 없는 경우가 많다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="dml-데이터-조작-언어-data-manipulation-language">DML: 데이터 조작 언어 (Data Manipulation Language)
+&lt;/h3>&lt;p>DML은 이미 정의된 테이블 내의 &lt;strong>데이터를 다루는 데&lt;/strong> 사용된다.
+즉, 데이터를 조회하고, 추가하고, 수정하고, 삭제하는 등의 &amp;ldquo;행위&amp;quot;에 관련된 명령어들이다.&lt;/p>
+&lt;h4 id="대표-명령어-1">대표 명령어
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>SELECT&lt;/strong>
+&lt;ul>
+&lt;li>데이터를 조회&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>INSERT&lt;/strong>
+&lt;ul>
+&lt;li>새로운 데이터를 추가&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">INSERT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">INTO&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">VALUES&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Alice&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>UPDATE&lt;/strong>
+&lt;ul>
+&lt;li>기존 데이터를 수정&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">UPDATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SET&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Bob&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>DELETE&lt;/strong>
+&lt;ul>
+&lt;li>데이터를 삭제&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">DELETE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Tip&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>DML 명령은 &lt;strong>트랜잭션(transaction)&lt;/strong> 에 의해 제어되며, &lt;code>COMMIT&lt;/code> 혹은 &lt;code>ROLLBACK&lt;/code>이 가능하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="ddl-vs-dml-요약-비교">DDL vs DML 요약 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>DDL&lt;/th>
+&lt;th>DML&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>목적&lt;/td>
+&lt;td>데이터 구조 정의&lt;/td>
+&lt;td>데이터 조작&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>대상&lt;/td>
+&lt;td>테이블, 뷰, 인덱스 등&lt;/td>
+&lt;td>테이블 내 행(row)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>트랜잭션&lt;/td>
+&lt;td>자동 커밋(rollback 불가)&lt;/td>
+&lt;td>트랜잭션 제어 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>사용 시점&lt;/td>
+&lt;td>설계, 구조 변경&lt;/td>
+&lt;td>운영, 조회/수정/삭제/추가&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="ddl-dml-dcl이란">DDL, DML, DCL이란?
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>분류&lt;/th>
+&lt;th>명령어&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>DML&lt;/strong>(Data Manipulation Language)데이터 조작어&lt;/td>
+&lt;td>&lt;code>SELECT&lt;/code>&lt;/td>
+&lt;td>데이터베이스에 저장된 데이터를 조회하거나 검색하는 명령어.일명 &lt;code>RETRIEVE&lt;/code>라고도 함.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;code>INSERT&lt;/code> &lt;code>UPDATE&lt;/code> &lt;code>DELETE&lt;/code>&lt;/td>
+&lt;td>테이블에 데이터를 삽입, 수정, 삭제하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DDL&lt;/strong>(Data Definition Language)데이터 정의어&lt;/td>
+&lt;td>&lt;code>CREATE&lt;/code> &lt;code>ALTER&lt;/code> &lt;code>DROP&lt;/code> &lt;code>RENAME&lt;/code> &lt;code>TRUNCATE&lt;/code>&lt;/td>
+&lt;td>테이블, 뷰, 인덱스 등 데이터 구조를 정의(생성, 변경, 삭제, 이름변경 등)하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DCL&lt;/strong>(Data Control Language)데이터 제어어&lt;/td>
+&lt;td>&lt;code>GRANT&lt;/code> &lt;code>REVOKE&lt;/code>&lt;/td>
+&lt;td>사용자에게 데이터베이스 객체에 대한 권한을 부여하거나 회수하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>TCL&lt;/strong>(Transaction Control Language)트랜잭션 제어어&lt;/td>
+&lt;td>&lt;code>COMMIT&lt;/code> &lt;code>ROLLBACK&lt;/code> &lt;code>SAVEPOINT&lt;/code>&lt;/td>
+&lt;td>DML 명령으로 변경된 데이터를 트랜잭션 단위로 확정하거나 취소하거나, 중간 저장점을 설정하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>DDL은 구조를, DML은 내용을 다룬다.
+데이터베이스를 이해하고 활용하려면 이 두 가지의 차이를 명확히 아는 것이 핵심이다.
+DDL로 틀을 만들고, DML로 그 틀 안을 채우는 구조로 SQL을 학습해 보자.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>데이터베이스 기본 개념 (테이블, 행, 열)&lt;/li>
+&lt;li>SQL 구문 기본 문법&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/sql-commands.html" target="_blank" rel="noopener"
+>PostgreSQL Documentation – SQL Commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://sqlbolt.com/" target="_blank" rel="noopener"
+>SQLBolt – Learn SQL the easy way&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.w3schools.com/sql/" target="_blank" rel="noopener"
+>W3Schools SQL Tutorial&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

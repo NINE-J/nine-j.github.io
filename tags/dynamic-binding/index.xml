@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dynamic-Binding on B9F1</title><link>https://b9f1.com/tags/dynamic-binding/</link><description>Recent content in Dynamic-Binding on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 29 Mar 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/dynamic-binding/index.xml" rel="self" type="application/rss+xml"/><item><title>Java 객체지향: 동적 바인딩</title><link>https://b9f1.com/p/2025-03-29-java-object-dynamic-binding/</link><pubDate>Sat, 29 Mar 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-03-29-java-object-dynamic-binding/</guid><description>&lt;img src="https://b9f1.com/p/2025-03-29-java-object-dynamic-binding/cover.png" alt="Featured image of post Java 객체지향: 동적 바인딩" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>&lt;code>Dynamic Binding&lt;/code>(동적 바인딩)은 &lt;code>Java&lt;/code>의 객체지향 프로그래밍에서 핵심적인 개념이다.
+런타임에 호출될 메서드를 결정하는 과정을 의미한다.
+이 개념은 &lt;code>Polymorphism&lt;/code>(다형성)을 구현하는 데 필수적이며, 코드의 유연성과 확장성을 높이는 데 기여한다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="기본-개념">기본 개념
+&lt;/h3>&lt;ul>
+&lt;li>정적 바인딩은 컴파일 시점에 호출될 메서드가 결정되는 반면, 동적 바인딩은 런타임에 결정된다.&lt;/li>
+&lt;li>&lt;code>Java&lt;/code>에서 일반적인 메서드 호출은 정적 바인딩으로 처리되지만, 오버라이딩된 메서드 호출은 동적 바인딩으로 처리된다.&lt;/li>
+&lt;li>동적 바인딩은 다형성을 구현하는 핵심적인 매커니즘이다.&lt;/li>
+&lt;li>상위 클래스 타입의 참조 변수로 하위 클래스 객체를 참조할 때, 런타임에 실제 객체의 타입에 따라 호출될 메서드가 결정된다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="작동-방식">작동 방식
+&lt;/h3>&lt;h4 id="메서드-테이블">메서드 테이블
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>Java&lt;/code>의 객체는 &lt;code>Method Table&lt;/code>(메서드 테이블)이라는 특별한 테이블을 가지고 있다.&lt;/li>
+&lt;li>메서드 테이블은 객체의 클래스에 정의된 메서드들의 주소를 저장한다.&lt;/li>
+&lt;li>하위 클래스에서 상위 클래스의 메서드를 오버라이딩하면 메서드 테이블에서 해당 메서드의 주소가 하위 클래스의 메서드 주소로 갱신된다.&lt;/li>
+&lt;/ul>
+&lt;h4 id="런타임-메서드-결정">런타임 메서드 결정
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>JVM&lt;/code>은 런타임에 객체의 메서드를 호출할 때 메서드 테이블을 참조하여 실제 객체의 타입에 맞는 메서드를 호출한다.&lt;/li>
+&lt;li>이를 통해 상위 클래스 타입의 참조 변수로 하위 클래스 객체의 메서드를 호출할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">sound&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;동물이 소리를 낸다!&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Dog&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">sound&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;강아지가 멍멍 짖는다.&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Cat&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">sound&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;고양이가 야옹 운다.&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">DynamicBindingExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">animal1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">animal2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Dog&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 다형성&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Animal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">animal3&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Cat&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 다형성&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">animal1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sound&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 동물이 소리를 낸다!&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">animal2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sound&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 강아지가 멍멍 짖는다. (동적 바인딩)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">animal3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sound&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 고양이가 야옹 운다. (동적 바인딩)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="메서드-테이블-1">메서드 테이블
+&lt;/h3>&lt;p>&lt;code>Java&lt;/code>의 메서드 테이블은 객체 지향 프로그래밍에서 동적 바인딩을 구현하는 데 핵심적인 역할을 하는 자료 구조이다.
+이 테이블은 객체의 클래스에 정의된 메서드들의 주소를 저장하며, 런타임에 어떤 메서드를 호출해야 하는지 결정하는 데 사용된다.&lt;/p>
+&lt;h4 id="기본-개념-1">기본 개념
+&lt;/h4>&lt;h5 id="메서드-주소-저장">메서드 주소 저장
+&lt;/h5>&lt;ul>
+&lt;li>메서드 테이블은 객체의 클래스에 정의된 메서드들의 실제 메모리 주소를 저장한다.&lt;/li>
+&lt;li>이를 통해 &lt;code>JVM&lt;/code>은 런타임 메서드를 호출할 때 실제 실행될 메서드의 위치를 빠르게 찾을 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h5 id="상속과-오버라이딩">상속과 오버라이딩
+&lt;/h5>&lt;ul>
+&lt;li>하위 클래스가 상위 클래스의 메서드를 오버라이딩하면, 메서드 테이블에서 해당 메서드의 주소가 하위 클래스의 메서드 주소로 갱신된다.&lt;/li>
+&lt;li>이를 통해 상위 클래스 타입의 참조 변수로 하위 클래스 객체의 메서드를 호출할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h5 id="동적-바인딩-구현">동적 바인딩 구현
+&lt;/h5>&lt;ul>
+&lt;li>&lt;code>JVM&lt;/code>은 런타임에 객체의 메서드를 호출할 때, 메서드 테이블을 참조하여 실제 객체의 타입에 맞는 메서드를 호출한다.&lt;/li>
+&lt;li>이를 통해 다형성을 구현할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h4 id="작동-방식-1">작동 방식
+&lt;/h4>&lt;h5 id="객체-생성">객체 생성
+&lt;/h5>&lt;ul>
+&lt;li>객체가 생성될 때, 해당 객체의 클래스에 대한 메서드 테이블이 생성된다.&lt;/li>
+&lt;li>메서드 테이블은 클래스에 정의된 모든 메서드의 주소를 저장한다.&lt;/li>
+&lt;/ul>
+&lt;h5 id="메서드-호출">메서드 호출
+&lt;/h5>&lt;ul>
+&lt;li>객체의 메서드를 호출할 때, &lt;code>JVM&lt;/code>은 객체의 메서드 테이블을 참조한다.&lt;/li>
+&lt;li>메서드 테이블에서 호출할 때 메서드의 주소를 찾아 해당 메서드를 실행한다.&lt;/li>
+&lt;/ul>
+&lt;h5 id="오버라이딩된-메서드-호출">오버라이딩된 메서드 호출
+&lt;/h5>&lt;ul>
+&lt;li>오버라이딩된 메서드를 호출할 때, JVM은 객체의 실제 타입을 확인하고 해당 타입의 메서드 테이블을 참조한다.&lt;/li>
+&lt;li>이를 통해 하위 클래스에서 오버라이딩된 메서드를 호출할 수 있다.&lt;/li>
+&lt;/ul></description></item></channel></rss>

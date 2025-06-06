@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>런타임 on B9F1</title><link>https://b9f1.com/categories/%EB%9F%B0%ED%83%80%EC%9E%84/</link><description>Recent content in 런타임 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/%EB%9F%B0%ED%83%80%EC%9E%84/index.xml" rel="self" type="application/rss+xml"/><item><title>Java 실행 환경: JVM 메모리 구조의 이해</title><link>https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/</link><pubDate>Sun, 06 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/cover.png" alt="Featured image of post Java 실행 환경: JVM 메모리 구조의 이해" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>자바 소스 코드를 실행하는 JVM의 메모리 구조를 알아본다.
+JVM은 자바 프로그램을 실행하기 위한 가상 머신으로, 플랫폼 독립성을 제공하며 메모리 관리, 스레드 동기화, 가비지 컬렉션 등의 기능을 수행한다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="java-소스-실행">Java 소스 실행
+&lt;/h3>&lt;p>자바 소스 코드는 &lt;code>.java&lt;/code> 파일로 저장되며, 이를 실행하기 위해 자바 컴파일러 &lt;code>javac&lt;/code>가 바이트 코드(Byte code) &lt;code>.class&lt;/code> 파일로 변환하게 된다.&lt;/p>
+&lt;p>바이트 코드는 JVM이 이해할 수 있는 중간 표현으로, 플랫폼 독립성을 제공한다.
+바이트 코드로 변환하는 이유는 다음과 같다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>보안성&lt;/strong>: 소스 코드를 직접 노출하지 않고 바이트 코드로 변환함으로써 코드의 내용을 보호할 수 있다.&lt;/li>
+&lt;li>&lt;strong>효율성&lt;/strong>: 컴파일 시 문법 검사와 최적화를 거치므로, 실행 시 추가적인 문법 검사가 필요 없어 시간이 절약된다.&lt;/li>
+&lt;li>&lt;strong>플랫폼 독립성:&lt;/strong> 바이트 코드는 JVM이 설치된 어떤 플랫폼에서든 실행 가능하다.&lt;/li>
+&lt;/ul>
+&lt;p>그러나 이 방식은 소스 코드가 변경될 때마다 컴파일을 하고 실행 시켜야 되기 때문에 초기 빌드 시간이 길어질 수 있다.&lt;/p>
+&lt;p>컴파일된 &lt;code>.class&lt;/code> 파일은 클래스 로더(Class Loader)에 의해 JVM 메모리 영역인 런타임 데이터 영역(Runtime Data Area)로 로드된다.&lt;/p>
+&lt;p>이후 실행 엔진(Execution Engine)이 바이트 코드를 실행 가능한 기계어로 변환하여 프로그램을 실행한다.&lt;/p>
+&lt;h3 id="jvm-메모리-구조">JVM 메모리 구조
+&lt;/h3>&lt;p>JVM은 자바 프로그램을 실행할 때 메모리를 다음과 같은 주요 영역으로 나눠 관리한다.
+각 영역은 특정 데이터를 저장하고 스레드 간 공유 여부나 가비지 컬렉션 대상 여부에 따라 역할이 나뉜다.&lt;/p>
+&lt;p>&lt;img src="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-1.png"
+width="951"
+height="638"
+srcset="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-1_hu_b2a96dfaa0ef73a7.png 480w, https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-1_hu_82b47f2ac5535d33.png 1024w"
+loading="lazy"
+alt="JVM 메모리 구조 다이어그램"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="357px"
+>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>메모리 영역&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;th>특징&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>메소드 영역 (Method Area)&lt;/strong>&lt;/td>
+&lt;td>클래스 정보, 정적 변수, 상수, 메서드 데이터, 바이트 코드 등이 저장됨.&lt;/td>
+&lt;td>모든 스레드가 공유. JVM 시작 시 생성.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>힙 (Heap)&lt;/strong>&lt;/td>
+&lt;td>객체와 배열 같은 동적 데이터가 저장됨.&lt;/td>
+&lt;td>가비지 컬렉션(GC)이 관리. 모든 스레드가 공유.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>스택 (Stack)&lt;/strong>&lt;/td>
+&lt;td>메서드 호출 시 지역 변수, 매개변수, 호출 정보(리턴 주소 등)가 저장됨.&lt;/td>
+&lt;td>스레드별 생성. LIFO 구조.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>PC 레지스터 (PC Register)&lt;/strong>&lt;/td>
+&lt;td>현재 실행 중인 JVM 명령어의 주소를 저장.&lt;/td>
+&lt;td>스레드별 생성. 매우 빠른 접근.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>네이티브 메소드 스택 (Native Method Stack)&lt;/strong>&lt;/td>
+&lt;td>네이티브 메서드 호출 시 사용되는 스택. C/C++ 코드 실행 시 활용.&lt;/td>
+&lt;td>스레드별 생성.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="method-area">Method Area
+&lt;/h3>&lt;p>JVM이 시작될 때 생성되며, 프로그램 종료 시까지 유지된다.
+바이트 코드가 이 영역에 저장된다.&lt;/p>
+&lt;ul>
+&lt;li>저장 데이터:
+&lt;ul>
+&lt;li>&lt;strong>클래스 정보&lt;/strong>: 클래스 구조, 메서드, 필드 등의 메타데이터&lt;/li>
+&lt;li>&lt;strong>정적 변수(&lt;code>static&lt;/code>)&lt;/strong>: 클래스의 정적 멤버 변수&lt;/li>
+&lt;li>&lt;strong>상수 풀&lt;/strong>: 문자열 리터럴, &lt;code>final&lt;/code> 변수 등&lt;/li>
+&lt;li>&lt;strong>메서드 바이트 코드&lt;/strong>: 컴파일된 메서드 코드.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>Java 8 이후 &lt;code>Metaspace&lt;/code>로 대체되었으며, 이는 네이티브 메모리를 사용하여 동적으로 확장 가능하다.
+모든 스레드가 공유하므로 동기화가 필요할 수 있다.&lt;/p>
+&lt;h3 id="heap">Heap
+&lt;/h3>&lt;p>동적으로 생성된 객체와 배열이 저장되는 영역이다.
+&lt;code>new&lt;/code> 키워드로 생성된 모든 인스턴스는 힙에 할당된다.&lt;/p>
+&lt;p>해당 객체가 소멸되기 전이나 GC(Garbage Collector)가 정리하기 전까지 유지되는 영역으로 쉽게 소멸되는 데이터가 아니다.&lt;/p>
+&lt;ul>
+&lt;li>GC의 대상이 되는 공간이며 효율적인 GC를 실행하기 위해서 5가지 영역으로 나뉘게 된다.
+&lt;ul>
+&lt;li>&lt;strong>Young Generation&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;strong>Eden Space&lt;/strong>: 새 객체가 처음 생성되는 곳&lt;/li>
+&lt;li>&lt;strong>Survivor Spaces&lt;/strong>(S0, S1): Minor GC 후 살아남은 객체가 이동&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Old Generation&lt;/strong>(Tenured): 오래된 객체가 저장됨.&lt;/li>
+&lt;li>&lt;strong>Permanent Generation&lt;/strong>(Java 7까지, 이후 Metaspace로 대체): 클래스 메타데이터 저장&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>힙은 GC의 주요 대상이며, 더 이상 참조되지 않는 객체를 정리하여 메모리를 회수한다.
+&lt;ul>
+&lt;li>Minor GC: Young Generation에서 발생&lt;/li>
+&lt;li>Major/Full GC: Old Generation과 전체 힙을 대상으로 함&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>모든 스레드가 공유하므로 동기화가 필요하다.&lt;/p>
+&lt;h3 id="stack">Stack
+&lt;/h3>&lt;p>각 스레드마다 독리적으로 생성되며, 메서드 호출 시마다 프레임(Frame)이 생성되어 스택에 쌓인다.&lt;/p>
+&lt;ul>
+&lt;li>프레임 구성:
+&lt;ul>
+&lt;li>지역 변수 배열: 메서드의 지역 변수와 매개변수&lt;/li>
+&lt;li>피연산자 스택: 연산 중간 결과 저장&lt;/li>
+&lt;li>프레임 데이터: 메서드 호출 정보(리턴 주소 등)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>메서드 호출이 종료되면 해당 프레임이 스택에서 제거되고, 지역 변수는 소멸된다.
+참조형 변수(예: 객체 참조)는 스택에 저장되지만, 실제 객체는 힙에 저장된다.&lt;/p>
+&lt;p>스레드별로 독립적이므로 동기화가 필요 없다.&lt;/p>
+&lt;h3 id="pc-register">PC Register
+&lt;/h3>&lt;ul>
+&lt;li>스레드별로 생성되며, 현재 실행 중인 JVM 명령어의 주소를 저장한다.&lt;/li>
+&lt;li>JVM이 명령어를 실행할 때 다음에 실행할 명령어 위치를 추적한다.&lt;/li>
+&lt;li>스레드가 실행 중단(예: 컨텍스트 스위칭) 시 현재 상태를 저장하여 재개 시 올바른 위치에서 실행을 계속할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="native-method-stack">Native Method Stack
+&lt;/h3>&lt;ul>
+&lt;li>Java가 아닌 네이티브 언어(&lt;code>C&lt;/code>, &lt;code>C++&lt;/code> 등)로 작성된 메서드를 실행할 때 사용된다.&lt;/li>
+&lt;li>JNI(Native Method Interface)를 통해 호출된 네이티브 메서드의 호출 스택을 관리한다.&lt;/li>
+&lt;li>스레드별로 독립적으로 생성된다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="execution-engine">Execution Engine
+&lt;/h3>&lt;p>클래스 로더가 로드한 바이트 코드를 실행 가능한 기계어로 변환하여 실행한다.&lt;/p>
+&lt;ul>
+&lt;li>구성:
+&lt;ul>
+&lt;li>&lt;strong>Interpreter&lt;/strong>: 바이트 코드를 한 줄씩 해석하여 실행. 초기 실행 속도는 빠르지만 반복 실행 시 비효율적&lt;/li>
+&lt;li>&lt;strong>JIT(Just-In-Time) Compiler&lt;/strong>: 자주 실행되는 코드를 런타임에 기계어로 컴파일하여 캐싱. 이후 실행 속도가 빨라진다.&lt;/li>
+&lt;li>&lt;strong>Garbage Collector&lt;/strong>: 더 이상 참조되지 않는 객체를 힙에서 제거한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>힙과 Method Area는 스레드 간 공유되므로 동기화 매커니즘이 필요하다.
+&lt;code>synchronized&lt;/code> 키워드나 &lt;code>Lock&lt;/code> 객체를 사용하여 동기화 처리.&lt;/p>
+&lt;h3 id="native-method-interface-jni">Native Method Interface (JNI)
+&lt;/h3>&lt;p>Java 코드와 네이티브 코드(&lt;code>C&lt;/code>/&lt;code>C++&lt;/code> 등) 간의 인터페이스를 제공하는 프레임워크.
+성능 최적화, 기존 &lt;code>C&lt;/code> 라이브러리 활용하는 용도이다.&lt;/p>
+&lt;ul>
+&lt;li>Java 코드에서 &lt;code>native&lt;/code> 키워드로 선언된 메서드를 호출&lt;/li>
+&lt;li>JNI가 해당 네이티브 메서드를 찾아 실행&lt;/li>
+&lt;li>네이티브 메서드는 네이티브 메소드 스택을 사용하여 실행&lt;/li>
+&lt;/ul>
+&lt;h3 id="native-method-libraries">Native Method Libraries
+&lt;/h3>&lt;p>JNI가 호출하는 네이티브 메서드의 구현체가 포함된 라이브러리.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>.dll&lt;/code> (Windows), &lt;code>.so&lt;/code> (Linux) 등의 동적 라이브러리 형태로 제공&lt;/li>
+&lt;li>JVM은 &lt;code>System.loadLibrary()&lt;/code>를 통해 필요한 라이브러리를 로드한다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="java의-실행과-각-메모리-영역">Java의 실행과 각 메모리 영역
+&lt;/h3>&lt;p>Java 프로그램의 생명 주기를 단계별로 살펴보며 각 메모리 영역이 어떻게 활용되는지 분석한다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>소스 코드 작성 및 컴파일&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>.java&lt;/code> 파일을 작성하고 &lt;code>javac&lt;/code>로 컴파일하여 &lt;code>.class&lt;/code> 파일(바이트 코드) 생성.&lt;/li>
+&lt;li>바이트 코드는 플랫폼 독립적이며, JVM이 이해할 수 있는 중간 언어.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Class Loading&lt;/strong>:
+&lt;ul>
+&lt;li>Class Loader가 &lt;code>.class&lt;/code> 파일을 읽어 Method Area에 클래스 정보(메타 데이터, 바이트 코드 등)를 로드한다.&lt;/li>
+&lt;li>정적 변수(&lt;code>static&lt;/code>)도 Method area에 할당한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>프로그램 실행&lt;/strong>:
+&lt;ul>
+&lt;li>Execution Engine이 바이트 코드를 해석/컴파일하여 실행한다.&lt;/li>
+&lt;li>&lt;code>main&lt;/code> 메서드 호출 시 스레드가 생성되고, 해당 스레드의 Stack에 &lt;code>main&lt;/code> 메서드 프레임이 생성된다.&lt;/li>
+&lt;li>PC Register는 현재 실행 중인 명령어 주소를 추적한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>객체 생성&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>new&lt;/code> 키워드로 객체를 생성하면 Heap에 객체가 할당된다.&lt;/li>
+&lt;li>객체 참조는 Stack의 지역 변수로 저장된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>메서드 호출&lt;/strong>:
+&lt;ul>
+&lt;li>메서드 호출 시 새로운 프레임이 Stack에 추가된다.&lt;/li>
+&lt;li>지역 변수와 매개변수는 프레임 내에 저장된다.&lt;/li>
+&lt;li>메서드 종료 시 프레임이 제거되고 지역 변수는 소멸된다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>스레드 동기화&lt;/strong>:
+&lt;ul>
+&lt;li>여러 스레드가 Heap 또는 Method Area에 데이터를 공유할 경우 동기화 필요&lt;/li>
+&lt;li>예: &lt;code>synchronized&lt;/code> 블록을 사용하여 공유 자원에 대한 접근 제어.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>가비지 컬렉션&lt;/strong>:
+&lt;ul>
+&lt;li>더 이상 참조되지 않는 객체를 &lt;code>Heap&lt;/code>에서 제거한다.&lt;/li>
+&lt;li>Young Generation에서 자주 발생하는 Minor GC와 전체 힙을 대상으로 하는 Full GC로 나뉜다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>네이티브 메서드 호출&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>native&lt;/code> 메서드 호출 시 JNI를 통해 네이티브 코드를 실행한다.&lt;/li>
+&lt;li>Native Method Stack에 호출 정보 저장&lt;/li>
+&lt;li>Native Method Libraries에서 해당 메서드 구현체 실행&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="효율적인-메모리-관리-전략">효율적인 메모리 관리 전략
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>Heap 메모리 최적화&lt;/strong>:
+&lt;ul>
+&lt;li>불필요한 객체 생성을 최조화&lt;/li>
+&lt;li>객체 풀(Object Pool)을 사용하여 자주 생성/소멸되는 객체 재사용.&lt;/li>
+&lt;li>적절한 GC 튜닝(예: &lt;code>-Xms&lt;/code>, &lt;code>-Xmx&lt;/code>로 초기/최대 힙 크기 설정)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Stack 메모리 관리&lt;/strong>:
+&lt;ul>
+&lt;li>깊은 재귀 호출을 피하여 StackOverflowError 방지&lt;/li>
+&lt;li>지역 변수 사용을 최소화하고, 불필요한 변수 선언 줄이기&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Method Area 관리&lt;/strong>:
+&lt;ul>
+&lt;li>클래스 로딩 최소화: 불필요한 클래스 로딩 방지&lt;/li>
+&lt;li>Metaspace 크기 조정 (예: &lt;code>-XX:MaxMetaspaceSize&lt;/code> 옵션)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>가비지 컬렉션 최적화&lt;/strong>:
+&lt;ul>
+&lt;li>Young/Old Generation 크기 조정&lt;/li>
+&lt;li>적절한 GC 알고리즘 선택 (예: G1GC, CMS)&lt;/li>
+&lt;li>메모리 누수 방지: 강한 참조(Strong Reference) 대신 약한 참조(Weak Reference) 사용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>네이티브 메모리 관리&lt;/strong>:
+&lt;ul>
+&lt;li>네이티브 메서드 호출 시 메모리 누수 주의&lt;/li>
+&lt;li>JNI로 할당된 네이티브 메모리를 적절히 해제&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="java-실행-예제">📌Java 실행 예제
+&lt;/h2>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>Native Method Libraries
+Native Method Libraries는 JDK에 포함된 기본 라이브러리가 아니라 사용자가 별도로 작성하거나 서드파티 라이브러리로 제공 받아야 하는 네이티브 라이브러리다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="프로젝트-생성">프로젝트 생성
+&lt;/h3>&lt;p>Windows에서 Gradle, Java 17, Groovy 프로젝트 생성 후 테스트할 예정이다.
+&lt;code>com.java.JVMMemoryExample&lt;/code> 클래스를 생성한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">java.util.ArrayList&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kn">import&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nn">java.util.List&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">JVMMemoryExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 정적 변수: Method Area에 저장됨&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">staticCounter&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 인스턴스 변수: Heap에 저장됨 (객체가 생성될 때)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">JVMMemoryExample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">message&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 메서드: Method Area에 바이트 코드로 저장됨&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">synchronized&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">incrementCounter&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 지역 변수: Stack에 저장됨&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">localVar&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">10&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 동기화: Heap/Method Area의 공유 자원(staticCounter)에 접근&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">staticCounter&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">localVar&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">currentThread&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">getName&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34; - Counter: &amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">staticCounter&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 네이티브 메서드 선언: JNI를 통해 호출&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">native&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">callNativeMethod&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 네이티브 라이브러리 로드: Native Method Libraries에서 로드&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">loadLibrary&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;NativeLib&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;프로그램 시작 - VisualVM 연결을 위해 15초 대기...&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">15000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// VisualVM 연결 시간 확보&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;1. 객체 생성 단계 시작 (5초 간격)&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">List&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">examples&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ArrayList&lt;/span>&lt;span class="o">&amp;lt;&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">for&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">83&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">examples&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Object-&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">%&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">20&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 20개마다 일시 정지&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34; 생성된 객체: &amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;개, 5초 대기...&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">5000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;2. 개별 객체 생성 및 스레드 시작 (10초 대기)&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">example1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">example2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;World&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">5000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 객체 생성 후 대기&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">finalExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">example1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">finalExample&lt;/span>&lt;span class="p">::&lt;/span>&lt;span class="n">incrementCounter&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Thread-1&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">JVMMemoryExample&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">finalExample1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">example2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">finalExample1&lt;/span>&lt;span class="p">::&lt;/span>&lt;span class="n">incrementCounter&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Thread-2&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">t1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">start&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">t2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">start&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">t1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">join&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">t2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">join&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">InterruptedException&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">printStackTrace&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;3. 네이티브 메서드 호출 전 10초 대기...&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">10000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;4. 네이티브 메서드 호출&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">example1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">callNativeMethod&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">5000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 네이티브 호출 후 대기&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;5. 참조 해제 및 GC 호출 단계&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34; example1, example2 참조 해제 (5초 대기)&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">example1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">example2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">5000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34; 첫 번째 GC 호출&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">gc&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">10000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// GC 후 메모리 변화 관찰&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34; examples 리스트 클리어 (5초 대기)&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">examples&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clear&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">5000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34; 두 번째 GC 호출&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">gc&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">10000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// GC 후 메모리 변화 관찰&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;6. 프로그램 종료 대기 (30초)&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">30000&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">long&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">millis&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Thread&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sleep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">millis&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">InterruptedException&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">printStackTrace&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="nativelib-생성">NativeLib 생성
+&lt;/h3>&lt;p>&lt;code>NativeLib&lt;/code>을 생성해서 라이브러리까지 테스트한다.
+이는 JNI(Java Native Interface)를 사용하여 &lt;code>C&lt;/code>/&lt;code>C++&lt;/code> 코드를 작성하고, 이를 동적 라이브러리 (&lt;code>.dll&lt;/code>, &lt;code>.so&lt;/code>, &lt;code>.dylib&lt;/code>)로 컴파일 하는 과정을 포함한다.&lt;/p>
+&lt;h4 id="네이티브-메서드-헤더-파일-생성">네이티브 메서드 헤더 파일 생성
+&lt;/h4>&lt;ol>
+&lt;li>&lt;code>JVMMemoryExample&lt;/code> 클래스를 컴파일한다.&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">javac JVMMemoryExample.java
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 컴파일부터 인코딩 오류... 파일은 UTF-8, javac는 기본 ms-949&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 인코딩 옵션 추가해서 테스트&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">javac -encoding UTF-8 JVMMemoryExample.java
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol start="2">
+&lt;li>&lt;code>javac -h&lt;/code> 명령어로 헤더 파일을 생성&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">javac -h . JVMMemoryExample.java
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 인코딩...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">javac -encoding UTF-8 -h . JVMMemoryExample.java
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># JVMMemoryExample.h 라는 파일이 생성된다. 내용은 아래와 같은 파일이 만들어진다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># JNIEXPORT void JNICALL Java_JVMMemoryExample_callNativeMethod(JNIEnv *, jobject);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="c-코드-작성">C 코드 작성
+&lt;/h4>&lt;p>&lt;code>NativeLib.c&lt;/code> 파일을 생성하고 네이티브 메서드를 구현한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;jni.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;JVMMemoryExample.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">JNIEXPORT&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="n">JNICALL&lt;/span> &lt;span class="nf">Java_JVMMemoryExample_callNativeMethod&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">JNIEnv&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">env&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">jobject&lt;/span> &lt;span class="n">obj&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;네이티브 메서드가 호출되었습니다!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="동적-라이브러리-컴파일">동적 라이브러리 컴파일
+&lt;/h4>&lt;p>MinGW를 사용한다.
+Java 환경 변수는 설정됐다고 가정한다.&lt;/p>
+&lt;p>&lt;code>gcc&lt;/code> 컴파일러를 사용하기 위해 SourceForge에서 MinGW-w64 바이너리 배포판을 다운로드 받아 &lt;code>C:\mingw-w64&lt;/code> 폴더 아래에 배치하고 환경 변수를 등록했다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">C:\mingw-w64\
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mingw64\
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> bin\ &amp;lt;- gcc.exe, g++.exe 등이 포함됨
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> include\
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> lib\
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>환경 변수 등록 후 &lt;code>gcc&lt;/code> 버전 확인&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">gcc --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># gcc (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Copyright (C) 2018 Free Software Foundation, Inc.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이후 컴파일 명령어 실행하면 &lt;code>NativeLib.dll&lt;/code> 파일이 생성된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">gcc -I&lt;span class="s2">&amp;#34;%JAVA_HOME%\include&amp;#34;&lt;/span> -I&lt;span class="s2">&amp;#34;%JAVA_HOME%\include\win32&amp;#34;&lt;/span> -shared -o NativeLib.dll NativeLib.c
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="라이브러리-경로-설정">라이브러리 경로 설정
+&lt;/h4>&lt;p>생성된 &lt;code>NativeLib.dll&lt;/code>을 &lt;code>java.library.path&lt;/code>에 추가하거나 IntelliJ에서 실행 시 경로를 지정한다.
+&lt;code>Run &amp;gt; Edit Configurations &amp;gt; VM options&lt;/code>에 추가해서 실행한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">-Djava.library.path&lt;span class="o">=&lt;/span>NativeLib_파일_경로
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예: -Djava.library.path=C:\libs&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="실행-결과">실행 결과
+&lt;/h4>&lt;p>일반적인 실행 결과&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">Thread-1 - Counter: &lt;span class="m">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Thread-2 - Counter: &lt;span class="m">20&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">네이티브 메서드가 호출되었습니다!
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">BUILD SUCCESSFUL in 444ms
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이 실행을 통해 JVM 메모리 구조를 확인하기 위해선 &lt;code>VisualVM&lt;/code>, &lt;code>JConsole&lt;/code> 또는 JVM 로그 옵션 &lt;code>-XLog:gc&lt;/code>를 사용할 수 있다.&lt;/p>
+&lt;h3 id="visualvm으로-jvm-메모리-구조-확인">VisualVM으로 JVM 메모리 구조 확인
+&lt;/h3>&lt;p>뭔가 이름부터 눈으로 확인하기 좋을 것 같아서 JDK에 포함되어 있는 강력한 모니터링 도구 VisualVM으로 JVM의 메모리 사용량, 스레드 상태, GC 동작 등을 확인한다.&lt;/p>
+&lt;p>JDK 설치 경로에서 &lt;code>jvisualvm.exe&lt;/code>이 있다면 실행한다.
+없다면 직접 VisualVM을 다운로드 받는다.&lt;/p>
+&lt;ul>
+&lt;li>OpenJDK를 사용하고 있고 &lt;code>jvisualvm.exe&lt;/code>가 포함되지 않은 배포판인 듯.&lt;/li>
+&lt;li>&lt;a class="link" href="https://visualvm.github.io/download.html" target="_blank" rel="noopener"
+>https://visualvm.github.io/download.html&lt;/a> 직접 VisualVM을 다운로드 받았다.&lt;/li>
+&lt;li>독립적으로 실행 가능해서 별도 위치에 배치한 후 &lt;code>visualvm_2110\bin\visualvm.exe&lt;/code>를 실행했다.&lt;/li>
+&lt;/ul>
+&lt;p>실행 후 자동으로 JDK가 감지되지만 직접 JDK를 지정하여 VisualVM을 실행할 수 있다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># VisualVM이 설치된 디렉토리로 이동한 후 JDK 경로를 지정하여 VisualVM을 실행&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예시 경로이므로 실제 경로를 사용한다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">visualvm.exe --jdkhome &lt;span class="s2">&amp;#34;C:\Program Files\java\openlogic-openjdk-17.0.14+7-windows-x64&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-2.png"
+width="884"
+height="552"
+srcset="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-2_hu_44bb1e75a4656ef5.png 480w, https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-2_hu_8911536d18e8fa5c.png 1024w"
+loading="lazy"
+alt="VisualVM 실행화면"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>&lt;/p>
+&lt;p>실행 후 좌측 패널에서 JVMMemoryExample을 확인할 수 있고 각 탭에서 필요한 정보를 찾아 확인해볼 수 있다.&lt;/p>
+&lt;p>실행 예제를 테스트하기 위해 VisualVM의 상단 툴바에서 &lt;code>Tools &amp;gt; Plugins &amp;gt; Available Plugins&lt;/code>을 보면 &lt;code>Visual GC&lt;/code>가 있다. 이걸 설치하고 확인해본다.&lt;/p>
+&lt;p>&lt;img src="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-3.png"
+width="1853"
+height="815"
+srcset="https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-3_hu_8de7f0e62c4f51f8.png 480w, https://b9f1.com/p/2025-04-06-java-memory-structure-jvm/image-3_hu_e25b9cd8253c3a36.png 1024w"
+loading="lazy"
+alt="VisualVM의 VisualGC 화면"
+class="gallery-image"
+data-flex-grow="227"
+data-flex-basis="545px"
+>&lt;/p>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>JVM의 메모리 구조를 이해하고 프로그램이 실행될 때 시각적으로 확인해볼 수 있었다.
+VisualVM은 다시 한 번 다뤄야겠다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="garbage-collector">Garbage Collector
+&lt;/h3>&lt;p>가비지 컬렉터 GC는 더 이상 참조되지 않는 객체를 힙에서 제거하여 메모리를 회수하는 역할을 갖는다.&lt;/p>
+&lt;h4 id="종류">종류
+&lt;/h4>&lt;ul>
+&lt;li>Serial GC: 단일 스레드로 GC 수행. 소규모 애플리케이션에 적합&lt;/li>
+&lt;li>Parallel GC: 여러 스레드로 GC 수행. 처리량 중점&lt;/li>
+&lt;li>CMS (Concurrent Mark-Sweep): 애플리케이션 스레드와 동시에 실행. 낮은 지연 시간 중점&lt;/li>
+&lt;li>G1GC: 대규모 힙에서 효율적인 GC. Java 9부터 기본 GC.&lt;/li>
+&lt;/ul>
+&lt;h4 id="동작">동작
+&lt;/h4>&lt;ol>
+&lt;li>Mark: 더 이상 참조되지 않는 객체 식별&lt;/li>
+&lt;li>Sweep: 식별된 객체 제거&lt;/li>
+&lt;li>Compact (일부 GC): 메모리 조각화 방지&lt;/li>
+&lt;/ol>
+&lt;h4 id="최적화-팁">최적화 팁
+&lt;/h4>&lt;ul>
+&lt;li>GC 로그 분석 (&lt;code>-Xlog:gc&lt;/code> 옵션)&lt;/li>
+&lt;li>애플리케이션 특성에 맞는 GC 선택&lt;/li>
+&lt;li>불필요한 객체 생성 방지&lt;/li>
+&lt;/ul></description></item></channel></rss>

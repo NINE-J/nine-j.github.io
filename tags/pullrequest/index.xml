@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PullRequest on B9F1</title><link>https://b9f1.com/tags/pullrequest/</link><description>Recent content in PullRequest on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 06 May 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/pullrequest/index.xml" rel="self" type="application/rss+xml"/><item><title>VSCode에서 PR 보기</title><link>https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/</link><pubDate>Tue, 06 May 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/cover.png" alt="Featured image of post VSCode에서 PR 보기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>VSCode에서 PR 보려는데 복잡시럽다 복잡시러.
+IntelliJ Ultimate/Community에선 GitHub 플러그인으로 손쉽게 확인이 가능하다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="ide에서-pr을-확인하면-좋은-점">IDE에서 PR을 확인하면 좋은 점
+&lt;/h3>&lt;p>코드 리뷰에 대한 코멘트를 &lt;strong>바로 파일의 라인에서 확인&lt;/strong>할 수 있다.
+의견이 있어서 Reply를 남기거나 수정 완료를 곧바로 처리할 수 있다.&lt;/p>
+&lt;p>&lt;img src="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-1.png"
+width="1476"
+height="845"
+srcset="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-1_hu_c47d631622e763b5.png 480w, https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-1_hu_c637b8f909930dab.png 1024w"
+loading="lazy"
+alt="IDE에서 PR을 확인하면 좋은 점"
+class="gallery-image"
+data-flex-grow="174"
+data-flex-basis="419px"
+>&lt;/p>
+&lt;h3 id="github-pull-requests">GitHub Pull Requests
+&lt;/h3>&lt;p>&lt;img src="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-2.png"
+width="2503"
+height="1107"
+srcset="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-2_hu_23caf4e1075de12a.png 480w, https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-2_hu_e8d4ffa41c55f926.png 1024w"
+loading="lazy"
+alt="GitHub Pull Requests 확장툴"
+class="gallery-image"
+data-flex-grow="226"
+data-flex-basis="542px"
+>&lt;/p>
+&lt;p>현재 기준 GitHub Pull Requests를 설치한다. &lt;a class="link" href="https://marketplace.visualstudio.com/items/?itemName=GitHub.vscode-pull-request-github" target="_blank" rel="noopener"
+>VSCode marketplace - GitHub Pull Requests&lt;/a>
+예전 이름은 GitHub Pull Requests and Issues였나 보다.
+기능은 같아서 PR, Issues를 확인할 수 있다.&lt;/p>
+&lt;h3 id="근데-이게-문제였다">근데 이게 문제였다
+&lt;/h3>&lt;p>확장 설치하면 열려 있는 PR만 확인이 됐다.
+필요한 다른 항목은 쿼리를 수정해줘야 한다.&lt;/p>
+&lt;p>&lt;code>Ctrl + Shift + P&lt;/code> 명령 팔레트&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt;GitHub Pull Requests: Configure
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 엔터 치면 두 개 나온다&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Configure Remotes...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Configure Queries...&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-3.png"
+width="1476"
+height="845"
+srcset="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-3_hu_9cb949fec66f4c9a.png 480w, https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-3_hu_72a53d90c93ffd4e.png 1024w"
+loading="lazy"
+alt="GitHub Pull Requests: Configure"
+class="gallery-image"
+data-flex-grow="174"
+data-flex-basis="419px"
+>&lt;/p>
+&lt;p>나는 닫힌 PR을 확인해야 해서 추가했다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// settings.json
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ... others
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nt">&amp;#34;githubPullRequests.queries&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// ... others
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;label&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;My Closed PRs&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;query&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;is:closed assignee:${user}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>필요에 맞게 수정 후 새로고침하면 잘 확인된다.&lt;/p>
+&lt;p>&lt;img src="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-4.png"
+width="1476"
+height="845"
+srcset="https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-4_hu_d1d457e03a36ea70.png 480w, https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/image-4_hu_e19722f9cdb46fca.png 1024w"
+loading="lazy"
+alt="GitHub Pull Requests 설정 settings.json"
+class="gallery-image"
+data-flex-grow="174"
+data-flex-basis="419px"
+>&lt;/p></description></item></channel></rss>
