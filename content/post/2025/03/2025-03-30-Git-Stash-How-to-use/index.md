@@ -77,6 +77,7 @@ git stash apply stash@{n}
 
 ```bash
 # 가장 최근의 stash 적용 후 삭제
+# 단, 적용 시 충돌이나 실패가 발생하는 경우 삭제되지 않고 유지된다.
 git stash pop
 
 # 특정 stash 적용 후 삭제
