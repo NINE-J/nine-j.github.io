@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Browser on B9F1</title><link>https://b9f1.com/categories/browser/</link><description>Recent content in Browser on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 May 2025 11:18:19 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/browser/index.xml" rel="self" type="application/rss+xml"/><item><title>No static resource</title><link>https://b9f1.com/p/2025-05-20-no-static-resource-well-known-appspecific-com.chrome.devtools.json/</link><pubDate>Tue, 20 May 2025 11:18:19 +0900</pubDate><guid>https://b9f1.com/p/2025-05-20-no-static-resource-well-known-appspecific-com.chrome.devtools.json/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-20-no-static-resource-well-known-appspecific-com.chrome.devtools.json/cover.png" alt="Featured image of post No static resource" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring 서버를 실행하고 크롬에서 로컬 호스트를 접속한 뒤 개발자 모드를 활성화 할 때 계속 같은 오류가 발생했다.&lt;/p>
+&lt;p>오류가 발생한 시점은 사용자 정의 예외를 공통으로 처리하기 위해 클래스를 추가한 시점에 발생했다.&lt;/p>
+&lt;p>프로그램에는 영향이 없는 것 같았지만 오류니까 거슬린다.
+프로덕션 환경에선 문제 없는 것 같은데 로컬 개발 환경에서 자주 발견되는 것 같다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>http-nio-8080-exec-7&lt;span class="o">]&lt;/span> ERROR GlobalExceptionHandler - &lt;span class="o">[&lt;/span>시스템 오류&lt;span class="o">]&lt;/span> No static resource .well-known/appspecific/com.chrome.devtools.json.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>로그 포맷을 변경해서 일반적이진 않겠지만 이 부분 &lt;code>.well-known/appspecific/com.chrome.devtools.json.&lt;/code>,
+개발자 모드를 활성화할 때마다 정적 리소스를 요청한다.&lt;/p>
+&lt;p>크로미움 기반 브라우저에서 로컬 호스트의 개발 서버를 열 때 재현할 수 있는 것 같은데 그래서 저 오류가 뭔지 궁금했다.&lt;/p>
+&lt;p>&lt;a class="link" href="https://chromium.googlesource.com/devtools/devtools-frontend/&amp;#43;/main/docs/ecosystem/README.md" target="_blank" rel="noopener"
+>Chromium DevTools Ecosystem Guide&lt;/a>문서에서 관련 내용을 확인할 수 있다.&lt;/p>
+&lt;h3 id="어떤-해결-방법이-있을까">어떤 해결 방법이 있을까
+&lt;/h3>&lt;p>크롬 개발자 도구가 자동으로 .well-known/appspecific/&amp;hellip; 파일을 요청하면서 생기는 현상.
+서버에 실제로 해당 정적 리소스가 없어서 Spring이 오류를 던지는 것이며, 보안 위험은 없다.&lt;/p>
+&lt;ul>
+&lt;li>무시하거나&lt;/li>
+&lt;li>더미 리소스를 만들어주거나&lt;/li>
+&lt;li>요청 경로 필터링으로 처리한다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="코드-기반으로-살펴-보기">코드 기반으로 살펴 보기
+&lt;/h3>&lt;p>일단 내 경우는 에러 핸들러 추가까진 안 보이다가 로그를 남기는 시점에 보이기 시작했다.&lt;/p>
+&lt;p>땜빵(?)을 하긴 했지만 별로 좋은 해결책은 아닌 것 같고.. 일단 코드 대충 보고 원인부터 알아보자.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@ControllerAdvice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">GlobalExceptionHandler&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Logger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">LogManager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getLogger&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GlobalExceptionHandler&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@ExceptionHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BusinessException&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ErrorResponse&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">handleBusinessException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BusinessException&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[서비스 오류] code: {}, messageKey: {}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getErrorCode&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">getCode&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getErrorCode&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">getMessageKey&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ErrorCode&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">errorCode&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getErrorCode&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">HttpStatus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mapToHttpStatus&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">errorCode&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">body&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@ExceptionHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ErrorResponse&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">handleGeneralException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// 크롬 버전 때문에 출력되는 에러 &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getMessage&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;No static resource .well-known/appspecific/com.chrome.devtools.json.&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">HttpStatus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">NOT_FOUND&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">build&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[시스템 오류] {}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getMessage&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">HttpStatus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">INTERNAL_SERVER_ERROR&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">body&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">HttpStatus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">mapToHttpStatus&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ErrorCode&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">errorCode&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Spring MVC는 기본적으로 다음과 같이 예외를 처리한다.&lt;/p>
+&lt;ul>
+&lt;li>정적 리소스를 찾지 못하면 &lt;code>NoResourceFoundException&lt;/code> 또는 &lt;code>NoHandlerFoundException&lt;/code>을 발생 시킨다.&lt;/li>
+&lt;li>이 예외는 기보적으로 Spring 내부 DispatcherSevlet이 처리하고 브라우저엔 404 응답만 보내지 로그로 남기지 않는다.&lt;/li>
+&lt;/ul>
+&lt;p>그런데&amp;hellip; 이렇게 명시적으로 로그를 박아 버리면&lt;/p>
+&lt;ul>
+&lt;li>Spring의 내부 예외 처리 메커니즘을 가로챈다&lt;/li>
+&lt;li>&lt;code>.well-known/...&lt;/code> 같은 요청에서 발생하는 예외도 잡힌다.&lt;/li>
+&lt;li>핸들러는 알 수 없는 시스템 오류로 간주하고 log.error()를 남긴다.&lt;/li>
+&lt;li>그 결과 크롬 개발자 도구에서 자동으로 보내는 요청에서도 에러 로그가 쌓인다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@ExceptionHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ResponseEntity&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ErrorResponse&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">handleGeneralException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">error&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[시스템 오류] {}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getMessage&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h4 id="지금의-나로선">지금의 나로선..
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>.well-known&lt;/code> 요청을 필터나 핸들러에서 따로 무시 처리&lt;/li>
+&lt;li>또는 &lt;code>@ExceptionHandler&lt;/code>의 범위를 좁혀서 시스템 예외 외에는 무시&lt;/li>
+&lt;li>가장 깔끔한 방법은 필요 없는 경로의 예외는 &lt;strong>로깅하지 않도록 분기 처리&lt;/strong>하는 것&lt;/li>
+&lt;/ul>
+&lt;h3 id="automatic-workspace-folders란">Automatic Workspace Folders란?
+&lt;/h3>&lt;blockquote>
+&lt;p>&lt;strong>Chrome DevTools (버전 M-135 이상)&lt;/strong> 에서 도입된 기능으로, DevTools가 개발 서버(devserver)로부터 프로젝트 디렉토리 정보를 자동으로 인식해, 로컬 워크스페이스로 연결하는 기능이다.&lt;/p>&lt;/blockquote>
+&lt;p>기존의 Workspaces 기능을 &lt;strong>자동화&lt;/strong>한 것으로, 디버깅 중 DevTools에서 소스 코드를 수정할 때 해당 수정 사항이 &lt;strong>로컬 파일에 직접 반영될 수 있도록 설정&lt;/strong>해준다고 한다.&lt;/p>
+&lt;h4 id="이런-기능이-생긴-배경">이런 기능이 생긴 배경
+&lt;/h4>&lt;p>기존 DevTools Workspaces 기능(M-63 도입)은 다음과 같은 불편이 있었다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>수동 설정이 필요&lt;/strong>함 (Workspace 탭에서 직접 폴더 지정)&lt;/li>
+&lt;li>&lt;strong>프로젝트별 관리가 불편&lt;/strong>함 (매번 폴더 추가/삭제 필요)&lt;/li>
+&lt;/ol>
+&lt;h4 id="작동-방식">작동 방식
+&lt;/h4>&lt;p>Chrome DevTools는 다음 조건을 만족할 때 자동으로 &lt;code>.well-known/appspecific/com.chrome.devtools.json&lt;/code> 파일을 요청한다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>브라우저에서 여는 페이지의 origin이 &lt;code>localhost&lt;/code>&lt;/strong>&lt;/li>
+&lt;li>DevTools가 열려 있는 상태&lt;/li>
+&lt;/ul>
+&lt;p>이 파일이 존재하면 DevTools는 해당 정보를 기반으로 자동으로 워크스페이스로 연결한다.&lt;/p>
+&lt;h4 id="요청되는-json-파일">요청되는 JSON 파일
+&lt;/h4>&lt;ul>
+&lt;li>요청 경로: &lt;code>/.well-known/appspecific/com.chrome.devtools.json&lt;/code>&lt;/li>
+&lt;li>이 JSON 파일은 다음과 같은 구조를 가진다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;workspace&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;root&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/Users/foobar/Projects/my-awesome-web-project&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;uuid&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;53b029bb-c989-4dca-969b-835fecec3717&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>각 필드 설명
+&lt;ul>
+&lt;li>&lt;code>workspace.root&lt;/code>: 프로젝트 디렉토리의 &lt;strong>절대 경로&lt;/strong>&lt;/li>
+&lt;li>&lt;code>workspace.uuid&lt;/code>: 프로젝트 고유 식별자 (v4 UUID 등 무작위로 생성)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="사용-조건">사용 조건
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>M-135&lt;/strong> 이상에서 사용 가능&lt;/li>
+&lt;li>&lt;strong>M-136&lt;/strong>에서는 기본적으로 &lt;strong>기능이 활성화되어 있음&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>이전 버전&lt;/strong>에서는 다음 두 플래그를 활성화해야 함
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">chrome&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">flags&lt;/span>&lt;span class="c1">#devtools-project-settings&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">chrome&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">flags&lt;/span>&lt;span class="c1">#devtools-automatic-workspace-folders&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;h4 id="요약-정보">요약 정보
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>내용&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>기능 이름&lt;/td>
+&lt;td>Automatic Workspace Folders&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>도입 버전&lt;/td>
+&lt;td>M-135 (기능 비활성화), M-136 (기본 활성화)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>목적&lt;/td>
+&lt;td>DevTools에서 로컬 프로젝트와 자동 연결하여 코드 수정 반영&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>작동 조건&lt;/td>
+&lt;td>origin이 &lt;code>localhost&lt;/code>일 때 DevTools에서 JSON 요청&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>경로&lt;/td>
+&lt;td>&lt;code>/.well-known/appspecific/com.chrome.devtools.json&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>JSON 필드&lt;/td>
+&lt;td>&lt;code>workspace.root&lt;/code>, &lt;code>workspace.uuid&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>부가 도구&lt;/td>
+&lt;td>Vite 플러그인 존재, &lt;code>npx serve&lt;/code> 예시 제공됨&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>명확한 해결책은 없지만 불필요한 로그를 출력하지 않게 설정하는 것이 좋겠다.
+크롬 기능에 대해 실제 사용 예시나 한계, 조건 등을 알아보는 것도 좋겠다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="참고-자료">참고 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/withastro/astro/issues/13789" target="_blank" rel="noopener"
+>https://github.com/withastro/astro/issues/13789&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://chromium.googlesource.com/devtools/devtools-frontend/&amp;#43;/main/docs/ecosystem/README.md" target="_blank" rel="noopener"
+>Chromium DevTools Ecosystem Guide&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://developer.chrome.com/blog/new-in-devtools-135?hl=ko" target="_blank" rel="noopener"
+>Chrome 135의 DevTools의 새로운 기능&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

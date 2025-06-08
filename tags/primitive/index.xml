@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Primitive on B9F1</title><link>https://b9f1.com/tags/primitive/</link><description>Recent content in Primitive on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/primitive/index.xml" rel="self" type="application/rss+xml"/><item><title>Java 문법: Primitive VS Wrapper</title><link>https://b9f1.com/p/2025-04-10-java-primitive-vs-wrapper/</link><pubDate>Thu, 10 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-10-java-primitive-vs-wrapper/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-10-java-primitive-vs-wrapper/cover.png" alt="Featured image of post Java 문법: Primitive VS Wrapper" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Java의 Primitive Type(기본형)과 Wrapper Class(래퍼 클래스)는 본질적으로 같은 데이터를 다루지만, 존재 목적과 사용 방식에서 근본적인 차이가 있다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="기본-개념">기본 개념
+&lt;/h3>&lt;h4 id="primitive-type-기본형">Primitive Type 기본형
+&lt;/h4>&lt;ul>
+&lt;li>Java에서 제공하는 가장 기본적인 데이터 타입&lt;/li>
+&lt;li>&lt;code>byte&lt;/code>, &lt;code>short&lt;/code>, &lt;code>int&lt;/code>, &lt;code>long&lt;/code>, &lt;code>float&lt;/code>, &lt;code>double&lt;/code>, &lt;code>char&lt;/code>, &lt;code>boolean&lt;/code> 8가지 존재&lt;/li>
+&lt;li>스택(Stack) 메모리에 직접 값 저장&lt;/li>
+&lt;li>null 값을 가질 수 없음&lt;/li>
+&lt;li>산술 연산 가능&lt;/li>
+&lt;li>기본 값 존재 (예: &lt;code>int&lt;/code>는 0, &lt;code>boolean&lt;/code>은 false)&lt;/li>
+&lt;/ul>
+&lt;h4 id="wrapper-class-래퍼-클래스">Wrapper Class 래퍼 클래스
+&lt;/h4>&lt;ul>
+&lt;li>Primitive type을 객체로 감싸는 클래스&lt;/li>
+&lt;li>&lt;code>Byte&lt;/code>, &lt;code>Short&lt;/code>, &lt;code>Integer&lt;/code>, &lt;code>Long&lt;/code>, &lt;code>Float&lt;/code>, &lt;code>Double&lt;/code>, &lt;code>Character&lt;/code>, &lt;code>Boolean&lt;/code>&lt;/li>
+&lt;li>힙(Heap) 메모리에 저장&lt;/li>
+&lt;li>null 값 허용&lt;/li>
+&lt;li>다양한 유틸리티 메서드 제공&lt;/li>
+&lt;/ul>
+&lt;h3 id="주요-차이점">주요 차이점
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>특징&lt;/th>
+&lt;th>Primitive Type&lt;/th>
+&lt;th>Wrapper Class&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>저장 위치&lt;/td>
+&lt;td>Stack&lt;/td>
+&lt;td>Heap&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>null 허용&lt;/td>
+&lt;td>불가&lt;/td>
+&lt;td>가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>메모리 사용량&lt;/td>
+&lt;td>적음&lt;/td>
+&lt;td>많음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>접근 속도&lt;/td>
+&lt;td>빠름&lt;/td>
+&lt;td>상대적으로 느림&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>기본값 존재&lt;/td>
+&lt;td>있음&lt;/td>
+&lt;td>없음(null)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>유틸리티 메서드&lt;/td>
+&lt;td>없음&lt;/td>
+&lt;td>있음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Collection 요소로 사용&lt;/td>
+&lt;td>불가&lt;/td>
+&lt;td>가능&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="boxing--unboxing">Boxing &amp;amp; Unboxing
+&lt;/h3>&lt;h4 id="오토-박싱-autoboxing">오토 박싱 Autoboxing
+&lt;/h4>&lt;ul>
+&lt;li>원시 타입 → Wrapper 클래스로 자동 변환
+&lt;ul>
+&lt;li>컴파일러가 내부적으로 &lt;code>Integer.valueOf()&lt;/code>를 호출&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">primitiveInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">100&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">autoBoxedInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">primitiveInt&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 오토박싱 (자동)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="오토-언박싱-autounboxing">오토 언박싱 Autounboxing
+&lt;/h4>&lt;ul>
+&lt;li>Wrapper 클래스 → 원시 타입으로 자동 변환
+&lt;ul>
+&lt;li>컴파일러가 내부적으로 &lt;code>intValue()&lt;/code>를 호출&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Integer&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">wrapperInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">200&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">autoUnboxedInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">wrapperInt&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 오토언박싱 (자동)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="명시적-박싱-explicit-boxing">명시적 박싱 (Explicit Boxing)
+&lt;/h4>&lt;ul>
+&lt;li>직접 Wrapper 클래스의 메서드(&lt;code>valueOf()&lt;/code>)를 호출&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">primitiveInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">300&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">explicitBoxedInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">valueOf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">primitiveInt&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 명시적 박싱&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="명시적-언박싱-explicit-unboxing">명시적 언박싱 (Explicit Unboxing)
+&lt;/h4>&lt;ul>
+&lt;li>직접 Wrapper 클래스의 메서드(&lt;code>intValue()&lt;/code>)를 호출&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Integer&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">wrapperInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">400&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">explicitUnboxedInt&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">wrapperInt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">intValue&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 명시적 언박싱&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="차이점-정리">차이점 정리
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>예제&lt;/th>
+&lt;th>변환 방식&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>오토박싱&lt;/strong>&lt;/td>
+&lt;td>&lt;code>Integer a = 100;&lt;/code>&lt;/td>
+&lt;td>컴파일러가 자동 처리&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>명시적 박싱&lt;/strong>&lt;/td>
+&lt;td>&lt;code>Integer b = Integer.valueOf(100);&lt;/code>&lt;/td>
+&lt;td>개발자가 직접 메서드 호출&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>오토언박싱&lt;/strong>&lt;/td>
+&lt;td>&lt;code>int c = wrapperInt;&lt;/code>&lt;/td>
+&lt;td>컴파일러가 자동 처리&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>명시적 언박싱&lt;/strong>&lt;/td>
+&lt;td>&lt;code>int d = wrapperInt.intValue();&lt;/code>&lt;/td>
+&lt;td>개발자가 직접 메서드 호출&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="언제-사용하지">언제 사용하지?
+&lt;/h3>&lt;h4 id="primitive-type">Primitive Type
+&lt;/h4>&lt;ol>
+&lt;li>성능이 중요한 경우&lt;/li>
+&lt;li>null 값이 필요하지 않은 경우&lt;/li>
+&lt;li>대량의 데이터를 다룰 때 (메모리 효율성)&lt;/li>
+&lt;li>단순한 산술 연산이 필요한 경우&lt;/li>
+&lt;/ol>
+&lt;h4 id="wrapper-class">Wrapper Class
+&lt;/h4>&lt;ol>
+&lt;li>null 값이 필요할 때
+&lt;ul>
+&lt;li>데이터의 부재를 표현해야 하는 경우&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>컬렉션(Collection)에 저장해야 할 때
+&lt;ul>
+&lt;li>Java 컬렉션 프레임워크는 객체만 저장 가능&lt;/li>
+&lt;li>예: &lt;code>List&amp;lt;int&amp;gt;&lt;/code> 불가, &lt;code>List&amp;lt;Integer&amp;gt;&lt;/code> 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>객체의 메서드를 사용해야 할 때
+&lt;ul>
+&lt;li>&lt;code>Integer.parseInt()&lt;/code>, &lt;code>Character.isLetter()&lt;/code> 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>제네릭 타입으로 사용해야 할 때
+&lt;ul>
+&lt;li>&lt;code>&amp;lt;T&amp;gt;&lt;/code>에는 객체만 사용 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="성능-고려사항">성능 고려사항
+&lt;/h3>&lt;ul>
+&lt;li>Boxing/Unboxing은 추가적인 오버헤드를 발생 시킨다.&lt;/li>
+&lt;li>반복문 등에서 자주 발생하면 성능 저하 가능성이 있다.&lt;/li>
+&lt;li>최신 JVM에서는 일부 상황에서 최적화되지만, 불필요한 Boxing/Unboxing은 피해야 한다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 비효율적인 예 (반복적인 boxing/unboxing)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Long&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0L&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">long&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">MAX_VALUE&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 매번 iteration에서 unboxing &amp;amp; boxing 발생&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 개선된 예&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">long&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0L&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">long&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">MAX_VALUE&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// primitive 연산만 발생&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="실무에선-언제-사용하지">실무에선 언제 사용하지?
+&lt;/h3>&lt;ol>
+&lt;li>의도가 명확한 코드 작성&lt;/li>
+&lt;li>JPA/Hibernate 엔티티 필드
+&lt;ul>
+&lt;li>기본키(ID)는 Wrapper로 선언 (null 가능성)&lt;/li>
+&lt;li>다른 필드는 상황에 따라 선택&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>DTO 설계
+&lt;ul>
+&lt;li>API 응답에서 값이 없을 수 있는 필드는 Wrapper 사용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>메서드 반환 타입
+&lt;ul>
+&lt;li>값이 없을 수 있는 경우 &lt;code>Optional&amp;lt;Primitive&amp;gt;&lt;/code> 대신 Wrapper 고려&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>동일한 데이터를 다루지만 메모리 구조, 성능, 사용 목적에서 차이가 있으므로 상황에 맞게 선택해야 한다.&lt;/p>
+&lt;p>핵심 원칙:&lt;/p>
+&lt;ul>
+&lt;li>성능이 중요하면 Primitive&lt;/li>
+&lt;li>객체 지향 기능이 필요하거나 null 표현이 필요하면 Wrapper&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>Primitive Type (기본형)&lt;/th>
+&lt;th>Wrapper Class (래퍼 클래스)&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>메모리/성능&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>저장 위치&lt;/td>
+&lt;td>스택(Stack) 메모리&lt;/td>
+&lt;td>힙(Heap) 메모리&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>메모리 사용량&lt;/td>
+&lt;td>적음 (값 직접 저장)&lt;/td>
+&lt;td>많음 (객체로 감싸서 저장)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>연산 속도&lt;/td>
+&lt;td>빠름&lt;/td>
+&lt;td>상대적으로 느림 (객체 접근 오버헤드)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>기능/유연성&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>null 허용&lt;/td>
+&lt;td>불가능&lt;/td>
+&lt;td>가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>메서드 지원&lt;/td>
+&lt;td>없음&lt;/td>
+&lt;td>다양한 유틸리티 메서드 제공&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>주요 사용처&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>적합한 경우&lt;/td>
+&lt;td>대량 연산, 성능이 중요한 로직&lt;br>로컬 변수&lt;/td>
+&lt;td>컬렉션(Collection) 사용 시&lt;br>제네릭 타입 필요 시&lt;br>null 표현이 필요한 필드&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ol>
+&lt;li>AutoBoxing 최적화
+&lt;ul>
+&lt;li>&lt;code>Integer.valueOf()&lt;/code>의 캐싱 매커니즘&lt;/li>
+&lt;li>&lt;code>Long&lt;/code> VS &lt;code>long&lt;/code> 반복문 성능 비교 실습&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Java 메모리 모델
+&lt;ul>
+&lt;li>Stack VS Heap 메모리 동장 방식&lt;/li>
+&lt;li>Primitive가 스택에 저장되는 이유&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Java 컬렉션과 제네릭
+&lt;ul>
+&lt;li>왜 컬렉션은 Primitive를 허용하지 않는가?&lt;/li>
+&lt;li>&lt;code>IntStream&lt;/code>, &lt;code>Eclipse Collections&lt;/code> 등 대안 라이브러리&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>JPA/Hibernate 매핑
+&lt;ul>
+&lt;li>엔티티 필드 타입 선택 가이드&lt;/li>
+&lt;li>&lt;code>@Column(nullable = false)&lt;/code>와 Primitive/Wrapper 관계&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Java 8 이후 변화
+&lt;ul>
+&lt;li>&lt;code>OptionalInt&lt;/code> VS &lt;code>Optional&amp;lt;Integer&amp;gt;&lt;/code>&lt;/li>
+&lt;li>람다식에서의 자동 형변환 동작&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol></description></item></channel></rss>
