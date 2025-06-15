@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>API on B9F1</title><link>https://b9f1.com/categories/api/</link><description>Recent content in API on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 May 2025 13:23:57 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/api/index.xml" rel="self" type="application/rss+xml"/><item><title>웹 API 진화의 핵심 전환</title><link>https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</link><pubDate>Tue, 20 May 2025 13:23:57 +0900</pubDate><guid>https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/cover.png" alt="Featured image of post 웹 API 진화의 핵심 전환" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>과거 웹 서비스 API의 표준은 SOAP(Simple Object Access Protocol)였다.&lt;/p>
+&lt;p>그러나 2010년대를 지나며 REST(Representational State Transfer)가 빠르게 주류로 자리 잡았고 요즘 대부분의 공개 웹 API에서 RESTful API가 사실상의 표준으로 자리 잡고 있다.&lt;/p>
+&lt;p>웹 API의 발전 과정 속에서, SOAP에서 REST로의 전환이 일어난 배경과 그에 따른 장단점을 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="soap의-등장과-전성기">SOAP의 등장과 전성기
+&lt;/h3>&lt;p>SOAP은 WSDL(Web Service Definition Language), XML 기반 메시지 포맷 그리고 HTTP 외에도 SMTP나 FTP를 사용할 수 있는 유연성 덕분에 초기에는 대형 엔터프라이즈 시스템에서 주로 채택되었다.
+보안(SOAP Security), 트랜잭션, 메시지 무결성 등 강력한 스펙이 특징이었다.&lt;/p>
+&lt;p>그러나 SOAP은 다음과 같은 문제를 가지고 있었다.&lt;/p>
+&lt;ul>
+&lt;li>메시지 포맷이 무겁고 복잡함 (XML 기반)&lt;/li>
+&lt;li>학습 비용이 높고 구현이 어려움&lt;/li>
+&lt;li>브라우저, 모바일 등 가벼운 클라이언트 환경과 맞지 않음&lt;/li>
+&lt;/ul>
+&lt;h3 id="rest의-부상">REST의 부상
+&lt;/h3>&lt;p>2000년에 로이 필딩(Roy Fielding)이 논문에서 제시한 REST는 본래 HTTP의 아키텍처 스타일로 제안된 개념이었지만 시간이 지나며 &amp;ldquo;RESTful API&amp;quot;라는 개념으로 대중화되었다.&lt;/p>
+&lt;p>REST의 핵심은 자원(Resource) 지향 아키텍처와 표준 HTTP 메서드(GET, POST, PUT, DELETE)를 활용한 통신이다.&lt;/p>
+&lt;p>REST가 빠르게 채택된 이유는 다음과 같다.&lt;/p>
+&lt;ul>
+&lt;li>HTTP라는 웹의 표준을 그대로 활용&lt;/li>
+&lt;li>JSON 기반 경량 메시지 포맷 (브라우저/모바일 친화적)&lt;/li>
+&lt;li>상태 없는(stateless) 구조로 확장성 우수&lt;/li>
+&lt;li>클라이언트와 서버 간 결합도가 낮음&lt;/li>
+&lt;li>문서화가 간단하고 테스트/디버깅이 쉬움&lt;/li>
+&lt;/ul>
+&lt;h3 id="soap-vs-rest">SOAP VS REST
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>SOAP&lt;/th>
+&lt;th>REST&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>메시지 포맷&lt;/td>
+&lt;td>XML (무겁고 엄격)&lt;/td>
+&lt;td>JSON, XML (가볍고 유연)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>표준&lt;/td>
+&lt;td>WSDL 등 다양한 스펙 존재&lt;/td>
+&lt;td>명확한 표준 없음 (URI, HTTP 활용)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>보안, 트랜잭션&lt;/td>
+&lt;td>WS-Security, WS-Atomic 등 내장 지원&lt;/td>
+&lt;td>HTTP 보안 활용, 트랜잭션 미지원&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>상태성&lt;/td>
+&lt;td>상태 유지(Stateful) 가능&lt;/td>
+&lt;td>Stateless 기반&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>학습 곡선&lt;/td>
+&lt;td>높음 (설정과 구현 복잡)&lt;/td>
+&lt;td>낮음 (간단한 HTTP 인터페이스)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>확장성과 경량성&lt;/td>
+&lt;td>제한적&lt;/td>
+&lt;td>뛰어남&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="rest-이후의-대안이-있을까">REST 이후의 대안이 있을까?
+&lt;/h3>&lt;p>REST는 단순하고 확장 가능한 아키텍처지만, 다음과 같은 한계가 존재한다.&lt;/p>
+&lt;ul>
+&lt;li>과도한 데이터 전송 (Over-fetching/Under-fetching)&lt;/li>
+&lt;li>정적인 엔드포인트 설계&lt;/li>
+&lt;li>실시간 양방향 통신 미지원&lt;/li>
+&lt;li>리소스 간 관계 표현의 어려움&lt;/li>
+&lt;/ul>
+&lt;p>이러한 문제를 해결하기 위한 대안으로 다음 기술이 떠오르고 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>GraphQL&lt;/strong>: 클라이언트가 필요한 데이터만 요청할 수 있어 Over-fetching/Under-fetching 문제를 해소함.&lt;/li>
+&lt;li>&lt;strong>gRPC&lt;/strong>: HTTP/2 기반의 양방향 스트리밍과 낮은 대역폭, 빠른 응답속도를 제공하여 마이크로서비스 간 통신에 적합함.&lt;/li>
+&lt;li>&lt;strong>Async API, WebSocket 기반 API&lt;/strong>: 실시간 스트리밍 통신 및 이벤트 기반 시스템에 특화됨.&lt;/li>
+&lt;/ul>
+&lt;p>이렇듯 REST는 여전히 강력한 기본값이지만, 목적에 따라 더 나은 대안들이 상황별로 사용되고 있다.&lt;/p>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>페이스북, 트위터, 구글, 아마존 등 주요 플랫폼 API는 거의 모두 REST 기반이다.
+심지어 마이크로소프트도 SOAP에서 REST 기반 API로 점진적으로 이동하고 있다고 한다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 메서드(GET, POST, PUT, DELETE)&lt;/li>
+&lt;li>XML vs. JSON 포맷&lt;/li>
+&lt;li>클라이언트-서버 아키텍처&lt;/li>
+&lt;li>상태 유지(Stateful) vs 상태 없음(Stateless)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm" target="_blank" rel="noopener"
+>Architectural Styles and the Design of Network-based Software Architectures - Roy Thomas Fielding&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/api-management/restify-soap-api" target="_blank" rel="noopener"
+>Import a SOAP API to API Management and convert it to REST&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design" target="_blank" rel="noopener"
+>RESTful API 디자인 가이드 - Microsoft&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://blog.postman.com/soap-vs-rest/" target="_blank" rel="noopener"
+>SOAP vs REST 비교 블로그 - Postman&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://graphql.org/" target="_blank" rel="noopener"
+>GraphQL 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://grpc.io/" target="_blank" rel="noopener"
+>gRPC 공식 문서&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

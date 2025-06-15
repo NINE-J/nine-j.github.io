@@ -1,0 +1,1101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DB on B9F1</title><link>https://b9f1.com/tags/db/</link><description>Recent content in DB on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 15 Jun 2025 16:50:13 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/db/index.xml" rel="self" type="application/rss+xml"/><item><title>ACID</title><link>https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</link><pubDate>Sun, 15 Jun 2025 16:50:13 +0900</pubDate><guid>https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/cover.png" alt="Featured image of post ACID" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>데이터베이스나 분산 시스템에서 트랜잭션은 안정성을 보장하는 핵심 개념이다.
+특히 ACID(원자성, 일관성, 고립성, 지속성) 속성은 신뢰할 수 있는 데이터 처리를 위한 기본 토대다.&lt;/p>
+&lt;p>이번 글에서는 ACID 각각의 속성이 보장되지 않을 때 어떤 문제들이 발생할 수 있는지 예시와 일반적인 해결책을 간단히 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="atomicity---원자성">Atomicity - 원자성
+&lt;/h3>&lt;blockquote>
+&lt;p>모든 작업이 수행되거나, 아무것도 수행되지 않아야 한다.&lt;/p>&lt;/blockquote>
+&lt;p>원자성이 깨지면, 하나의 트랜잭션 안에서 일부 작업만 처리되고 나머지가 실패한 상태가 될 수 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>예시&lt;/strong>: A → B로 계좌 이체 중 A 계좌에서 출금은 됐지만 B 계좌로 입금이 되기 전 장애가 발생한 경우 → 금액 손실.&lt;/li>
+&lt;li>&lt;strong>문제점&lt;/strong>: 시스템 상태가 불완전하게 갱신되어 데이터 손실 가능.&lt;/li>
+&lt;li>&lt;strong>해결 방안&lt;/strong>:
+&lt;ul>
+&lt;li>DBMS가 제공하는 &lt;strong>트랜잭션 롤백&lt;/strong>(Rollback) 메커니즘 사용.&lt;/li>
+&lt;li>&lt;code>try-catch&lt;/code>를 통해 예외 발생 시 &lt;code>rollback()&lt;/code> 호출하도록 처리.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">connection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setAutoCommit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">withdraw&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fromAccount&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">deposit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">toAccount&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">connection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">commit&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">catch&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">connection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">rollback&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 전체 트랜잭션이 되돌아감&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="consistency---일관성">Consistency - 일관성
+&lt;/h3>&lt;blockquote>
+&lt;p>트랜잭션 전후의 데이터 상태는 항상 시스템 규칙을 만족해야 한다.&lt;/p>&lt;/blockquote>
+&lt;p>일관성은 데이터베이스에 정의된 &lt;strong>제약 조건, 외래키, 트리거, 비즈니스 규칙 등&lt;/strong>이 항상 유지되어야 한다는 의미다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>예시&lt;/strong>: 주문 시 존재하지 않는 상품 ID가 참조되거나, 재고가 음수가 되는 경우.&lt;/li>
+&lt;li>&lt;strong>문제점&lt;/strong>: 무결성이 깨진 데이터가 DB에 저장될 수 있음.&lt;/li>
+&lt;li>&lt;strong>해결 방안&lt;/strong>:
+&lt;ul>
+&lt;li>DB 레벨: 외래 키, 유일성 제약, &lt;code>CHECK&lt;/code>, &lt;code>NOT NULL&lt;/code> 등의 &lt;strong>제약 조건 설정&lt;/strong>&lt;/li>
+&lt;li>애플리케이션 레벨: 추가적인 &lt;strong>비즈니스 유효성 검사&lt;/strong> 코드 구현&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>단, 일관성은 트랜잭션이 &lt;strong>성공적으로 끝났을 경우에만&lt;/strong> 보장된다. 실패한 트랜잭션은 원자성과 함께 롤백되어 무결성을 해치지 않음.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="isolation---고립성">Isolation - 고립성
+&lt;/h3>&lt;blockquote>
+&lt;p>각 트랜잭션은 서로 독립적으로 실행돼야 한다.&lt;/p>&lt;/blockquote>
+&lt;p>고립성이 깨지면 동시에 실행 중인 트랜잭션들이 서로 영향을 주며 비정상적인 데이터가 조회되거나 저장될 수 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>주요 문제 유형:&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>문제&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;th>예시&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Dirty Read&lt;/strong>&lt;/td>
+&lt;td>다른 트랜잭션이 아직 커밋하지 않은 데이터를 읽음&lt;/td>
+&lt;td>B가 업데이트 중인 데이터를 A가 미리 읽음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Non-repeatable Read&lt;/strong>&lt;/td>
+&lt;td>같은 조건으로 두 번 조회했는데 결과가 달라짐&lt;/td>
+&lt;td>A가 한 사용자의 나이를 두 번 조회하는 사이 B가 그 값을 수정&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Phantom Read&lt;/strong>&lt;/td>
+&lt;td>같은 조건으로 조회했는데 행 개수가 달라짐&lt;/td>
+&lt;td>A가 “나이 ≥ 30” 조건으로 조회한 후 B가 새로운 30세 사용자를 삽입&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>&lt;strong>격리 수준 비교 (ANSI SQL 기준):&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>수준&lt;/th>
+&lt;th>보장 범위&lt;/th>
+&lt;th>발생 가능한 문제&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>READ UNCOMMITTED&lt;/td>
+&lt;td>아무것도 보장 안 됨&lt;/td>
+&lt;td>Dirty Read, Non-repeatable Read, Phantom Read&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>READ COMMITTED&lt;/td>
+&lt;td>커밋된 데이터만 읽음&lt;/td>
+&lt;td>Non-repeatable Read, Phantom Read&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>REPEATABLE READ&lt;/td>
+&lt;td>동일 쿼리 결과 동일&lt;/td>
+&lt;td>Phantom Read&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SERIALIZABLE&lt;/td>
+&lt;td>가장 강력, 완전한 고립&lt;/td>
+&lt;td>성능 저하 가능성&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>&lt;strong>해결 방안&lt;/strong>:
+&lt;ul>
+&lt;li>DB 격리 수준을 적절히 설정 (성능 vs 고립성 트레이드오프 고려)&lt;/li>
+&lt;li>비즈니스 중요도에 따라 적용 수준을 유연하게 구성&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="durability---지속성">Durability - 지속성
+&lt;/h3>&lt;blockquote>
+&lt;p>트랜잭션이 커밋되면, 그 결과는 영구히 저장되어야 한다.&lt;/p>&lt;/blockquote>
+&lt;p>지속성이 보장되지 않으면, 트랜잭션이 커밋되었더라도 시스템 장애 발생 시 데이터가 유실될 수 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>예시&lt;/strong>: 사용자가 결제를 완료했는데, 직후 서버 다운으로 주문 내역이 저장되지 않음 → 신뢰성 손상&lt;/li>
+&lt;li>&lt;strong>문제점&lt;/strong>: 커밋 이후에도 데이터 유실 가능 → 사용자 신뢰도 하락&lt;/li>
+&lt;li>&lt;strong>해결 방안&lt;/strong>:
+&lt;ul>
+&lt;li>DBMS의 &lt;strong>WAL(Write-Ahead Logging)&lt;/strong>: 로그를 먼저 디스크에 기록하고 나서 커밋 처리&lt;/li>
+&lt;li>&lt;strong>RAID, 이중화 스토리지&lt;/strong>, 디스크 플러시(sync) 전략&lt;/li>
+&lt;li>분산 시스템에서는 &lt;strong>Replication, Quorum 기반의 커밋&lt;/strong> 방식도 사용됨&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>트랜잭션의 ACID 속성은 단순한 개념이 아니라, 실제 시스템에서 &lt;strong>데이터 무결성과 안정성의 최후 보루&lt;/strong>다.&lt;/p>
+&lt;p>속성이 하나라도 무너지면 “커밋됐지만 저장되지 않음”, “이체했는데 금액이 사라짐”, “동시 접속 시 데이터 꼬임” 같은 치명적 문제가 발생할 수 있다.&lt;/p>
+&lt;p>결국 이는 &lt;strong>비즈니스 신뢰성&lt;/strong>과 &lt;strong>사용자 경험&lt;/strong>에 직결된다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>트랜잭션 정의와 트랜잭션 경계 설정&lt;/li>
+&lt;li>데이터베이스의 커밋/롤백 메커니즘&lt;/li>
+&lt;li>SQL 격리 수준과 락(lock) 종류 (공유 락, 배타 락 등)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener"
+>PostgreSQL Isolation Levels 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html" target="_blank" rel="noopener"
+>MySQL 트랜잭션 격리 수준 비교&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://martin.kleppmann.com/" target="_blank" rel="noopener"
+>Martin Kleppmann&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>역정규화, 언제 그리고 왜 사용하는가?</title><link>https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</link><pubDate>Mon, 02 Jun 2025 08:57:20 +0900</pubDate><guid>https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/cover.png" alt="Featured image of post 역정규화, 언제 그리고 왜 사용하는가?" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>데이터베이스 정규화는 이상 현상을 방지하고 데이터 일관성을 보장하기 위한 핵심 원칙이다.&lt;/p>
+&lt;p>그러나 실전에서는 정규화된 모델이 항상 최고의 선택은 아니다.
+자세한 내용은 다음에 다뤄보고 이번엔 &lt;strong>역정규화(Denormalization)&lt;/strong> 가 필요하게 되는 상황과, 이를 적용할 때의 고려사항 및 장단점을 간단한 사례와 함께 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="정규화와-현실의-간극">정규화와 현실의 간극
+&lt;/h3>&lt;p>정규화는 테이블 간 중복을 줄이고 무결성을 유지하기 위한 훌륭한 이론이다.
+하지만 현실에서는 다음과 같은 상황에서 정규화된 모델이 병목이 되기도 한다.&lt;/p>
+&lt;h4 id="역정규화가-필요한-대표적인-상황">역정규화가 필요한 대표적인 상황
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>복잡한 조인이 빈번하게 발생하는 경우&lt;/strong>
+&lt;ul>
+&lt;li>예: 게시판 목록을 조회할 때 게시글, 작성자, 댓글 수 등 여러 테이블을 조인해야 하는 경우&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>실시간 조회 성능이 중요한 경우&lt;/strong>
+&lt;ul>
+&lt;li>OLTP 시스템 또는 사용자 피드, 홈화면 로딩 등 수 ms 단위 응답이 필요한 상황&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>읽기 비율이 매우 높은 경우&lt;/strong>
+&lt;ul>
+&lt;li>쓰기보다 읽기가 훨씬 많고, 동일한 데이터를 반복 조회하는 경우 캐싱 효과를 극대화하기 위해 역정규화를 적용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>집계 데이터가 자주 필요한 경우&lt;/strong>
+&lt;ul>
+&lt;li>주문 총액, 리뷰 수, 좋아요 수 등 매번 COUNT, SUM을 하지 않고 별도로 저장&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="역정규화-적용-시-고려사항">역정규화 적용 시 고려사항
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>고려 내용&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>데이터 정합성&lt;/td>
+&lt;td>중복된 컬럼이 여러 테이블에 있을 경우, 변경 시 일관성 유지가 어려움&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>유지보수 복잡도&lt;/td>
+&lt;td>역정규화된 필드는 직접 관리하거나 트리거, 애플리케이션 로직으로 동기화해야 함&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>성능 이점&lt;/td>
+&lt;td>조회 속도와 쿼리 단순화에는 확실한 효과가 있음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>데이터 증가&lt;/td>
+&lt;td>중복 데이터로 인해 테이블 크기가 커질 수 있음&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>→ &lt;strong>결국, ‘성능’과 ‘정합성’ 사이의 균형&lt;/strong>을 고려하여 설계해야 한다.&lt;/p>
+&lt;h3 id="장단점-비교">장단점 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>장점&lt;/th>
+&lt;th>단점&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>- 조인 최소화로 인한 속도 향상 &lt;br>- 쿼리 복잡도 감소 &lt;br>- 집계 데이터 미리 보관 가능&lt;/td>
+&lt;td>- 데이터 정합성 문제 가능성 &lt;br>- 유지보수 로직 증가 &lt;br>- 중복 데이터로 저장 공간 낭비&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="실무에서의-팁">실무에서의 팁
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>정규화된 모델로 먼저 설계하고&lt;/strong>, 필요한 곳에만 역정규화한다.&lt;/li>
+&lt;li>&lt;strong>집계용 컬럼은 write-through 방식&lt;/strong>으로 관리하거나, 이벤트 기반 비동기 처리도 고려한다.&lt;/li>
+&lt;li>&lt;strong>Redis, ElasticSearch와 같은 서브 시스템&lt;/strong>으로 조회 성능을 분산시키는 것도 대안이다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>“모든 데이터베이스는 처음엔 정규화로 시작하고, 결국엔 역정규화로 최적화된다.”&lt;/p>&lt;/blockquote>
+&lt;p>정규화와 역정규화는 대립이 아닌 균형의 문제다.
+목적에 맞는 데이터 구조 설계가 진짜 실력이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>제1정규형~제3정규형 이해&lt;/li>
+&lt;li>기본 SQL 조인과 인덱스 작동 방식&lt;/li>
+&lt;li>데이터베이스 성능 튜닝 기초&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://martinfowler.com/books/refactoringDatabases.html" target="_blank" rel="noopener"
+>Martin Fowler - Refactoring Databases&lt;/a>&lt;/li>
+&lt;li>PostgreSQL Performance Tuning&lt;/li>
+&lt;li>CQRS (Command Query Responsibility Segregation) 아키텍처&lt;/li>
+&lt;/ul></description></item><item><title>DDL VS DML</title><link>https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</link><pubDate>Mon, 02 Jun 2025 08:34:00 +0900</pubDate><guid>https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/cover.png" alt="Featured image of post DDL VS DML" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>SQL은 데이터베이스를 다루기 위한 언어지만, 그 목적에 따라 크게 두 가지로 나뉜다.&lt;/p>
+&lt;p>바로 &lt;strong>DDL(Data Definition Language)&lt;/strong> 과 &lt;strong>DML(Data Manipulation Language)&lt;/strong>&lt;/p>
+&lt;p>이 둘의 차이점을 명확히 정리하고, 각각의 대표적인 명령어와 그 용도를 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="ddl-데이터-정의-언어-data-definition-language">DDL: 데이터 정의 언어 (Data Definition Language)
+&lt;/h3>&lt;p>DDL은 데이터베이스의 구조를 정의하는 데 사용된다.
+즉, &lt;strong>테이블, 스키마, 인덱스, 뷰&lt;/strong> 등을 생성, 변경, 삭제할 때 사용하는 명령어들이다.
+이러한 작업은 데이터의 틀을 잡는 작업이므로, 주로 개발 초기나 데이터 모델링 단계에서 많이 사용된다.&lt;/p>
+&lt;h4 id="대표-명령어">대표 명령어
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>CREATE&lt;/strong>
+&lt;ul>
+&lt;li>테이블이나 데이터베이스 객체를 생성&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">CREATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">INT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">PRIMARY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">VARCHAR&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">50&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>ALTER&lt;/strong>
+&lt;ul>
+&lt;li>기존 테이블의 구조 변경 (컬럼 추가/수정/삭제 등)&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">ALTER&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">ADD&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">email&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">VARCHAR&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>DROP&lt;/strong>
+&lt;ul>
+&lt;li>테이블이나 객체를 삭제&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">DROP&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>TRUNCATE&lt;/strong>
+&lt;ul>
+&lt;li>테이블을 비우되, 테이블 구조는 남김&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">TRUNCATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">TABLE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>DDL 명령은 대부분 &lt;strong>자동 커밋(autocommit)&lt;/strong> 되어, 되돌릴 수 없는 경우가 많다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="dml-데이터-조작-언어-data-manipulation-language">DML: 데이터 조작 언어 (Data Manipulation Language)
+&lt;/h3>&lt;p>DML은 이미 정의된 테이블 내의 &lt;strong>데이터를 다루는 데&lt;/strong> 사용된다.
+즉, 데이터를 조회하고, 추가하고, 수정하고, 삭제하는 등의 &amp;ldquo;행위&amp;quot;에 관련된 명령어들이다.&lt;/p>
+&lt;h4 id="대표-명령어-1">대표 명령어
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>SELECT&lt;/strong>
+&lt;ul>
+&lt;li>데이터를 조회&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>INSERT&lt;/strong>
+&lt;ul>
+&lt;li>새로운 데이터를 추가&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">INSERT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">INTO&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">VALUES&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Alice&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>UPDATE&lt;/strong>
+&lt;ul>
+&lt;li>기존 데이터를 수정&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">UPDATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SET&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;Bob&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>DELETE&lt;/strong>
+&lt;ul>
+&lt;li>데이터를 삭제&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">DELETE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">WHERE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Tip&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>DML 명령은 &lt;strong>트랜잭션(transaction)&lt;/strong> 에 의해 제어되며, &lt;code>COMMIT&lt;/code> 혹은 &lt;code>ROLLBACK&lt;/code>이 가능하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="ddl-vs-dml-요약-비교">DDL vs DML 요약 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>DDL&lt;/th>
+&lt;th>DML&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>목적&lt;/td>
+&lt;td>데이터 구조 정의&lt;/td>
+&lt;td>데이터 조작&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>대상&lt;/td>
+&lt;td>테이블, 뷰, 인덱스 등&lt;/td>
+&lt;td>테이블 내 행(row)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>트랜잭션&lt;/td>
+&lt;td>자동 커밋(rollback 불가)&lt;/td>
+&lt;td>트랜잭션 제어 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>사용 시점&lt;/td>
+&lt;td>설계, 구조 변경&lt;/td>
+&lt;td>운영, 조회/수정/삭제/추가&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="ddl-dml-dcl이란">DDL, DML, DCL이란?
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>분류&lt;/th>
+&lt;th>명령어&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>DML&lt;/strong>(Data Manipulation Language)데이터 조작어&lt;/td>
+&lt;td>&lt;code>SELECT&lt;/code>&lt;/td>
+&lt;td>데이터베이스에 저장된 데이터를 조회하거나 검색하는 명령어.일명 &lt;code>RETRIEVE&lt;/code>라고도 함.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;code>INSERT&lt;/code> &lt;code>UPDATE&lt;/code> &lt;code>DELETE&lt;/code>&lt;/td>
+&lt;td>테이블에 데이터를 삽입, 수정, 삭제하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DDL&lt;/strong>(Data Definition Language)데이터 정의어&lt;/td>
+&lt;td>&lt;code>CREATE&lt;/code> &lt;code>ALTER&lt;/code> &lt;code>DROP&lt;/code> &lt;code>RENAME&lt;/code> &lt;code>TRUNCATE&lt;/code>&lt;/td>
+&lt;td>테이블, 뷰, 인덱스 등 데이터 구조를 정의(생성, 변경, 삭제, 이름변경 등)하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DCL&lt;/strong>(Data Control Language)데이터 제어어&lt;/td>
+&lt;td>&lt;code>GRANT&lt;/code> &lt;code>REVOKE&lt;/code>&lt;/td>
+&lt;td>사용자에게 데이터베이스 객체에 대한 권한을 부여하거나 회수하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>TCL&lt;/strong>(Transaction Control Language)트랜잭션 제어어&lt;/td>
+&lt;td>&lt;code>COMMIT&lt;/code> &lt;code>ROLLBACK&lt;/code> &lt;code>SAVEPOINT&lt;/code>&lt;/td>
+&lt;td>DML 명령으로 변경된 데이터를 트랜잭션 단위로 확정하거나 취소하거나, 중간 저장점을 설정하는 명령어.&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>DDL은 구조를, DML은 내용을 다룬다.
+데이터베이스를 이해하고 활용하려면 이 두 가지의 차이를 명확히 아는 것이 핵심이다.
+DDL로 틀을 만들고, DML로 그 틀 안을 채우는 구조로 SQL을 학습해 보자.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>데이터베이스 기본 개념 (테이블, 행, 열)&lt;/li>
+&lt;li>SQL 구문 기본 문법&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/sql-commands.html" target="_blank" rel="noopener"
+>PostgreSQL Documentation – SQL Commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://sqlbolt.com/" target="_blank" rel="noopener"
+>SQLBolt – Learn SQL the easy way&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.w3schools.com/sql/" target="_blank" rel="noopener"
+>W3Schools SQL Tutorial&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>psql: 시작하기</title><link>https://b9f1.com/p/2025-04-20-psql-getting-started/</link><pubDate>Sun, 20 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-20-psql-getting-started/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-20-psql-getting-started/cover.png" alt="Featured image of post psql: 시작하기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>기본적으로 그냥 설치 후 환경 변수에 psql 등록돼서 버전 확인이 가능했다.
+기본 옵션으로 설치해서 DBeaver 역시 어렵지 않게 연결할 수 있었다.&lt;/p>
+&lt;p>근데 PostgreSQL이 동작하고 있는 서버의 IP라던가 포트를 확인하려고 하는데 오류가 있었다.&lt;/p>
+&lt;ul>
+&lt;li>Windows11, PostgreSQL 17.4 설치&lt;/li>
+&lt;li>SQL shell은 정상 동작&lt;/li>
+&lt;li>PostgreSQL 설치 후 Bash, CMD에서 &lt;code>psql&lt;/code> 명령어 찾을 수 없음 오류&lt;/li>
+&lt;li>DBeaver 접속 정상&lt;/li>
+&lt;/ul>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="postgresql-설치-확인">PostgreSQL 설치 확인
+&lt;/h3>&lt;p>설치가 잘 됐는지 Bash, CMD 등에서 버전을 확인해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예상 출력&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql &lt;span class="o">(&lt;/span>PostgreSQL&lt;span class="o">)&lt;/span> 17.4
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-접속하기">PostgreSQL 접속하기
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">psql -U [username] -d [database_name] -h [hostname] -p [port_number]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>username&lt;/code>: PostgreSQL 데이터베이스에 로그인할 사용자 이름이다. 기본적으로 &amp;lsquo;postgres&amp;rsquo;로 설정되어 있다.&lt;/li>
+&lt;li>&lt;code>database_name&lt;/code>: 접속할 데이터베이스의 이름이다. 기본값은 &amp;lsquo;postgres&amp;rsquo;이다.&lt;/li>
+&lt;li>&lt;code>hostname&lt;/code>: PostgreSQL 서버의 호스트 이름이다. 기본값은 &amp;rsquo;localhost&amp;rsquo;이다.&lt;/li>
+&lt;li>&lt;code>port_number&lt;/code>: PostgreSQL 서버의 포트 번호이다. 기본값은 &amp;lsquo;5432&amp;rsquo;이다.&lt;/li>
+&lt;/ul>
+&lt;p>기본 옵션으로 설치한 나의 경우 아래와 같다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -U postgres -d postgres -h localhost -p &lt;span class="m">5432&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예시 출력&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql &lt;span class="o">(&lt;/span>17.4&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">도움말을 보려면 &lt;span class="s2">&amp;#34;help&amp;#34;&lt;/span>를 입력하십시오.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 프롬프트가 변경된다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">postgres&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># \q | Ctrl+C 등으로 빠져나올 수 있다.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="사용자의-password-인증을-실패했습니다">사용자의 password 인증을 실패했습니다
+&lt;/h3>&lt;p>명령창에서 psql 접속 후 시도하는 방법도 있지만 &lt;a class="link" href="https://wikidocs.net/215908" target="_blank" rel="noopener"
+>PostgreSQL 입문서&lt;/a>에 보면 &lt;code>test&lt;/code> 데이터베이스에 연결하여 간단한 SQL 쿼리를 실행하는 명령어가 있다.&lt;/p>
+&lt;p>근데 시도하면 오류가 발생한다?&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_addr()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;USER NAME&amp;gt; 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql: 오류: &lt;span class="s2">&amp;#34;localhost&amp;#34;&lt;/span> &lt;span class="o">(&lt;/span>::1&lt;span class="o">)&lt;/span>, &lt;span class="m">5432&lt;/span> 포트로 서버 접속 할 수 없음: 치명적오류: 사용자 &lt;span class="s2">&amp;#34;&amp;lt;USER NAME&amp;gt;&amp;#34;&lt;/span>의 password 인증을 실패했습니다
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>비밀번호는 틀리지 않았고 Bash, CMD 등에서 테스트 명령만 실패한다.&lt;/p>
+&lt;p>&lt;code>pg_hba.conf&lt;/code> 파일의 인증 메서드를 수정하라는 정보가 많았는데 이건 보안을 바꾸는 거니까 지금 필요한 근본적인 해결책이 아니다.&lt;/p>
+&lt;p>postgres 접속은 가능하니까 접속해서 USER 목록을 조회해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="n">postgres&lt;/span>&lt;span class="o">=#&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pg_user&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">----------
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="err">개&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">행&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="o">=#&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usesuper&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usecreatedb&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pg_user&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usesuper&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usecreatedb&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">----------+----------+-------------
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="err">개&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">행&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>존재하는 유저는 postgres 뿐인데 테스트 명령에 왜 엉뚱한 사용자명이 나올까?&lt;/p>
+&lt;p>이 명령은 명시적으로 &lt;code>-U&lt;/code> (user)를 지정하지 않았기 때문에 현재 로그인된 OS 사용자 이름을 PostgreSQL 클라이언트가 그대로 사용하려고 한다.&lt;/p>
+&lt;p>확실히 존재하는 postgres 유저로 테스트 명령을 실행하기 위해 &lt;code>-U postgres&lt;/code>를 붙여주면 명확하게 &lt;code>postgres&lt;/code> 유저로 접속 시도하게 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -U postgres -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_addr()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet_server_addr
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ::1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>1개 행&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql -U postgres -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_port()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet_server_port
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">5432&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>1개 행&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-설치">PostgreSQL 설치
+&lt;/h3>&lt;p>&lt;a class="link" href="https://www.postgresql.org/download/" target="_blank" rel="noopener"
+>PostgreSQL 공식 다운로드&lt;/a> Download 페이지에서 운영체제에 맞게 선택 후 다운로드&lt;/p>
+&lt;p>나는 지금 시점 끈따끈따한 17.4 선택.&lt;/p>
+&lt;h4 id="0welcome">0.Welcome
+&lt;/h4>&lt;p>설치 파일을 실행하면 환영해준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설정 - PostgreSQL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup - PostgreSQL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL 설치 마법사에 오신 것을 환영합니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Welcome to the PostgreSQL Setup Wizard.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="1installation-directory">1.Installation Directory
+&lt;/h4>&lt;p>설치할 경로를 선택한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL이 설치될 디렉토리를 지정해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please specify the directory where PostgreSQL will be installed.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 디렉토리 [경로 인풋] [경로 선택 버튼]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Directory [C:\Program Files\PostgreSQL\17] [choose path button]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="2select-components">2.Select Components
+&lt;/h4>&lt;p>설치 항목을 선택하라고 한다.&lt;/p>
+&lt;ul>
+&lt;li>PostgreSQL Server
+&lt;ul>
+&lt;li>PostgreSQL database server&lt;/li>
+&lt;li>PostgreSQL 데이터베이스 서버&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>pgAdmin4
+&lt;ul>
+&lt;li>pgAdmin4는 PostgreSQL 데이터베이스와 서버를 관리하고 사용하기 위한 그래픽 인터페이스입니다.&lt;/li>
+&lt;li>pgAdmin4 is a graphical interface for managing and working with PostgreSQL databases and servers.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Stack Builder
+&lt;ul>
+&lt;li>Stack Builder는 PostgreSQL 설치를 보완하기 위해 추가 도구, 드라이버 및 애플리케이션을 다운로드하고 설치하는 데 사용할 수 있습니다.&lt;/li>
+&lt;li>Stack Builder may be used to download and install additional tools, drivers and applications to complement your PostgreSQL installation&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Command Line tools
+&lt;ul>
+&lt;li>이 옵션은 libpq, ecpg, pg_basebackup, pg_dump, pg_estore, pg_bench 등과 같은 명령줄 도구와 클라이언트 라이브러리를 설치합니다. 명령줄 도구는 PostgreSQL 데이터베이스 서버 또는 pgAdmin4를 설치할 때 필요한 옵션입니다.&lt;/li>
+&lt;li>This option installs command line tools and client libraries such as libpq, ecpg, pg_basebackup, pg_dump, pg_restore,pg_bench and more. The command line tools are a required option when installing the PostgreSQL Database Server or pgAdmin4.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>간단히 필요한 것만 선택. 귀찮으면 다 선택된 상태로 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 구성 요소 선택
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select Components
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치할 구성 요소를 선택합니다: 설치하지 않을 구성 요소를 지웁니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select the components you want to install: clear the components you do not want to install.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 계속할 준비가 되면 다음을 클릭합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Click Next when you are ready to continue
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [x] PostgreSQL Server
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] pgAdmin4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] Stack Builder
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [x] Command Line Tools
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="3data-directory">3.Data Directory
+&lt;/h4>&lt;p>Data 경로를 설정한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터 디렉토리
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터를 저장할 디렉토리를 선택해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please select a directory under which to store your data.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터 디렉토리 [경로 인풋] [경로 선택 버튼]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory [C:\Program Files\PostgreSQL\17\data] [choose path button]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="4password">4.Password
+&lt;/h4>&lt;p>데이터베이스 슈퍼사용자(postgres)의 비밀번호를 설정한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Password
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터베이스 슈퍼사용자(postgres)의 비밀번호를 입력해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please provide a password for the database superuser (postgres).
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호 [비밀번호 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Password [type your password]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호 재입력 [비밀번호 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Retype password [type your password]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="5port">5.Port
+&lt;/h4>&lt;p>포트를 설정한다.
+특별히 변경할 필요 없어서 기본 포트로 사용. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 포트
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Port
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 서버가 수신해야 할 포트 번호를 선택해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please select the port number the server should listen on.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 포트 [포트 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Port [5432]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="6advanced-options">6.Advanced Options
+&lt;/h4>&lt;p>Locale 설정 시 &lt;code>DEFAULT&lt;/code> 값이 기본으로 설정되어 있을텐데 본인이 사용하고 있는 &lt;strong>운영체제의 시스템 로케일&lt;/strong>을 그대로 사용하게 된다.&lt;/p>
+&lt;p>한국어 Windows 기준으로는 &lt;code>Korean_Korea.949&lt;/code>로 설정되고 한국어 macOS 기준으로는 &lt;code>ko_KR.UTF-8&lt;/code>로 설정된다.
+이는 PostgreSQL에서 한글 정렬이나 &lt;code>LIKE&lt;/code> 검색 시 예기치 않은 동작을 유발할 수 있다.&lt;/p>
+&lt;p>AWS와 같은 클라우드 플랫폼을 사용해 배포를 진행하는 경우 실제 서버 운영 환경 배제할 수는 없다.
+Linux 기반의 서버, AWS RDS, Docker 컨테이너 등에서는 &lt;code>en_US.UTF-8&lt;/code> Locale을 사용하는 점을 고려하자.&lt;/p>
+&lt;p>나중에 서버 배포 하고 맞출 때 인코딩 불상사를 보고 싶지 않으면 미리 맞추는 게 좋고,
+이미 만들어진 데이터베이스의 로케일은 &lt;strong>변경할 수 없고&lt;/strong>, &lt;strong>새 클러스터를 만들거나 데이터베이스를 새로 생성&lt;/strong>해야 한다.&lt;/p>
+&lt;p>잘 선택한 후 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 고급 옵션 설정
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Advanced Options
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 새 데이터베이스 클러스터에서 사용할 지역을 선택합니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select the locale to be used by the new database cluster.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 지역 [지역 선택 드롭다운]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Locale [en-US]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="7pre-installation-summary">7.Pre Installation Summary
+&lt;/h4>&lt;p>위 단계에서 선택한 설치 옵션의 요약 정보를 보여준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 전 요약
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Pre Installation Summary
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 다음 설정이 설치에 사용됩니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The following settings will be used for the installation
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Server Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory: C:\Program Files\PostgreSQL\17\data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Port: 5432
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Superuser: postgres
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operating System Account: NT AUTHORITY\NetworkService
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Service: postgresql-x64-17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Command Line Tools Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Log: C:\Users\&amp;lt;UserName&amp;gt;\AppData\Local\Temp\install-postgresql.log
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="8ready-to-install">8.Ready to Install
+&lt;/h4>&lt;p>요약 정보를 확인하고 이상이 없는지 확인 한 번 더 해준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 준비 완료
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Ready to Install
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 이제 컴퓨터에 PostgreSQL 설치를 시작할 준비가 되었습니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup is now ready to begin installing PostgreSQL on your computer.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="9installing">9.Installing
+&lt;/h4>&lt;p>설치 진행 바를 확인하며 기다리면 완료된다. 약 10초 내외 (성능 따라 다를 듯)&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installing
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 프로그램이 컴퓨터에 PostgreSQL을 설치하는 동안 잠시 기다려 주세요
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please wait while Setup installs PostgreSQL on your computer
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 중...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">installing...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[설치 진행 상태바]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="10completing">10.Completing
+&lt;/h4>&lt;p>10단계에서 완료 화면을 볼 수 있다.
+만약 구성 요소 선택에서 다른 옵션을 더 체크했다면 별도의 추가 작업이 있다.
+근데 이건 설치 이후에도 추가할 수 있는 부분이니까 별도로 추가하면 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL 설치 마법사 완료
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Completing the PostgreSQL Setup Wizard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 컴퓨터에 PostgreSQL 설치가 완료되었습니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup has finished installing PostgreSQL on your computer.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-삭제">PostgreSQL 삭제
+&lt;/h3>&lt;p>&lt;code>제어판 &amp;gt; 프로그램 및 기능&lt;/code>에서 설치한 PostgreSQL 버전 삭제를 누르면 Setup 팝업이 뜬다.
+&lt;code>Entire application&lt;/code> 또는 &lt;code>individual components&lt;/code> 중 선택하고 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Uninstallation mode]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션 또는 개별 구성 요소를 제거하시겠습니까?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Do you want to uninstall entire application or individual components?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] Entire application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션과 애플리케이션에 설치된 모든 파일을 제거합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Removes entire application and all files installed by the application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 개별 구성 요소
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] individual components
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 개별 구성 요소를 제거하고 나머지 애플리케이션은 설치된 상태로 유지합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Removes individual components while leaving the rest of application installed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>삭제 진행 프로그레스를 지나고 경고가 있을 수 있다.
+&lt;code>data\log&lt;/code> 파일을 보고 있었고 등등 다른 프로그램에서 사용 중이라서 발생한 것 같다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Warning]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The data directory (C:\\Program Files\PostgreSQL\&amp;lt;version&amp;gt;\data) has not been removed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>그래도 삭제 완료는 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Info]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Uninstallation completed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>PostgreSQL 설치 경로 &lt;code>C:\\Program Files\PostgreSQL&lt;/code>에서 폴더도 깔끔히 삭제해준다.
+PostgreSQL 관련 시스템 환경 변수를 등록했었다면 찾아서 삭제한다.&lt;/p>
+&lt;p>재부팅 끗-⭐.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="참고-자료">참고 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://wikidocs.net/book/8814" target="_blank" rel="noopener"
+>PostgreSQL을 여행하는 입문자를 위한 안내서&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
