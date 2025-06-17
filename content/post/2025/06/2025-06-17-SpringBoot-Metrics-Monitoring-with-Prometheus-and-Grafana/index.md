@@ -31,8 +31,8 @@ Spring Boot 프로젝트에서 Prometheus, Grafana를 연동해 시간의 흐름
     - spring-boot-actuator
     - micrometer-registry-prometheus
 - Docker 또는 Docker Desktop
-- docker-compose.yaml
-- prometheus.yaml
+- docker-compose.yml
+- prometheus.yml
 
 #### build.gradle
 
@@ -45,9 +45,9 @@ dependencies {
 }
 ```
 
-#### application.yaml
+#### application.yml
 
-```yaml
+```yml
 management:
   endpoints:
     web:
@@ -64,13 +64,13 @@ management:
 Docker 서비스 실행 자동화 설정
 여러 Docker 컨테이너(Prometheus, Grafana 등)를 한 번에 실행/종료/관리하기 위한 설정
 
-```yaml
+```yml
 services:
   prometheus:
     image: prom/prometheus:latest  # Prometheus 공식 이미지
     container_name: prometheus     # 컨테이너 이름 지정, 내부 DNS로도 사용돤다. ex)http://prometheus:9090
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml  # 로컬 설정 파일을 컨테이너에 마운트
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # 로컬 설정 파일을 컨테이너에 마운트
     ports:
       - "9090:9090"  # 호스트의 9090 → 컨테이너의 9090 (Prometheus 웹 UI)
     networks:
@@ -93,7 +93,7 @@ networks:
 
 - 이건 사용자 정의 브리지 네트워크를 선언하는 부분이고 따로 옵션(예 `driver`)을 주지 않으면 Docoker가 기본값으로 설정된 브리지 네트워크를 생성한다.
 - 명시적으로 정의도 가능하지만 대부분의 경우 생략해도 무방하다.
-    ```yaml
+    ```yml
     networks:
       monitoring:
         driver: bridge
@@ -116,7 +116,7 @@ Prometheus가 어떤 서버나 앱의 메트릭을 수집할지 설정하는 파
 >[!INFO]
 >`host.docker.internal`은 Docker 컨테이너가 로컬 호스트의 Spring Boot 앱에 접근하기 위한 주소다. (Mac/Windows 한정. Linux는 다르다)
 
-```yaml
+```yml
 global:  
   scrape_interval: 5s  # 모든 타겟을 5초마다 스크랩(메트릭 수집)함  
   
@@ -130,7 +130,7 @@ scrape_configs:
 
 ### 실행
 
-`docker-compose.yaml` 파일이 있는 경로로 이동해서 `docker-compose up` 명령을 실행하면 Docker에 알맞게 Volume, Images, Container 생성되며 빌드된다.
+`docker-compose.yml` 파일이 있는 경로로 이동해서 `docker-compose up` 명령을 실행하면 Docker에 알맞게 Volume, Images, Container 생성되며 빌드된다.
 
 정상적으로 아래 출력을 확인했다면 `localhost:9090`에 접속하면 Prometheus UI를 확인할 수 있다.
 
@@ -234,7 +234,7 @@ grafana     | logger=settings t=2025-06-17T12:40:19.581230583Z level=info msg="C
 
 ![Image 6](2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06.png)
 
-4. 주의할 것은 `localhost` 아니고 `docker-compose.yaml`에서 설정한 컨테이너 이름이자 내부 DNS를  `prometheus`로 사용
+4. 주의할 것은 `localhost` 아니고 `docker-compose.yml`에서 설정한 컨테이너 이름이자 내부 DNS를  `prometheus`로 사용
 
 ![Image 7](2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07.png)
 
