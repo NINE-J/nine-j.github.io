@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PhantomRead on B9F1</title><link>https://b9f1.com/tags/phantomread/</link><description>Recent content in PhantomRead on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 15 Jun 2025 17:31:13 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/phantomread/index.xml" rel="self" type="application/rss+xml"/><item><title>트랜잭션 격리성 - Isolation</title><link>https://b9f1.com/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/</link><pubDate>Sun, 15 Jun 2025 17:31:13 +0900</pubDate><guid>https://b9f1.com/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/cover.png" alt="Featured image of post 트랜잭션 격리성 - Isolation" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>트랜잭션의 ACID 속성 중 &lt;strong>Isolcation(격리성)&lt;/strong> 은 다수의 트랜잭션이 동시에 실행될 때 각 트랜잭션이 서로에게 미치는 영향을 통제하기 위한 핵심 요소이며 가장 복잡하고 이해하기 어려운 속성이다.&lt;/p>
+&lt;p>격리 수준이 보장하는 것은 단순히 일관성이 아니라 &lt;strong>데이터 무결성과 비즈니스의 신뢰성&lt;/strong> 이다.
+특히 동시성 환경에서 격리 수준이 부족하면 데이터는 꼬이고, 그 피해는 실시간으로 사용자에게 전달된다.&lt;/p>
+&lt;p>이번 글에서 정리하는 건 모두 이해하고 작성할 수 없어서 관련 자료를 정리한 후 상세한 내용에 대해 더 깊게 파고들 예정이다.&lt;/p>
+&lt;p>격리성이 무너지면서 발생하는 문제들을 예제로 설명하고, 이를 막기 위해 존재하는 격리 수준들에 대해 단계적으로 정리해본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="격리성은-기본값으로-보장되고-있을까">격리성은 기본값으로 보장되고 있을까?
+&lt;/h3>&lt;ul>
+&lt;li>대부분의 RDBMS의 기본 격리 수준은 &lt;code>READ COMMITED&lt;/code> 또는 &lt;code>REPEATABLE READ&lt;/code>이지만 이름은 같아도 구현 방식과 보장 수준은 다르다.&lt;/li>
+&lt;li>예를 들어 Oracle의 &lt;code>SERIALIZABLE&lt;/code>은 실제론 &lt;code>SNAPSHOT ISOLATION&lt;/code>&lt;/li>
+&lt;li>MySQL의 &lt;code>REPEATABLE READ&lt;/code>는 기본적으로 Phantom Read를 방지하지 않으며&lt;/li>
+&lt;li>PostgreSQL은 MVCC 기반이지만 &lt;code>Serializable&lt;/code>을 명시해야만 실제 직렬화 보장을 한다.
+&lt;ul>
+&lt;li>MVCC: Multi-Version Concurrency Control, 다중 버전 동시성 제어&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>격리 수준은 이름이 같다고 같은 게 아니다.
+반드시 DB별 구현 방식을 확인해야 한다.&lt;/p>
+&lt;h3 id="격리-수준이-깨질-때-벌어지는-현상들">격리 수준이 깨질 때 벌어지는 현상들
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>유형&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;th>예시&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Dirty Read&lt;/strong>&lt;/td>
+&lt;td>커밋되지 않은 데이터를 읽음&lt;/td>
+&lt;td>A가 송금 처리 중인데, B가 중간 상태의 금액을 읽고 합산하여 중복 송금 발생&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Non-Repeatable Read&lt;/strong>&lt;/td>
+&lt;td>동일 조건으로 두 번 조회했는데 결과가 다름&lt;/td>
+&lt;td>A가 상품 재고를 두 번 조회하는 사이, B가 재고를 변경함&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Phantom Read&lt;/strong>&lt;/td>
+&lt;td>같은 쿼리인데 행 개수가 달라짐&lt;/td>
+&lt;td>A가 &lt;code>&amp;quot;나이 &amp;gt; 30&amp;quot;&lt;/code> 조건으로 조회 → B가 35세 사용자를 삽입 → A가 다시 조회하면 결과 달라짐&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="실무에서-실제-발생한-사례">실무에서 실제 발생한 사례
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>동시 송금 시스템에서의 경쟁 조건&lt;/strong>
+&lt;ul>
+&lt;li>사용자가 잔액이 100인 상태에서 거의 동시에 두 번 송금 요청을 보냄&lt;/li>
+&lt;li>둘 다 잔액 조회 결과 100을 읽고, 각각 80을 송금 → 총 160 송금됨&lt;/li>
+&lt;li>이유: &lt;code>READ COMMITTED&lt;/code> 상태에서는 두 트랜잭션이 서로를 고려하지 못함&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>해결책은?&lt;/strong>
+&lt;ul>
+&lt;li>&lt;code>SERIALIZABLE&lt;/code> 수준의 격리 또는 &lt;strong>애플리케이션 차원의 락&lt;/strong> 적용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="ansi-sql-격리-수준-비교표">ANSI SQL 격리 수준 비교표
+&lt;/h3>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>격리 수준을 올리면 오류는 줄지만, 성능에 영향을 미친다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;p>격리 수준 4가지와 이에 따른 현상 3가지가 있다.
+이 3가지 현상을 읽기 현상(Read Phenomena)라고 표현한다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Dirty Read&lt;/strong>: 커밋되지 않은(trash) 데이터를 읽는 현상&lt;/li>
+&lt;li>&lt;strong>Non-Repeatable Read&lt;/strong>: 같은 쿼리를 두 번 실행했을 때 결과가 달라지는 현상&lt;/li>
+&lt;li>&lt;strong>Phantom Read&lt;/strong>: 동일 조건의 쿼리에서 행 개수가 달라지는 현상 (삽입/삭제로 인해)&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>격리 수준&lt;/th>
+&lt;th>Dirty Read&lt;/th>
+&lt;th>Non-Repeatable Read&lt;/th>
+&lt;th>Phantom Read&lt;/th>
+&lt;th>비고&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>READ UNCOMMITTED&lt;/strong>&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>최저 성능, 실사용 거의 없음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>READ COMMITTED&lt;/strong>&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>대부분 DB의 기본값&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>REPEATABLE READ&lt;/strong>&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>허용&lt;/td>
+&lt;td>MySQL 기본값 (하지만 Phantom Read 방지는 불완전함)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>SERIALIZABLE&lt;/strong>&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>방지&lt;/td>
+&lt;td>가장 강력하나 성능 저하 있음&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="spring에서의-설정-방법">Spring에서의 설정 방법
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Transactional&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">isolation&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Isolation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">SERIALIZABLE&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">processTransaction&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>Isolation.DEFAULT&lt;/code>: DBMS 기본 설정 따름&lt;/li>
+&lt;li>프로젝트에 따라 &lt;code>.yml&lt;/code>, &lt;code>.yaml&lt;/code> 또는 DB 설정에서 전역 기본값을 조정할 수도 있음&lt;/li>
+&lt;li>트랜잭션을 사용할 때 &lt;code>@Transactional&lt;/code>만 선언하고 끝이 아니라 어떤 &lt;code>isolation level&lt;/code>이 적용되는지 알아본다면 좋을 것이다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>&lt;strong>트랜잭션은 선언만으로 안전하지 않다.&lt;/strong>&lt;/p>
+&lt;p>격리 수준은 코드의 동작 방식과 데이터 신뢰성을 결정짓는 중요한 요소다.&lt;br>
+문제를 겪고 나서야 &amp;ldquo;왜 데이터가 꼬였지?&amp;ldquo;를 고민하기보다, 미리 격리 수준을 설정하고 이해하는 것이 훨씬 값지다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>트랜잭션과 커밋/롤백의 개념&lt;/li>
+&lt;li>DB 락: Shared Lock vs Exclusive Lock&lt;/li>
+&lt;li>MVCC(Multi-Version Concurrency Control)&lt;/li>
+&lt;li>&lt;a class="link" href="https://oimbook.tistory.com/entry/Read-Phenomena-in-Transactions" target="_blank" rel="noopener"
+>Read Phenomena in Transactions by oim_&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener"
+>PostgreSQL 공식 문서: Isolation Levels&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html" target="_blank" rel="noopener"
+>MySQL InnoDB 트랜잭션 격리 수준&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative.html" target="_blank" rel="noopener"
+>Spring Declarative Transaction Management&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://martin.kleppmann.com/2014/11/25/hermitage-testing-the-i-in-acid.html" target="_blank" rel="noopener"
+>Hermitage: Testing the “I” in ACID&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://sesoc.tistory.com/317" target="_blank" rel="noopener"
+>I-9. 표준 SQL 이란?&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://en.wikipedia.org/wiki/Isolation_%28database_systems%29" target="_blank" rel="noopener"
+>Isolation (database systems)&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
