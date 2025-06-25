@@ -4,8 +4,8 @@ description: 왜 우리는 REST를 선택했는가
 author: Nine
 date: 2025-05-20 13:23:57
 categories:
+  - CS
   - Network
-  - API
 tags:
   - devlog
   - SOAP

@@ -29,7 +29,7 @@ Root 계정과 IAM 사용자 권한의 차이 그리고 왜 IAM 사용자로 운
 AWS 문서에는 다음과 같이 적혀 있다.
 
 > [!WARNING]
-> “We strongly recommend that you don't use the root user for your everyday tasks” [docs.aws.amazon.com+8docs.aws.amazon.com+8docs.aws.amazon.com+8](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html?utm_source=chatgpt.com)
+> “We strongly recommend that you don't use the root user for your everyday tasks” [docs.aws.amazon.com+8docs.aws.amazon.com+8docs.aws.amazon.com+8](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html)
 
 Root 계정은 결제 수단 변경, 계정 설정 수정, Support 플랜 변경 등 **IAM으로는 불가능한 민감 작업을 수행**할 수 있기 때문에 AWS는 **MFA 설정, 자동화 억제, 긴급 상황에서만 사용**하도록 권장한다.
 
@@ -91,6 +91,6 @@ AWS 문서들이 일관되게 강조하는 IAM 기반 안전 운영 방식을 �
 ### 더 알아보기
 
 - [IAM Best Practices (AWS 공식)](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
-- [AWS Billing 및 Cost Management 정책 예시](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-example-policies.html?utm_source=chatgpt.com)
+- [AWS Billing 및 Cost Management 정책 예시](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-example-policies.html)
 - [Well-Architected Framework](https://aws.amazon.com/ko/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&wa-lens-whitepapers.sort-order=desc&wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&wa-guidance-whitepapers.sort-order=desc)
 - [AWS Free Tier 안내](https://aws.amazon.com/free)

@@ -2,7 +2,7 @@
 title: 나만의 리눅스 터미널 설정
 description: 유용한 터미널 설정을 알아보자
 author: Nine
-date: 2025-02-15
+Created: 2025-02-15
 categories:
   - WSL
   - Terminal
@@ -250,65 +250,65 @@ source-file ~/.tmux.conf
 - Meta 키 `M` - 일반적으로 `Alt` 키로 매핑된다. 즉, `M-1`은 `Alt + 1` 과 동일하다.
 - `DC`는 `delete` 키를 의미한다.
 
-| 단축키                           | 설명                                                                                             |
-| -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `C-b C-b`                        | Prefix 키 자체를 입력 (즉, `C-b`를 두 번 입력)                                                   |
+| 단축키                           | 설명                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------ |
+| `C-b C-b`                        | Prefix 키 자체를 입력 (즉, `C-b`를 두 번 입력)                                                         |
 | `Prefix C-o`                     | 창을 순환 이동 (Rotate through panes)                                                            |
-| `Prefix C-z`                     | 현재 클라이언트 일시 정지 (Suspend the current client)                                           |
-| `Prefix Space`                   | 다음 레이아웃 선택 (Select next layout)                                                          |
-| `Prefix !`                       | 현재 패널을 새로운 창으로 이동 (Break pane to a new window)                                      |
-| `Prefix "`                       | 창을 수직으로 분할 (Split window vertically)                                                     |
-| `Prefix #`                       | 모든 붙여넣기 버퍼 목록 표시 (List all paste buffers)                                            |
-| `Prefix $`                       | 현재 세션 이름 변경 (Rename current session)                                                     |
-| `Prefix %`                       | 창을 수평으로 분할 (Split window horizontally)                                                   |
-| `Prefix &`                       | 현재 창 종료 (Kill current window)                                                               |
-| `Prefix '`                       | 창 번호 입력 후 이동 (Prompt for window index to select)                                         |
-| `Prefix (`                       | 이전 클라이언트로 전환 (Switch to previous client)                                               |
-| `Prefix )`                       | 다음 클라이언트로 전환 (Switch to next client)                                                   |
-| `Prefix ,`                       | 현재 창 이름 변경 (Rename current window)                                                        |
-| `Prefix -`                       | 가장 최근 붙여넣기 버퍼 삭제 (Delete the most recent paste buffer)                               |
-| `Prefix .`                       | 현재 창 이동 (Move the current window)                                                           |
-| `Prefix /`                       | 키 바인딩 설명 표시 (Describe key binding)                                                       |
-| `Prefix 0~9`                     | 특정 번호의 창 선택 (Select window 0~9)                                                          |
-| `Prefix :`                       | 명령어 입력 프롬프트 (Prompt for a command)                                                      |
-| `Prefix ;`                       | 이전 활성 패널로 이동 (Move to the previously active pane)                                       |
-| `Prefix =`                       | 붙여넣기 버퍼 선택 (Choose a paste buffer from a list)                                           |
-| `Prefix ?`                       | 키 바인딩 목록 표시 (List key bindings)                                                          |
-| `Prefix C`                       | 옵션 사용자 지정 (Customize options)                                                             |
-| `Prefix D`                       | 클라이언트 분리 선택 (Choose and detach a client from a list)                                    |
-| `Prefix E`                       | 패널 크기를 균등하게 조정 (Spread panes out evenly)                                              |
-| `Prefix L`                       | 마지막 클라이언트로 전환 (Switch to the last client)                                             |
-| `Prefix M`                       | 선택된 패널 마크 해제 (Clear the marked pane)                                                    |
-| `Prefix [`                       | 복사 모드 진입 (Enter copy mode)                                                                 |
-| `Prefix ]`                       | 최근 붙여넣기 버퍼 붙여넣기 (Paste the most recent paste buffer)                                 |
-| `Prefix c`                       | 새 창 생성 (Create a new window)                                                                 |
-| `Prefix d`                       | 현재 클라이언트 분리 (Detach the current client)                                                 |
-| `Prefix f`                       | 패널 검색 (Search for a pane)                                                                    |
-| `Prefix i`                       | 창 정보 표시 (Display window information)                                                        |
-| `Prefix l`                       | 이전 창으로 이동 (Select the previously current window)                                          |
-| `Prefix m`                       | 현재 패널 마크/마크 해제 (Toggle the marked pane)                                                |
-| `Prefix n`                       | 다음 창 선택 (Select the next window)                                                            |
+| `Prefix C-z`                     | 현재 클라이언트 일시 정지 (Suspend the current client)                                                |
+| `Prefix Space`                   | 다음 레이아웃 선택 (Select next layout)                                                            |
+| `Prefix !`                       | 현재 패널을 새로운 창으로 이동 (Break pane to a new window)                                             |
+| `Prefix "`                       | 창을 수직으로 분할 (Split window vertically)                                                       |
+| `Prefix #`                       | 모든 붙여넣기 버퍼 목록 표시 (List all paste buffers)                                                  |
+| `Prefix $`                       | 현재 세션 이름 변경 (Rename current session)                                                       |
+| `Prefix %`                       | 창을 수평으로 분할 (Split window horizontally)                                                     |
+| `Prefix &`                       | 현재 창 종료 (Kill current window)                                                              |
+| `Prefix '`                       | 창 번호 입력 후 이동 (Prompt for window index to select)                                           |
+| `Prefix (`                       | 이전 클라이언트로 전환 (Switch to previous client)                                                   |
+| `Prefix )`                       | 다음 클라이언트로 전환 (Switch to next client)                                                       |
+| `Prefix ,`                       | 현재 창 이름 변경 (Rename current window)                                                         |
+| `Prefix -`                       | 가장 최근 붙여넣기 버퍼 삭제 (Delete the most recent paste buffer)                                     |
+| `Prefix .`                       | 현재 창 이동 (Move the current window)                                                          |
+| `Prefix /`                       | 키 바인딩 설명 표시 (Describe key binding)                                                         |
+| `Prefix 0~9`                     | 특정 번호의 창 선택 (Select window 0~9)                                                            |
+| `Prefix :`                       | 명령어 입력 프롬프트 (Prompt for a command)                                                         |
+| `Prefix ;`                       | 이전 활성 패널로 이동 (Move to the previously active pane)                                          |
+| `Prefix =`                       | 붙여넣기 버퍼 선택 (Choose a paste buffer from a list)                                             |
+| `Prefix ?`                       | 키 바인딩 목록 표시 (List key bindings)                                                            |
+| `Prefix C`                       | 옵션 사용자 지정 (Customize options)                                                              |
+| `Prefix D`                       | 클라이언트 분리 선택 (Choose and detach a client from a list)                                       |
+| `Prefix E`                       | 패널 크기를 균등하게 조정 (Spread panes out evenly)                                                   |
+| `Prefix L`                       | 마지막 클라이언트로 전환 (Switch to the last client)                                                  |
+| `Prefix M`                       | 선택된 패널 마크 해제 (Clear the marked pane)                                                       |
+| `Prefix [`                       | 복사 모드 진입 (Enter copy mode) -> spacebar 선택, enter 복사 (키가 동작하지 않는 경우 vi 키맵핑 필요할 수 있음)        |
+| `Prefix ]`                       | 최근 붙여넣기 버퍼 붙여넣기 (Paste the most recent paste buffer)                                       |
+| `Prefix c`                       | 새 창 생성 (Create a new window)                                                               |
+| `Prefix d`                       | 현재 클라이언트 분리 (Detach the current client)                                                    |
+| `Prefix f`                       | 패널 검색 (Search for a pane)                                                                  |
+| `Prefix i`                       | 창 정보 표시 (Display window information)                                                       |
+| `Prefix l`                       | 이전 창으로 이동 (Select the previously current window)                                           |
+| `Prefix m`                       | 현재 패널 마크/마크 해제 (Toggle the marked pane)                                                    |
+| `Prefix n`                       | 다음 창 선택 (Select the next window)                                                           |
 | `Prefix o`                       | 다음 패널 선택 (Select the next pane)                                                            |
-| `Prefix p`                       | 이전 창 선택 (Select the previous window)                                                        |
+| `Prefix p`                       | 이전 창 선택 (Select the previous window)                                                       |
 | `Prefix q`                       | 패널 번호 표시 (Display pane numbers)                                                            |
-| `Prefix r`                       | 현재 클라이언트 다시 그리기 (Redraw the current client)                                          |
-| `Prefix s`                       | 세션 목록에서 선택 (Choose a session from a list)                                                |
-| `Prefix t`                       | 시계 표시 (Show a clock)                                                                         |
-| `Prefix w`                       | 창 목록에서 선택 (Choose a window from a list)                                                   |
+| `Prefix r`                       | 현재 클라이언트 다시 그리기 (Redraw the current client)                                                |
+| `Prefix s`                       | 세션 목록에서 선택 (Choose a session from a list)                                                  |
+| `Prefix t`                       | 시계 표시 (Show a clock)                                                                       |
+| `Prefix w`                       | 창 목록에서 선택 (Choose a window from a list)                                                    |
 | `Prefix x`                       | 활성 패널 종료 (Kill the active pane)                                                            |
 | `Prefix z`                       | 패널 확대/축소 (Zoom the active pane)                                                            |
-| `Prefix {`                       | 현재 패널을 위쪽 패널과 교환 (Swap the active pane with the pane above)                          |
-| `Prefix }`                       | 현재 패널을 아래쪽 패널과 교환 (Swap the active pane with the pane below)                        |
-| `Prefix ~`                       | 메시지 기록 보기 (Show messages)                                                                 |
-| `Prefix DC` (`DC` = `delete`)    | 창의 보이는 부분을 커서가 따라가도록 리셋 (Reset visible part of the window follows the cursor)  |
-| `Prefix PPage`                   | 복사 모드에서 위로 스크롤 (Enter copy mode and scroll up)                                        |
-| `Prefix ↑ / ↓ / ← / →`           | 패널 간 이동 (Select pane up/down/left/right)                                                    |
+| `Prefix {`                       | 현재 패널을 위쪽 패널과 교환 (Swap the active pane with the pane above)                                |
+| `Prefix }`                       | 현재 패널을 아래쪽 패널과 교환 (Swap the active pane with the pane below)                               |
+| `Prefix ~`                       | 메시지 기록 보기 (Show messages)                                                                  |
+| `Prefix DC` (`DC` = `delete`)    | 창의 보이는 부분을 커서가 따라가도록 리셋 (Reset visible part of the window follows the cursor)              |
+| `Prefix PPage`                   | 복사 모드에서 위로 스크롤 (Enter copy mode and scroll up)                                             |
+| `Prefix ↑ / ↓ / ← / →`           | 패널 간 이동 (Select pane up/down/left/right)                                                   |
 | `Prefix M-1 ~ M-5` (`M` = `Alt`) | 레이아웃 설정 (Set even-horizontal, even-vertical, main-horizontal, main-vertical, tiled layout) |
-| `Prefix M-n / M-p`               | 경고가 있는 창으로 이동 (Select next/previous window with an alert)                              |
-| `Prefix M-o`                     | 패널을 반대 방향으로 순환 (Rotate through the panes in reverse)                                  |
+| `Prefix M-n / M-p`               | 경고가 있는 창으로 이동 (Select next/previous window with an alert)                                  |
+| `Prefix M-o`                     | 패널을 반대 방향으로 순환 (Rotate through the panes in reverse)                                       |
 | `Prefix M-↑ / M-↓ / M-← / M-→`   | 패널 크기 조정 (Resize pane up/down/left/right by 5)                                             |
 | `Prefix C-↑ / C-↓ / C-← / C-→`   | 패널 크기 조정 (Resize pane up/down/left/right)                                                  |
-| `Prefix S-↑ / S-↓ / S-← / S-→`   | 창의 보이는 부분을 이동 (Move the visible part of the window up/down/left/right)                 |
+| `Prefix S-↑ / S-↓ / S-← / S-→`   | 창의 보이는 부분을 이동 (Move the visible part of the window up/down/left/right)                     |
 
 #### Tmux Plugin Manager
 
@@ -347,7 +347,7 @@ prefix + I
 ##### 플러그인 설정 및 설치
 
 ```bash
-# 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 생성한다.
+# 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 생성하거나 수정
 vim ~/.tmux.conf
 
 # 아래 내용을 run '~/.tmux/plugins/tpm/tpm' 명령 위에 추가 후 저장
@@ -368,6 +368,22 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'
 
 - `prefix + Ctrl-s` - save
 - `prefix + Ctrl-r` - restore
+
+#### vi 키 맵핑
+
+tmux는 기본적으로 vi 키로 동작하지만 정상적으로 키 입력이 안 되는 경우가 발생할 수 있다.
+그럴 땐 직접 vi 키 맵핑으로 동작할 수 있게 설정에 추가하고 적용한다.
+
+문서 하단에 추가하고 설정 적용 커맨드 실행한다.
+
+```bash
+# 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 생성하거나 수정
+vim ~/.tmux.conf
+
+# vi 키 바인딩
+# 복사모드 Termux에서 실행 중인 tmux 세션에서 스페이스바와 Enter 키를 사용하여 해당 줄을 복사
+set-window-option -g mode-keys vi
+```
 
 ## 📌선택사항
 
