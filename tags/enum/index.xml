@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Enum on B9F1</title><link>https://b9f1.com/tags/enum/</link><description>Recent content in Enum on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 09 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/enum/index.xml" rel="self" type="application/rss+xml"/><item><title>Java Enum</title><link>https://b9f1.com/p/2025-04-09-java-when-and-how-to-use-the-enum-type/</link><pubDate>Wed, 09 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-09-java-when-and-how-to-use-the-enum-type/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-09-java-when-and-how-to-use-the-enum-type/cover.png" alt="Featured image of post Java Enum" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Java의 &lt;code>enum&lt;/code>(열거형)은 타입 안전성(Type-Safety)과 코드 가독성을 제공하는 고정된 상수 집합 관리 도구다.&lt;/p>
+&lt;p>기존의 &lt;code>public static final&lt;/code> 상수보다 발전된 형태로, 제한된 선택지를 표현할 때 주로 사용된다.&lt;/p>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>핵심 특징&lt;/p>
+&lt;ul>
+&lt;li>Java 5부터 공식 지원 (J2SE 5.0)&lt;/li>
+&lt;li>클래스의 확장 기능 제공 (필드, 메서드 추가 가능)&lt;/li>
+&lt;li>&lt;code>Comparable&lt;/code>, &lt;code>Serializable&lt;/code> 자동 구현&lt;/li>
+&lt;/ul>
+&lt;/div>
+&lt;/div>&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="enum은-왜-만들어졌는가">enum은 왜 만들어졌는가?
+&lt;/h3>&lt;h4 id="기존-방식의-한계">기존 방식의 한계
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ORDERED&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">PAID&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">2&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">DELIVERED&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">3&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>문제점:&lt;/p>
+&lt;ul>
+&lt;li>타입 안정성 부족: &lt;code>int status = 100;&lt;/code> 처럼 유효하지 않은 값 할당 가능&lt;/li>
+&lt;li>가독성 낮음: &lt;code>if (status == 1)&lt;/code> vs &lt;code>if(status == Status.ORDERED)&lt;/code>&lt;/li>
+&lt;li>확장성 부족: 상수에 메서드나 속성을 추가할 수 없음&lt;/li>
+&lt;/ul>
+&lt;h4 id="enum의-해결-방안">enum의 해결 방안
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">enum&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ORDERED&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">PAID&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">DELIVERED&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>컴파일 타입 검증 &lt;code>Status status = Status.ORDERED&lt;/code>만 허용 (잘못된 값 컴파일 오류)&lt;/li>
+&lt;li>명시적 표현으로 코드 가독성 향상&lt;/li>
+&lt;li>객체처럼 메서드/속성 추가 가능&lt;/li>
+&lt;/ul>
+&lt;h4 id="내부-동작-원리">내부 동작 원리
+&lt;/h4>&lt;p>enum은 컴파일러에 의해 클래스로 변환된다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>java.lang.Enum&lt;/code> 상속 &lt;code>compareTo()&lt;/code>, &lt;code>name()&lt;/code>, &lt;code>ordinal()&lt;/code> 기본 제공&lt;/li>
+&lt;li>생성자 &lt;code>private&lt;/code> 외부 인스턴스화 불가&lt;/li>
+&lt;li>&lt;code>values()&lt;/code>, &lt;code>valueOf()&lt;/code> 자동생성&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">java&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">Enum&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Enum 상수 = static final 인스턴스&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ORDERED&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ORDERED&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">PAID&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;PAID&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// ...&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">$VALUES&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ORDERED&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">PAID&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">Status&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ordinal&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 생성자는 private&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">super&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ordinal&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">values&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">$VALUES&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clone&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">valueOf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cm">/*...*/&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="언제부터-본격적으로-사용됐을까">언제부터 본격적으로 사용됐을까?
+&lt;/h3>&lt;ul>
+&lt;li>Java 5부터 본격 도입 - J2SE 5.0 (Tiger)에서 공식적으로 추가됐다고 한다.&lt;/li>
+&lt;li>2000년대 중반부터 도메인 모델링에서 enum이 적극 활용되기 시작됐다고 한다.&lt;/li>
+&lt;li>Spring, JPA와 같은 프레임워크에서 enum을 권장한다. (예: &lt;code>@Enumerated(EnumType.STRING)&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;h4 id="어떤-것을-대체할-수-있었나">어떤 것을 대체할 수 있었나
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>public static final&lt;/code> 상수&lt;/li>
+&lt;li>&lt;code>interface&lt;/code>에 상수 정의(&lt;code>interface Status { int ORDERED = 1; }&lt;/code>)&lt;/li>
+&lt;li>&lt;code>Map&lt;/code>이나 &lt;code>List&lt;/code>로 관리하던 것들&lt;/li>
+&lt;/ul>
+&lt;h4 id="enum을-사용하게-된-결정적-이유">enum을 사용하게 된 결정적 이유?
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>비교 대상&lt;/th>
+&lt;th>문제점&lt;/th>
+&lt;th>enum의 장점&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>public static final&lt;/code>&lt;/td>
+&lt;td>타입 안전성 X, 가독성 낮음&lt;/td>
+&lt;td>&lt;strong>타입 체크 O, 명시적 이름&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>interface&lt;/code> 상수&lt;/td>
+&lt;td>구현 클래스가 강제됨&lt;/td>
+&lt;td>&lt;strong>독립적인 타입&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>Map&lt;/code>/&lt;code>List&lt;/code> 관리&lt;/td>
+&lt;td>런타임 오류 가능성&lt;/td>
+&lt;td>&lt;strong>컴파일 타임 검증&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;ul>
+&lt;li>&lt;code>enum&lt;/code>은 기본 타입이 아니라 Java 컴파일러에 의해 특별히 처리되는 클래스다.&lt;/li>
+&lt;li>&lt;code>public static final&lt;/code> 상수의 문제점인 타입 안정성과 가독성을 해결&lt;/li>
+&lt;li>제한된 선택지를 안전하게 관리하기 위한 특수한 클래스&lt;/li>
+&lt;/ul>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="성능-최적화">성능 최적화
+&lt;/h3>&lt;p>&lt;code>==&lt;/code> vs &lt;code>equals()&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">PAID&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">PAID&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 권장 (빠름)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Status&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">PAID&lt;/span>&lt;span class="p">))&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 동작하지만 불필요&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>JPA 연동: &lt;code>@Enumerated(EnumType.String)&lt;/code>&lt;/li>
+&lt;li>Enum 단점: 새로운 상수 추가 시 모든 &lt;code>switch&lt;/code> 검토 필요&lt;/li>
+&lt;li>Enum 과 싱글톤 관계&lt;/li>
+&lt;/ul>
+&lt;h3 id="참고-자료">참고 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html" target="_blank" rel="noopener"
+>Oracle Docs - Enum Types&lt;/a>&lt;/li>
+&lt;li>Effective Java Item 34: &amp;ldquo;Use enums instead of int constants&amp;rdquo;&lt;/li>
+&lt;/ul></description></item></channel></rss>
