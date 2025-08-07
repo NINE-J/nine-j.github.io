@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Abstract on B9F1</title><link>https://b9f1.com/tags/abstract/</link><description>Recent content in Abstract on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 10 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/abstract/index.xml" rel="self" type="application/rss+xml"/><item><title>Java 객체지향: 추상 클래스</title><link>https://b9f1.com/p/2025-04-10-java-the-concept-and-necessity-of-abstraction/</link><pubDate>Thu, 10 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-10-java-the-concept-and-necessity-of-abstraction/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-10-java-the-concept-and-necessity-of-abstraction/cover.png" alt="Featured image of post Java 객체지향: 추상 클래스" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>추상화는 복잡한 시스템에서 핵심적인 개념이나 기능을 추출하여 간단하게 표현하는 것을 말한다.
+객체지향 프로그래밍에서는 불피룡한 세부 사항을 숨기고 필요한 부분만 표현하는 기법이다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="클래스가-이미-추상화된-개념인데-추상-클래스">클래스가 이미 추상화된 개념인데 추상 클래스?
+&lt;/h3>&lt;p>클래스 자체가 추상화된 개념이지만, 추상 클래스는 더 높은 수준의 추상화를 제공한다.&lt;/p>
+&lt;h4 id="일반-클래스-vs-추상-클래스">일반 클래스 vs 추상 클래스
+&lt;/h4>&lt;ol>
+&lt;li>일반 클래스: 구체적인 구현을 포함하며 인스턴스화 가능&lt;/li>
+&lt;li>추상 클래스: 부분적으로 구현된 상태로, 하위 클래스에서 완성해야 하는 추상 메서드를 가짐&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 일반 클래스 - 구체적인 구현&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Dog&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">bark&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34; says: Woof!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 추상 클래스 - 부분적 구현 + 추상화&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Canine&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">breath&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34; is breathing.&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">makeSound&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 하위 클래스에서 구현 필요&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Wolf&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Canine&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">makeSound&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34; says: Howl!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 사용 예&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">Main&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Dog&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">myDog&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Dog&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">myDog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Buddy&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">myDog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">bark&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Canine myCanine = new Canine(); // 컴파일 에러 - 추상 클래스는 인스턴스화 불가&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Wolf&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">myWolf&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Wolf&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">myWolf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">name&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;Ghost&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">myWolf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">breath&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">myWolf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">makeSound&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="추상화의-필요성">추상화의 필요성
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>복잡성 감소&lt;/strong>: 시스템의 복잡도를 낮춰 이해하기 쉽게 만든다.&lt;/li>
+&lt;li>&lt;strong>재사용성 증가&lt;/strong>: 공통적인 특성을 추출해 여러 곳에서 재사용할 수 있다.&lt;/li>
+&lt;li>&lt;strong>유지보수 용이&lt;/strong>: 변경이 필요한 경우 추상화된 부분만 수정하면 된다.&lt;/li>
+&lt;li>&lt;strong>포준화&lt;/strong>: 인터페이스를 통해 표준화된 접근 방식을 제공한다.&lt;/li>
+&lt;/ol>
+&lt;h3 id="행위-중심-추상화-vs-데이터-중심-추상화">행위 중심 추상화 vs 데이터 중심 추상화
+&lt;/h3>&lt;p>OOP에서 중요한 건 객체와 객체 간의 상호 작용을 설계하는 것.
+따라서 필드(데이터) 보다는 메서드(행위)를 중점으로 추상화 기법을 적용하여 객체를 설계하는 것이 중요하다.&lt;/p>
+&lt;p>그러나 필요에 따라 데이터를 중심으로 추상화 하여 객체 및 클래스를 설계하는 경우도 존재한다.
+대표적으로 DTO(Data Transfer Object) 같은 클래스가 있다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;th>예시&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>행위 중심 추상화&lt;/td>
+&lt;td>객체가 수행할 **기능(행동)**에 초점&lt;/td>
+&lt;td>&lt;code>interface Runnable { void run(); }&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>데이터 중심 추상화&lt;/td>
+&lt;td>객체가 가진 **속성(데이터)**에 초점&lt;/td>
+&lt;td>&lt;code>abstract class Shape { int x, y; }&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="추상-클래스와-인터페이스">추상 클래스와 인터페이스
+&lt;/h3>&lt;h4 id="공통점">공통점
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>인스턴스 생성 불가&lt;/strong>: 직접 객체를 생성할 수 없다.&lt;/li>
+&lt;li>&lt;strong>추상 메서드 포함&lt;/strong>: 구현되지 않은 메서드를 가질 수 있다.&lt;/li>
+&lt;li>&lt;strong>다형성 지원&lt;/strong>: 상속/구현을 통해 다형성을 제공한다.&lt;/li>
+&lt;li>&lt;strong>계층 구조 형성&lt;/strong>: 클래스들의 관계를 구조화한다.&lt;/li>
+&lt;/ol>
+&lt;h4 id="차이점">차이점
+&lt;/h4>&lt;p>추상 클래스는 인스턴스를 생성할 수 없는데 왜 생성자를 가질 수 있을까?&lt;/p>
+&lt;ul>
+&lt;li>생성자의 존재는 &amp;ldquo;너는 이 클래스를 직접 쓰는 게 아니라, 하위 클래스를 만들 때 이 규칙으로 초기화해야 해&amp;quot;라는 의미로 해석할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>특징&lt;/th>
+&lt;th>추상 클래스&lt;/th>
+&lt;th>인터페이스&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>키워드&lt;/strong>&lt;/td>
+&lt;td>&lt;code>abstract class&lt;/code>&lt;/td>
+&lt;td>&lt;code>interface&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>상속&lt;/strong>&lt;/td>
+&lt;td>단일 상속만 가능&lt;/td>
+&lt;td>다중 구현 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>변수&lt;/strong>&lt;/td>
+&lt;td>인스턴스 변수, 상수 모두 가능&lt;/td>
+&lt;td>상수만 가능 (public static final)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>메서드&lt;/strong>&lt;/td>
+&lt;td>추상/구현 메서드 모두 가능&lt;/td>
+&lt;td>Java 8 이전: 모두 추상 메서드&lt;br>Java 8+: default, static 메서드 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>생성자&lt;/strong>&lt;/td>
+&lt;td>가질 수 있음&lt;/td>
+&lt;td>가질 수 없음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>접근 제어자&lt;/strong>&lt;/td>
+&lt;td>다양한 접근 제어자 사용 가능&lt;/td>
+&lt;td>기본적으로 public&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>사용 목적&lt;/strong>&lt;/td>
+&lt;td>관련 있는 클래스들의 공통점 정의&lt;/td>
+&lt;td>다른 계층의 클래스들에 공통 기능 정의&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="잘못된-추상화의-예시와-개선-방법">잘못된 추상화의 예시와 개선 방법
+&lt;/h3>&lt;h4 id="불필요한-추상화">불필요한 추상화
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 너무 구체적인 것을 추상화한 경우&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">DatabaseConnector&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">connectToMySQL&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">connectToPostgreSQL&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">connectToOracle&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 개선 방법: 공통적인 연결 개념으로 추상화&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">DatabaseConnector&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">connect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">url&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">abstract&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">disconnect&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="언제-사용하지">언제 사용하지?
+&lt;/h3>&lt;ol>
+&lt;li>관련 클래스들 사이의 공통점을 추출할 때&lt;/li>
+&lt;li>일부 메서드는 구현하고, 일부는 하위 클래스에 &lt;strong>위임할 때&lt;/strong>&lt;/li>
+&lt;li>템플릿 메서드 패턴 구현 시&lt;/li>
+&lt;li>계층 구조를 명확히 표현하고 싶을 때&lt;/li>
+&lt;/ol>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>Java의 추상화 개념, 추상 클래스와 인터페이스의 적절한 사용법, 그리고 잘못된 추상화의 예와 개선 방법을 알아보았다.&lt;/p>
+&lt;p>인터페이스가 서비스의 최소 규약인 것처럼, 추상 클래스는 클래스의 골격이 되고 클래스는 생성될 객체의 청사진이라고 이해할 수 있겠다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;p>추가적으로 찾아보면 좋을 것들을 더 적어본다..&lt;/p>
+&lt;h3 id="디자인-패턴에서의-추상화-활용">디자인 패턴에서의 추상화 활용
+&lt;/h3>&lt;ul>
+&lt;li>팩토리 메서드 패턴&lt;/li>
+&lt;li>템플릿 메서드 패턴&lt;/li>
+&lt;li>브리지 패턴&lt;/li>
+&lt;/ul>
+&lt;h3 id="solid-원칙과의-연관성">SOLID 원칙과의 연관성
+&lt;/h3>&lt;ul>
+&lt;li>단일 책임 원칙(SRP)
+&lt;ul>
+&lt;li>추상화를 통해 책임 분리 유도&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>개방-폐쇄 원칙(OCP)
+&lt;ul>
+&lt;li>확장에는 열려 있고 변경에는 닫힌 설계&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>의존 역전 원칙(DIP)
+&lt;ul>
+&lt;li>고수준 모듈이 저수준 모듈에 의존하지 않도록 추상화 계층 도입&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="실무-적용-시-고려사항">실무 적용 시 고려사항
+&lt;/h3>&lt;ul>
+&lt;li>추상화의 적정선
+&lt;ul>
+&lt;li>YAGNI 원칙 (You Ain&amp;rsquo;t Gonna Need It): 과도한 추상화는 복잡도 증가&lt;/li>
+&lt;li>계층 깊이 vs 유연성 트레이드오프&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>성능 영향
+&lt;ul>
+&lt;li>가상 메서드 테이블(VMT) 오버헤드 (극미량이지만 고성능 시스템에서 고려)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>테스트 용이성
+&lt;ul>
+&lt;li>추상 클래스는 Mocking이 어려울 수 있음 &lt;code>@Spy&lt;/code> 사용 사례&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

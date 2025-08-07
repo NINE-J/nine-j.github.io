@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>계층구조 on B9F1</title><link>https://b9f1.com/tags/%EA%B3%84%EC%B8%B5%EA%B5%AC%EC%A1%B0/</link><description>Recent content in 계층구조 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 21 Jun 2025 21:08:37 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EA%B3%84%EC%B8%B5%EA%B5%AC%EC%A1%B0/index.xml" rel="self" type="application/rss+xml"/><item><title>입력값 검증 어디까지 해야 할까?</title><link>https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/</link><pubDate>Sat, 21 Jun 2025 21:08:37 +0900</pubDate><guid>https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/cover.png" alt="Featured image of post 입력값 검증 어디까지 해야 할까?" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>입력값 검증은 보안, 데이터 무결성, 사용자 경험을 모두 좌우하는 핵심 요소다.
+하지만 각 계층의 책임이 명확하지 않으면 중복 검증, 누락, 책임 희석 등의 문제가 발생할 수 있다.&lt;/p>
+&lt;p>각 계층에서 검증 책임을 정리하고 중복 없이 안정성을 확보하는 전략과 트레이드오프를 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="presentation-layer">Presentation Layer
+&lt;/h3>
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>클라이언트와 Controller에서의 검증은 빠른 피드백을 줄 수 있지만 절대 신뢰할 수 있는 검증 계층은 아니다. 반드시 하위 계층의 보완이 필요하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Web, Controller&lt;/li>
+&lt;li>책임: UI/UX 관점에서 빠른 피드백 제공&lt;/li>
+&lt;li>검증: 형식적 유효성(null, 공백, 정규식 등)
+&lt;ul>
+&lt;li>예: 이메일 형식, 숫자 범위, 필수 입력 여부&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: &lt;code>@Valid&lt;/code>, &lt;code>@Validated&lt;/code>, &lt;code>BindingResult&lt;/code>, JavaScript 클라이언트 측 검증&lt;/li>
+&lt;li>목적: UX 개선 + 서버 리소스 낭비 방지&lt;/li>
+&lt;/ul>
+&lt;h3 id="service-layer">Service Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>비즈니스 정책을 수반하는 검증은 Controller가 아닌 Service에서 처리해야 한다. 핵심 규칙을 책임지는 계층이다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Application, Service&lt;/li>
+&lt;li>책임: 유스케이스 단위의 비즈니스 규칙 검증&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>상태 기반 조건&lt;/li>
+&lt;li>중복 등록, 권한 체크, 사용 제한 등&lt;/li>
+&lt;li>예: 하루 1회만 등록 가능, 좌석 수 초과 불가 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: 조건문, Guard Clause, Specification Pattern, 예외 발생 기반 제어&lt;/li>
+&lt;li>목적: 흐름 제어와 정책 보장, 응답 일관성 유지&lt;/li>
+&lt;/ul>
+&lt;h3 id="domain-layer">Domain Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>도메인은 단순한 데이터 보관소가 아니라 행위와 불변 조건을 포함한 책임 주체다.
+도메인 객체는 자기 상태를 보호해야 하며 외부로부터 일관성을 강제 받지 않는다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Domain Model (Entity, ValueObject, Aggregate)&lt;/li>
+&lt;li>책임: 객체의 내부 일관성과 상태 전이 검증&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>객체 생성 시 필수 조건&lt;/li>
+&lt;li>상태 변경 제약
+&lt;ul>
+&lt;li>예: 배송 상태는 &amp;lsquo;결제 완료&amp;rsquo; 이후에만 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: 생성자/정적 팩토리 검증, 불변 조건 메서드, &lt;code>validateTransition()&lt;/code> 등&lt;/li>
+&lt;li>목적: 외부 계층 의존 없는 무결성 유지, 테스트 가능성 향상&lt;/li>
+&lt;/ul>
+&lt;h3 id="persistence-layer">Persistence Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>하위 계층일수록 안전 장치 역할이 강해진다. 모든 검증을 상위 계층에 의존하는 것은 위험하다.
+DB는 최후의 방어선으로 작동해야 한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Repositoiry, Database&lt;/li>
+&lt;li>책임: 저장 및 조회 시 스키마 기반의 데이터 무결성 보장&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>DB 스키마 제약: &lt;code>NOT NULL&lt;/code>, &lt;code>UNIQUE&lt;/code>, &lt;code>CHECK&lt;/code>, &lt;code>FK&lt;/code> 등&lt;/li>
+&lt;li>ORM 수준 검증: &lt;code>@Column(nullable = false)&lt;/code>, &lt;code>@UniqueConstraint&lt;/code> 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: JPA, Hibernate Validator, RDB 제약 조건&lt;/li>
+&lt;li>목적: 상위 계층 누락 방지, 악의적 요청 방어&lt;/li>
+&lt;/ul>
+&lt;h3 id="trade-off">Trade-off
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>장점&lt;/th>
+&lt;th>단점&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>계층별 검증 분산&lt;/strong>&lt;/td>
+&lt;td>책임 분리, 시스템 안정성 증가&lt;/td>
+&lt;td>로직 분산 → 이해 난이도 상승&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>중복 검증 허용&lt;/strong>&lt;/td>
+&lt;td>Fail-safe 설계 가능, 안정성 강화&lt;/td>
+&lt;td>과도한 검증 → 응답 지연, 리소스 낭비 가능성&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>검증 통합 집중&lt;/strong>&lt;/td>
+&lt;td>유지보수 단순화 가능&lt;/td>
+&lt;td>변경 시 연쇄 영향 발생, 도메인 무결성 위험&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>입력값 검증은 단일 계층의 책임이 아니다.
+각 계층에서 역할에 맞는 검증을 수행해야만 중복을 줄이고 안전성을 확보할 수 있다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>계층&lt;/th>
+&lt;th>핵심 역할&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Presentation&lt;/td>
+&lt;td>빠른 피드백&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Service&lt;/td>
+&lt;td>정책 흐름 제어&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Domain&lt;/td>
+&lt;td>불변 조건 보장&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Persistence&lt;/td>
+&lt;td>최종 무결성 수호선 역할&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>MVC / 계층형 아키텍처 기본 개념&lt;/li>
+&lt;li>DDD의 엔티티, 밸류 객체, 애그리거트 이해&lt;/li>
+&lt;li>Bean Validation (&lt;code>@Valid&lt;/code>, &lt;code>@NotBlank&lt;/code>)&lt;/li>
+&lt;li>예외 처리 흐름 (&lt;code>@ControllerAdvice&lt;/code>, 예외 매핑)&lt;/li>
+&lt;li>REST 응답 코드 설계 (&lt;code>400&lt;/code>, &lt;code>409&lt;/code>, &lt;code>422&lt;/code> 등)&lt;/li>
+&lt;/ul>
+&lt;h3 id="-더-알아보기">🔍 더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/core/validation/" target="_blank" rel="noopener"
+>Spring Validation 공식 문서&lt;/a>&lt;/li>
+&lt;li>Jakarta Bean Validation 3.0&lt;/li>
+&lt;li>Effective Java - Item 49: Check parameters for validity&lt;/li>
+&lt;li>Refactoring 2nd Ed - Bad Smells in Code: Shotgun Surgery, Feature Envy&lt;/li>
+&lt;li>Martin Fowler - Specification Pattern&lt;/li>
+&lt;li>Validation in DDD: Where, Why, How&lt;/li>
+&lt;/ul></description></item></channel></rss>

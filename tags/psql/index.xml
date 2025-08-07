@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Psql on B9F1</title><link>https://b9f1.com/tags/psql/</link><description>Recent content in Psql on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Jun 2025 10:11:44 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/psql/index.xml" rel="self" type="application/rss+xml"/><item><title>WSL에서 PSQL 사용하기</title><link>https://b9f1.com/p/2025-06-27-wsl-using-psql/</link><pubDate>Fri, 27 Jun 2025 10:11:44 +0900</pubDate><guid>https://b9f1.com/p/2025-06-27-wsl-using-psql/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-27-wsl-using-psql/cover.png" alt="Featured image of post WSL에서 PSQL 사용하기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>백엔드 개발을 진행하다 보면 WSL에서 &lt;code>psql&lt;/code>을 사용해 Windows에 설치된 PostgreSQL에 접속하고 싶은 상황이 있다.&lt;/p>
+&lt;p>그러나 단순한 클라이언트 설치만으로는 접속이 되지 않는다. 방화벽, 접속 허용 설정, 포트 개방 등 네트워크 보안 요소를 고려해야 하기 때문이다.&lt;/p>
+&lt;p>WSL에서 PostgreSQL 접속 방법을 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="postgresql-클라이언트-설치">PostgreSQL 클라이언트 설치
+&lt;/h3>&lt;p>Windows에 구성된 PostgreSQL에 접속하기 위해 클라이언트를 설치해야 한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install postgresql-client
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Tip&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>apt-get&lt;/code>은 더 오래된 전통적인 CLI 툴&lt;/p>
+&lt;ul>
+&lt;li>스크립트나 자동화에 주로 사용&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>apt&lt;/code>는 &lt;code>apt-get&lt;/code>과 &lt;code>apt-cache&lt;/code>의 여러 기능을 합쳐 사용자 친화적으로 만든 통합 명령어&lt;/p>
+&lt;ul>
+&lt;li>2014년 즈음부터 Debian/Ubuntu에 포함되었고 Ubuntu 16.04부터 기본으로 권장&lt;/li>
+&lt;li>깔끔한 출력과 심플한 옵션 제공&lt;/li>
+&lt;/ul>
+&lt;p>일상적인 사용에 &lt;code>apt&lt;/code>가 권장되며 스크립트 자동화, 하위 호환에 &lt;code>apt-get&lt;/code>을 사용할 수 있다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="windows-ip-확인">Windows IP 확인
+&lt;/h3>&lt;p>PostgreSQL 서버가 설치된 Windows 쪽 IP를 알아야 접속이 가능하다.
+이때 &lt;code>ifconfig&lt;/code>이 아니라 다음 명령어를 사용해야 정확하다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ip route &lt;span class="p">|&lt;/span> grep default
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예시 결과&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">default via 172.27.208.1 dev eth0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>172.27.208.1&lt;/code>이 &lt;strong>WSL에서 Windows를 바라보는 IP (게이트웨이 IP)&lt;/strong> 이므로 이 주소를 접속 대상 IP로 사용한다.&lt;/p>
+&lt;h3 id="windows-postgresql-서버-설정-변경">Windows PostgreSQL 서버 설정 변경
+&lt;/h3>&lt;h4 id="postgresqlconf">postgresql.conf
+&lt;/h4>&lt;p>Windows에 설치된 PostgreSQL 설정 디렉토리에서 아래 설정을 찾아 수정한다.&lt;/p>
+&lt;p>보통은 기본 설치 경로에 있다. &lt;code>C:\Program Files\PostgreSQL\{version}\data&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">listen_addresses&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;*&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 또는 원하는 IP만&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">listen_addresses&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;localhost,172.27.208.1&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Tip&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>*&lt;/code> 와일드 카드로 전체를 여는 것보다 특정 IP에서 들어오는 것만 명시적으로 지정하는 것이 보안상 안전하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h4 id="pg_hbaconf">pg_hba.conf
+&lt;/h4>&lt;p>해당 대역(WSL 내부 IP 포함)을 명시적으로 허용해야 접속 가능하다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">host all all 172.27.208.1 md5
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>수정 후에는 반드시 PostgreSQL 서비스를 재시작해야 설정이 반영된다.&lt;/p>
+&lt;p>Windows의 &lt;code>services.msc&lt;/code>에서 PostgreSQL을 다시 시작하거나 명령어를 사용해 재시작한다.&lt;/p>
+&lt;h3 id="windows-방화벽에서-포트-열기">Windows 방화벽에서 포트 열기
+&lt;/h3>&lt;p>WSL은 Windows의 입장에선 외부 네트워크로 간주된다.
+기본적으로 TCP 5432 포트는 차단되어 있다.&lt;/p>
+&lt;p>따라서 명시적으로 인바운드 규칙을 추가해야 한다.
+기본적인 설정으로 가정하고 정리한다.&lt;/p>
+&lt;p>설정 경로:&lt;/p>
+&lt;ul>
+&lt;li>Windows의 실행 &amp;gt; &lt;code>wf.msc&lt;/code> (Windows Defender 방화벽 고급 보안)
+&lt;ul>
+&lt;li>또는 제어판에서 방화벽 &amp;gt; 고급 설정&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>인바운드 규칙에서 새 규칙 추가
+&lt;ul>
+&lt;li>유형: 포트&lt;/li>
+&lt;li>프로토콜: TCP&lt;/li>
+&lt;li>포트: 5432&lt;/li>
+&lt;li>작업: 연결 허용&lt;/li>
+&lt;li>프로필: 도메인/개인/공용 모두 선택&lt;/li>
+&lt;li>이름: Allow PostgreSQL 5432 for WSL&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="연결-테스트">연결 테스트
+&lt;/h3>&lt;p>WSL 터미널에서 명령 실행 확인&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">nc -zv 172.27.208.1 &lt;span class="m">5432&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 포트 정상적으로 붙게 되면&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Connection to 172.27.208.1 &lt;span class="m">5432&lt;/span> port &lt;span class="o">[&lt;/span>tcp/postgresql&lt;span class="o">]&lt;/span> succeeded!
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>그 다음 실제 접속&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 호스트, 유저, DB&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql -h 172.27.208.1 -U postgres -d postgres
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>WSL은 로컬처럼 보이지만 네트워크적으로는 별개의 장치로 취급된다.&lt;/p>&lt;/blockquote>
+&lt;p>단순히 PostgreSQL을 설치하는 것만으로 접속이 불가능하다.
+&lt;code>listen_addresses&lt;/code>, &lt;code>pg_hba.conf&lt;/code>, 방화벽 인바운드 설정까지 모두 갖춰져야 제대로 동작한다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>WSL 기본 개념&lt;/li>
+&lt;li>PostgreSQL 서버와 클라이언트 구조&lt;/li>
+&lt;li>Windows 방화벽 설정&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/" target="_blank" rel="noopener"
+>WSL 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/" target="_blank" rel="noopener"
+>PostgreSQL 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/runtime-config-connection.html" target="_blank" rel="noopener"
+>&lt;code>listen_addresses&lt;/code> 설명&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/auth-pg-hba-conf.html" target="_blank" rel="noopener"
+>&lt;code>pg_hba.conf&lt;/code> 인증 가이드&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>psql: 시작하기</title><link>https://b9f1.com/p/2025-04-20-psql-getting-started/</link><pubDate>Sun, 20 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-20-psql-getting-started/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-20-psql-getting-started/cover.png" alt="Featured image of post psql: 시작하기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>기본적으로 그냥 설치 후 환경 변수에 psql 등록돼서 버전 확인이 가능했다.
+기본 옵션으로 설치해서 DBeaver 역시 어렵지 않게 연결할 수 있었다.&lt;/p>
+&lt;p>근데 PostgreSQL이 동작하고 있는 서버의 IP라던가 포트를 확인하려고 하는데 오류가 있었다.&lt;/p>
+&lt;ul>
+&lt;li>Windows11, PostgreSQL 17.4 설치&lt;/li>
+&lt;li>SQL shell은 정상 동작&lt;/li>
+&lt;li>PostgreSQL 설치 후 Bash, CMD에서 &lt;code>psql&lt;/code> 명령어 찾을 수 없음 오류&lt;/li>
+&lt;li>DBeaver 접속 정상&lt;/li>
+&lt;/ul>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="postgresql-설치-확인">PostgreSQL 설치 확인
+&lt;/h3>&lt;p>설치가 잘 됐는지 Bash, CMD 등에서 버전을 확인해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql --version
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예상 출력&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql &lt;span class="o">(&lt;/span>PostgreSQL&lt;span class="o">)&lt;/span> 17.4
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-접속하기">PostgreSQL 접속하기
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">psql -U [username] -d [database_name] -h [hostname] -p [port_number]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>username&lt;/code>: PostgreSQL 데이터베이스에 로그인할 사용자 이름이다. 기본적으로 &amp;lsquo;postgres&amp;rsquo;로 설정되어 있다.&lt;/li>
+&lt;li>&lt;code>database_name&lt;/code>: 접속할 데이터베이스의 이름이다. 기본값은 &amp;lsquo;postgres&amp;rsquo;이다.&lt;/li>
+&lt;li>&lt;code>hostname&lt;/code>: PostgreSQL 서버의 호스트 이름이다. 기본값은 &amp;rsquo;localhost&amp;rsquo;이다.&lt;/li>
+&lt;li>&lt;code>port_number&lt;/code>: PostgreSQL 서버의 포트 번호이다. 기본값은 &amp;lsquo;5432&amp;rsquo;이다.&lt;/li>
+&lt;/ul>
+&lt;p>기본 옵션으로 설치한 나의 경우 아래와 같다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -U postgres -d postgres -h localhost -p &lt;span class="m">5432&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 예시 출력&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql &lt;span class="o">(&lt;/span>17.4&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">도움말을 보려면 &lt;span class="s2">&amp;#34;help&amp;#34;&lt;/span>를 입력하십시오.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 프롬프트가 변경된다.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">postgres&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="c1">#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># \q | Ctrl+C 등으로 빠져나올 수 있다.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="사용자의-password-인증을-실패했습니다">사용자의 password 인증을 실패했습니다
+&lt;/h3>&lt;p>명령창에서 psql 접속 후 시도하는 방법도 있지만 &lt;a class="link" href="https://wikidocs.net/215908" target="_blank" rel="noopener"
+>PostgreSQL 입문서&lt;/a>에 보면 &lt;code>test&lt;/code> 데이터베이스에 연결하여 간단한 SQL 쿼리를 실행하는 명령어가 있다.&lt;/p>
+&lt;p>근데 시도하면 오류가 발생한다?&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_addr()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;USER NAME&amp;gt; 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql: 오류: &lt;span class="s2">&amp;#34;localhost&amp;#34;&lt;/span> &lt;span class="o">(&lt;/span>::1&lt;span class="o">)&lt;/span>, &lt;span class="m">5432&lt;/span> 포트로 서버 접속 할 수 없음: 치명적오류: 사용자 &lt;span class="s2">&amp;#34;&amp;lt;USER NAME&amp;gt;&amp;#34;&lt;/span>의 password 인증을 실패했습니다
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>비밀번호는 틀리지 않았고 Bash, CMD 등에서 테스트 명령만 실패한다.&lt;/p>
+&lt;p>&lt;code>pg_hba.conf&lt;/code> 파일의 인증 메서드를 수정하라는 정보가 많았는데 이건 보안을 바꾸는 거니까 지금 필요한 근본적인 해결책이 아니다.&lt;/p>
+&lt;p>postgres 접속은 가능하니까 접속해서 USER 목록을 조회해본다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="n">postgres&lt;/span>&lt;span class="o">=#&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pg_user&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">----------
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="err">개&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">행&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="o">=#&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">SELECT&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usesuper&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usecreatedb&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pg_user&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">usename&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usesuper&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">usecreatedb&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">----------+----------+-------------
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">postgres&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">|&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="err">개&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="err">행&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>존재하는 유저는 postgres 뿐인데 테스트 명령에 왜 엉뚱한 사용자명이 나올까?&lt;/p>
+&lt;p>이 명령은 명시적으로 &lt;code>-U&lt;/code> (user)를 지정하지 않았기 때문에 현재 로그인된 OS 사용자 이름을 PostgreSQL 클라이언트가 그대로 사용하려고 한다.&lt;/p>
+&lt;p>확실히 존재하는 postgres 유저로 테스트 명령을 실행하기 위해 &lt;code>-U postgres&lt;/code>를 붙여주면 명확하게 &lt;code>postgres&lt;/code> 유저로 접속 시도하게 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -U postgres -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_addr()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet_server_addr
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ::1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>1개 행&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">psql -U postgres -d &lt;span class="nb">test&lt;/span> -c &lt;span class="s2">&amp;#34;select inet_server_port()&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">postgres 사용자의 암호:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inet_server_port
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">5432&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">(&lt;/span>1개 행&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-설치">PostgreSQL 설치
+&lt;/h3>&lt;p>&lt;a class="link" href="https://www.postgresql.org/download/" target="_blank" rel="noopener"
+>PostgreSQL 공식 다운로드&lt;/a> Download 페이지에서 운영체제에 맞게 선택 후 다운로드&lt;/p>
+&lt;p>나는 지금 시점 끈따끈따한 17.4 선택.&lt;/p>
+&lt;h4 id="0welcome">0.Welcome
+&lt;/h4>&lt;p>설치 파일을 실행하면 환영해준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설정 - PostgreSQL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup - PostgreSQL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL 설치 마법사에 오신 것을 환영합니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Welcome to the PostgreSQL Setup Wizard.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="1installation-directory">1.Installation Directory
+&lt;/h4>&lt;p>설치할 경로를 선택한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL이 설치될 디렉토리를 지정해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please specify the directory where PostgreSQL will be installed.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 디렉토리 [경로 인풋] [경로 선택 버튼]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Directory [C:\Program Files\PostgreSQL\17] [choose path button]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="2select-components">2.Select Components
+&lt;/h4>&lt;p>설치 항목을 선택하라고 한다.&lt;/p>
+&lt;ul>
+&lt;li>PostgreSQL Server
+&lt;ul>
+&lt;li>PostgreSQL database server&lt;/li>
+&lt;li>PostgreSQL 데이터베이스 서버&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>pgAdmin4
+&lt;ul>
+&lt;li>pgAdmin4는 PostgreSQL 데이터베이스와 서버를 관리하고 사용하기 위한 그래픽 인터페이스입니다.&lt;/li>
+&lt;li>pgAdmin4 is a graphical interface for managing and working with PostgreSQL databases and servers.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Stack Builder
+&lt;ul>
+&lt;li>Stack Builder는 PostgreSQL 설치를 보완하기 위해 추가 도구, 드라이버 및 애플리케이션을 다운로드하고 설치하는 데 사용할 수 있습니다.&lt;/li>
+&lt;li>Stack Builder may be used to download and install additional tools, drivers and applications to complement your PostgreSQL installation&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Command Line tools
+&lt;ul>
+&lt;li>이 옵션은 libpq, ecpg, pg_basebackup, pg_dump, pg_estore, pg_bench 등과 같은 명령줄 도구와 클라이언트 라이브러리를 설치합니다. 명령줄 도구는 PostgreSQL 데이터베이스 서버 또는 pgAdmin4를 설치할 때 필요한 옵션입니다.&lt;/li>
+&lt;li>This option installs command line tools and client libraries such as libpq, ecpg, pg_basebackup, pg_dump, pg_restore,pg_bench and more. The command line tools are a required option when installing the PostgreSQL Database Server or pgAdmin4.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>간단히 필요한 것만 선택. 귀찮으면 다 선택된 상태로 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 구성 요소 선택
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select Components
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치할 구성 요소를 선택합니다: 설치하지 않을 구성 요소를 지웁니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select the components you want to install: clear the components you do not want to install.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 계속할 준비가 되면 다음을 클릭합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Click Next when you are ready to continue
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [x] PostgreSQL Server
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] pgAdmin4
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] Stack Builder
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [x] Command Line Tools
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="3data-directory">3.Data Directory
+&lt;/h4>&lt;p>Data 경로를 설정한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터 디렉토리
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터를 저장할 디렉토리를 선택해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please select a directory under which to store your data.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터 디렉토리 [경로 인풋] [경로 선택 버튼]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory [C:\Program Files\PostgreSQL\17\data] [choose path button]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="4password">4.Password
+&lt;/h4>&lt;p>데이터베이스 슈퍼사용자(postgres)의 비밀번호를 설정한다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Password
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 데이터베이스 슈퍼사용자(postgres)의 비밀번호를 입력해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please provide a password for the database superuser (postgres).
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호 [비밀번호 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Password [type your password]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 비밀번호 재입력 [비밀번호 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Retype password [type your password]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="5port">5.Port
+&lt;/h4>&lt;p>포트를 설정한다.
+특별히 변경할 필요 없어서 기본 포트로 사용. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 포트
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Port
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 서버가 수신해야 할 포트 번호를 선택해 주세요.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please select the port number the server should listen on.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 포트 [포트 입력 인풋]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Port [5432]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="6advanced-options">6.Advanced Options
+&lt;/h4>&lt;p>Locale 설정 시 &lt;code>DEFAULT&lt;/code> 값이 기본으로 설정되어 있을텐데 본인이 사용하고 있는 &lt;strong>운영체제의 시스템 로케일&lt;/strong>을 그대로 사용하게 된다.&lt;/p>
+&lt;p>한국어 Windows 기준으로는 &lt;code>Korean_Korea.949&lt;/code>로 설정되고 한국어 macOS 기준으로는 &lt;code>ko_KR.UTF-8&lt;/code>로 설정된다.
+이는 PostgreSQL에서 한글 정렬이나 &lt;code>LIKE&lt;/code> 검색 시 예기치 않은 동작을 유발할 수 있다.&lt;/p>
+&lt;p>AWS와 같은 클라우드 플랫폼을 사용해 배포를 진행하는 경우 실제 서버 운영 환경 배제할 수는 없다.
+Linux 기반의 서버, AWS RDS, Docker 컨테이너 등에서는 &lt;code>en_US.UTF-8&lt;/code> Locale을 사용하는 점을 고려하자.&lt;/p>
+&lt;p>나중에 서버 배포 하고 맞출 때 인코딩 불상사를 보고 싶지 않으면 미리 맞추는 게 좋고,
+이미 만들어진 데이터베이스의 로케일은 &lt;strong>변경할 수 없고&lt;/strong>, &lt;strong>새 클러스터를 만들거나 데이터베이스를 새로 생성&lt;/strong>해야 한다.&lt;/p>
+&lt;p>잘 선택한 후 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 고급 옵션 설정
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Advanced Options
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 새 데이터베이스 클러스터에서 사용할 지역을 선택합니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Select the locale to be used by the new database cluster.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 지역 [지역 선택 드롭다운]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Locale [en-US]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="7pre-installation-summary">7.Pre Installation Summary
+&lt;/h4>&lt;p>위 단계에서 선택한 설치 옵션의 요약 정보를 보여준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 전 요약
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Pre Installation Summary
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 다음 설정이 설치에 사용됩니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The following settings will be used for the installation
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Server Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Data Directory: C:\Program Files\PostgreSQL\17\data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Port: 5432
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Superuser: postgres
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Operating System Account: NT AUTHORITY\NetworkService
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Database Service: postgresql-x64-17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Command Line Tools Installation Directory: C:\Program Files\PostgreSQL\17
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installation Log: C:\Users\&amp;lt;UserName&amp;gt;\AppData\Local\Temp\install-postgresql.log
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="8ready-to-install">8.Ready to Install
+&lt;/h4>&lt;p>요약 정보를 확인하고 이상이 없는지 확인 한 번 더 해준다. Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 준비 완료
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Ready to Install
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 이제 컴퓨터에 PostgreSQL 설치를 시작할 준비가 되었습니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup is now ready to begin installing PostgreSQL on your computer.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="9installing">9.Installing
+&lt;/h4>&lt;p>설치 진행 바를 확인하며 기다리면 완료된다. 약 10초 내외 (성능 따라 다를 듯)&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Installing
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 프로그램이 컴퓨터에 PostgreSQL을 설치하는 동안 잠시 기다려 주세요
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Please wait while Setup installs PostgreSQL on your computer
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 설치 중...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">installing...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[설치 진행 상태바]
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="10completing">10.Completing
+&lt;/h4>&lt;p>10단계에서 완료 화면을 볼 수 있다.
+만약 구성 요소 선택에서 다른 옵션을 더 체크했다면 별도의 추가 작업이 있다.
+근데 이건 설치 이후에도 추가할 수 있는 부분이니까 별도로 추가하면 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Setup]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># PostgreSQL 설치 마법사 완료
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Completing the PostgreSQL Setup Wizard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 컴퓨터에 PostgreSQL 설치가 완료되었습니다.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Setup has finished installing PostgreSQL on your computer.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="postgresql-삭제">PostgreSQL 삭제
+&lt;/h3>&lt;p>&lt;code>제어판 &amp;gt; 프로그램 및 기능&lt;/code>에서 설치한 PostgreSQL 버전 삭제를 누르면 Setup 팝업이 뜬다.
+&lt;code>Entire application&lt;/code> 또는 &lt;code>individual components&lt;/code> 중 선택하고 Click Next&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Uninstallation mode]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션 또는 개별 구성 요소를 제거하시겠습니까?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Do you want to uninstall entire application or individual components?
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] Entire application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 전체 애플리케이션과 애플리케이션에 설치된 모든 파일을 제거합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Removes entire application and all files installed by the application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 개별 구성 요소
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- [ ] individual components
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 개별 구성 요소를 제거하고 나머지 애플리케이션은 설치된 상태로 유지합니다
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Removes individual components while leaving the rest of application installed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>삭제 진행 프로그레스를 지나고 경고가 있을 수 있다.
+&lt;code>data\log&lt;/code> 파일을 보고 있었고 등등 다른 프로그램에서 사용 중이라서 발생한 것 같다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Warning]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">The data directory (C:\\Program Files\PostgreSQL\&amp;lt;version&amp;gt;\data) has not been removed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>그래도 삭제 완료는 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Info]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Uninstallation completed
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>PostgreSQL 설치 경로 &lt;code>C:\\Program Files\PostgreSQL&lt;/code>에서 폴더도 깔끔히 삭제해준다.
+PostgreSQL 관련 시스템 환경 변수를 등록했었다면 찾아서 삭제한다.&lt;/p>
+&lt;p>재부팅 끗-⭐.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="참고-자료">참고 자료
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://wikidocs.net/book/8814" target="_blank" rel="noopener"
+>PostgreSQL을 여행하는 입문자를 위한 안내서&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

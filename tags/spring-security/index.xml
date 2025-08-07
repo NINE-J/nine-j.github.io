@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Spring-Security on B9F1</title><link>https://b9f1.com/tags/spring-security/</link><description>Recent content in Spring-Security on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 05 Aug 2025 01:58:05 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/spring-security/index.xml" rel="self" type="application/rss+xml"/><item><title>JWT 구조를 구체적으로 알아보자</title><link>https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</link><pubDate>Tue, 05 Aug 2025 01:58:05 +0900</pubDate><guid>https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/cover.png" alt="Featured image of post JWT 구조를 구체적으로 알아보자" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>최근 백엔드 인증/인가 시스템을 설계하거나 OAuth 2.0 기반의 로그인 시스템을 구축할 때 가장 많이 등장하는 키워드 중 하나가 &lt;code>JWT(JSON Web Token)&lt;/code>이다.&lt;/p>
+&lt;p>JWT의 &lt;strong>3단계 구조&lt;/strong>를 정확히 이해하고, 각 구성 요소가 왜 존재하는지, 어떤 역할을 하는지 예제를 통해 상세히 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;p>JWT는 기본적으로 &lt;strong>세 부분으로 구성된 문자열&lt;/strong>이다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Header&lt;/span>&lt;span class="o">&amp;gt;.&amp;lt;&lt;/span>&lt;span class="n">Payload&lt;/span>&lt;span class="o">&amp;gt;.&amp;lt;&lt;/span>&lt;span class="n">Signature&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>각각의 의미를 뜯어보자.&lt;/p>
+&lt;h3 id="1-header-헤더">1. Header (헤더)
+&lt;/h3>&lt;p>이 부분은 &lt;strong>토큰을 어떻게 검증할 것인지에 대한 메타 정보&lt;/strong>를 제공한다.
+Base64Url로 인코딩되어 토큰의 첫 번째 파트를 구성한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;alg&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HS256&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;typ&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;JWT&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>alg&lt;/code>(algorithm): 토큰 서명을 생성하기 위한 알고리즘을 명시. 보통 &lt;code>HS256&lt;/code> 또는 &lt;code>RS256&lt;/code>.&lt;/li>
+&lt;li>&lt;code>typ&lt;/code>(type): 토큰의 타입을 나타냄. JWT를 사용하는 경우 &lt;code>&amp;quot;JWT&amp;quot;&lt;/code>로 고정.&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-payload-페이로드">2. Payload (페이로드)
+&lt;/h3>&lt;p>이 페이로드는 &lt;strong>서명되어 있지만 암호화되어 있진 않다.&lt;/strong> 즉, &lt;strong>누구나 내용을 볼 수 있다.&lt;/strong>&lt;br>
+따라서 민감 정보(password, 주민번호 등)는 절대 포함시키면 안 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sub&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;user1234&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;John Doe&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;iat&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1691432621&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;exp&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1691436221&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;role&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;admin&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>sub&lt;/code>(subject): 주체 식별자 (ex. 사용자 ID).&lt;/li>
+&lt;li>&lt;code>iat&lt;/code>(issued at): 발급 시간 (Unix timestamp).&lt;/li>
+&lt;li>&lt;code>exp&lt;/code>(expiration): 만료 시간.&lt;/li>
+&lt;li>&lt;code>role&lt;/code>, &lt;code>email&lt;/code> 등 커스텀 클레임: 인증 또는 인가에 필요한 사용자 속성 값.&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-signature-서명">3. Signature (서명)
+&lt;/h3>&lt;p>서버는 이 서명을 사용하여 토큰이 &lt;strong>위조되지 않았음을 검증&lt;/strong>할 수 있다.&lt;br>
+서명이 다르면 페이로드가 조작된 것이다. 유효하지 않은 토큰으로 처리된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">HMACSHA256&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">base64UrlEncode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">header&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">base64UrlEncode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">payload&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">secret&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>앞서 인코딩한 Header와 Payload를 &lt;code>.&lt;/code>으로 연결한 후,&lt;/li>
+&lt;li>비밀 키(&lt;code>secret&lt;/code>)를 이용해 알고리즘(&lt;code>HS256&lt;/code> 등)으로 서명한 값.&lt;/li>
+&lt;/ul>
+&lt;h3 id="jwt-예시">JWT 예시
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">eyJzdWIiOiIxMjM0NTYiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDAwMDAwMDB9.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>각 부분을 디코딩하면:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Header&lt;/strong>:
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;alg&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HS256&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;typ&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;JWT&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>Payload&lt;/strong>:
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;sub&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;123456&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;role&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;admin&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;exp&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1700000000&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>Signature&lt;/strong>: 서버에서 secret key로만 확인 가능.&lt;/li>
+&lt;/ul>
+&lt;h3 id="jwt의-주요-보안-고려사항">JWT의 주요 보안 고려사항
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>서명만 존재하고, 페이로드는 암호화되지 않는다.&lt;/strong>
+&lt;ul>
+&lt;li>민감 정보는 넣지 말 것.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>만료 시간(&lt;code>exp&lt;/code>)을 꼭 설정&lt;/strong>하자.
+&lt;ul>
+&lt;li>토큰 탈취 시 무한히 사용할 수 없도록 하기 위해.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>서버는 반드시 Signature를 검증&lt;/strong>해야 한다.
+&lt;ul>
+&lt;li>서명 검증을 하지 않으면 누구나 Payload만 바꿔도 토큰이 유효해진다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>JWT는 “신뢰할 수 있는 정보를 클라이언트에 안전하게 전달하기 위한 구조화된 문자열”이다.&lt;/p>&lt;/blockquote>
+&lt;p>&lt;code>Header&lt;/code>는 토큰의 형식과 알고리즘, &lt;code>Payload&lt;/code>는 전달하고자 하는 정보, &lt;code>Signature&lt;/code>는 위조 여부를 판별하는 핵심 키이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Base64 인코딩/디코딩&lt;/li>
+&lt;li>대칭/비대칭 키 개념 (HMAC vs RSA)&lt;/li>
+&lt;li>HTTP 인증 방식 (Bearer Token)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://jwt.io/" target="_blank" rel="noopener"
+>jwt.io&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+>RFC 7519: JSON Web Token (JWT)&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html" target="_blank" rel="noopener"
+>Spring Security에서 JWT 사용하기 공식 가이드&lt;/a>&lt;/li>
+&lt;li>OAuth 2.0과 JWT의 관계&lt;/li>
+&lt;li>JWT vs Session 기반 인증 비교 포스팅&lt;/li>
+&lt;/ul></description></item><item><title>Spring 웹 보안 위협과 대응 전략</title><link>https://b9f1.com/p/2025-08-05-spring-web-security-threats-and-response-strategies/</link><pubDate>Tue, 05 Aug 2025 01:52:32 +0900</pubDate><guid>https://b9f1.com/p/2025-08-05-spring-web-security-threats-and-response-strategies/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-05-spring-web-security-threats-and-response-strategies/cover.png" alt="Featured image of post Spring 웹 보안 위협과 대응 전략" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring 기반 웹 애플리케이션을 개발하거나 운영할 때 반드시 고려해야 할 대표적인 4가지 보안 위협을 다뤄본다.&lt;/p>
+&lt;p>CSRF, XSS, 세션 고정, JWT 탈취는 대부분의 웹 시스템에서 발생할 수 있는 위험이다.
+각 공격의 특성과 Spring Security를 활용한 대응 전략을 정리하여 실제 서비스에 적용할 수 있는 인사이트를 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="1-csrf-cross-site-request-forgery">1. CSRF (Cross-Site Request Forgery)
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>공격 개요&lt;/strong>: 사용자가 의도치 않게 공격자의 요청을 자신의 권한으로 서버에 보내게 하는 공격.&lt;/li>
+&lt;li>&lt;strong>예시&lt;/strong>: 로그인한 사용자가 의심 없는 사이트를 방문했는데, 그 사이트에 포함된 악성 스크립트가 사용자의 계정으로 돈을 송금하는 요청을 서버에 보냄.&lt;/li>
+&lt;li>&lt;strong>Spring Security 대응 전략&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>@EnableWebSecurity&lt;/code> 사용 시 기본적으로 CSRF 토큰이 활성화됨.&lt;/li>
+&lt;li>HTML &lt;code>&amp;lt;form&amp;gt;&lt;/code> 내에 CSRF 토큰을 자동 삽입하거나, JavaScript 요청에서는 &lt;code>X-CSRF-TOKEN&lt;/code> 헤더로 전달.&lt;/li>
+&lt;li>API 서버의 경우 &lt;code>csrf().disable()&lt;/code> 후 토큰 기반 인증(JWT 등)으로 대체하는 경우가 많음.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">http&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">csrf&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">disable&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// API 서버라면 비활성화 가능&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">authorizeHttpRequests&lt;/span>&lt;span class="p">(...)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-xss-cross-site-scripting">2. XSS (Cross-Site Scripting)
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>공격 개요&lt;/strong>: 클라이언트 브라우저에서 악성 JavaScript가 실행되도록 유도하는 공격.&lt;/li>
+&lt;li>&lt;strong>예시&lt;/strong>: 게시판에 &lt;code>&amp;lt;script&amp;gt;alert('XSS');&amp;lt;/script&amp;gt;&lt;/code> 삽입 시, 이를 읽은 다른 사용자의 브라우저가 스크립트를 실행함.&lt;/li>
+&lt;li>&lt;strong>대응 전략&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;strong>출력 시 이스케이프&lt;/strong>: JSP, Thymeleaf 등 템플릿 엔진은 기본적으로 HTML 이스케이프 적용.&lt;/li>
+&lt;li>&lt;strong>Spring Boot 내장 방어&lt;/strong>: Thymeleaf는 &lt;code>th:text=&amp;quot;${var}&amp;quot;&lt;/code>로 출력 시 자동 escape.&lt;/li>
+&lt;li>&lt;strong>JSON 출력 시&lt;/strong>: XSS 필터 사용 필요 (예: &lt;code>XssEscapeServletFilter&lt;/code> 추가).&lt;/li>
+&lt;li>&lt;strong>입력 검증&lt;/strong>도 병행 권장 (단, 출력 시 이스케이프는 항상 해야 함).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">FilterRegistrationBean&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">XssEscapeServletFilter&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">xssFilter&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">FilterRegistrationBean&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">XssEscapeServletFilter&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">registrationBean&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">FilterRegistrationBean&lt;/span>&lt;span class="o">&amp;lt;&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">registrationBean&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setFilter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">XssEscapeServletFilter&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">registrationBean&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setOrder&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">1&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">registrationBean&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="3-세션-고정-공격-session-fixation">3. 세션 고정 공격 (Session Fixation)
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>공격 개요&lt;/strong>: 공격자가 세션 ID를 미리 지정한 뒤 피해자가 해당 세션으로 로그인하도록 유도.&lt;/li>
+&lt;li>&lt;strong>예시&lt;/strong>: 공격자가 &lt;code>JSESSIONID=known_id&lt;/code>로 피해자 브라우저를 설정한 뒤 로그인 유도 → 세션 탈취.&lt;/li>
+&lt;li>&lt;strong>Spring Security 대응 전략&lt;/strong>:
+&lt;ul>
+&lt;li>로그인 성공 시 세션 ID를 새로 발급하도록 설정: &lt;code>sessionFixation().newSession()&lt;/code>&lt;/li>
+&lt;li>기본적으로 Spring Security는 &lt;code>changeSessionId()&lt;/code> 정책을 사용 (Java EE 7+ 환경)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">http&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sessionManagement&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sessionFixation&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">migrateSession&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 또는 newSession()&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="4-jwt-탈취">4. JWT 탈취
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>공격 개요&lt;/strong>: JWT가 노출되면 누구나 동일한 권한으로 API 요청 가능.&lt;/li>
+&lt;li>&lt;strong>예시&lt;/strong>: HTTPS 미사용 환경에서 JWT가 탈취되어 악의적인 요청 발생.&lt;/li>
+&lt;li>&lt;strong>대응 전략&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;strong>HTTPS 필수&lt;/strong>: 전송 시 암호화는 기본.&lt;/li>
+&lt;li>&lt;strong>토큰 저장 위치&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>localStorage&lt;/code> → XSS에 취약하나 CSRF 안전.&lt;/li>
+&lt;li>&lt;code>HttpOnly Cookie&lt;/code> → CSRF 취약하나 XSS에 안전. CSRF 방어 필수.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>JWT 구성 보완&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>exp&lt;/code>(만료시간), &lt;code>iat&lt;/code>, &lt;code>jti&lt;/code> 등을 활용하여 재사용 방지.&lt;/li>
+&lt;li>서버 측에서 블랙리스트 관리 로직 구현 (Redis 활용 등).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// JWT 사용 시 Filter에서 인증 구현 예시&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">JwtAuthenticationFilter&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">extends&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">OncePerRequestFilter&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">protected&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">doFilterInternal&lt;/span>&lt;span class="p">(...)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">token&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">resolveToken&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">request&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">token&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">jwtProvider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">validate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">token&lt;/span>&lt;span class="p">))&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Authentication&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">auth&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">jwtProvider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getAuthentication&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">token&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SecurityContextHolder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getContext&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="na">setAuthentication&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">auth&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>웹 보안은 단순히 설정으로 끝나지 않는다.&lt;/p>
+&lt;p>아키텍처 설계 단계부터 공격 벡터를 고려하고, Spring Security를 활용해 방어 레이어를 체계적으로 구성해야 한다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP의 Stateless 특성&lt;/li>
+&lt;li>쿠키/세션/토큰 인증 방식&lt;/li>
+&lt;li>Spring Security 설정 구조&lt;/li>
+&lt;li>웹 브라우저의 Same-Origin 정책&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/index.html" target="_blank" rel="noopener"
+>Spring Security 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener"
+>OWASP Top 10&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html" target="_blank" rel="noopener"
+>CSRF in Spring Security&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://owasp.org/www-community/xss-prevention" target="_blank" rel="noopener"
+>XSS Prevention Cheat Sheet (OWASP)&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>OAuth 2.0 핵심 구조 이해하기</title><link>https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/cover.png" alt="Featured image of post OAuth 2.0 핵심 구조 이해하기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>백엔드 인증 인프라를 설계하며 OAuth 2.0이 표준처럼 자리 잡았다는 사실을 체감하고 있다.&lt;/p>
+&lt;p>특히 소셜 로그인이나 외부 리소스 접근 권한 위임 기능을 구현하면서 “Authorization Code Grant” 방식의 구조와 흐름을 완벽히 이해하는 것이 중요하다고 판단해 이 글을 작성하게 되었다.&lt;/p>
+&lt;p>이번 포스팅에서는 OAuth 2.0의 주요 컴포넌트와 함께 Authorization Code Grant가 어떤 흐름으로 동작하는지 실전 중심으로 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="oauth-20의-주요-컴포넌트">OAuth 2.0의 주요 컴포넌트
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>컴포넌트&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Resource Owner&lt;/strong>&lt;/td>
+&lt;td>리소스(정보)의 실제 소유자. 보통 사용자(User)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Client&lt;/strong>&lt;/td>
+&lt;td>리소스 접근을 요청하는 애플리케이션 (ex. 우리가 개발하는 웹앱)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Authorization Server&lt;/strong>&lt;/td>
+&lt;td>인증을 담당하며, Access Token을 발급하는 서버&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Resource Server&lt;/strong>&lt;/td>
+&lt;td>보호된 리소스를 제공하는 API 서버 (Authorization Server와 분리될 수도 있음)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="authorization-code-grant-흐름">Authorization Code Grant 흐름
+&lt;/h3>&lt;p>이 방식은 &lt;strong>보안성과 유연성&lt;/strong>을 모두 만족하는 방식으로, 웹 앱에서 가장 많이 사용된다.&lt;/p>
+&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant User
+participant Client (웹앱)
+participant AuthorizationServer
+participant ResourceServer
+User->>Client: 로그인 요청
+Client->>AuthorizationServer: 인증 요청 (사용자 브라우저를 리디렉션)
+AuthorizationServer->>User: 로그인 + 권한 요청
+User->>AuthorizationServer: 로그인 &amp; 승인
+AuthorizationServer->>Client: Authorization Code 전달 (리디렉션 URI)
+Client->>AuthorizationServer: Authorization Code + Client Secret로 Access Token 요청
+AuthorizationServer->>Client: Access Token + (선택) Refresh Token 전달
+Client->>ResourceServer: Access Token으로 리소스 요청
+ResourceServer->>Client: 리소스 응답
+&lt;/pre>
+&lt;/div>
+&lt;h4 id="흐름-요약">흐름 요약
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>인증 요청:&lt;/strong> Client가 Authorization Server에 인증 요청 URL로 리디렉트.&lt;/li>
+&lt;li>&lt;strong>사용자 승인:&lt;/strong> 사용자는 로그인 후 권한 승인.&lt;/li>
+&lt;li>&lt;strong>코드 수신:&lt;/strong> Authorization Server는 Redirect URI에 &lt;code>Authorization Code&lt;/code>를 포함하여 리디렉트.&lt;/li>
+&lt;li>&lt;strong>토큰 요청:&lt;/strong> Client는 받은 코드를 Authorization Server에 전송하며, Access Token 요청.&lt;/li>
+&lt;li>&lt;strong>토큰 수신:&lt;/strong> Authorization Server는 Access Token을 응답.&lt;/li>
+&lt;li>&lt;strong>API 요청:&lt;/strong> Client는 받은 Access Token을 사용해 Resource Server에 요청.&lt;/li>
+&lt;li>&lt;strong>데이터 수신:&lt;/strong> 유효한 토큰이면 리소스를 응답.&lt;/li>
+&lt;/ol>
+&lt;h4 id="refresh-token은-왜-필요할까">Refresh Token은 왜 필요할까?
+&lt;/h4>&lt;p>Access Token은 일반적으로 &lt;strong>짧은 유효시간(예: 1시간)&lt;/strong> 을 가진다.
+이때 Refresh Token이 있으면 재로그인 없이 새로운 Access Token을 발급 받을 수 있어 UX 개선에 큰 역할을 한다.&lt;/p>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>OAuth 2.0의 핵심은 &lt;strong>책임 분리와 위임&lt;/strong>이며, Authorization Code Grant는 가장 안전하고 실전적인 인증 흐름이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 프로토콜의 기본 흐름&lt;/li>
+&lt;li>RESTful API의 인증/인가 개념&lt;/li>
+&lt;li>HTTPS 통신 방식&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener"
+>RFC 6749: The OAuth 2.0 Authorization Framework&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html" target="_blank" rel="noopener"
+>Spring Security OAuth2 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jwt.io/" target="_blank" rel="noopener"
+>JWT.io&lt;/a>&lt;/li>
+&lt;li>키워드: &lt;code>PKCE&lt;/code>, &lt;code>Client Credentials&lt;/code>, &lt;code>Implicit Grant&lt;/code>, &lt;code>OpenID Connect&lt;/code>, &lt;code>Refresh Token Rotation&lt;/code>&lt;/li>
+&lt;/ul></description></item></channel></rss>

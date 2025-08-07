@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>세션기반인증 on B9F1</title><link>https://b9f1.com/tags/%EC%84%B8%EC%85%98%EA%B8%B0%EB%B0%98%EC%9D%B8%EC%A6%9D/</link><description>Recent content in 세션기반인증 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 04 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EC%84%B8%EC%85%98%EA%B8%B0%EB%B0%98%EC%9D%B8%EC%A6%9D/index.xml" rel="self" type="application/rss+xml"/><item><title>세션 vs 토큰 인증 차이</title><link>https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/cover.png" alt="Featured image of post 세션 vs 토큰 인증 차이" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>백엔드 개발자가 꼭 이해하고 있어야 할 인증의 두 축, &lt;strong>세션 기반 인증&lt;/strong>과 &lt;strong>토큰 기반 인증&lt;/strong>의 구조적 차이점과 각각의 &lt;strong>보안상 고려사항&lt;/strong>에 대해 다뤄보자.&lt;/p>
+&lt;p>특히 REST API 설계, OAuth2 도입, JWT 사용 시 맞닥뜨리는 여러 결정 포인트에서 어떤 방식을 왜 선택해야 하는지, 실전 관점에서 짚어본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="세션-기반-인증-session-based-authentication">세션 기반 인증 (Session-based Authentication)
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>동작 방식&lt;/strong>
+&lt;ul>
+&lt;li>로그인 성공 시 서버는 사용자 정보를 저장한 &lt;strong>세션 ID&lt;/strong>를 생성하고, 클라이언트에 &lt;strong>쿠키로 전달&lt;/strong>한다.&lt;/li>
+&lt;li>이후 모든 요청에는 쿠키가 자동으로 첨부되어 세션 ID를 통해 인증 정보를 확인한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>특징&lt;/strong>
+&lt;ul>
+&lt;li>서버가 세션 상태를 &lt;strong>직접 저장&lt;/strong> (메모리, Redis 등)&lt;/li>
+&lt;li>브라우저 친화적 (자동 쿠키 처리)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>보안 고려사항&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>CSRF 공격&lt;/strong>에 취약: 쿠키가 자동 전송되기 때문&lt;/li>
+&lt;li>세션 탈취(Session Hijacking) 대비 필요&lt;/li>
+&lt;li>&lt;strong>SameSite, Secure, HttpOnly&lt;/strong> 쿠키 옵션 사용 필수&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>적합한 경우&lt;/strong>
+&lt;ul>
+&lt;li>브라우저 기반의 전통적인 웹 서비스&lt;/li>
+&lt;li>내부망 또는 통제된 환경&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="토큰-기반-인증-token-based-authentication">토큰 기반 인증 (Token-based Authentication)
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>동작 방식&lt;/strong>
+&lt;ul>
+&lt;li>로그인 성공 시 서버는 &lt;strong>JWT(JSON Web Token)&lt;/strong> 또는 커스텀 토큰을 발급하고, 클라이언트는 이를 &lt;strong>로컬 저장소에 저장&lt;/strong>한다.&lt;/li>
+&lt;li>이후 요청 시 Authorization 헤더를 통해 &lt;strong>직접 첨부&lt;/strong>해서 인증한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>특징&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>서버 무상태(stateless)&lt;/strong> 인증 방식 (세션 저장 불필요)&lt;/li>
+&lt;li>클라이언트/서버 분리된 구조에 유리&lt;/li>
+&lt;li>JWT는 &lt;strong>자체적으로 서명되어 위변조 검증&lt;/strong> 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>보안 고려사항&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>XSS에 취약&lt;/strong>: 토큰을 로컬스토리지에 저장 시 노출 가능&lt;/li>
+&lt;li>&lt;strong>토큰 탈취 → 장기 권한 노출&lt;/strong> 우려&lt;/li>
+&lt;li>만료시간, Refresh Token 전략, &lt;strong>Token Rotation&lt;/strong> 도입 필요&lt;/li>
+&lt;li>HTTPS 필수&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>적합한 경우&lt;/strong>
+&lt;ul>
+&lt;li>모바일 앱, SPA(Single Page App)&lt;/li>
+&lt;li>분산 시스템, 마이크로서비스&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="주요-차이-정리">주요 차이 정리
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>세션 기반 인증&lt;/th>
+&lt;th>토큰 기반 인증&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>서버 상태&lt;/td>
+&lt;td>상태 유지 (Stateful)&lt;/td>
+&lt;td>상태 없음 (Stateless)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>저장소&lt;/td>
+&lt;td>서버 메모리/DB/Redis&lt;/td>
+&lt;td>클라이언트 로컬 저장소&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>인증 전달&lt;/td>
+&lt;td>쿠키 (자동 전송)&lt;/td>
+&lt;td>HTTP Header (직접 전송)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>취약점&lt;/td>
+&lt;td>CSRF, 세션 탈취&lt;/td>
+&lt;td>XSS, 토큰 탈취&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>사용 사례&lt;/td>
+&lt;td>웹 사이트&lt;/td>
+&lt;td>모바일, API 서버&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>인증 방식은 서비스 구조와 위협 모델에 따라 선택하자. 만능은 없다.&lt;/p>&lt;/blockquote>
+&lt;p>클라이언트가 브라우저 중심이고 보안 제어가 가능한 경우엔 &lt;strong>세션 기반 인증&lt;/strong>이, REST API나 모바일 중심이라면 &lt;strong>토큰 기반 인증&lt;/strong>이 적절하다.&lt;/p>
+&lt;p>단, 어떤 방식을 쓰든 보안은 추가 설정과 방어 로직 없이는 무너질 수 있다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 쿠키/헤더&lt;/li>
+&lt;li>JWT 구조 (Header.Payload.Signature)&lt;/li>
+&lt;li>CSRF, XSS 개념&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" target="_blank" rel="noopener"
+>OWASP 인증 관련 가이드&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jwt.io/introduction" target="_blank" rel="noopener"
+>JWT 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+>RFC 7519: JSON Web Token (JWT)&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://oauth.net/2/" target="_blank" rel="noopener"
+>OAuth 2.0 개념 정리 및 흐름&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
