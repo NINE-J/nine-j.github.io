@@ -189,7 +189,6 @@ build_prompt() {
 	prompt_newline # 이 위치에 추가한다.
 	prompt_end
 }
-{% raw %}
 # 아래 내용을 추가한다.
 prompt_newline() {
   if [[ -n $CURRENT_BG ]]; then
@@ -202,7 +201,6 @@ prompt_newline() {
   echo -n "%{%f%}"
   CURRENT_BG=''
 }
-{% endraw %}
 # 수정 후 저장
 # 이후 적용
 source ~/.zshrc
@@ -232,25 +230,25 @@ source-file ~/.tmux.conf
 
 #### Tmux Command
 
-| 명령어                              | 설명                                      |
-| ----------------------------------- | ----------------------------------------- |
-| `tmux`                              | 새 tmux 세션 시작                         |
-| `tmux ls` 또는 `tmux list-sessions` | 실행 중인 tmux 세션 목록 보기             |
-| `tmux attach-session -t {세션명}`   | 특정 세션에 접근 (세션명에 따라)          |
-| `tmux attach` 또는 `tmux a`         | 마지막으로 사용한 tmux 세션에 접근        |
-| `tmux new -s {세션명}`              | 새로운 tmux 세션을 특정 이름으로 시작     |
-| `tmux kill-session -t {세션명}`     | 특정 세션 종료 (세션명에 따라)            |
-| `tmux kill-server`                  | 모든 tmux 세션 종료 (서버 종료)           |
-| `Ctrl + b, d`                       | 현재 tmux 세션에서 detach (세션 분리)     |
-| `Ctrl + b, s`                       | 세션 목록 보기 (세션 선택 후 attach 가능) |
-| `Ctrl + b, $`                       | 현재 세션의 이름 변경 (rename session)    |
+|명령어|설명|
+|---|---|
+|`tmux`|새 tmux 세션 시작|
+|`tmux ls` 또는 `tmux list-sessions`|실행 중인 tmux 세션 목록 보기|
+|`tmux attach-session -t {세션명}`|특정 세션에 접근 (세션명에 따라)|
+|`tmux attach` 또는 `tmux a`|마지막으로 사용한 tmux 세션에 접근|
+|`tmux new -s {세션명}`|새로운 tmux 세션을 특정 이름으로 시작|
+|`tmux kill-session -t {세션명}`|특정 세션 종료 (세션명에 따라)|
+|`tmux kill-server`|모든 tmux 세션 종료 (서버 종료)|
+|`Ctrl + b, d`|현재 tmux 세션에서 detach (세션 분리)|
+|`Ctrl + b, s`|세션 목록 보기 (세션 선택 후 attach 가능)|
+|`Ctrl + b, $`|현재 세션의 이름 변경 (rename session)|
 
 #### Tmux Shortcuts
 
 - Meta 키 `M` - 일반적으로 `Alt` 키로 매핑된다. 즉, `M-1`은 `Alt + 1` 과 동일하다.
 - `DC`는 `delete` 키를 의미한다.
 
-| 단축키                           | 설명                                                                                         |
+| 단축키                              | 설명                                                                                         |
 | -------------------------------- | ------------------------------------------------------------------------------------------ |
 | `C-b C-b`                        | Prefix 키 자체를 입력 (즉, `C-b`를 두 번 입력)                                                         |
 | `Prefix C-o`                     | 창을 순환 이동 (Rotate through panes)                                                            |
@@ -440,15 +438,135 @@ wsl --unregister Ubuntu
 - WSL의 파일은 기본적으로 `C:\Users\{사용자 이름}\AppData\Local\Packages` 폴더에 저장된다.
 	- 이 폴더에서 해당 배포판 관련 폴더를 찾아 삭제할 수 있다.
 
+### Powerlevel10k
+
+>[!TIP] powerlevel10k repository
+>[GitHub-powerlevel10k](https://github.com/romkatv/powerlevel10k#oh-my-zsh)
+>[심볼 표현을 위한 meslo font](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k)
+
+저장소를 클론 받는다.
+폰트도 미리 설치하면 편하다.
+
+```bash
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+```
+
+`.zshrc`를 열어서 테마를 변경한다.
+
+```bash
+vim ~/.zshrc
+# ZSH_THEME 찾아서 변경
+ZSH_THEME="powerlevel10k/powerlevel10k"
+# 변경된 .zshrc 적용
+source ~/.zshrc
+```
+
+변경된 `.zshrc` 적용 후 아래와 같이 출력 되면 성공
+
+- UTF-8 텍스트 확인
+    - `ASCII` 문자로 충분했지만 대부분의 오픈 소스들은 거의 최소 `UTF-8`를 쓰고 있기 때문에 사용하는 폰트가 해당 텍스트를 지원하고 있는지 확인하는 것
+- PUA(Private Use Area)에 해당하는 글자가 보이는지 확인
+    - PUA는 이름 그대로 사용자 정의 영역이고 `UTF-8`, `UTF-16`에서 사용자 개인이 직접 특수 문자를 정의해서 쓸 수 있는 구간.(`U+E000 ~ U+F8FF`, `U+F0000 ~ U+10FFFF`)
+```bash
+This is Powerlevel10k configuration wizard. You are seeing it because you haven't
+      defined any Powerlevel10k configuration options. It will ask you a few questions and
+                                     configure your prompt.
+    
+                        Does this look like a diamond (rotated square)?
+                          reference: https://graphemica.com/%E2%97%86
+    
+                                         --->    <---
+    
+    (y)  Yes.
+    
+    (n)  No.
+    
+    (q)  Quit and do nothing.
+    
+    Choice [ynq]:
+```
+
+이후 여러가지 설정을 묻는데 취향에 맞게 설정 후 `recommended` 옵션으로 마무리한다.
+기존에 적용했던 랜덤 임티와 이름 표현도 수정이 필요하다.
+
+#### `~/.p10k.zsh`
+
+- 랜덤 이모지 적용
+
+```bash
+  # The list of segments shown on the left. Fill it with the most important segments.
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    # =========================[ Line #1 ]=========================
+    # os_icon               # os identifier
+    custom_emoji            # custom emoji
+    dir                     # current directory
+    vcs                     # git status
+    # =========================[ Line #2 ]=========================
+    newline                 # \n
+    # prompt_char           # prompt symbol
+  )
+  # custom emoji env
+  POWERLEVEL9K_CUSTOM_EMOJI="my_random_emoji"
+  POWERLEVEL9K_CUSTOM_EMOJI_BACKGROUND=0   # 배경
+  # custom emoji function
+  function my_random_emoji() {
+    local emojis=("🤌")
+    echo "${emojis[RANDOM % ${#emojis[@]} + 1]}"
+  }
+```
+
+- 경로 축약 표현
+    - 취향에 맞게 적절히 조정
+
+```bash
+  # If directory is too long, shorten some of its segments to the shortest possible unique
+  # prefix. The shortened directory can be tab-completed to the original.
+  # typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate
+  # Replace removed segment suffixes with this symbol.
+  # typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
+  typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=...
+
+  # If set to "first" ("last"), remove everything before the first (last) subdirectory that contains
+  # files matching $POWERLEVEL9K_SHORTEN_FOLDER_MARKER. For example, when the current directory is
+  # /foo/bar/git_repo/nested_git_repo/baz, prompt will display git_repo/nested_git_repo/baz (first)
+  # or nested_git_repo/baz (last). This assumes that git_repo and nested_git_repo contain markers
+  # and other directories don't.
+  #
+  # Optionally, "first" and "last" can be followed by ":<offset>" where <offset> is an integer.
+  # This moves the truncation point to the right (positive offset) or to the left (negative offset)
+  # relative to the marker. Plain "first" and "last" are equivalent to "first:0" and "last:0"
+  # respectively.
+  typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=false
+  # Don't shorten this many last directory segments. They are anchors.
+  typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+  # Shorten directory if it's longer than this even if there is space for it. The value can
+  # be either absolute (e.g., '80') or a percentage of terminal width (e.g, '50%'). If empty,
+  # directory will be shortened only when prompt doesn't fit or when other parameters demand it
+  # (see POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS and POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT below).
+  # If set to `0`, directory will always be shortened to its minimum length.
+  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=80
+  # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least this
+  # many columns for typing commands.
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS=40
+  # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least
+  # COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands.
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT=50
+  # If set to true, embed a hyperlink into the directory. Useful for quickly
+  # opening a directory in the file manager simply by clicking the link.
+  # Can also be handy when the directory is shortened, as it allows you to see
+  # the full directory that was used in previous commands.
+  typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
+```
+
 ## ⚙️EndNote
 
 ### WSL
 
 Windows Sub-system for Linux, 윈도우의 하위 시스템으로 리눅스 사용
 
->[!INFO]
->개발자는 Windows 컴퓨터에서 동시에 Windows와 Linux의 기능에 액세스할 수 있습니다.
->WSL(Linux용 Windows 하위 시스템)을 사용하면 개발자가 Linux 배포판(예: Ubuntu, OpenSUSE, Kali, Debian, Arch Linux)을 설치하고 기존 가상 머신 또는 이중 부팅 설정의 오버헤드 없이 Windows에서 직접 Linux 애플리케이션, 유틸리티 및 Bash 명령줄 도구를 사용할 수 있습니다.
+>[!info]
+>개발자는 Windows 컴퓨터에서 동시에 Windows와 Linux의 기능에 액세스할 수 있습니다. WSL(Linux용 Windows 하위 시스템)을 사용하면 개발자가 Linux 배포판(예: Ubuntu, OpenSUSE, Kali, Debian, Arch Linux)을 설치하고 기존 가상 머신 또는 이중 부팅 설정의 오버헤드 없이 Windows에서 직접 Linux 애플리케이션, 유틸리티 및 Bash 명령줄 도구를 사용할 수 있습니다.
 
 #### Git 자격증명 관련
 
