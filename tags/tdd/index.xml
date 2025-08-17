@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TDD on B9F1</title><link>https://b9f1.com/tags/tdd/</link><description>Recent content in TDD on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 21 Jun 2025 23:29:50 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/tdd/index.xml" rel="self" type="application/rss+xml"/><item><title>테스트 더블 - Test Doubles</title><link>https://b9f1.com/p/2025-06-21-tdd-testdouble-with-mockito-mock-and-spy/</link><pubDate>Sat, 21 Jun 2025 23:29:50 +0900</pubDate><guid>https://b9f1.com/p/2025-06-21-tdd-testdouble-with-mockito-mock-and-spy/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-21-tdd-testdouble-with-mockito-mock-and-spy/cover.png" alt="Featured image of post 테스트 더블 - Test Doubles" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>테스트 코드 리팩토링을 하면서 테스트 더블에 대해 좀 더 깊이 있게 정리할 필요를 느꼈다.&lt;/p>
+&lt;p>Mock이랑 Stub이랑 뭐가 다르지? 왜 Spy를 쓰지? 같은 고민을 한 개발자라면 공감할 수 있을 것이다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="테스트-더블이란">테스트 더블이란?
+&lt;/h3>&lt;p>테스트 더블은 테스트에서만 쓰이는 대체 객체를 말한다.
+실제 객체가 아직 구현되지 않았거나 테스트에 방해가 되는 외부 의존성을 대체하기 위해 사용한다.&lt;/p>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>용어 유래&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>영화에서 위험한 장면을 대신하는 스턴트 더블처럼 테스트에서도 그 역할을 대신 수행한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="테스트-더블-5종-시각화-요약">테스트 더블 5종 시각화 요약
+&lt;/h3>&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+graph TD
+A[Test Double] --> B(Dummy)
+A --> C(Fake)
+A --> D(Stub)
+A --> E(Spy)
+A --> F(Mock)
+B -->|사용 안함| B1[단순 파라미터 채움]
+C -->|간소화 구현| C1[예: 인메모리 DB]
+D -->|출력 고정| D1[예: 외부 API 응답]
+E -->|호출 감시| E1[예: 이벤트 기록 확인]
+F -->|행위 명세| F1[예: 호출 순서, 인자 확인]
+&lt;/pre>
+&lt;/div>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>유형&lt;/th>
+&lt;th>주용도&lt;/th>
+&lt;th>특징&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Dummy&lt;/strong>&lt;/td>
+&lt;td>자리는 필요하나 사용하지 않음&lt;/td>
+&lt;td>주로 파라미터 용&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Fake&lt;/strong>&lt;/td>
+&lt;td>간단한 로직으로 실제 동작 대체&lt;/td>
+&lt;td>인메모리 DB 등&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Stub&lt;/strong>&lt;/td>
+&lt;td>입력에 따라 고정된 출력 제공&lt;/td>
+&lt;td>결과 중심 테스트&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Spy&lt;/strong>&lt;/td>
+&lt;td>실제 동작 + 호출 기록&lt;/td>
+&lt;td>부분 mocking&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Mock&lt;/strong>&lt;/td>
+&lt;td>상호작용 행위 검증&lt;/td>
+&lt;td>verify 기반 검증&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="각각의-실제-예제와-사용-기준">각각의 실제 예제와 사용 기준
+&lt;/h3>&lt;h4 id="요약-정리">요약 정리
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>테스트 더블&lt;/th>
+&lt;th>실제 동작 유무&lt;/th>
+&lt;th>주 용도&lt;/th>
+&lt;th>주 검증 전략&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Dummy&lt;/td>
+&lt;td>❌&lt;/td>
+&lt;td>자리 채움용&lt;/td>
+&lt;td>없음&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Fake&lt;/td>
+&lt;td>✅ (간소화)&lt;/td>
+&lt;td>동작 대체&lt;/td>
+&lt;td>상태 검증&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Stub&lt;/td>
+&lt;td>❌&lt;/td>
+&lt;td>응답 고정&lt;/td>
+&lt;td>상태 검증&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Spy&lt;/td>
+&lt;td>✅&lt;/td>
+&lt;td>호출 감시&lt;/td>
+&lt;td>행위 + 상태&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Mock&lt;/td>
+&lt;td>❌&lt;/td>
+&lt;td>상호작용 검증&lt;/td>
+&lt;td>행위 검증&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h4 id="dummy---아무-일도-하지-않는-자리-채움용">Dummy - 아무 일도 하지 않는 자리 채움용
+&lt;/h4>&lt;p>생성자나 파라미터에 꼭 필요하지만 실제 동작에 영향 주지 않는 의존성을 대신할 때&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">interface&lt;/span> &lt;span class="nc">Logger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">DummyLogger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">implements&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Logger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">message&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// do nothing&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">sendEmail_doesNotRequireRealLogger&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Logger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">dummyLogger&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">DummyLogger&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">es&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dummyLogger&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">es&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">sendEmail&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;hello@test.com&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 로그 기능은 테스트 대상 아님&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="fake---간이-구현체로-테스트-성능-향상">Fake - 간이 구현체로 테스트 성능 향상
+&lt;/h4>&lt;p>실제 구현 대신 동작은 유지하되 속도/제약을 줄인 테스트용 구현이 필요할 때&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">FakeUserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">implements&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">UserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Map&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">store&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">HashMap&lt;/span>&lt;span class="o">&amp;lt;&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">put&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getEmail&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">boolean&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">email&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">store&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">containsKey&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">email&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">userIsSavedInFakeRepo&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">FakeUserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">repo&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">FakeUserRepository&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">repo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@fake.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertTrue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">repo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@fake.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="stub---미리-정해진-출력값-반환">Stub - 미리 정해진 출력값 반환
+&lt;/h4>&lt;ul>
+&lt;li>특정 메서드가 고정된 값을 반환하도록 설정하고 싶을 때&lt;/li>
+&lt;li>외부 시스템 응답, 복잡한 연산 결과 등을 대체할 때&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">UserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">stubRepo&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">UserRepository&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">when&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stubRepo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;stub@test.com&amp;#34;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="na">thenReturn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">stubReturnsTrueWhenUserExists&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="p">(...,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">stubRepo&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertTrue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">canRegister&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;stub@test.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 상태 검증&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="spy---실제-객체와-호출-감시">Spy - 실제 객체와 호출 감시
+&lt;/h4>&lt;ul>
+&lt;li>실제 메서드 실행은 유지하면서 호출 여부/횟수를 검증하고 싶을 때&lt;/li>
+&lt;li>일부 동작은 stub하고 일부는 실제 로직을 유지하고 싶을 때&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">List&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ArrayList&lt;/span>&lt;span class="o">&amp;lt;&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">List&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">spyList&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">spy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">spyList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;item&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">verify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">spyList&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;item&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 행위 검증&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;div class="admonition tip">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/>&lt;/svg>
+&lt;span>Tip&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>실제 메서드 호출을 방지하려면 &lt;code>doReturn(...).when(spy).method()&lt;/code> 패턴 사용&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h4 id="mock---행위-검증에-최적화된-전용-객체">Mock - 행위 검증에 최적화된 전용 객체
+&lt;/h4>&lt;ul>
+&lt;li>메서드가 어떤 인자로 몇 번 호출되었는지 명확히 검증해야 할 때&lt;/li>
+&lt;li>객체의 상태 변화보다 호출 자체가 테스트 목적일 떄&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">EmailService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">...);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">signUp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;mock@test.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">verify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">sendWelcome&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;mock@test.com&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="상태-검증-vs-행위-검증-비교-시나리오">상태 검증 VS 행위 검증 비교 시나리오
+&lt;/h4>&lt;p>회원 가입 시 이메일 발송을 예로 들면 다음과 같다.&lt;/p>
+&lt;h5 id="상태-검증">상태 검증
+&lt;/h5>&lt;p>저장 결과 확인&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">testUserIsSaved&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">UserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">fakeRepo&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">InMemoryUserRepository&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">dummyEmail&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">email&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dummyEmail&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">fakeRepo&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">signUp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@test.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertTrue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fakeRepo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">contains&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@test.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="행위-검증">행위 검증
+&lt;/h5>&lt;p>특정 메서드 호출 여부 확인&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">testWelcomeEmailSent&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">EmailService&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">UserRepository&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">stubRepo&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignUpService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">stubRepo&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">sus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">signUp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@test.com&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">verify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mockEmail&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">sendWelcome&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;test@test.com&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="언제-어떤-테스트-더블을-써야-할까">언제 어떤 테스트 더블을 써야 할까?
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>시나리오&lt;/th>
+&lt;th>선택&lt;/th>
+&lt;th>이유&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>1. Redis 캐시 hit 여부 확인&lt;/td>
+&lt;td>Spy&lt;/td>
+&lt;td>실제 Redis는 사용하고 hit 여부만 확인&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2. 대량 주문을 처리하는 서비스&lt;/td>
+&lt;td>Fake&lt;/td>
+&lt;td>In-memory OrderRepo로 테스트&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3. 외부 결제 시스템 응답 시뮬레이션&lt;/td>
+&lt;td>Stub&lt;/td>
+&lt;td>실패 응답을 지정해서 테스트&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>4. 이메일 발송 여부 확인&lt;/td>
+&lt;td>Mock&lt;/td>
+&lt;td>&lt;code>send()&lt;/code> 메서드 호출 여부 검증&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>5. Validator에 전달되는 객체 확인&lt;/td>
+&lt;td>Spy&lt;/td>
+&lt;td>메서드 호출 인자 확인 가능&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="mockito-주의사항">Mockito 주의사항
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>상황&lt;/th>
+&lt;th>권장 방식&lt;/th>
+&lt;th>이유&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Spy의 실제 호출을 막고 싶을 때&lt;/td>
+&lt;td>&lt;code>doReturn().when(...)&lt;/code>&lt;/td>
+&lt;td>&lt;code>when(...).thenReturn(...)&lt;/code>은 NPE 발생 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Stub 응답을 순차적으로 지정할 때&lt;/td>
+&lt;td>&lt;code>when().thenReturn(...).thenReturn(...)&lt;/code>&lt;/td>
+&lt;td>순차적 응답 가능&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Mock과 Spy 중 무엇을 선택해야 할지 헷갈릴 때&lt;/td>
+&lt;td>기본은 Mock, 일부만 다르게 하려면 Spy&lt;/td>
+&lt;td>전체 stub이 필요 없다면 Spy 고려&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>테스트는 코드를 검증하는 도구이자, 아키텍처를 되돌아보게 하는 거울이다.&lt;/p>&lt;/blockquote>
+&lt;p>Mock, Stub, Spy… 용어에 휘둘리기보다, &lt;strong>무엇을 검증하고 싶은지&lt;/strong>를 기준으로 테스트 더블을 선택해보자.
+테스트는 결국 &lt;strong>가독성, 유지보수성, 신뢰성&lt;/strong>을 확보하는 핵심 도구다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Java 또는 Kotlin 기반 테스트 경험&lt;/li>
+&lt;li>JUnit 및 Mockito 기본 사용법&lt;/li>
+&lt;li>단위 테스트와 통합 테스트의 차이&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://site.mockito.org/" target="_blank" rel="noopener"
+>Mockito 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.baeldung.com/java-unit-testing-best-practices" target="_blank" rel="noopener"
+>Best Practices for Unit Testing in Java - baeldung&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://martinfowler.com/articles/microservice-testing/" target="_blank" rel="noopener"
+>Testing Strategies in a Microservice Architecture – Martin Fowler&lt;/a>&lt;/li>
+&lt;li>Effective Unit Testing - 테스트 설계 관점에서의 Mock, Stub&lt;/li>
+&lt;li>Refactoring - 테스트와 리팩토링의 연결&lt;/li>
+&lt;/ul></description></item><item><title>입력값 검증 어디까지 해야 할까?</title><link>https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/</link><pubDate>Sat, 21 Jun 2025 21:08:37 +0900</pubDate><guid>https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/cover.png" alt="Featured image of post 입력값 검증 어디까지 해야 할까?" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>입력값 검증은 보안, 데이터 무결성, 사용자 경험을 모두 좌우하는 핵심 요소다.
+하지만 각 계층의 책임이 명확하지 않으면 중복 검증, 누락, 책임 희석 등의 문제가 발생할 수 있다.&lt;/p>
+&lt;p>각 계층에서 검증 책임을 정리하고 중복 없이 안정성을 확보하는 전략과 트레이드오프를 알아보자.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="presentation-layer">Presentation Layer
+&lt;/h3>
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>Warning&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>클라이언트와 Controller에서의 검증은 빠른 피드백을 줄 수 있지만 절대 신뢰할 수 있는 검증 계층은 아니다. 반드시 하위 계층의 보완이 필요하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Web, Controller&lt;/li>
+&lt;li>책임: UI/UX 관점에서 빠른 피드백 제공&lt;/li>
+&lt;li>검증: 형식적 유효성(null, 공백, 정규식 등)
+&lt;ul>
+&lt;li>예: 이메일 형식, 숫자 범위, 필수 입력 여부&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: &lt;code>@Valid&lt;/code>, &lt;code>@Validated&lt;/code>, &lt;code>BindingResult&lt;/code>, JavaScript 클라이언트 측 검증&lt;/li>
+&lt;li>목적: UX 개선 + 서버 리소스 낭비 방지&lt;/li>
+&lt;/ul>
+&lt;h3 id="service-layer">Service Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>비즈니스 정책을 수반하는 검증은 Controller가 아닌 Service에서 처리해야 한다. 핵심 규칙을 책임지는 계층이다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Application, Service&lt;/li>
+&lt;li>책임: 유스케이스 단위의 비즈니스 규칙 검증&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>상태 기반 조건&lt;/li>
+&lt;li>중복 등록, 권한 체크, 사용 제한 등&lt;/li>
+&lt;li>예: 하루 1회만 등록 가능, 좌석 수 초과 불가 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: 조건문, Guard Clause, Specification Pattern, 예외 발생 기반 제어&lt;/li>
+&lt;li>목적: 흐름 제어와 정책 보장, 응답 일관성 유지&lt;/li>
+&lt;/ul>
+&lt;h3 id="domain-layer">Domain Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>도메인은 단순한 데이터 보관소가 아니라 행위와 불변 조건을 포함한 책임 주체다.
+도메인 객체는 자기 상태를 보호해야 하며 외부로부터 일관성을 강제 받지 않는다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Domain Model (Entity, ValueObject, Aggregate)&lt;/li>
+&lt;li>책임: 객체의 내부 일관성과 상태 전이 검증&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>객체 생성 시 필수 조건&lt;/li>
+&lt;li>상태 변경 제약
+&lt;ul>
+&lt;li>예: 배송 상태는 &amp;lsquo;결제 완료&amp;rsquo; 이후에만 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: 생성자/정적 팩토리 검증, 불변 조건 메서드, &lt;code>validateTransition()&lt;/code> 등&lt;/li>
+&lt;li>목적: 외부 계층 의존 없는 무결성 유지, 테스트 가능성 향상&lt;/li>
+&lt;/ul>
+&lt;h3 id="persistence-layer">Persistence Layer
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>하위 계층일수록 안전 장치 역할이 강해진다. 모든 검증을 상위 계층에 의존하는 것은 위험하다.
+DB는 최후의 방어선으로 작동해야 한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>계층: Repositoiry, Database&lt;/li>
+&lt;li>책임: 저장 및 조회 시 스키마 기반의 데이터 무결성 보장&lt;/li>
+&lt;li>검증:
+&lt;ul>
+&lt;li>DB 스키마 제약: &lt;code>NOT NULL&lt;/code>, &lt;code>UNIQUE&lt;/code>, &lt;code>CHECK&lt;/code>, &lt;code>FK&lt;/code> 등&lt;/li>
+&lt;li>ORM 수준 검증: &lt;code>@Column(nullable = false)&lt;/code>, &lt;code>@UniqueConstraint&lt;/code> 등&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>기술 예시: JPA, Hibernate Validator, RDB 제약 조건&lt;/li>
+&lt;li>목적: 상위 계층 누락 방지, 악의적 요청 방어&lt;/li>
+&lt;/ul>
+&lt;h3 id="trade-off">Trade-off
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>장점&lt;/th>
+&lt;th>단점&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>계층별 검증 분산&lt;/strong>&lt;/td>
+&lt;td>책임 분리, 시스템 안정성 증가&lt;/td>
+&lt;td>로직 분산 → 이해 난이도 상승&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>중복 검증 허용&lt;/strong>&lt;/td>
+&lt;td>Fail-safe 설계 가능, 안정성 강화&lt;/td>
+&lt;td>과도한 검증 → 응답 지연, 리소스 낭비 가능성&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>검증 통합 집중&lt;/strong>&lt;/td>
+&lt;td>유지보수 단순화 가능&lt;/td>
+&lt;td>변경 시 연쇄 영향 발생, 도메인 무결성 위험&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>입력값 검증은 단일 계층의 책임이 아니다.
+각 계층에서 역할에 맞는 검증을 수행해야만 중복을 줄이고 안전성을 확보할 수 있다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>계층&lt;/th>
+&lt;th>핵심 역할&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Presentation&lt;/td>
+&lt;td>빠른 피드백&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Service&lt;/td>
+&lt;td>정책 흐름 제어&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Domain&lt;/td>
+&lt;td>불변 조건 보장&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Persistence&lt;/td>
+&lt;td>최종 무결성 수호선 역할&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>MVC / 계층형 아키텍처 기본 개념&lt;/li>
+&lt;li>DDD의 엔티티, 밸류 객체, 애그리거트 이해&lt;/li>
+&lt;li>Bean Validation (&lt;code>@Valid&lt;/code>, &lt;code>@NotBlank&lt;/code>)&lt;/li>
+&lt;li>예외 처리 흐름 (&lt;code>@ControllerAdvice&lt;/code>, 예외 매핑)&lt;/li>
+&lt;li>REST 응답 코드 설계 (&lt;code>400&lt;/code>, &lt;code>409&lt;/code>, &lt;code>422&lt;/code> 등)&lt;/li>
+&lt;/ul>
+&lt;h3 id="-더-알아보기">🔍 더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/core/validation/" target="_blank" rel="noopener"
+>Spring Validation 공식 문서&lt;/a>&lt;/li>
+&lt;li>Jakarta Bean Validation 3.0&lt;/li>
+&lt;li>Effective Java - Item 49: Check parameters for validity&lt;/li>
+&lt;li>Refactoring 2nd Ed - Bad Smells in Code: Shotgun Surgery, Feature Envy&lt;/li>
+&lt;li>Martin Fowler - Specification Pattern&lt;/li>
+&lt;li>Validation in DDD: Where, Why, How&lt;/li>
+&lt;/ul></description></item><item><title>Spring 핵심 철학</title><link>https://b9f1.com/p/2025-04-29-spring-core-philosophy/</link><pubDate>Tue, 29 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-29-spring-core-philosophy/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-29-spring-core-philosophy/cover.png" alt="Featured image of post Spring 핵심 철학" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>Spring Framework는 지금껏 사용해야 하니 필요한 만큼만 알아보고 사용할 수 있다면 그만이었다.
+그게 프레임워크의 장점이기도 하지만 자세히 알고 다루는 게 당연히 좋을 것이다.&lt;/p>
+&lt;p>Spring의 기본 철학과 그게 왜 중요한지 실제 코드에선 어떻게 드러나는지 정리해보고 싶어졌다.&lt;/p>
+&lt;ul>
+&lt;li>Spring Framework는 &lt;strong>POJO 기반 개발 철학&lt;/strong>을 중심으로 복잡한 엔터프라이즈 애플리케이션을 단순화 한다.&lt;/li>
+&lt;li>&lt;strong>객체지향 설계 원칙(SRP, SoC, DRY 등)&lt;/strong> 을 자연스럽게 실현할 수 있도록 설계되어 클린 아키텍처의 이상을 구현한다.&lt;/li>
+&lt;li>&lt;strong>테스트 주도 개발(TDD)&lt;/strong> 을 내재화하여 단위 테스트 및 통합 테스트가 손쉬운 구조를 지향한다.&lt;/li>
+&lt;li>전통적인 Java EE와의 차별점은 단순한 기술적 비교를 넘어 &lt;strong>철학적 차별화&lt;/strong>로 설명할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="pojo-기반-개발---순수-자바의-진정한-의미">POJO 기반 개발 - 순수 자바의 진정한 의미
+&lt;/h3>&lt;p>Spring은 POJO(Plain Old Java Object)라는 개념을 강조한다.&lt;/p>
+&lt;p>그냥 평범한 자바 객체가 왜 중요한가.&lt;/p>
+&lt;p>알고 보니 그 핵심은 프레임워크에 종속되지 않은 코드 작성이었다.
+즉, Spring 없이도 돌아가는 순수 자바 객체를 만들어야 유지보수나 테스트가 더 쉬워진다는 것이다.&lt;/p>
+&lt;ul>
+&lt;li>POJO의 핵심 특징
+&lt;ul>
+&lt;li>특별한 인터페이스/상속이 필요 없다.&lt;/li>
+&lt;li>어노테이션 없이도 돌아가는 단순한 구조&lt;/li>
+&lt;li>getter/setter만 있는 평범한 자바 객체&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>자주 강조되는 부분은 비침투성(Non-Invasiveness)인데, 이건 &amp;ldquo;내 비즈니스 로직에 프레임워크 종속적인 코드를 심지 않아도 된다&amp;quot;는 뜻이다.&lt;/p>
+&lt;p>정말 중요한 개념 같아서 메모해놨던 문장이다.&lt;/p>
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous">
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Info&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>Spring Framework의 핵심 원칙 중 하나는 &amp;lsquo;비침투성&amp;rsquo;입니다.&lt;/p>
+&lt;p>비즈니스 로직이나 도메인 모델에 프레임워크 종속 클래스를 억지로 넣지 않아도 실행되어야 한다는 의미입니다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;p>직접 작성한 간단한 예제도 다시 떠올려 봤다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">OrderService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">PaymentProcessor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">paymentProcessor&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">OrderService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PaymentProcessor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">paymentProcessor&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">paymentProcessor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">paymentProcessor&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">processOrder&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Order&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">order&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">paymentProcessor&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">charge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">order&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Spring 없이도 동작하는 순수 자바코드. 이게 바로 Spring이 지향하는 방식이라는 걸 확실히 알게 됐다.&lt;/p>
+&lt;h4 id="pojo의-재밌는-일화">POJO의 재밌는 일화
+&lt;/h4>&lt;p>&lt;a class="link" href="https://martinfowler.com/bliki/POJO.html" target="_blank" rel="noopener"
+>마틴 파울러 형님의 POJO 소개&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>**POJO (Plain Old Java Object)**는 &amp;ldquo;평범한 자바 객체&amp;quot;라는 의미의 약어입니다.&lt;/p>
+&lt;p>이 용어는 2000년 9월, 저(마틴 파울러), 레베카 파슨스, 조쉬 매켄지가 한 컨퍼런스에서 발표를 준비하던 중에 만들어졌습니다.
+그 발표에서는 &lt;strong>비즈니스 로직을 Entity Bean 같은 복잡한 구조 대신, 일반 자바 객체에 담을 때 얻는 여러 이점&lt;/strong>에 대해 이야기하려고 했습니다.
+그런데 우리는 사람들이 왜 그렇게까지 &lt;strong>일반 자바 객체 사용을 꺼려하는지&lt;/strong> 의문이 들었고, 결론적으로 &amp;ldquo;그 객체들이 단지 이름이 멋지지 않기 때문&amp;quot;이라는 데 생각이 모였습니다.
+그래서 우리가 이름을 하나 붙여줬고, 그 이름이 아주 잘 퍼져 나가게 된 것이죠.&lt;/p>&lt;/blockquote>
+&lt;h3 id="객체지향-설게-원칙">객체지향 설게 원칙
+&lt;/h3>&lt;p>Spring의 또 다른 포인트는 객체지향 설계 원칙이었다.
+사실 SOLID 원칙 같은 건 교과서적으로만 알고 있었는데 Spring 구조 안에서 그게 자연스럽게 드러난다는 걸 배웠다.&lt;/p>
+&lt;h4 id="drydont-repeat-yourself">DRY(Don&amp;rsquo;t Repeat Yourself)
+&lt;/h4>&lt;p>중복 방지를 위해 AOP(관점지향 프로그래밍)를 활용하는 방식이 인상적이었다.&lt;/p>
+&lt;p>단순히 기능적으로 쓸 수 있다는 게 아니라 반복되는 패턴을 추상화하고 코드의 관심사를 깔끔히 분리하려는 시도구나.&lt;/p>
+&lt;p>예를 들어 트랜잭션 처리, 로깅 같은 건 매번 코드에 쓰지 않고 &lt;code>@Transactional&lt;/code>, &lt;code>@Aspect&lt;/code>로 공통화 하는 방식의 AOP를 도입하면 횡단 관심사를 코드 밖으로 꺼낼 수 있다.&lt;/p>
+&lt;h4 id="srpsingle-responsibility-principle">SRP(Single Responsibility Principle)
+&lt;/h4>&lt;p>서비스, 컨트롤러, 레포지토리로 책임을 나누는 계층 구조 덕분에 코드가 깔끔하게 분리될 수 있다.
+&amp;ldquo;변화의 이유가 하나여야 한다&amp;quot;는 SRP 원칙을 확실히 이해하고 넘어간다.&lt;/p>
+&lt;h4 id="socseparation-of-concerns">SoC(Separation of Concerns)
+&lt;/h4>&lt;p>DI(의존성 주입), AOP 같은 개념이 결국 각자의 역할에 집중할 수 있게 돕는 도구라는 점도 정리해볼 수 있었다.
+예를 들어 &lt;code>@Aspect&lt;/code>로 로깅은 별도로 떼어내고 서비스 로직은 비즈니스에만 집중할 수 있게 한다.&lt;/p>
+&lt;p>예전에 소켓 통신 오류가 계속 발생하는 상황에 트러블 슈팅을 위해 어떤 방법이 있을까 고민해보고 찾아보다가 Aspect 클래스를 생성해서 메서드 실행은 건드리지 않고 내가 원하는 측정만 추가하는 방식이 필요했는데 그냥 쓰고 이게 되네 했던 순간보다 다시 알아보는 지금 &amp;ldquo;코드의 순수성&amp;quot;과 &amp;ldquo;변화 대응력&amp;quot;을 동시에 높이는 설계적인 해법이라서 신기하고 진짜 큰 가치구나 싶다.&lt;/p>
+&lt;h3 id="spring은-테스트를-위한-구조다">Spring은 테스트를 위한 구조다
+&lt;/h3>&lt;p>&lt;img src="https://b9f1.com/p/2025-04-29-spring-core-philosophy/image-1.png"
+width="800"
+height="708"
+srcset="https://b9f1.com/p/2025-04-29-spring-core-philosophy/image-1_hu_961d8165fdfa6db4.png 480w, https://b9f1.com/p/2025-04-29-spring-core-philosophy/image-1_hu_6d3fd58f8e5d4d14.png 1024w"
+loading="lazy"
+alt="TDD 시각화"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="271px"
+>&lt;/p>
+&lt;p>이건 체감이 정말 컸던 부분이다.
+TDD는 테스트 환경 세팅이 어려운데 Spring은 POJO와 DI 덕분에 이게 정말 단순해진다.&lt;/p>
+&lt;ul>
+&lt;li>Spring에서 TDD 특징
+&lt;ul>
+&lt;li>컨테이너 없어도 단위 테스트 가능 (POJO 덕분!)&lt;/li>
+&lt;li>의존성 주입 덕분에 Mocking이 간단&lt;/li>
+&lt;li>&lt;code>@SpringBootTest&lt;/code>로 통합 테스트도 손쉽게 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>테스트했던 가장 단순 코드 &lt;code>@DisplayName&lt;/code> 달아놨던.. 그래서 일관성 없이 어딘 달고 어딘 안 달고&amp;hellip;
+메서드명을 한글로 사용해보자! 😊&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nd">@DisplayName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;기본 정보로 사용자 생성시 필수 필드가 올바르게 설정되어야 한다&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">createWithBasicInfo&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">UserFixture&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">createValidUser&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getId&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getEmail&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getName&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getPassword&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCreatedAt&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getUpdatedAt&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getUpdatedAt&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isEqualTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCreatedAt&lt;/span>&lt;span class="p">()),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getChannels&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isEmpty&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getProfileImageId&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="na">isNull&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Test&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nd">@DisplayName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;유효한 credentials로 로그인 시 UserResponse 반환&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">loginSuccess&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// given &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">when&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">userRepository&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">findByNameWithPassword&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getName&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getPassword&lt;/span>&lt;span class="p">())).&lt;/span>&lt;span class="na">thenReturn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Optional&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">ofNullable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// when &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">UserResponse&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">authService&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">login&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loginRequest&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Then &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">isNotNull&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assertThat&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">response&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">usingRecursiveComparison&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isEqualTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">toUserResponse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">verify&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">userRepository&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">findByNameWithPassword&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loginRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">userName&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">loginRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">password&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>&lt;strong>RED:&lt;/strong> 구현이 필요해?
+&lt;ul>
+&lt;li>테스트 작성하고 오류를 만나&lt;/li>
+&lt;li>빨간줄이 내가 뭘 만들어야 하는지 알려주는 게 돼&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>GREEN:&lt;/strong> 코드 작성 했어?
+&lt;ul>
+&lt;li>테스트를 돌려&lt;/li>
+&lt;li>로직을 수정하고 필요한 걸 또 만들어&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>REFACTOR:&lt;/strong> 개선할 수 있겠는데?
+&lt;ul>
+&lt;li>클린 코드로 개선해보자&lt;/li>
+&lt;li>변경하면서 다시 &lt;strong>RED&lt;/strong>를 만나&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;p>TestContext Framework도 정말 유용하다.
+트랜잭션 처리나 컨텍스트 초기화 같은 걸 알아서 해주니까 훨씬 간편하게 통합 테스트를 구성할 수 있다.&lt;/p>
+&lt;ul>
+&lt;li>TestContext Framework의 주요 기능
+&lt;ul>
+&lt;li>&lt;strong>컨텍스트 캐싱&lt;/strong>: 테스트마다 매번 새 컨텍스트를 띄우면 느리니까, 같은 설정이면 재사용해서 속도를 최적화함.&lt;/li>
+&lt;li>&lt;strong>DI 지원&lt;/strong>: 테스트 클래스에 &lt;code>@Autowired&lt;/code> 같은 걸 쓸 수 있게 해줌.&lt;/li>
+&lt;li>&lt;strong>트랜잭션 관리&lt;/strong>: 테스트가 끝난 후 자동으로 DB 롤백 → 깨끗한 상태 유지.&lt;/li>
+&lt;li>&lt;strong>이벤트 리스너/후크&lt;/strong>: 테스트 실행 전후에 더 복잡한 작업(예: 컨텍스트 초기화)도 가능.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="테스트-중심-개발을-유도하는-설계-철학">테스트 중심 개발을 유도하는 설계 철학
+&lt;/h4>&lt;p>Spring은 처음부터 테스트 가능한 코드(testable code)를 중심에 두고 설계됐다.
+다음과 같은 구조적 특징이 TDD를 촉진시킨다.&lt;/p>
+&lt;ul>
+&lt;li>POJO 기반 클래스 → 별도의 컨테이너 없이도 테스트 가능&lt;/li>
+&lt;li>DI를 통한 구성 → 객체간 결합도 감소 → 단위 테스트 용이&lt;/li>
+&lt;li>설정과 환경 분리 → 테스트 대상 코드의 독립성 확보&lt;/li>
+&lt;li>모듈화된 아키텍처 → 책임과 기능 분리 → 테스트 대상을 명확히 구분 가능&lt;/li>
+&lt;/ul>
+&lt;p>단순히 테스트가 가능한 수준을 넘어서 테스트 주도 개발을 실질적으로 적용하고 유지할 수 있는 환경을 제공한다는 점에서 의미가 크다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>객체지향 기본 개념&lt;/li>
+&lt;li>JUnit 기본 사용법&lt;/li>
+&lt;li>Mockito 사용 경험&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>POJO란 무엇인가?&lt;/li>
+&lt;li>테스트 주도 개발 개념&lt;/li>
+&lt;li>&lt;a class="link" href="https://spring.io/projects/spring-framework" target="_blank" rel="noopener"
+>Spring 공식 문서&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bean on B9F1</title><link>https://b9f1.com/tags/bean/</link><description>Recent content in Bean on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 28 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/bean/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring Boot와 웹서버</title><link>https://b9f1.com/p/2025-04-28-springboot-and-web-servers/</link><pubDate>Mon, 28 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-28-springboot-and-web-servers/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-28-springboot-and-web-servers/cover.png" alt="Featured image of post Spring Boot와 웹서버" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>웹 서버와 WAS의 차이점을 명확히 이해하고 Spring Boot의 내장 톰캣이 어떤 역할을 하는지 알아본다.
+또한, Spring Boot에서 사용되는 다양한 Bean 등록 방법과 각각의 장단점을 비교 분석한다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="web-server-vs-web-application-server">Web Server VS Web Application Server
+&lt;/h3>&lt;h4 id="웹-서버web-server">웹 서버(Web Server)
+&lt;/h4>&lt;ul>
+&lt;li>정적 콘텐츠(HTML, CSS, JS, 이미지 등)을 제공하는 서버&lt;/li>
+&lt;li>클라이언트의 요청을 받아 파일 시스템의 리소스를 반환&lt;/li>
+&lt;li>동적 처리 불가능 WAS와 연동 필요&lt;/li>
+&lt;li>예: Nginx, Apache HTTP Server 등&lt;/li>
+&lt;/ul>
+&lt;h4 id="웹-애플리케이션-서버web-application-server">웹 애플리케이션 서버(Web Application Server)
+&lt;/h4>&lt;ul>
+&lt;li>편하게 &amp;lsquo;와쓰&amp;rsquo;라고 발음하는 경우가 많다.&lt;/li>
+&lt;li>동적 콘텐츠(비즈니스 로직, DB 연동)를 처리하는 서버&lt;/li>
+&lt;li>서블릿 컨테이너를 포함해 애플리에킹션 실행 환경 제공&lt;/li>
+&lt;li>웹 서버의 기능도 일부 포함 가능 (단, 정적 리소스 처리 효율성이 떨어짐)&lt;/li>
+&lt;li>예: Tomcat, Jetty 등&lt;/li>
+&lt;/ul>
+&lt;h4 id="주요-차이점">주요 차이점
+&lt;/h4>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>구분&lt;/th>
+&lt;th>웹 서버&lt;/th>
+&lt;th>WAS&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>역할&lt;/strong>&lt;/td>
+&lt;td>정적 콘텐츠 제공&lt;/td>
+&lt;td>동적 콘텐츠 처리&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>예시&lt;/strong>&lt;/td>
+&lt;td>Nginx, Apache&lt;/td>
+&lt;td>Tomcat, Jetty&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>성능&lt;/strong>&lt;/td>
+&lt;td>정적 파일 처리 최적화&lt;/td>
+&lt;td>애플리케이션 로직 실행&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>보안&lt;/strong>&lt;/td>
+&lt;td>리버스 프록시, 로드 밸런싱&lt;/td>
+&lt;td>세션 관리, 트랜잭션 처리&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="spring-boot의-내장-톰캣은-was">Spring Boot의 내장 톰캣은 WAS
+&lt;/h3>&lt;ul>
+&lt;li>Spring Boot는 내장형 톰캣을 기본으로 제공한다.
+&lt;ul>
+&lt;li>별도의 WAS 설치 없이 실행이 가능하단 소리다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>spring-boot-starter-web&lt;/code> 의존성 추가 시 자동 구성된다.&lt;/li>
+&lt;li>WAS로 동작하지만 정적 리소스도 처리 가능하다. (개발용으로 충분)&lt;/li>
+&lt;li>프로덕션 환경에서는 Nginx + Spring Boot(Tomcat) 등 조합을 사용하는 것이 좋다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="spring-boot에서-bean-등록-방법-비교">Spring Boot에서 Bean 등록 방법 비교
+&lt;/h3>&lt;h4 id="컴포넌트-스캔">컴포넌트 스캔
+&lt;/h4>&lt;p>&lt;code>@Component&lt;/code>, &lt;code>@Service&lt;/code>, &lt;code>Repository&lt;/code>, &lt;code>@Controller&lt;/code> 등 어노테이션으로 간단히 빈 등록이 가능하다. 명확한 케이스를 나타내는 어노테이션을 사용하는데, 대부분 &lt;code>@Component&lt;/code>를 상속 받고 있다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>장점:&lt;/strong>
+&lt;ul>
+&lt;li>간편한 등록 &lt;code>@Component&lt;/code> 및 하위 어노테이션 자동 감지&lt;/li>
+&lt;li>의존성 자동 주입 &lt;code>@Autowired&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>단점:&lt;/strong>
+&lt;ul>
+&lt;li>명시적 제어 불가능&lt;/li>
+&lt;li>모든 빈이 스캔되므로 불필요한 빈이 등록될 수 있다.&lt;/li>
+&lt;li>커스터마이징이 어렵다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="자바-설정-클래스">자바 설정 클래스
+&lt;/h4>&lt;p>&lt;code>@Configuration&lt;/code> + &lt;code>@Bean&lt;/code> 조합으로 명시적 등록 방법&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Configuration&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">AppConfig&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MyService&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">myService&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MyServiceImpl&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>장점:&lt;/strong>
+&lt;ul>
+&lt;li>명시적 빈 등록&lt;/li>
+&lt;li>필요한 빈만 선택적으로 등록 가능&lt;/li>
+&lt;li>외부 라이브러리 빈 등록에 유용&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>단점:&lt;/strong>
+&lt;ul>
+&lt;li>수동 등록이 번거로울 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="import를-이용한-빈-등록">Import를 이용한 빈 등록
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Configuration&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nd">@Import&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="n">DatabaseConfig&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SecurityConfig&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">class&lt;/span>&lt;span class="p">})&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">class&lt;/span> &lt;span class="nc">AppConfig&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>장점:&lt;/strong>
+&lt;ul>
+&lt;li>모듈화된 설정 관리 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>단점:&lt;/strong>
+&lt;ul>
+&lt;li>의존성 관계가 명확하지 않을 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="xml-기반-빈-등록">XML 기반 빈 등록
+&lt;/h4>&lt;p>legacy한 기술이라서 &amp;ldquo;이런 방법이 있구나&amp;rdquo; 정도만 이해하자.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;bean&lt;/span> &lt;span class="na">id=&lt;/span>&lt;span class="s">&amp;#34;myService&amp;#34;&lt;/span> &lt;span class="na">class=&lt;/span>&lt;span class="s">&amp;#34;com.example.MyServiceImpl&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>장점:&lt;/strong>
+&lt;ul>
+&lt;li>레거시 시스템과 호환성&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>단점:&lt;/strong>
+&lt;ul>
+&lt;li>가독성이 떨어진다.&lt;/li>
+&lt;li>유지보수가 어렵다.&lt;/li>
+&lt;li>최신 Spring에 권장되지 않는다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="최적의-방법은">최적의 방법은?
+&lt;/h4>&lt;ul>
+&lt;li>컴포넌트 스캔: 일반적인 애플리케이션 빈 등록&lt;/li>
+&lt;li>&lt;code>@Bean&lt;/code> 수동 등록: 외부 라이브러리, 커스텀 설정 필요 시&lt;/li>
+&lt;li>&lt;code>@Import&lt;/code>: 설정 분리 시 유용&lt;/li>
+&lt;/ul>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Servlet Container: 웹 애플리케이션 실행 환경
+&lt;ul>
+&lt;li>예: Tomcat&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>DI(Dependency Injection): Spring의 핵심 개념, 빈 간의 의존성 관리&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-boot/how-to/webserver.html#page-title" target="_blank" rel="noopener"
+>Spring 공식 문서 - Embedded Web Servers&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cloud on B9F1</title><link>https://b9f1.com/categories/cloud/</link><description>Recent content in Cloud on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 03 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/cloud/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS RDS vs EC2 직접 설치</title><link>https://b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</link><pubDate>Sun, 03 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/cover.png" alt="Featured image of post AWS RDS vs EC2 직접 설치" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>초기 프로젝트를 구축하거나 서비스를 운영하는 과정에서 &lt;strong>데이터베이스를 어디에 설치할지&lt;/strong>는 중요한 결정 중 하나다.&lt;/p>
+&lt;p>특히 AWS 환경에서는 &lt;code>RDS&lt;/code>를 사용할지, &lt;code>EC2&lt;/code>에 직접 설치할지를 두고 많은 고민을 하게 된다.&lt;/p>
+&lt;p>실제 운영 관점에서 &lt;strong>RDS의 주요 이점과 EC2 직접 설치 방식과의 차이점&lt;/strong>을 정리하고 &lt;code>RDS&lt;/code>가 적합하지 않은 상황까지 함께 다뤄보려 한다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="rds를-사용할-때의-주요-이점">RDS를 사용할 때의 주요 이점
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>자동화된 관리&lt;/strong>:
+&lt;ul>
+&lt;li>백업, 보안 패치, 장애 복구까지 AWS가 관리&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Multi-AZ 구성 가능&lt;/strong>:
+&lt;ul>
+&lt;li>자동 장애 조치(Failover) 지원으로 고가용성 확보&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>자동 백업 및 시점 복구(PITR)&lt;/strong>:
+&lt;ul>
+&lt;li>데이터 복구를 쉽게 수행 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>보안 강화&lt;/strong>:
+&lt;ul>
+&lt;li>IAM 인증, KMS 암호화, 보안 그룹 등 보안 기능 내장&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>모니터링 및 알림&lt;/strong>:
+&lt;ul>
+&lt;li>CloudWatch 연동으로 실시간 DB 상태 확인 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>스케일링 유연성&lt;/strong>:
+&lt;ul>
+&lt;li>수직 확장과 읽기 전용 복제(Replica) 지원&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="ec2에-직접-설치와-비교">EC2에 직접 설치와 비교
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>EC2 직접 설치&lt;/th>
+&lt;th>RDS&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>설치 편의성&lt;/td>
+&lt;td>수동&lt;/td>
+&lt;td>자동&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>패치 및 유지보수&lt;/td>
+&lt;td>직접 관리&lt;/td>
+&lt;td>AWS 자동&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>확장성&lt;/td>
+&lt;td>어렵고 시간 소요&lt;/td>
+&lt;td>빠르고 간편&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>장애 조치&lt;/td>
+&lt;td>복잡한 구성 필요&lt;/td>
+&lt;td>자동 장애 복구 지원&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>보안 설정&lt;/td>
+&lt;td>수동 구성&lt;/td>
+&lt;td>IAM, KMS 등 통합 제공&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>백업/복구&lt;/td>
+&lt;td>직접 스크립트 작성&lt;/td>
+&lt;td>자동 백업 및 PITR 지원&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>직접 설치는 최대한의 유연성과 커스터마이징이 가능하다는 장점이 있지만, &lt;strong>보안과 가용성을 직접 관리해야 한다는 부담&lt;/strong>이 있다.&lt;/p>
+&lt;p>특히 운영 경험이 적거나 인프라 리소스가 부족한 팀에게는 &lt;code>RDS&lt;/code>가 훨씬 더 효율적이다.&lt;/p>
+&lt;h3 id="rds가-적합하지-않은-케이스">RDS가 적합하지 않은 케이스
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>복잡한 확장 플러그인이 필요한 경우&lt;/strong> (예: PostgreSQL의 일부 확장 모듈 미지원)&lt;/li>
+&lt;li>&lt;strong>DB 튜닝을 위해 커널 파라미터까지 조정해야 하는 경우&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>최소비용으로 간헐적 사용을 원할 때&lt;/strong> (EC2+Docker가 유리)&lt;/li>
+&lt;li>사내망 또는 외부 연결이 자유로운 구조를 구성하고자 할 때&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>복잡한 운영을 줄이고 안정성을 확보하고 싶다면, AWS RDS는 최고의 선택이 될 수 있다.&lt;/p>&lt;/blockquote>
+&lt;p>하지만 반대로, &lt;strong>비용 최적화·유연성·특수 환경을 원한다면 EC2 직접 설치가 유리할 수 있다.&lt;/strong>
+결국 핵심은 &lt;strong>“어떤 서비스를 어떻게 운영할 것인가?”&lt;/strong> 에 달려 있다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>AWS 서비스 (EC2, RDS, VPC, IAM, KMS)&lt;/li>
+&lt;li>리눅스 서버와 DB 설치 경험&lt;/li>
+&lt;li>PostgreSQL 또는 MySQL과 같은 관계형 DB 운영 경험&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://docs.aws.amazon.com/rds/" target="_blank" rel="noopener"
+>Amazon RDS 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.postgresql.org/docs/current/contrib.html" target="_blank" rel="noopener"
+>PostgreSQL 확장 기능 목록&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html" target="_blank" rel="noopener"
+>AWS Well-Architected Framework: Operational Excellence Pillar&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

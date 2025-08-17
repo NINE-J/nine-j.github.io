@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SecurityContext on B9F1</title><link>https://b9f1.com/tags/securitycontext/</link><description>Recent content in SecurityContext on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 16 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/securitycontext/index.xml" rel="self" type="application/rss+xml"/><item><title>컨텍스트 안전 전파</title><link>https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/cover.png" alt="Featured image of post 컨텍스트 안전 전파" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>멀티스레드와 비동기 환경에서 흔히 사용하는 &lt;strong>MDC(Logback Mapped Diagnostic Context)&lt;/strong> 나 &lt;strong>SecurityContext&lt;/strong> 는 내부적으로 &lt;code>ThreadLocal&lt;/code> 기반으로 동작한다.&lt;/p>
+&lt;p>문제는 요청을 처리하는 스레드가 바뀌는 순간(예: &lt;code>@Async&lt;/code>, &lt;code>Executor&lt;/code>, &lt;code>CompletableFuture&lt;/code>, Reactor 등) 이 컨텍스트 정보가 사라지거나 누락되기 쉽다는 것이다.&lt;/p>
+&lt;p>따라서 &lt;strong>로그 추적성과 보안 인증 상태를 잃지 않고 스레드를 건너뛰어 전파하는 방법&lt;/strong>이 필요하다.
+서블릿 기반(Spring MVC + @Async/Executor/CompletableFuture)과 리액티브 기반(Reactor/WebFlux)에서 각각 컨텍스트를 안전하게 전달하는 실전 패턴을 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="왜-사라지나-threadlocal의-본질">왜 사라지나? &lt;code>ThreadLocal&lt;/code>의 본질
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>MDC(Logback MDC)&lt;/strong>, &lt;strong>SecurityContextHolder&lt;/strong>는 기본적으로 &lt;code>ThreadLocal&lt;/code> 기반이다.&lt;/li>
+&lt;li>작업이 &lt;strong>다른 스레드&lt;/strong>(스레드풀, ForkJoin)에서 실행되면 값이 비어 있거나 &lt;strong>이전 요청의 쓰레기 값&lt;/strong>이 남을 수 있다(스레드 재사용).&lt;/li>
+&lt;li>해결 핵심: &lt;strong>(캡처) → (전파) → (정리)&lt;/strong> 의 생명주기를 명시한다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="서블릿동기비동기-스택-6가지-정석-패턴">서블릿(동기/비동기) 스택: 6가지 정석 패턴
+&lt;/h3>&lt;h4 id="a-runnablecallable-래핑핵심-원리">A. &lt;code>Runnable/Callable&lt;/code> 래핑(핵심 원리)
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">MdcPropagatingRunnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">implements&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Map&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">MdcPropagatingRunnable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">delegate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">captured&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">run&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Map&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">run&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">finally&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clear&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>캡처 → set → 실행 → 복원/clear&lt;/strong>.&lt;/li>
+&lt;li>&lt;code>SecurityContext&lt;/code>도 동일 원리로 적용 가능.&lt;/li>
+&lt;/ul>
+&lt;h4 id="b-taskdecorator로-전역-적용asyncthreadpooltaskexecutor">B. &lt;code>TaskDecorator&lt;/code>로 전역 적용(@Async/ThreadPoolTaskExecutor)
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">TaskDecorator&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">mdcTaskDecorator&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MdcPropagatingRunnable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">taskExecutor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TaskDecorator&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">decorator&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ThreadPoolTaskExecutor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ThreadPoolTaskExecutor&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setTaskDecorator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">decorator&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">initialize&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>장점: &lt;code>@Async&lt;/code>, &lt;code>CompletableFuture&lt;/code>, 커스텀 &lt;code>Executor&lt;/code> 모두 &lt;strong>자동 전파&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;h4 id="c-spring-security-전파-전용-유틸">C. Spring Security 전파 전용 유틸
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Executors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">newFixedThreadPool&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">8&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">secExecutor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">DelegatingSecurityContextExecutor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">secExecutor&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">execute&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cm">/* SecurityContext 보존됨 */&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">});&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>&lt;code>DelegatingSecurityContext*&lt;/code>&lt;/strong> 계열(Executor, ExecutorService, Runnable, Callable)을 사용하면 &lt;strong>인증 컨텍스트만&lt;/strong> 확실히 전달된다.&lt;/li>
+&lt;li>MDC도 필요하면 B 패턴과 &lt;strong>조합&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;h4 id="d-securitycontextholder-전략-옵션">D. &lt;code>SecurityContextHolder&lt;/code> 전략 옵션
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">SecurityContextHolder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setStrategyName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SecurityContextHolder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">MODE_INHERITABLETHREADLOCAL&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>자식 스레드&lt;/strong>에 한해 상속.&lt;/li>
+&lt;li>한계: &lt;strong>스레드풀 재사용&lt;/strong>과는 맞지 않는다(“새로 만든 자식 스레드”만 상속).&lt;/li>
+&lt;/ul>
+&lt;h4 id="e-completablefuture에서의-주의">E. &lt;code>CompletableFuture&lt;/code>에서의 주의
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">CompletableFuture&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">supplyAsync&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">doWork&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">finally&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clear&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">},&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">taskExecutor&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>기본 공급자는 &lt;strong>ForkJoinPool&lt;/strong> → 문맥 유실. 항상 &lt;strong>전파 가능한 Executor&lt;/strong>와 &lt;strong>명시적 set/clear&lt;/strong> 사용.&lt;/li>
+&lt;/ul>
+&lt;h4 id="f-작업-종료-시-정리clean-up-는-의무">F. 작업 종료 시 &lt;strong>정리(clean-up)&lt;/strong> 는 의무
+&lt;/h4>&lt;ul>
+&lt;li>실패, 취소 케이스까지 &lt;strong>finally에서 clear/복원&lt;/strong>.&lt;/li>
+&lt;li>그렇지 않으면 &lt;strong>컨텍스트 누수&lt;/strong>로 다른 요청 로그가 오염된다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="리액티브reactorwebflux-스택-컨텍스트는-데이터다">리액티브(Reactor/WebFlux) 스택: 컨텍스트는 데이터다
+&lt;/h3>&lt;h4 id="a-securitycontext-리액티브-전용-api-사용">A. SecurityContext 리액티브 전용 API 사용
+&lt;/h4>&lt;ul>
+&lt;li>인증은 &lt;code>ReactiveSecurityContextHolder&lt;/code>를 통해 Reactor &lt;strong>Context&lt;/strong>에 저장/조회.&lt;/li>
+&lt;li>예) WebFilter에서 &lt;code>contextWrite&lt;/code>로 주입, 다운스트림에서 자동 사용.&lt;/li>
+&lt;/ul>
+&lt;h4 id="b-mdc-reactor-context-mdc-브리징">B. MDC Reactor Context, MDC 브리징
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 컨텍스트 키 정의&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">record&lt;/span> &lt;span class="nc">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">KEY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;TRACE&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 컨텍스트 주입&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Mono&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">deferContextual&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctxView&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctxView&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Mono&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">fromRunnable&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;trace={}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">traceId&lt;/span>&lt;span class="p">()));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">})&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">contextWrite&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">put&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;abc-123&amp;#34;&lt;/span>&lt;span class="p">)));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 공통 브리징 연산자(예시)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Function&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Publisher&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Publisher&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">mdc&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Flux&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">from&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pub&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">doOnEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnNext&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnError&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnComplete&lt;/span>&lt;span class="p">())&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getContextView&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getOrDefault&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;-&amp;#34;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="na">traceId&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ignored&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">putCloseable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;traceId&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="p">))&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// MDC는 이 시점 로깅에만 반영됨&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getType&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignalType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">ON_NEXT&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">debug&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;processing...&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">});&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>핵심: Reactor 로그는 &lt;strong>시그널 순간에만&lt;/strong> MDC에 넣고 즉시 닫는다(&lt;code>MDC.putCloseable&lt;/code>).&lt;/li>
+&lt;li>장점: 스레드 hops가 잦아도 &lt;strong>오염, 누수 없음&lt;/strong>.&lt;/li>
+&lt;li>리액터 체인 가장 바깥에서 &lt;code>transform(mdc())&lt;/code>로 한 번만 적용.&lt;/li>
+&lt;/ul>
+&lt;h3 id="무엇을-언제-사용하는-게-좋을까">무엇을 언제 사용하는 게 좋을까
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>상황&lt;/th>
+&lt;th>권장 패턴&lt;/th>
+&lt;th>비고&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Spring MVC + &lt;code>@Async&lt;/code>/&lt;code>Executor&lt;/code>&lt;/td>
+&lt;td>&lt;strong>TaskDecorator(B)&lt;/strong> + 필요 시 &lt;strong>DelegatingSecurityContext(C)&lt;/strong>&lt;/td>
+&lt;td>전역 일관성, 적용 쉬움&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>단발 커스텀 스케줄러/쓰레드&lt;/td>
+&lt;td>&lt;strong>Runnable/Callable 래핑(A)&lt;/strong>&lt;/td>
+&lt;td>최소 오버헤드&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CompletableFuture&lt;/code>&lt;/td>
+&lt;td>&lt;strong>전파 가능한 Executor&lt;/strong> + &lt;strong>명시적 set/clear(E)&lt;/strong>&lt;/td>
+&lt;td>ForkJoinPool 지양&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>자식 스레드만 생성&lt;/td>
+&lt;td>&lt;strong>INHERITABLETHREADLOCAL(D)&lt;/strong>&lt;/td>
+&lt;td>풀 재사용 환경에 부적합&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>WebFlux/Reactor&lt;/td>
+&lt;td>&lt;strong>ReactiveSecurityContextHolder&lt;/strong> + &lt;strong>MDC 브리징(B 리액티브판)&lt;/strong>&lt;/td>
+&lt;td>ThreadLocal 직접 접근 금지&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="체크리스트">체크리스트
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>캡처 시점&lt;/strong>은 요청 입구(필터/인터셉터/웹필터)에서.&lt;/li>
+&lt;li>&lt;strong>전파 책임&lt;/strong>은 스케줄링/실행 시점(Executor/연산자)에서.&lt;/li>
+&lt;li>&lt;strong>정리&lt;/strong>는 항상 &lt;code>finally&lt;/code> 또는 &lt;code>try-with-resources(MDC.putCloseable)&lt;/code>로.&lt;/li>
+&lt;li>풀 크기, 큐 적재량을 조정해 &lt;strong>컨텍스트 스와핑 비용&lt;/strong>을 최소화.&lt;/li>
+&lt;li>성능 민감 구간에선 &lt;strong>필드형 추적 ID&lt;/strong>(메서드 파라미터로 전달)도 고려 — 오버헤드와 가독성의 트레이드오프.&lt;/li>
+&lt;/ol>
+&lt;h3 id="캡처-전파-정리-시각화">캡처, 전파, 정리 시각화
+&lt;/h3>&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant IN as Request Inbound
+participant CAP as Capture
+participant EXEC as Executor
+participant RUN as Task
+IN->>CAP: traceId, auth 캡처
+CAP->>EXEC: Runnable/Callable 래핑
+EXEC->>RUN: set(MDC, SecurityContext)
+RUN-->>EXEC: finally { clear()/restore() }
+&lt;/pre>
+&lt;/div>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>비동기의 본질은 &lt;strong>스레드 이동&lt;/strong>이고, 해법의 본질은 &lt;strong>캡처-전파-정리의 규율&lt;/strong>이다.
+이 원칙만 지키면 &lt;code>MDC&lt;/code>와 &lt;code>SecurityContext&lt;/code>는 어느 실행 모델에서도 흔들리지 않는다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>ThreadLocal과 스레드풀 재사용 모델&lt;/li>
+&lt;li>Logback MDC 기본 사용법 (&lt;code>MDC.put&lt;/code>, &lt;code>MDC.clear&lt;/code>, &lt;code>MDC.putCloseable&lt;/code>)&lt;/li>
+&lt;li>Spring Security: &lt;code>SecurityContextHolder&lt;/code>, &lt;code>Authentication&lt;/code>&lt;/li>
+&lt;li>Reactor의 &lt;code>Context&lt;/code>와 신호(시그널) 기반 훅&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>Spring Security: &lt;code>DelegatingSecurityContextExecutor&lt;/code>, &lt;code>DelegatingSecurityContextCallable/Runnable&lt;/code>&lt;/li>
+&lt;li>Spring Framework: &lt;code>TaskDecorator&lt;/code>, &lt;code>ThreadPoolTaskExecutor&lt;/code>, &lt;code>@Async&lt;/code>&lt;/li>
+&lt;li>Reactor: &lt;code>Context&lt;/code>, &lt;code>contextWrite&lt;/code>, &lt;code>doOnEach&lt;/code>, &lt;code>SignalType&lt;/code>&lt;/li>
+&lt;li>로깅: 분산 트레이싱(TraceId/SpanId)와 MDC 연동, &lt;code>MDC.putCloseable&lt;/code> 활용 패턴&lt;/li>
+&lt;/ul></description></item></channel></rss>

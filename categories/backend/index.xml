@@ -1,0 +1,914 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Backend on B9F1</title><link>https://b9f1.com/categories/backend/</link><description>Recent content in Backend on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 16 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/categories/backend/index.xml" rel="self" type="application/rss+xml"/><item><title>Race condition 뿌리부터 잡기</title><link>https://b9f1.com/p/2025-08-16-from-the-basics-of-race-condition/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-16-from-the-basics-of-race-condition/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-16-from-the-basics-of-race-condition/cover.png" alt="Featured image of post Race condition 뿌리부터 잡기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>트래픽이 두 배가 되는 순간, 가장 먼저 터지는 건 &lt;strong>성능&lt;/strong>이 아니라 &lt;strong>정합성&lt;/strong>이다.&lt;/p>
+&lt;p>멀티스레드 환경의 대표적 복병 &lt;strong>경쟁 상태(Race Condition)&lt;/strong> 는 재현도 어렵고 한 번 새면 데이터 신뢰도가 무너진다.&lt;/p>
+&lt;p>운영 환경에서 빈번하게 마주치는 &lt;strong>경쟁 상태의 원인&lt;/strong>, &lt;strong>재현 패턴&lt;/strong>, &lt;strong>해결 전략의 우선순위&lt;/strong>를 정리한다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="경쟁-상태란-무엇인가">경쟁 상태란 무엇인가?
+&lt;/h3>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>정의&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>여러 스레드가 &lt;strong>공유 상태(shared state)&lt;/strong> 를 동시에 읽고/쓰기 하며 실행 타이밍에 따라 결과가 달라지는 상황.&lt;br>
+핵심 원인 축: &lt;strong>AVR&lt;/strong> - Atomicity(원자성), Visibility(가시성), Reordering(재배치).&lt;/p>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>Atomicity&lt;/strong>: &lt;code>x = x + 1&lt;/code> 같은 RMW(Read–Modify–Write) 연산이 중간에 끼어들기로 깨지면서 lost update 발생&lt;/li>
+&lt;li>&lt;strong>Visibility&lt;/strong>: 한 스레드의 쓰기가 다른 스레드에 늦게 보여 stale value(오래된 값) 관측, 잘못된 분기
+&lt;ul>
+&lt;li>stale value: 다른 스레드가 최신 값을 썼음에도 불구하고, 캐시/레지스터 등 중간 계층에 남아있던 &lt;strong>이전 값&lt;/strong>&lt;/li>
+&lt;li>이 때문에 &lt;strong>중복 및 누락&lt;/strong>뿐 아니라 &lt;code>if (value==0)&lt;/code> 같은 &lt;strong>조건 분기 오류&lt;/strong>가 발생&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>Reordering&lt;/strong>: CPU out-of-order 실행이나 JIT 최적화로 happens-before 순서가 무너짐&lt;/li>
+&lt;/ul>
+&lt;h3 id="위험-신호와-재현-패턴">위험 신호와 재현 패턴
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>증상&lt;/strong>: 카운터 불일치, 중복/누락, “가끔” 실패하는 테스트, 운영 환경에서만 나타나는 버그(Heisenbug)&lt;/li>
+&lt;li>&lt;strong>패턴&lt;/strong>:
+&lt;ul>
+&lt;li>&lt;code>if(없으면 저장)&lt;/code> 후 put (TOCTOU)&lt;/li>
+&lt;li>캐시 초기화 동시 접근&lt;/li>
+&lt;li>통계 카운터 증가&lt;/li>
+&lt;li>잘못된 Lazy init&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>Heisenbug&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>하이젠버그는 프로그래밍에서 테스트를 수행할 때 발생되는 버그의 형태 중의 하나로서 문제를 발견하고 수정하기 위한 디버깅을 수행하려고 하면 문제점이 사라지는 형태의 버그를 말한다.&lt;/p>
+&lt;/div>
+&lt;/div>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>TOCTOU (Time Of Check to Time Of Use)&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>검사 시점과 사용 시점 사이의 틈새에서 다른 스레드가 상태를 바꿔 &lt;strong>예상치 못한 버그 및 보안 취약점&lt;/strong>을 유발하는 &lt;strong>클래식 경쟁 조건 유형&lt;/strong>.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h3 id="최소-예제로-보는-버그">최소 예제로 보는 버그
+&lt;/h3>
+&lt;div class="admonition warning">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>&lt;/svg>
+&lt;span>원자적이지 않은 연산&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>value++&lt;/code> 는 단일 연산처럼 보이지만, JVM 바이트코드 레벨에서는 &lt;code>getfield&lt;/code> → &lt;code>iconst_1&lt;/code> → &lt;code>iadd&lt;/code> → &lt;code>putfield&lt;/code> 로 분해된다.
+중간에 다른 스레드가 끼어들어 lost update 발생. &lt;code>volatile&lt;/code>은 가시성만 보장해도 원자성은 보장 못 한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">BrokenCounter&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">0&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">inc&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 경쟁 상태&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">get&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="바이트코드-관점필드-증가">바이트코드 관점(필드 증가)
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>getfield value&lt;/code> → &lt;code>iconst_1&lt;/code> → &lt;code>iadd&lt;/code> → &lt;code>putfield value&lt;/code>&lt;/li>
+&lt;li>단일 연산이 아니라 여러 명령어로 분해됨 → 원자성 깨짐&lt;/li>
+&lt;/ul>
+&lt;h4 id="interleaving-예-두-스레드">Interleaving 예 (두 스레드)
+&lt;/h4>&lt;ul>
+&lt;li>두 번 증가 의도 → 최종 값 1 (한 번만 반영)&lt;/li>
+&lt;li>DB의 &lt;strong>Lost Update anomaly&lt;/strong>와 동일한 문제&lt;/li>
+&lt;/ul>
+&lt;h3 id="가시성까지-얽히면-더-위험">가시성까지 얽히면 더 위험
+&lt;/h3>&lt;ul>
+&lt;li>A 스레드가 &lt;code>1&lt;/code> 저장해도, B 스레드는 캐시 coherence 지연으로 여전히 &lt;code>0&lt;/code>(stale value) 관측&lt;/li>
+&lt;li>결과:
+&lt;ol>
+&lt;li>카운터 중복·누락&lt;/li>
+&lt;li>조건 분기 오류 (예: &lt;code>if (get()==0) init()&lt;/code>이 중복 실행)&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="왜-volatile로-해결되지-않나">왜 &lt;code>volatile&lt;/code>로 해결되지 않나?
+&lt;/h3>&lt;ul>
+&lt;li>&lt;code>volatile&lt;/code>은 가시성(Visibility)과 재배치(Reordering) 방지 일부를 보장한다.&lt;/li>
+&lt;li>하지만 &lt;code>value++&lt;/code> 같은 RMW 원자성은 보장 못 함&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">volatile&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">inc&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// 여전히 lost update 가능&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="해결-전략-락보다-설계가-먼저">해결 전략: 락보다 설계가 먼저
+&lt;/h3>&lt;h4 id="상태-자체를-줄여라">상태 자체를 줄여라
+&lt;/h4>&lt;ul>
+&lt;li>불변 객체(Immutable), Copy-on-Write, 메시지 패싱/Actor 모델, 이벤트 루프&lt;/li>
+&lt;/ul>
+&lt;h4 id="스레드-컨파인먼트">스레드 컨파인먼트
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>ThreadLocal&lt;/code>, 키 파티셔닝(같은 키는 동일 워커로)&lt;/li>
+&lt;/ul>
+&lt;h4 id="원자-연산--동시-컬렉션-juc">원자 연산 &amp;amp; 동시 컬렉션 (J.U.C)
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>AtomicInteger.incrementAndGet()&lt;/code> (CAS 기반)
+&lt;ul>
+&lt;li>CAS(Compare-And-Swap)는 &lt;strong>재시도 루프(spin)&lt;/strong> 구조로 동작한다. 즉, 경쟁이 심하면 충돌이 잦아지고 성능이 급격히 저하될 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>고경합 환경엔 &lt;code>LongAdder&lt;/code>
+&lt;ul>
+&lt;li>내부적으로 셀(Cell) 배열에 분산 저장하여 스레드 충돌을 줄인다.&lt;/li>
+&lt;li>주기적 집계를 통해 최종 값을 계산 → CAS 충돌 병목이 적음.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>ConcurrentHashMap.computeIfAbsent/merge&lt;/code>로 TOCTOU 제거&lt;/li>
+&lt;/ul>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>CAS와 성능&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>CAS는 실패 시 루프를 돌며 재시도하는 &lt;strong>spin 기반 알고리즘&lt;/strong>이다.
+경쟁이 적을 땐 락보다 빠르지만, 경쟁이 많으면 계속 충돌 → 재시도로 인해 오히려 락보다 느려질 수 있다.
+이 때문에 고경합 상황에서는 &lt;code>LongAdder&lt;/code> 같은 분산 구조가 더 유리하다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h4 id="동기화-synchronization">동기화 (Synchronization)
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>synchronized&lt;/code> (간단, 확실)&lt;/li>
+&lt;li>&lt;code>ReentrantLock&lt;/code> (tryLock, 타임아웃 지원)&lt;/li>
+&lt;li>&lt;code>ReadWriteLock&lt;/code>, &lt;code>StampedLock&lt;/code> (낙관적 읽기 성능 개선)
+&lt;ul>
+&lt;li>&lt;code>StampedLock&lt;/code>의 &lt;strong>낙관적 읽기&lt;/strong>는 실제 읽은 값이 도중에 다른 쓰기에 의해 깨지지 않았는지 &lt;code>validate(stamp)&lt;/code> 호출로 반드시 검증해야 안전하다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="admonition info">
+&lt;div class="admonition-header">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>&lt;/svg>
+&lt;span>StampedLock의 validate()&lt;br>&lt;/span>
+&lt;/div>
+&lt;div class="admonition-content">
+&lt;p>&lt;code>long stamp = lock.tryOptimisticRead();&lt;/code> → 값 읽기 → &lt;code>if (!lock.validate(stamp)) { ...재시도... }&lt;/code>
+낙관적 읽기는 무조건 성공하는 게 아니라, 읽은 후에 검증(validate)을 반드시 거쳐야 한다. 검증이 실패하면 일반적인 읽기 락을 다시 걸어야 한다.&lt;/p>
+&lt;/div>
+&lt;/div>&lt;h4 id="가시성-보장--안전한-게시">가시성 보장 &amp;amp; 안전한 게시
+&lt;/h4>&lt;ul>
+&lt;li>&lt;code>volatile&lt;/code> 플래그, &lt;code>final&lt;/code> 필드&lt;/li>
+&lt;li>Safe Publication (동기화 통해 객체를 게시)&lt;/li>
+&lt;/ul>
+&lt;h4 id="단일-실행--멱등idempotency">단일 실행 &amp;amp; 멱등(Idempotency)
+&lt;/h4>&lt;ul>
+&lt;li>멱등 설계, fencing token(순서 보장 토큰)&lt;/li>
+&lt;/ul>
+&lt;h3 id="실전-시나리오별-추천-레시피">실전 시나리오별 추천 레시피
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>시나리오&lt;/th>
+&lt;th>증상&lt;/th>
+&lt;th>해법&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>동시 카운팅/지표&lt;/td>
+&lt;td>증발(Lost update)&lt;/td>
+&lt;td>&lt;code>LongAdder&lt;/code> → 주기적 집계&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Lazy 초기화&lt;/td>
+&lt;td>중복 생성&lt;/td>
+&lt;td>&lt;code>computeIfAbsent&lt;/code>, 초기화 전용 락&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>캐시 프리로드&lt;/td>
+&lt;td>중복 로드&lt;/td>
+&lt;td>키 파티셔닝 + 단일 워커&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>읽기 99%&lt;/td>
+&lt;td>락 경합&lt;/td>
+&lt;td>Copy-on-Write, &lt;code>StampedLock&lt;/code> 낙관 읽기&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>고가 연산 임계구역&lt;/td>
+&lt;td>응답 지연&lt;/td>
+&lt;td>임계구역 축소, 분해락(키별 락)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>키 충돌 업데이트&lt;/td>
+&lt;td>중복·경합&lt;/td>
+&lt;td>키별 락/Striped Lock, &lt;code>merge&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="성능-vs-정확성-트레이드오프">성능 vs 정확성 트레이드오프
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>정확성 고정&lt;/strong>: &lt;code>synchronized&lt;/code>/ConcurrentHashMap으로 정합성 우선 확보&lt;/li>
+&lt;li>&lt;strong>핫스팟 튜닝&lt;/strong>: 임계구역 축소, 자료구조 교체&lt;/li>
+&lt;li>&lt;strong>마지막에&lt;/strong>: 락-프리/낙관적 기법 적용&lt;/li>
+&lt;/ol>
+&lt;h3 id="테스트검증-전략">테스트·검증 전략
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>jcstress&lt;/strong> (OpenJDK 동시성 경계 테스트 프레임워크)&lt;/li>
+&lt;li>&lt;strong>확률 테스트&lt;/strong> (스레드 수·코어 수·JVM 옵션 다양화)&lt;/li>
+&lt;li>&lt;strong>페일패스트 계측&lt;/strong> (불가능 상태 assert)&lt;/li>
+&lt;li>&lt;strong>장시간 soak test&lt;/strong> (운영 유사 환경)&lt;/li>
+&lt;li>이런 버그는 &lt;strong>Heisenbug&lt;/strong> 특성이 강함 → 반드시 장기간·다양 환경에서 검증 필요&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>&lt;strong>공유 상태를 최소화하라.&lt;/strong>
+남는 공유 상태는 반드시 &lt;strong>J.U.C(java.util.concurrent)&lt;/strong> 와 &lt;strong>명시적 동기화&lt;/strong>로 보호하라.
+먼저 정합성을 보장하고, 이후 성능을 최적화하는 순서가 바람직하다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Java Memory Model(JMM), happens-before&lt;/li>
+&lt;li>monitor/synchronized, CAS(compare-and-swap)&lt;/li>
+&lt;li>J.U.C(java.util.concurrent): 원자 클래스, 동시 컬렉션&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>Java Concurrency in Practice (Brian Goetz)&lt;/li>
+&lt;li>Effective Java 동시성 아이템&lt;/li>
+&lt;li>OpenJDK &lt;strong>jcstress&lt;/strong>&lt;/li>
+&lt;li>Oracle Concurrency 튜토리얼&lt;/li>
+&lt;li>Martin Kleppmann: Idempotency / Exactly-once&lt;/li>
+&lt;/ul></description></item><item><title>컨텍스트 안전 전파</title><link>https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/cover.png" alt="Featured image of post 컨텍스트 안전 전파" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>멀티스레드와 비동기 환경에서 흔히 사용하는 &lt;strong>MDC(Logback Mapped Diagnostic Context)&lt;/strong> 나 &lt;strong>SecurityContext&lt;/strong> 는 내부적으로 &lt;code>ThreadLocal&lt;/code> 기반으로 동작한다.&lt;/p>
+&lt;p>문제는 요청을 처리하는 스레드가 바뀌는 순간(예: &lt;code>@Async&lt;/code>, &lt;code>Executor&lt;/code>, &lt;code>CompletableFuture&lt;/code>, Reactor 등) 이 컨텍스트 정보가 사라지거나 누락되기 쉽다는 것이다.&lt;/p>
+&lt;p>따라서 &lt;strong>로그 추적성과 보안 인증 상태를 잃지 않고 스레드를 건너뛰어 전파하는 방법&lt;/strong>이 필요하다.
+서블릿 기반(Spring MVC + @Async/Executor/CompletableFuture)과 리액티브 기반(Reactor/WebFlux)에서 각각 컨텍스트를 안전하게 전달하는 실전 패턴을 살펴본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="왜-사라지나-threadlocal의-본질">왜 사라지나? &lt;code>ThreadLocal&lt;/code>의 본질
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>MDC(Logback MDC)&lt;/strong>, &lt;strong>SecurityContextHolder&lt;/strong>는 기본적으로 &lt;code>ThreadLocal&lt;/code> 기반이다.&lt;/li>
+&lt;li>작업이 &lt;strong>다른 스레드&lt;/strong>(스레드풀, ForkJoin)에서 실행되면 값이 비어 있거나 &lt;strong>이전 요청의 쓰레기 값&lt;/strong>이 남을 수 있다(스레드 재사용).&lt;/li>
+&lt;li>해결 핵심: &lt;strong>(캡처) → (전파) → (정리)&lt;/strong> 의 생명주기를 명시한다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="서블릿동기비동기-스택-6가지-정석-패턴">서블릿(동기/비동기) 스택: 6가지 정석 패턴
+&lt;/h3>&lt;h4 id="a-runnablecallable-래핑핵심-원리">A. &lt;code>Runnable/Callable&lt;/code> 래핑(핵심 원리)
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">MdcPropagatingRunnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">implements&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">private&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Map&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">MdcPropagatingRunnable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">delegate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">captured&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nd">@Override&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">run&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">Map&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">captured&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">run&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">finally&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">old&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clear&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>캡처 → set → 실행 → 복원/clear&lt;/strong>.&lt;/li>
+&lt;li>&lt;code>SecurityContext&lt;/code>도 동일 원리로 적용 가능.&lt;/li>
+&lt;/ul>
+&lt;h4 id="b-taskdecorator로-전역-적용asyncthreadpooltaskexecutor">B. &lt;code>TaskDecorator&lt;/code>로 전역 적용(@Async/ThreadPoolTaskExecutor)
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">TaskDecorator&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">mdcTaskDecorator&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Runnable&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MdcPropagatingRunnable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nd">@Bean&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">taskExecutor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TaskDecorator&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">decorator&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ThreadPoolTaskExecutor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ThreadPoolTaskExecutor&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setTaskDecorator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">decorator&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">initialize&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ex&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>장점: &lt;code>@Async&lt;/code>, &lt;code>CompletableFuture&lt;/code>, 커스텀 &lt;code>Executor&lt;/code> 모두 &lt;strong>자동 전파&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;h4 id="c-spring-security-전파-전용-유틸">C. Spring Security 전파 전용 유틸
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Executors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">newFixedThreadPool&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">8&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Executor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">secExecutor&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">DelegatingSecurityContextExecutor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">delegate&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">secExecutor&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">execute&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="cm">/* SecurityContext 보존됨 */&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">});&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>&lt;code>DelegatingSecurityContext*&lt;/code>&lt;/strong> 계열(Executor, ExecutorService, Runnable, Callable)을 사용하면 &lt;strong>인증 컨텍스트만&lt;/strong> 확실히 전달된다.&lt;/li>
+&lt;li>MDC도 필요하면 B 패턴과 &lt;strong>조합&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;h4 id="d-securitycontextholder-전략-옵션">D. &lt;code>SecurityContextHolder&lt;/code> 전략 옵션
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">SecurityContextHolder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setStrategyName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">SecurityContextHolder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">MODE_INHERITABLETHREADLOCAL&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;strong>자식 스레드&lt;/strong>에 한해 상속.&lt;/li>
+&lt;li>한계: &lt;strong>스레드풀 재사용&lt;/strong>과는 맞지 않는다(“새로 만든 자식 스레드”만 상속).&lt;/li>
+&lt;/ul>
+&lt;h4 id="e-completablefuture에서의-주의">E. &lt;code>CompletableFuture&lt;/code>에서의 주의
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getCopyOfContextMap&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">CompletableFuture&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">supplyAsync&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">setContextMap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">doWork&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">finally&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">clear&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">},&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">taskExecutor&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>기본 공급자는 &lt;strong>ForkJoinPool&lt;/strong> → 문맥 유실. 항상 &lt;strong>전파 가능한 Executor&lt;/strong>와 &lt;strong>명시적 set/clear&lt;/strong> 사용.&lt;/li>
+&lt;/ul>
+&lt;h4 id="f-작업-종료-시-정리clean-up-는-의무">F. 작업 종료 시 &lt;strong>정리(clean-up)&lt;/strong> 는 의무
+&lt;/h4>&lt;ul>
+&lt;li>실패, 취소 케이스까지 &lt;strong>finally에서 clear/복원&lt;/strong>.&lt;/li>
+&lt;li>그렇지 않으면 &lt;strong>컨텍스트 누수&lt;/strong>로 다른 요청 로그가 오염된다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="리액티브reactorwebflux-스택-컨텍스트는-데이터다">리액티브(Reactor/WebFlux) 스택: 컨텍스트는 데이터다
+&lt;/h3>&lt;h4 id="a-securitycontext-리액티브-전용-api-사용">A. SecurityContext 리액티브 전용 API 사용
+&lt;/h4>&lt;ul>
+&lt;li>인증은 &lt;code>ReactiveSecurityContextHolder&lt;/code>를 통해 Reactor &lt;strong>Context&lt;/strong>에 저장/조회.&lt;/li>
+&lt;li>예) WebFilter에서 &lt;code>contextWrite&lt;/code>로 주입, 다운스트림에서 자동 사용.&lt;/li>
+&lt;/ul>
+&lt;h4 id="b-mdc-reactor-context-mdc-브리징">B. MDC Reactor Context, MDC 브리징
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 컨텍스트 키 정의&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">record&lt;/span> &lt;span class="nc">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">final&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">KEY&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s">&amp;#34;TRACE&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 컨텍스트 주입&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">Mono&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">deferContextual&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctxView&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctxView&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Mono&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">fromRunnable&lt;/span>&lt;span class="p">(()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">info&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;trace={}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">traceId&lt;/span>&lt;span class="p">()));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">})&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">contextWrite&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">put&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;abc-123&amp;#34;&lt;/span>&lt;span class="p">)));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">// 공통 브리징 연산자(예시)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="kd">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">static&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Function&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Publisher&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Publisher&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nf">mdc&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">Flux&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">from&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pub&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="na">doOnEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnNext&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnError&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">isOnComplete&lt;/span>&lt;span class="p">())&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getContextView&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ctx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getOrDefault&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">KEY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">new&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TraceCtx&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;-&amp;#34;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="na">traceId&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ignored&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">MDC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">putCloseable&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;traceId&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">traceId&lt;/span>&lt;span class="p">))&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// MDC는 이 시점 로깅에만 반영됨&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">signal&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">getType&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">SignalType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">ON_NEXT&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="na">debug&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;processing...&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">});&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>핵심: Reactor 로그는 &lt;strong>시그널 순간에만&lt;/strong> MDC에 넣고 즉시 닫는다(&lt;code>MDC.putCloseable&lt;/code>).&lt;/li>
+&lt;li>장점: 스레드 hops가 잦아도 &lt;strong>오염, 누수 없음&lt;/strong>.&lt;/li>
+&lt;li>리액터 체인 가장 바깥에서 &lt;code>transform(mdc())&lt;/code>로 한 번만 적용.&lt;/li>
+&lt;/ul>
+&lt;h3 id="무엇을-언제-사용하는-게-좋을까">무엇을 언제 사용하는 게 좋을까
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>상황&lt;/th>
+&lt;th>권장 패턴&lt;/th>
+&lt;th>비고&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Spring MVC + &lt;code>@Async&lt;/code>/&lt;code>Executor&lt;/code>&lt;/td>
+&lt;td>&lt;strong>TaskDecorator(B)&lt;/strong> + 필요 시 &lt;strong>DelegatingSecurityContext(C)&lt;/strong>&lt;/td>
+&lt;td>전역 일관성, 적용 쉬움&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>단발 커스텀 스케줄러/쓰레드&lt;/td>
+&lt;td>&lt;strong>Runnable/Callable 래핑(A)&lt;/strong>&lt;/td>
+&lt;td>최소 오버헤드&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>CompletableFuture&lt;/code>&lt;/td>
+&lt;td>&lt;strong>전파 가능한 Executor&lt;/strong> + &lt;strong>명시적 set/clear(E)&lt;/strong>&lt;/td>
+&lt;td>ForkJoinPool 지양&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>자식 스레드만 생성&lt;/td>
+&lt;td>&lt;strong>INHERITABLETHREADLOCAL(D)&lt;/strong>&lt;/td>
+&lt;td>풀 재사용 환경에 부적합&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>WebFlux/Reactor&lt;/td>
+&lt;td>&lt;strong>ReactiveSecurityContextHolder&lt;/strong> + &lt;strong>MDC 브리징(B 리액티브판)&lt;/strong>&lt;/td>
+&lt;td>ThreadLocal 직접 접근 금지&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="체크리스트">체크리스트
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>캡처 시점&lt;/strong>은 요청 입구(필터/인터셉터/웹필터)에서.&lt;/li>
+&lt;li>&lt;strong>전파 책임&lt;/strong>은 스케줄링/실행 시점(Executor/연산자)에서.&lt;/li>
+&lt;li>&lt;strong>정리&lt;/strong>는 항상 &lt;code>finally&lt;/code> 또는 &lt;code>try-with-resources(MDC.putCloseable)&lt;/code>로.&lt;/li>
+&lt;li>풀 크기, 큐 적재량을 조정해 &lt;strong>컨텍스트 스와핑 비용&lt;/strong>을 최소화.&lt;/li>
+&lt;li>성능 민감 구간에선 &lt;strong>필드형 추적 ID&lt;/strong>(메서드 파라미터로 전달)도 고려 — 오버헤드와 가독성의 트레이드오프.&lt;/li>
+&lt;/ol>
+&lt;h3 id="캡처-전파-정리-시각화">캡처, 전파, 정리 시각화
+&lt;/h3>&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant IN as Request Inbound
+participant CAP as Capture
+participant EXEC as Executor
+participant RUN as Task
+IN->>CAP: traceId, auth 캡처
+CAP->>EXEC: Runnable/Callable 래핑
+EXEC->>RUN: set(MDC, SecurityContext)
+RUN-->>EXEC: finally { clear()/restore() }
+&lt;/pre>
+&lt;/div>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>비동기의 본질은 &lt;strong>스레드 이동&lt;/strong>이고, 해법의 본질은 &lt;strong>캡처-전파-정리의 규율&lt;/strong>이다.
+이 원칙만 지키면 &lt;code>MDC&lt;/code>와 &lt;code>SecurityContext&lt;/code>는 어느 실행 모델에서도 흔들리지 않는다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>ThreadLocal과 스레드풀 재사용 모델&lt;/li>
+&lt;li>Logback MDC 기본 사용법 (&lt;code>MDC.put&lt;/code>, &lt;code>MDC.clear&lt;/code>, &lt;code>MDC.putCloseable&lt;/code>)&lt;/li>
+&lt;li>Spring Security: &lt;code>SecurityContextHolder&lt;/code>, &lt;code>Authentication&lt;/code>&lt;/li>
+&lt;li>Reactor의 &lt;code>Context&lt;/code>와 신호(시그널) 기반 훅&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>Spring Security: &lt;code>DelegatingSecurityContextExecutor&lt;/code>, &lt;code>DelegatingSecurityContextCallable/Runnable&lt;/code>&lt;/li>
+&lt;li>Spring Framework: &lt;code>TaskDecorator&lt;/code>, &lt;code>ThreadPoolTaskExecutor&lt;/code>, &lt;code>@Async&lt;/code>&lt;/li>
+&lt;li>Reactor: &lt;code>Context&lt;/code>, &lt;code>contextWrite&lt;/code>, &lt;code>doOnEach&lt;/code>, &lt;code>SignalType&lt;/code>&lt;/li>
+&lt;li>로깅: 분산 트레이싱(TraceId/SpanId)와 MDC 연동, &lt;code>MDC.putCloseable&lt;/code> 활용 패턴&lt;/li>
+&lt;/ul></description></item><item><title>JWT 구조를 구체적으로 알아보자</title><link>https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</link><pubDate>Tue, 05 Aug 2025 01:58:05 +0900</pubDate><guid>https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/cover.png" alt="Featured image of post JWT 구조를 구체적으로 알아보자" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>최근 백엔드 인증/인가 시스템을 설계하거나 OAuth 2.0 기반의 로그인 시스템을 구축할 때 가장 많이 등장하는 키워드 중 하나가 &lt;code>JWT(JSON Web Token)&lt;/code>이다.&lt;/p>
+&lt;p>JWT의 &lt;strong>3단계 구조&lt;/strong>를 정확히 이해하고, 각 구성 요소가 왜 존재하는지, 어떤 역할을 하는지 예제를 통해 상세히 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;p>JWT는 기본적으로 &lt;strong>세 부분으로 구성된 문자열&lt;/strong>이다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">Header&lt;/span>&lt;span class="o">&amp;gt;.&amp;lt;&lt;/span>&lt;span class="n">Payload&lt;/span>&lt;span class="o">&amp;gt;.&amp;lt;&lt;/span>&lt;span class="n">Signature&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>각각의 의미를 뜯어보자.&lt;/p>
+&lt;h3 id="1-header-헤더">1. Header (헤더)
+&lt;/h3>&lt;p>이 부분은 &lt;strong>토큰을 어떻게 검증할 것인지에 대한 메타 정보&lt;/strong>를 제공한다.
+Base64Url로 인코딩되어 토큰의 첫 번째 파트를 구성한다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;alg&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HS256&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;typ&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;JWT&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>alg&lt;/code>(algorithm): 토큰 서명을 생성하기 위한 알고리즘을 명시. 보통 &lt;code>HS256&lt;/code> 또는 &lt;code>RS256&lt;/code>.&lt;/li>
+&lt;li>&lt;code>typ&lt;/code>(type): 토큰의 타입을 나타냄. JWT를 사용하는 경우 &lt;code>&amp;quot;JWT&amp;quot;&lt;/code>로 고정.&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-payload-페이로드">2. Payload (페이로드)
+&lt;/h3>&lt;p>이 페이로드는 &lt;strong>서명되어 있지만 암호화되어 있진 않다.&lt;/strong> 즉, &lt;strong>누구나 내용을 볼 수 있다.&lt;/strong>&lt;br>
+따라서 민감 정보(password, 주민번호 등)는 절대 포함시키면 안 된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;sub&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;user1234&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;John Doe&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;iat&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1691432621&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;exp&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1691436221&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;role&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;admin&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>sub&lt;/code>(subject): 주체 식별자 (ex. 사용자 ID).&lt;/li>
+&lt;li>&lt;code>iat&lt;/code>(issued at): 발급 시간 (Unix timestamp).&lt;/li>
+&lt;li>&lt;code>exp&lt;/code>(expiration): 만료 시간.&lt;/li>
+&lt;li>&lt;code>role&lt;/code>, &lt;code>email&lt;/code> 등 커스텀 클레임: 인증 또는 인가에 필요한 사용자 속성 값.&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-signature-서명">3. Signature (서명)
+&lt;/h3>&lt;p>서버는 이 서명을 사용하여 토큰이 &lt;strong>위조되지 않았음을 검증&lt;/strong>할 수 있다.&lt;br>
+서명이 다르면 페이로드가 조작된 것이다. 유효하지 않은 토큰으로 처리된다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">HMACSHA256&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">base64UrlEncode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">header&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">base64UrlEncode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">payload&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">secret&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>앞서 인코딩한 Header와 Payload를 &lt;code>.&lt;/code>으로 연결한 후,&lt;/li>
+&lt;li>비밀 키(&lt;code>secret&lt;/code>)를 이용해 알고리즘(&lt;code>HS256&lt;/code> 등)으로 서명한 값.&lt;/li>
+&lt;/ul>
+&lt;h3 id="jwt-예시">JWT 예시
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">eyJzdWIiOiIxMjM0NTYiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDAwMDAwMDB9.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>각 부분을 디코딩하면:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Header&lt;/strong>:
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;alg&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;HS256&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;typ&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;JWT&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>Payload&lt;/strong>:
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="nt">&amp;#34;sub&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;123456&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;role&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;admin&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;exp&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">1700000000&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;strong>Signature&lt;/strong>: 서버에서 secret key로만 확인 가능.&lt;/li>
+&lt;/ul>
+&lt;h3 id="jwt의-주요-보안-고려사항">JWT의 주요 보안 고려사항
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>서명만 존재하고, 페이로드는 암호화되지 않는다.&lt;/strong>
+&lt;ul>
+&lt;li>민감 정보는 넣지 말 것.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>만료 시간(&lt;code>exp&lt;/code>)을 꼭 설정&lt;/strong>하자.
+&lt;ul>
+&lt;li>토큰 탈취 시 무한히 사용할 수 없도록 하기 위해.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>서버는 반드시 Signature를 검증&lt;/strong>해야 한다.
+&lt;ul>
+&lt;li>서명 검증을 하지 않으면 누구나 Payload만 바꿔도 토큰이 유효해진다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>JWT는 “신뢰할 수 있는 정보를 클라이언트에 안전하게 전달하기 위한 구조화된 문자열”이다.&lt;/p>&lt;/blockquote>
+&lt;p>&lt;code>Header&lt;/code>는 토큰의 형식과 알고리즘, &lt;code>Payload&lt;/code>는 전달하고자 하는 정보, &lt;code>Signature&lt;/code>는 위조 여부를 판별하는 핵심 키이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>Base64 인코딩/디코딩&lt;/li>
+&lt;li>대칭/비대칭 키 개념 (HMAC vs RSA)&lt;/li>
+&lt;li>HTTP 인증 방식 (Bearer Token)&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://jwt.io/" target="_blank" rel="noopener"
+>jwt.io&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+>RFC 7519: JSON Web Token (JWT)&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html" target="_blank" rel="noopener"
+>Spring Security에서 JWT 사용하기 공식 가이드&lt;/a>&lt;/li>
+&lt;li>OAuth 2.0과 JWT의 관계&lt;/li>
+&lt;li>JWT vs Session 기반 인증 비교 포스팅&lt;/li>
+&lt;/ul></description></item><item><title>OAuth 2.0 핵심 구조 이해하기</title><link>https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/cover.png" alt="Featured image of post OAuth 2.0 핵심 구조 이해하기" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>백엔드 인증 인프라를 설계하며 OAuth 2.0이 표준처럼 자리 잡았다는 사실을 체감하고 있다.&lt;/p>
+&lt;p>특히 소셜 로그인이나 외부 리소스 접근 권한 위임 기능을 구현하면서 “Authorization Code Grant” 방식의 구조와 흐름을 완벽히 이해하는 것이 중요하다고 판단해 이 글을 작성하게 되었다.&lt;/p>
+&lt;p>이번 포스팅에서는 OAuth 2.0의 주요 컴포넌트와 함께 Authorization Code Grant가 어떤 흐름으로 동작하는지 실전 중심으로 알아본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="oauth-20의-주요-컴포넌트">OAuth 2.0의 주요 컴포넌트
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>컴포넌트&lt;/th>
+&lt;th>설명&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Resource Owner&lt;/strong>&lt;/td>
+&lt;td>리소스(정보)의 실제 소유자. 보통 사용자(User)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Client&lt;/strong>&lt;/td>
+&lt;td>리소스 접근을 요청하는 애플리케이션 (ex. 우리가 개발하는 웹앱)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Authorization Server&lt;/strong>&lt;/td>
+&lt;td>인증을 담당하며, Access Token을 발급하는 서버&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Resource Server&lt;/strong>&lt;/td>
+&lt;td>보호된 리소스를 제공하는 API 서버 (Authorization Server와 분리될 수도 있음)&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="authorization-code-grant-흐름">Authorization Code Grant 흐름
+&lt;/h3>&lt;p>이 방식은 &lt;strong>보안성과 유연성&lt;/strong>을 모두 만족하는 방식으로, 웹 앱에서 가장 많이 사용된다.&lt;/p>
+&lt;div class="mermaid-container zoomable">
+&lt;pre class="mermaid">
+sequenceDiagram
+participant User
+participant Client (웹앱)
+participant AuthorizationServer
+participant ResourceServer
+User->>Client: 로그인 요청
+Client->>AuthorizationServer: 인증 요청 (사용자 브라우저를 리디렉션)
+AuthorizationServer->>User: 로그인 + 권한 요청
+User->>AuthorizationServer: 로그인 &amp; 승인
+AuthorizationServer->>Client: Authorization Code 전달 (리디렉션 URI)
+Client->>AuthorizationServer: Authorization Code + Client Secret로 Access Token 요청
+AuthorizationServer->>Client: Access Token + (선택) Refresh Token 전달
+Client->>ResourceServer: Access Token으로 리소스 요청
+ResourceServer->>Client: 리소스 응답
+&lt;/pre>
+&lt;/div>
+&lt;h4 id="흐름-요약">흐름 요약
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>인증 요청:&lt;/strong> Client가 Authorization Server에 인증 요청 URL로 리디렉트.&lt;/li>
+&lt;li>&lt;strong>사용자 승인:&lt;/strong> 사용자는 로그인 후 권한 승인.&lt;/li>
+&lt;li>&lt;strong>코드 수신:&lt;/strong> Authorization Server는 Redirect URI에 &lt;code>Authorization Code&lt;/code>를 포함하여 리디렉트.&lt;/li>
+&lt;li>&lt;strong>토큰 요청:&lt;/strong> Client는 받은 코드를 Authorization Server에 전송하며, Access Token 요청.&lt;/li>
+&lt;li>&lt;strong>토큰 수신:&lt;/strong> Authorization Server는 Access Token을 응답.&lt;/li>
+&lt;li>&lt;strong>API 요청:&lt;/strong> Client는 받은 Access Token을 사용해 Resource Server에 요청.&lt;/li>
+&lt;li>&lt;strong>데이터 수신:&lt;/strong> 유효한 토큰이면 리소스를 응답.&lt;/li>
+&lt;/ol>
+&lt;h4 id="refresh-token은-왜-필요할까">Refresh Token은 왜 필요할까?
+&lt;/h4>&lt;p>Access Token은 일반적으로 &lt;strong>짧은 유효시간(예: 1시간)&lt;/strong> 을 가진다.
+이때 Refresh Token이 있으면 재로그인 없이 새로운 Access Token을 발급 받을 수 있어 UX 개선에 큰 역할을 한다.&lt;/p>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;p>OAuth 2.0의 핵심은 &lt;strong>책임 분리와 위임&lt;/strong>이며, Authorization Code Grant는 가장 안전하고 실전적인 인증 흐름이다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 프로토콜의 기본 흐름&lt;/li>
+&lt;li>RESTful API의 인증/인가 개념&lt;/li>
+&lt;li>HTTPS 통신 방식&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener"
+>RFC 6749: The OAuth 2.0 Authorization Framework&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html" target="_blank" rel="noopener"
+>Spring Security OAuth2 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jwt.io/" target="_blank" rel="noopener"
+>JWT.io&lt;/a>&lt;/li>
+&lt;li>키워드: &lt;code>PKCE&lt;/code>, &lt;code>Client Credentials&lt;/code>, &lt;code>Implicit Grant&lt;/code>, &lt;code>OpenID Connect&lt;/code>, &lt;code>Refresh Token Rotation&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>세션 vs 토큰 인증 차이</title><link>https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/cover.png" alt="Featured image of post 세션 vs 토큰 인증 차이" />&lt;h2 id="개요">📌개요
+&lt;/h2>&lt;p>백엔드 개발자가 꼭 이해하고 있어야 할 인증의 두 축, &lt;strong>세션 기반 인증&lt;/strong>과 &lt;strong>토큰 기반 인증&lt;/strong>의 구조적 차이점과 각각의 &lt;strong>보안상 고려사항&lt;/strong>에 대해 다뤄보자.&lt;/p>
+&lt;p>특히 REST API 설계, OAuth2 도입, JWT 사용 시 맞닥뜨리는 여러 결정 포인트에서 어떤 방식을 왜 선택해야 하는지, 실전 관점에서 짚어본다.&lt;/p>
+&lt;h2 id="내용">📌내용
+&lt;/h2>&lt;h3 id="세션-기반-인증-session-based-authentication">세션 기반 인증 (Session-based Authentication)
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>동작 방식&lt;/strong>
+&lt;ul>
+&lt;li>로그인 성공 시 서버는 사용자 정보를 저장한 &lt;strong>세션 ID&lt;/strong>를 생성하고, 클라이언트에 &lt;strong>쿠키로 전달&lt;/strong>한다.&lt;/li>
+&lt;li>이후 모든 요청에는 쿠키가 자동으로 첨부되어 세션 ID를 통해 인증 정보를 확인한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>특징&lt;/strong>
+&lt;ul>
+&lt;li>서버가 세션 상태를 &lt;strong>직접 저장&lt;/strong> (메모리, Redis 등)&lt;/li>
+&lt;li>브라우저 친화적 (자동 쿠키 처리)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>보안 고려사항&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>CSRF 공격&lt;/strong>에 취약: 쿠키가 자동 전송되기 때문&lt;/li>
+&lt;li>세션 탈취(Session Hijacking) 대비 필요&lt;/li>
+&lt;li>&lt;strong>SameSite, Secure, HttpOnly&lt;/strong> 쿠키 옵션 사용 필수&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>적합한 경우&lt;/strong>
+&lt;ul>
+&lt;li>브라우저 기반의 전통적인 웹 서비스&lt;/li>
+&lt;li>내부망 또는 통제된 환경&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="토큰-기반-인증-token-based-authentication">토큰 기반 인증 (Token-based Authentication)
+&lt;/h3>&lt;ol>
+&lt;li>&lt;strong>동작 방식&lt;/strong>
+&lt;ul>
+&lt;li>로그인 성공 시 서버는 &lt;strong>JWT(JSON Web Token)&lt;/strong> 또는 커스텀 토큰을 발급하고, 클라이언트는 이를 &lt;strong>로컬 저장소에 저장&lt;/strong>한다.&lt;/li>
+&lt;li>이후 요청 시 Authorization 헤더를 통해 &lt;strong>직접 첨부&lt;/strong>해서 인증한다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>특징&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>서버 무상태(stateless)&lt;/strong> 인증 방식 (세션 저장 불필요)&lt;/li>
+&lt;li>클라이언트/서버 분리된 구조에 유리&lt;/li>
+&lt;li>JWT는 &lt;strong>자체적으로 서명되어 위변조 검증&lt;/strong> 가능&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>보안 고려사항&lt;/strong>
+&lt;ul>
+&lt;li>&lt;strong>XSS에 취약&lt;/strong>: 토큰을 로컬스토리지에 저장 시 노출 가능&lt;/li>
+&lt;li>&lt;strong>토큰 탈취 → 장기 권한 노출&lt;/strong> 우려&lt;/li>
+&lt;li>만료시간, Refresh Token 전략, &lt;strong>Token Rotation&lt;/strong> 도입 필요&lt;/li>
+&lt;li>HTTPS 필수&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;strong>적합한 경우&lt;/strong>
+&lt;ul>
+&lt;li>모바일 앱, SPA(Single Page App)&lt;/li>
+&lt;li>분산 시스템, 마이크로서비스&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="주요-차이-정리">주요 차이 정리
+&lt;/h3>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>항목&lt;/th>
+&lt;th>세션 기반 인증&lt;/th>
+&lt;th>토큰 기반 인증&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>서버 상태&lt;/td>
+&lt;td>상태 유지 (Stateful)&lt;/td>
+&lt;td>상태 없음 (Stateless)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>저장소&lt;/td>
+&lt;td>서버 메모리/DB/Redis&lt;/td>
+&lt;td>클라이언트 로컬 저장소&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>인증 전달&lt;/td>
+&lt;td>쿠키 (자동 전송)&lt;/td>
+&lt;td>HTTP Header (직접 전송)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>취약점&lt;/td>
+&lt;td>CSRF, 세션 탈취&lt;/td>
+&lt;td>XSS, 토큰 탈취&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>사용 사례&lt;/td>
+&lt;td>웹 사이트&lt;/td>
+&lt;td>모바일, API 서버&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="결론">🎯결론
+&lt;/h2>&lt;blockquote>
+&lt;p>인증 방식은 서비스 구조와 위협 모델에 따라 선택하자. 만능은 없다.&lt;/p>&lt;/blockquote>
+&lt;p>클라이언트가 브라우저 중심이고 보안 제어가 가능한 경우엔 &lt;strong>세션 기반 인증&lt;/strong>이, REST API나 모바일 중심이라면 &lt;strong>토큰 기반 인증&lt;/strong>이 적절하다.&lt;/p>
+&lt;p>단, 어떤 방식을 쓰든 보안은 추가 설정과 방어 로직 없이는 무너질 수 있다.&lt;/p>
+&lt;h2 id="endnote">⚙️EndNote
+&lt;/h2>&lt;h3 id="사전-지식">사전 지식
+&lt;/h3>&lt;ul>
+&lt;li>HTTP 쿠키/헤더&lt;/li>
+&lt;li>JWT 구조 (Header.Payload.Signature)&lt;/li>
+&lt;li>CSRF, XSS 개념&lt;/li>
+&lt;/ul>
+&lt;h3 id="더-알아보기">더 알아보기
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" target="_blank" rel="noopener"
+>OWASP 인증 관련 가이드&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jwt.io/introduction" target="_blank" rel="noopener"
+>JWT 공식 문서&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+>RFC 7519: JSON Web Token (JWT)&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://oauth.net/2/" target="_blank" rel="noopener"
+>OAuth 2.0 개념 정리 및 흐름&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
