@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>계층모델 on B9F1</title><link>https://b9f1.com/tags/%EA%B3%84%EC%B8%B5%EB%AA%A8%EB%8D%B8/</link><description>Recent content in 계층모델 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 30 Aug 2025 13:33:52 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EA%B3%84%EC%B8%B5%EB%AA%A8%EB%8D%B8/index.xml" rel="self" type="application/rss+xml"/><item><title>네트워크 계층 모델 비교</title><link>https://b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</link><pubDate>Sat, 30 Aug 2025 13:33:52 +0900</pubDate><guid>https://b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-30-comparison-of-network-layer-models/cover.png" alt="Featured image of post 네트워크 계층 모델 비교" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;네트워크를 이해할 때 가장 먼저 마주하는 개념이 바로 &lt;strong&gt;계층 모델(Layered Model)&lt;/strong&gt; 이다.&lt;/p&gt;
+&lt;p&gt;대표적으로 &lt;strong&gt;TCP/IP 4계층 모델&lt;/strong&gt;과 &lt;strong&gt;OSI 7계층 모델&lt;/strong&gt;이 있는데, 두 모델은 네트워크 통신을 구조적으로 설명하는 기준이 된다.&lt;/p&gt;
+&lt;p&gt;두 모델을 각각 설명하고, 어떤 차이가 있으며 실무에서는 어떻게 이해하면 좋은지 다뤄본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="osi-7계층-모델"&gt;OSI 7계층 모델
+&lt;/h3&gt;&lt;p&gt;국제표준화기구(ISO)에서 제정한 &lt;strong&gt;OSI(Open Systems Interconnection)&lt;/strong&gt; 모델은 네트워크 통신 과정을 7단계로 나눈다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;물리 계층 (Physical)&lt;/strong&gt;: 전기 신호, 케이블, 하드웨어 전송 매체&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 링크 계층 (Data Link)&lt;/strong&gt;: MAC 주소, 프레임 전송, 오류 검출 (예: Ethernet, Switch)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 계층 (Network)&lt;/strong&gt;: IP 주소 기반 라우팅 (예: IP, Router)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: 종단 간 통신, 신뢰성 보장 (예: TCP, UDP)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;세션 계층 (Session)&lt;/strong&gt;: 세션 관리, 연결 유지/종료 (예: NetBIOS)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;표현 계층 (Presentation)&lt;/strong&gt;: 데이터 형식 변환, 암호화 (예: SSL/TLS, JPEG)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 사용자 서비스 제공 (예: HTTP, FTP, SMTP)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart LR
+%% 송신 측
+subgraph Sender[송신 측 - Encapsulation]
+direction TB
+A1[응용 계층] --&gt; A2[전송 계층] --&gt; A3[네트워크 계층] --&gt; A4[데이터 링크 계층] --&gt; A5[물리 계층]
+A1_side[Data] --- A1
+A2_side[TCP/UDP Header + Data] --- A2
+A3_side[IP Header + TCP Segment] --- A3
+A4_side[MAC Header + IP Packet + CRC] --- A4
+A5_side[010101 비트 스트림] --- A5
+end
+%% 수신 측
+subgraph Receiver[수신 측 - Decapsulation]
+direction TB
+B5[물리 계층] --&gt; B4[데이터 링크 계층] --&gt; B3[네트워크 계층] --&gt; B2[전송 계층] --&gt; B1[응용 계층]
+B5_side[010101 비트 스트림] --- B5
+B4_side[프레임 해제 → IP Packet] --- B4
+B3_side[패킷 해제 → TCP Segment] --- B3
+B2_side[세그먼트 해제 → Data] --- B2
+B1_side[Application Data 복원] --- B1
+end
+%% 송수신 연결
+A5 --전송--&gt; B5
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="tcpip-4계층-모델"&gt;TCP/IP 4계층 모델
+&lt;/h3&gt;&lt;p&gt;실제 인터넷 프로토콜에서 사용되는 구조는 &lt;strong&gt;TCP/IP 모델&lt;/strong&gt;이다. OSI보다 단순화되어 있으며, 실무에서는 이 모델을 주로 따른다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 액세스 계층 (Network Access)&lt;/strong&gt;: 하드웨어 인터페이스, 데이터 링크 &amp;amp; 물리 계층 포함&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인터넷 계층 (Internet)&lt;/strong&gt;: IP 주소 기반 라우팅 (IP, ICMP 등)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: TCP/UDP 기반 통신 제어&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 애플리케이션 서비스 (HTTP, FTP, DNS, SMTP 등)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;오늘날 인터넷이 동작하는 실제 표준 구조다.&lt;/p&gt;
+&lt;h3 id="두-모델의-비교"&gt;두 모델의 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;OSI 7계층&lt;/th&gt;
+&lt;th&gt;TCP/IP 4계층&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;계층 수&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;TCP/IP는 실용적으로 단순화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;정의 기관&lt;/td&gt;
+&lt;td&gt;ISO&lt;/td&gt;
+&lt;td&gt;ARPANET/DoD&lt;/td&gt;
+&lt;td&gt;목적 차이: 이론 vs 실무&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;표현/세션&lt;/td&gt;
+&lt;td&gt;독립 계층 존재&lt;/td&gt;
+&lt;td&gt;응용 계층에 통합&lt;/td&gt;
+&lt;td&gt;OSI는 세밀, TCP/IP는 실용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;전송 계층&lt;/td&gt;
+&lt;td&gt;TCP/UDP 모두 포함&lt;/td&gt;
+&lt;td&gt;동일&lt;/td&gt;
+&lt;td&gt;신뢰성(연결형 vs 비연결형) 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보급&lt;/td&gt;
+&lt;td&gt;이론/교육 중심&lt;/td&gt;
+&lt;td&gt;인터넷 표준&lt;/td&gt;
+&lt;td&gt;TCP/IP가 사실상 전세계 표준&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+subgraph OSI_7
+OSI1["응용 계층&lt;br/&gt;(Application)"]
+OSI2["표현 계층&lt;br/&gt;(Presentation)"]
+OSI3["세션 계층&lt;br/&gt;(Session)"]
+OSI4["전송 계층&lt;br/&gt;(Transport)"]
+OSI5["네트워크 계층&lt;br/&gt;(Network)"]
+OSI6["데이터 링크 계층&lt;br/&gt;(Data Link)"]
+OSI7["물리 계층&lt;br/&gt;(Physical)"]
+end
+subgraph TCPIP_4
+TCP1["응용 계층&lt;br/&gt;(Application)"]
+TCP2["전송 계층&lt;br/&gt;(Transport)"]
+TCP3["인터넷 계층&lt;br/&gt;(Internet)"]
+TCP4["네트워크 액세스 계층&lt;br/&gt;(Network Access)"]
+end
+%% 매핑 관계
+OSI1 --&gt; TCP1
+OSI2 --&gt; TCP1
+OSI3 --&gt; TCP1
+OSI4 --&gt; TCP2
+OSI5 --&gt; TCP3
+OSI6 --&gt; TCP4
+OSI7 --&gt; TCP4
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;네트워크 공부 초기에 &amp;ldquo;OSI 7계층&amp;quot;을 무조건 외워야 하는지 의문이었다.
+하지만 실무에서는 “이론적 설명”보다 TCP/IP 모델이 더 쓰인다.
+결국 “OSI는 네트워크 교과서의 언어, TCP/IP는 인터넷의 언어”라고 이해하면 쉽다.
+즉, &lt;strong&gt;OSI는 이상적인 개념도, TCP/IP는 현실 세계 지도&lt;/strong&gt;라고 비유할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;OSI 7계층은 개념적 학습과 문제 진단에 유용하고, TCP/IP 4계층은 인터넷의 실제 동작 표준이다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;즉, 공부할 때는 OSI로 세밀하게 이해하고, 실무에서는 TCP/IP로 단순하게 적용하는 것이 가장 효율적이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;네트워크 기본 용어 (패킷, 프레임, 포트, 프로토콜)&lt;/li&gt;
+&lt;li&gt;인터넷 프로토콜(IP), TCP/UDP 개념&lt;/li&gt;
+&lt;li&gt;OSI와 TCP/IP 모델의 역사적 배경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/OSI_model" target="_blank" rel="noopener"
+&gt;Wikipedia - OSI model&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

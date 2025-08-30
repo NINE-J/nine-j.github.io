@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HttpMessageConverter on B9F1</title><link>https://b9f1.com/tags/httpmessageconverter/</link><description>Recent content in HttpMessageConverter on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 21 May 2025 21:28:02 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/httpmessageconverter/index.xml" rel="self" type="application/rss+xml"/><item><title>@RestController 요청이 응답으로 반환되기까지</title><link>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</link><pubDate>Wed, 21 May 2025 21:28:02 +0900</pubDate><guid>https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</guid><description>&lt;img src="https://b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/cover.png" alt="Featured image of post @RestController 요청이 응답으로 반환되기까지" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot를 활용한 REST API 개발에서 &lt;code&gt;@RestController&lt;/code&gt;는 가장 많이 사용되는 어노테이션 중 하나다. 하지만 그 이면에서 실제 HTTP 요청이 어떻게 애플리케이션으로 전달되고, 어떤 과정을 거쳐 클라이언트에게 JSON 등으로 응답이 전달되는지는 자주 간과된다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 Spring MVC의 요청 처리 흐름을 DispatcherServlet을 기점으로 전반적으로 살펴보고, 특히 &lt;code&gt;HttpMessageConverter&lt;/code&gt;가 어떤 역할을 하며 언제 동작하는지 명확히 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="요청-처리-흐름-요약"&gt;요청 처리 흐름 요약
+&lt;/h3&gt;&lt;p&gt;Spring Boot 애플리케이션에서 HTTP 요청이 들어오면 다음과 같은 순서로 처리된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;요청 수신 – &lt;code&gt;DispatcherServlet&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모든 HTTP 요청은 먼저 &lt;code&gt;DispatcherServlet&lt;/code&gt;에서 수신된다.&lt;/li&gt;
+&lt;li&gt;이 서블릿은 Front Controller로서 전체 요청의 진입점이며, Spring Boot에서는 자동으로 등록된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;핸들러 탐색 – &lt;code&gt;HandlerMapping&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;어떤 컨트롤러 메서드가 이 요청을 처리할지 결정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RequestMapping&lt;/code&gt;, &lt;code&gt;@GetMapping&lt;/code&gt; 등으로 설정된 경로 정보를 기반으로 매핑이 일어난다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;핸들러 실행 – &lt;code&gt;HandlerAdapter&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;찾은 핸들러(즉, &lt;code&gt;@RestController&lt;/code&gt;의 메서드)를 실행하는 어댑터.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RequestBody&lt;/code&gt;가 선언되어 있다면 이 시점에 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 JSON → 객체 변환이 이뤄진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;응답 변환 – &lt;code&gt;HttpMessageConverter&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨트롤러 메서드가 반환한 Java 객체는 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 다시 JSON 등의 HTTP 응답 본문으로 변환된다.&lt;/li&gt;
+&lt;li&gt;이때 사용되는 대표적인 구현체로는 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;가 있으며, 내부적으로 Jackson을 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;응답 반환 – &lt;code&gt;DispatcherServlet&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;변환된 응답은 다시 &lt;code&gt;DispatcherServlet&lt;/code&gt;을 통해 클라이언트에게 반환된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="httpmessageconverter의-동작-시점과-역할"&gt;&lt;code&gt;HttpMessageConverter&lt;/code&gt;의 동작 시점과 역할
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;HttpMessageConverter&lt;/code&gt;는 &lt;strong&gt;요청과 응답의 바디(body)를 변환&lt;/strong&gt;하는 컴포넌트로서 다음과 같은 역할을 한다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@RequestBody&lt;/code&gt;가 있는 경우:
+&lt;ul&gt;
+&lt;li&gt;요청 바디를 JSON → Java 객체로 역직렬화 (ex. DTO로 바인딩)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ResponseBody&lt;/code&gt; 또는 &lt;code&gt;@RestController&lt;/code&gt;가 있는 경우:
+&lt;ul&gt;
+&lt;li&gt;반환되는 객체를 Java 객체 → JSON으로 직렬화&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이 변환은 &lt;code&gt;RequestMappingHandlerAdapter&lt;/code&gt;에 등록된 &lt;code&gt;messageConverters&lt;/code&gt; 리스트를 순회하며 타입과 Content-Type 헤더를 기반으로 적절한 컨버터를 찾아 자동으로 수행된다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant HttpMessageConverter
+Client-&gt;&gt;DispatcherServlet: HTTP 요청 전송
+DispatcherServlet-&gt;&gt;HandlerMapping: 핸들러 조회
+HandlerMapping--&gt;&gt;DispatcherServlet: 핸들러 반환
+DispatcherServlet-&gt;&gt;HandlerAdapter: 핸들러 실행 요청
+HandlerAdapter-&gt;&gt;HttpMessageConverter: 요청 바디 역직렬화 (JSON → 객체)
+HttpMessageConverter--&gt;&gt;HandlerAdapter: 객체 반환
+HandlerAdapter-&gt;&gt;Controller: 메서드 호출
+Controller--&gt;&gt;HandlerAdapter: 객체 반환
+HandlerAdapter-&gt;&gt;HttpMessageConverter: 객체 직렬화 (객체 → JSON)
+HttpMessageConverter--&gt;&gt;HandlerAdapter: JSON 반환
+HandlerAdapter--&gt;&gt;DispatcherServlet: 응답 반환
+DispatcherServlet--&gt;&gt;Client: 응답 전송
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="mappingjackson2httpmessageconverter"&gt;MappingJackson2HttpMessageConverter
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;는 Spring MVC에서 **Java 객체를 JSON으로 직렬화하거나 JSON을 Java 객체로 역직렬화할 때 사용되는 기본 &lt;code&gt;HttpMessageConverter&lt;/code&gt;**이다. 내부적으로 &lt;a class="link" href="https://github.com/FasterXML/jackson" target="_blank" rel="noopener"
+&gt;Jackson&lt;/a&gt; 라이브러리를 활용하여 JSON 처리 기능을 수행한다.&lt;/p&gt;
+&lt;p&gt;Spring Boot를 사용하면 기본적으로 Jackson이 의존성에 포함되며, 이로 인해 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;는 자동으로 등록되어 동작한다. 주로 다음과 같은 상황에서 사용된다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;Content-Type: application/json&lt;/code&gt;으로 JSON 요청을 보낼 경우, &lt;code&gt;@RequestBody&lt;/code&gt;에 해당 JSON이 자동으로 매핑된다.&lt;/li&gt;
+&lt;li&gt;컨트롤러가 객체를 반환할 때 &lt;code&gt;@ResponseBody&lt;/code&gt; 또는 &lt;code&gt;@RestController&lt;/code&gt;가 붙어 있으면, 해당 객체는 JSON으로 변환되어 응답된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@PostMapping&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/users&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;UserResponse&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;createUser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nd"&gt;@RequestBody&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserCreateRequest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;User&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;userService&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;ok&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위의 예시에서 &lt;code&gt;@RequestBody&lt;/code&gt;를 통해 들어온 JSON은 Jackson이 &lt;code&gt;UserCreateRequest&lt;/code&gt;로 역직렬화하며, 반환되는 &lt;code&gt;UserResponse&lt;/code&gt;는 JSON으로 직렬화되어 클라이언트로 전달된다.&lt;/p&gt;
+&lt;h4 id="커스터마이징"&gt;커스터마이징
+&lt;/h4&gt;&lt;p&gt;Jackson 설정은 다양하게 커스터마이징할 수 있다. 예를 들어:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ObjectMapper&lt;/code&gt;의 설정 변경 (&lt;code&gt;@JsonNaming&lt;/code&gt;, &lt;code&gt;@JsonProperty&lt;/code&gt;, &lt;code&gt;@JsonIgnore&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;날짜 포맷 지정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;null&lt;/code&gt; 필드 무시&lt;/li&gt;
+&lt;li&gt;필드 snake_case ↔ camelCase 자동 변환&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Jackson2ObjectMapperBuilderCustomizer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;customizer&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;featuresToDisable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SerializationFeature&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;WRITE_DATES_AS_TIMESTAMPS&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;propertyNamingStrategy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PropertyNamingStrategies&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;SNAKE_CASE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;serializationInclusion&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;JsonInclude&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;Include&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;NON_NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이렇게 하면 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;에 연결된 &lt;code&gt;ObjectMapper&lt;/code&gt;가 위 설정을 따라 동작하게 된다.&lt;/p&gt;
+&lt;h4 id="기타-팁"&gt;기타 팁
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot는 &lt;code&gt;spring.jackson.*&lt;/code&gt; 속성을 통해 설정을 간편하게 지원한다.&lt;/li&gt;
+&lt;li&gt;필요에 따라 &lt;code&gt;WebMvcConfigurer&lt;/code&gt;에서 직접 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 설정해 특정 타입만 Jackson 대신 다른 컨버터로 처리하게 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;configureMessageConverters&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;HttpMessageConverter&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;converters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;converters&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MappingJackson2HttpMessageConverter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;myCustomObjectMapper&lt;/span&gt;&lt;span class="p"&gt;()));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Spring MVC의 요청 처리 흐름은 &lt;code&gt;DispatcherServlet&lt;/code&gt;에서 시작해 &lt;code&gt;HandlerMapping&lt;/code&gt;, &lt;code&gt;HandlerAdapter&lt;/code&gt;, &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 RESTful 서비스를 완성한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;특히 &lt;code&gt;HttpMessageConverter&lt;/code&gt;는 요청과 응답을 Java 객체 ↔ JSON 사이에서 자동 변환해주는 핵심적인 컴포넌트로, 동작 시점과 역할을 명확히 이해하는 것이 REST API 개발의 안정성과 유지보수성을 높이는 데 매우 중요하다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;서블릿 기반 웹 애플리케이션 구조&lt;/li&gt;
+&lt;li&gt;Spring MVC의 &lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@RestController&lt;/code&gt; 어노테이션 차이&lt;/li&gt;
+&lt;li&gt;Jackson의 직렬화/역직렬화 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc.html" target="_blank" rel="noopener"
+&gt;Spring Web MVC 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/web.html#web.servlet.spring-mvc.message-converters" target="_blank" rel="noopener"
+&gt;Spring Boot의 HttpMessageConverters 설정&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html" target="_blank" rel="noopener"
+&gt;DispatcherServlet 내부 구조&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

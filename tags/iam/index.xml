@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IAM on B9F1</title><link>https://b9f1.com/tags/iam/</link><description>Recent content in IAM on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 22 Jun 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/iam/index.xml" rel="self" type="application/rss+xml"/><item><title>IAM 사용자로 AWS 관리</title><link>https://b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</link><pubDate>Sun, 22 Jun 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/cover.png" alt="Featured image of post IAM 사용자로 AWS 관리" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;AWS를 간단히 사용할 땐 Root 계정 하나로 로그인하고 필요한 것만 확인하고 참 편하긴 편하다.
+하지만 몇 번의 프로젝트를 통해 Root 계정은 절대 일상적으로 써선 안 된다는 걸 온몸으로 배웠다.&lt;/p&gt;
+&lt;p&gt;Root 계정과 IAM 사용자 권한의 차이 그리고 왜 IAM 사용자로 운영하는 게 Best Practice인지에 대해 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="root-계정은-일상적으로-사용하지-마라"&gt;Root 계정은 일상적으로 사용하지 마라
+&lt;/h3&gt;&lt;p&gt;AWS 문서에는 다음과 같이 적혀 있다.&lt;/p&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;“We strongly recommend that you don&amp;rsquo;t use the root user for your everyday tasks” &lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html" target="_blank" rel="noopener"
+&gt;docs.aws.amazon.com+8docs.aws.amazon.com+8docs.aws.amazon.com+8&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Root 계정은 결제 수단 변경, 계정 설정 수정, Support 플랜 변경 등 &lt;strong&gt;IAM으로는 불가능한 민감 작업을 수행&lt;/strong&gt;할 수 있기 때문에 AWS는 &lt;strong&gt;MFA 설정, 자동화 억제, 긴급 상황에서만 사용&lt;/strong&gt;하도록 권장한다.&lt;/p&gt;
+&lt;h3 id="iam-사용자로-운영하는-이유"&gt;IAM 사용자로 운영하는 이유
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안 강화&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;IAM 사용자는 권한을 세분화할 수 있어 최소 권한 원칙 구현 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;역할 분리&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인프라 운영, 결제 조회, 개발자 접근 등을 구분해서 관리 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;추적과 감사&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;누가 어떤 리소스를 언제 썼는지 CloudTrail로 기록 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;팀 확장 대응&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실습 → 팀 운영 → 기업 운영까지 유연하게 확장 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용/결제 보호&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실수로 비싼 리소스를 생성하는 것 방지 가능 (예: GPU EC2, RDS Multi-AZ)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="iam-사용자-권한-관리-방법"&gt;IAM 사용자 권한 관리 방법
+&lt;/h3&gt;&lt;p&gt;처음엔 복잡할 수 있지만 차근차근 순서대로 진행하면서 IAM 사용자를 분리해서 관리해보면 안정감이 느껴지고 권한에 대해 이해할 수 있게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;루트 계정으로 로그인&lt;/li&gt;
+&lt;li&gt;사용자 그룹 생성, IAM 사용자 생성 → 콘솔 접근 허용 + MFA 설정&lt;/li&gt;
+&lt;li&gt;역할에 따라 다음과 같이 그룹화하는 것을 권장. 조직에서 정하는 방식으로 진행하면 된다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;BillingViewerGroup&lt;/code&gt; - 결제 정보만 조회&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;InfraAdminGroup&lt;/code&gt; - EC2, RDS 등 자원 생성/삭제&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReadOnlyGroup&lt;/code&gt; - 전체 리소스 조회만 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;정책은 AWS에서 제공하는 관리형 정책부터 시작&lt;/li&gt;
+&lt;li&gt;필요 시 커스텀 정책 작성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="root-계정에만-있는-특수-작업"&gt;Root 계정에만 있는 특수 작업
+&lt;/h3&gt;&lt;p&gt;평소 작업엔 IAM으로 권한을 분리하여 최소 권한 원칙을 지키며 사용해야겠지만 특수한 경우는 어쩔 수 없이 Root 계정으로 로그인해야 할 것이다.&lt;/p&gt;
+&lt;p&gt;Root 계정 로그인 시 단일 인증이 아닌 멀티 인증 방식도 제공하는 것 같다.
+즉 2명 이상의 인증을 통해 로그인을 허용한다.&lt;/p&gt;
+&lt;p&gt;AWS에 따르면 Root 계정만 수행 가능한 작업은 다음과 같다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Activate IAM Access&lt;/code&gt;: IAM 사용자에게 Billing 콘솔 접근 활성화&lt;/li&gt;
+&lt;li&gt;루트 이메일 주소 및 결제 방식 변경&lt;/li&gt;
+&lt;li&gt;루트 계정 비밀번호 또는 액세스 키 재설정&lt;/li&gt;
+&lt;li&gt;AWS 계정 종료&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 작업은 Root 계정이 반드시 있어야만 할 수 있으므로 평시에는 IAM 기반 사용자/역할로 운영하고 Root는 긴급시에만 사용하는 구조가 안전하다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Root 계정은 금고 열쇠와 같다. 평소에는 꺼내지도 말아야 하며 AWS 운영은 IAM 사용자 기반으로 최소 권한 원칙을 엄수해야 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;IAM 사용자 기반 운영은 번거로워 보여도 AWS에서 실수 없이 오래 살아남고 싶은 개발자라면 반드시 익숙해져야 할 &lt;strong&gt;안전장치&lt;/strong&gt;다.&lt;/p&gt;
+&lt;p&gt;AWS 문서들이 일관되게 강조하는 IAM 기반 안전 운영 방식을 실천해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="-사전-지식"&gt;### 사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS Root 계정과 IAM 사용자 구조 이해&lt;/li&gt;
+&lt;li&gt;기본적인 AWS Console UI 조작&lt;/li&gt;
+&lt;li&gt;AWS 관리형 정책 및 인라인 정책 개념&lt;/li&gt;
+&lt;li&gt;최소 권한 원칙(Least Privilege Principle)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener"
+&gt;IAM Best Practices (AWS 공식)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-example-policies.html" target="_blank" rel="noopener"
+&gt;AWS Billing 및 Cost Management 정책 예시&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/ko/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-lens-whitepapers.sort-order=desc&amp;amp;wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-guidance-whitepapers.sort-order=desc" target="_blank" rel="noopener"
+&gt;Well-Architected Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/free" target="_blank" rel="noopener"
+&gt;AWS Free Tier 안내&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>성능최적화 on B9F1</title><link>https://b9f1.com/tags/%EC%84%B1%EB%8A%A5%EC%B5%9C%EC%A0%81%ED%99%94/</link><description>Recent content in 성능최적화 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 30 Aug 2025 13:25:20 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EC%84%B1%EB%8A%A5%EC%B5%9C%EC%A0%81%ED%99%94/index.xml" rel="self" type="application/rss+xml"/><item><title>로컬 캐시 vs 분산 캐시</title><link>https://b9f1.com/p/2025-08-30-local-cache-vs-distributed-cache/</link><pubDate>Sat, 30 Aug 2025 13:25:20 +0900</pubDate><guid>https://b9f1.com/p/2025-08-30-local-cache-vs-distributed-cache/</guid><description>&lt;img src="https://b9f1.com/p/2025-08-30-local-cache-vs-distributed-cache/cover.png" alt="Featured image of post 로컬 캐시 vs 분산 캐시" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;애플리케이션의 성능 최적화에서 &lt;strong&gt;캐시(Cache)&lt;/strong&gt; 는 빠질 수 없는 핵심 요소다.&lt;/p&gt;
+&lt;p&gt;캐시는 데이터를 반복적으로 계산하거나 DB에서 가져오지 않고, &lt;strong&gt;빠른 접근이 가능한 저장소&lt;/strong&gt;에 보관해 재사용함으로써 응답 속도를 개선한다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 &lt;strong&gt;로컬 캐시(Local Cache)&lt;/strong&gt; 와 &lt;strong&gt;분산 캐시(Distributed Cache)&lt;/strong&gt; 의 개념적 차이를 살펴보고, 각각의 장단점, 그리고 실무에서 어떤 기준으로 선택해야 하는지 다룬다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="1-로컬-캐시local-cache"&gt;1. 로컬 캐시(Local Cache)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 애플리케이션 프로세스 내부 메모리에 데이터를 저장하는 캐시.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: Spring Boot에서 &lt;code&gt;@Cacheable&lt;/code&gt;과 함께 사용하는 &lt;code&gt;ConcurrentHashMap&lt;/code&gt;, Guava Cache, Caffeine 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="장점"&gt;장점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;DB나 네트워크를 거치지 않고 &lt;strong&gt;메모리 접근 속도&lt;/strong&gt;로 응답 → 극한의 성능.&lt;/li&gt;
+&lt;li&gt;설치나 운영이 간단하며, 외부 시스템 의존도가 없음.&lt;/li&gt;
+&lt;li&gt;트래픽이 적거나 단일 서버 애플리케이션에 적합.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단점"&gt;단점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;확장성 부족&lt;/strong&gt;: 서버가 여러 대라면 각 인스턴스마다 캐시를 따로 관리해야 함 → 데이터 불일치(Inconsistency).&lt;/li&gt;
+&lt;li&gt;서버 재시작 시 캐시 데이터 손실.&lt;/li&gt;
+&lt;li&gt;캐시 메모리 크기가 서버 메모리에 직접 의존.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-분산-캐시distributed-cache"&gt;2. 분산 캐시(Distributed Cache)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 네트워크를 통해 여러 애플리케이션 인스턴스가 공유하는 외부 캐시 서버.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: Redis, Memcached, Hazelcast, AWS ElastiCache.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="장점-1"&gt;장점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;여러 서버 간 &lt;strong&gt;캐시 일관성 보장&lt;/strong&gt; (모든 노드가 같은 캐시 데이터 참조).&lt;/li&gt;
+&lt;li&gt;서버 재시작에도 데이터 유지 가능(특히 Redis 같은 Persistent Cache).&lt;/li&gt;
+&lt;li&gt;대규모 트래픽 처리와 수평 확장에 적합.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단점-1"&gt;단점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;네트워크를 거치므로 로컬 캐시보다 접근 속도는 느림.&lt;/li&gt;
+&lt;li&gt;별도의 인프라 운영이 필요하며, 설정 및 비용 부담이 있음.&lt;/li&gt;
+&lt;li&gt;네트워크 장애 시 캐시 미스(cache miss) 폭발 가능성.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-실무에서의-선택-기준"&gt;3. 실무에서의 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;기준&lt;/th&gt;
+&lt;th&gt;로컬 캐시 적합&lt;/th&gt;
+&lt;th&gt;분산 캐시 적합&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;트래픽 규모&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;소규모, 단일 서버&lt;/td&gt;
+&lt;td&gt;대규모, 다중 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;일관성 요구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;데이터 변동이 적거나 중요하지 않은 경우&lt;/td&gt;
+&lt;td&gt;강한 일관성이 필요한 경우&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;간단한 아키텍처 추구&lt;/td&gt;
+&lt;td&gt;별도 인프라 운영 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;성능&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;마이크로초 단위 응답&lt;/td&gt;
+&lt;td&gt;밀리초 단위 응답 (네트워크 오버헤드)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;장애 복원력&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;서버 재시작 시 캐시 유실&lt;/td&gt;
+&lt;td&gt;영속성 옵션을 통해 데이터 유지 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;보통 &lt;strong&gt;초기 단계&lt;/strong&gt;에서는 로컬 캐시(Caffeine 등)로 간단히 시작하고, 트래픽이 증가해 서버를 여러 대 띄우는 순간 &lt;strong&gt;분산 캐시(Redis)&lt;/strong&gt; 로 전환하는 전략이 가장 합리적이다.&lt;/p&gt;
+&lt;p&gt;실제로 Spring에서도 &lt;code&gt;@Cacheable&lt;/code&gt; 같은 어노테이션은 캐시 추상화를 제공해 &lt;strong&gt;로컬 ↔ 분산 캐시 전환이 용이&lt;/strong&gt;하도록 설계되어 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;지금 운영하는 서비스는 “속도”가 중요한가, “규모와 일관성”이 중요한가?&lt;/p&gt;
+&lt;p&gt;이 질문에 대한 답이 로컬 vs 분산 캐시 선택의 시작점이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;프로젝트 초반에는 로컬 캐시로 충분하다. 그러나 &lt;strong&gt;트래픽 증가·수평 확장·데이터 일관성 요구&lt;/strong&gt;가 생기는 순간 분산 캐시로 전환해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;캐시의 기본 동작 원리 (Cache Hit / Cache Miss)&lt;/li&gt;
+&lt;li&gt;Spring Cache 추상화 (&lt;code&gt;@Cacheable&lt;/code&gt;, &lt;code&gt;@CachePut&lt;/code&gt;, &lt;code&gt;@CacheEvict&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Redis, Memcached 같은 인메모리 DB의 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/integration/cache.html" target="_blank" rel="noopener"
+&gt;Spring Framework Docs - Caching Abstraction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://redis.io/docs/" target="_blank" rel="noopener"
+&gt;Redis 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://github.com/ben-manes/caffeine" target="_blank" rel="noopener"
+&gt;Caffeine Cache GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;PostgreSQL의 캐시 활용 및 쿼리 최적화&lt;/li&gt;
+&lt;li&gt;AWS ElastiCache&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>JPA의 대표적인 성능 병목</title><link>https://b9f1.com/p/2025-06-15-springboot-jpa-causes-and-solutions-for-n-plus-1-problems/</link><pubDate>Sun, 15 Jun 2025 15:34:08 +0900</pubDate><guid>https://b9f1.com/p/2025-06-15-springboot-jpa-causes-and-solutions-for-n-plus-1-problems/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-15-springboot-jpa-causes-and-solutions-for-n-plus-1-problems/cover.png" alt="Featured image of post JPA의 대표적인 성능 병목" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;JPA를 사용하면서 가장 자주 마주치는 성능 문제 중 하나가 바로 N+1 문제다.
+&amp;ldquo;나는 하나의 쿼리만 호출했는데 왜 수십 개의 쿼리가 날아가지?&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;이번엔 N+1 문제가 발생하는 원인과 이를 해결하는 방법을 Spring Boot 환경 중심으로 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="n1-문제란"&gt;N+1 문제란?
+&lt;/h3&gt;&lt;p&gt;N+1 문제는 1개의 쿼리로 N개의 결과를 가져온 후 각 결과에 대해 N번 추가 쿼리를 실행하는 현상을 의미한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orders&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orderRepository&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;findAll&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 1번&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orders&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getMember&lt;/span&gt;&lt;span class="p"&gt;().&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// N번&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;orders&lt;/code&gt;를 조회하는 &lt;code&gt;findAll()&lt;/code&gt; 쿼리 1회&lt;/li&gt;
+&lt;li&gt;각 &lt;code&gt;order&lt;/code&gt;의 연관된 &lt;code&gt;member&lt;/code&gt;를 지연 로딩(LAZY)하면서 &lt;code&gt;order&lt;/code&gt; 수만큼 N회 추가 쿼리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;결과적으로 1+N회의 쿼리가 발생하게 된다.&lt;/p&gt;
+&lt;h3 id="왜-이런-문제가-발생할까"&gt;왜 이런 문제가 발생할까?
+&lt;/h3&gt;&lt;p&gt;기본적으로 JPA는 연관 관계를 지연 로딩으로 설정하기 때문이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Entity&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@ManyToOne&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fetch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;FetchType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;LAZY&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Member&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;member&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;지연 로딩의 목적은 불필요한 데이터를 미리 조회하지 않기 위한 것이지만 반복문처럼 연관 객체를 순차적으로 접근할 때 N+1 문제가 발생한다.&lt;/p&gt;
+&lt;h3 id="해결-방법"&gt;해결 방법
+&lt;/h3&gt;&lt;h4 id="1-fetch-join"&gt;1. Fetch Join
+&lt;/h4&gt;&lt;p&gt;가장 직관적인 해결책이다.
+연관된 엔티티를 함께 조회하는 조인 쿼리를 사용한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; Select o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; FROM Order o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; JOIN FETCH o.member
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;JPA는 이 쿼리 결과를 기반으로 &lt;code&gt;Order&lt;/code&gt;와 &lt;code&gt;Member&lt;/code&gt;를 한 번에 메모리에 올린다.&lt;/li&gt;
+&lt;li&gt;Hibernate는 더 이상 각 &lt;code&gt;member&lt;/code&gt;에 대해 추가 쿼리를 실행하지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;가장 강력하고 빠른 방법이지만 &lt;code&gt;Fetch Join&lt;/code&gt;은 컬렉션(&lt;code&gt;@OneToMany&lt;/code&gt; 등)에 사용할 경우 페이징이 불가능하다는 단점이 있다.&lt;/p&gt;
+&lt;h4 id="2-entitygraph"&gt;2. &lt;code&gt;@EntityGraph&lt;/code&gt;
+&lt;/h4&gt;&lt;p&gt;엔티티 수준에서 &lt;code&gt;Fetch Join&lt;/code&gt;과 유사한 효과를 얻을 수 있는 선언적 방법이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@EntityGraph&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attributePaths&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;member&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Select o FROM Order o&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;코드 가독성이 좋아지고 재사용 가능한 설정을 만들 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Fetch Join&lt;/code&gt;을 간결하게 사용하기 위한 어노테이션이고 내부적으로 기능이 비슷해서 비슷한 단점을 가진다.
+실제로는 &lt;code&gt;left outer join&lt;/code&gt;을 사용한다는 점을 주의해야 한다.&lt;/p&gt;
+&lt;h4 id="3-batch-size-설정"&gt;3. Batch Size 설정
+&lt;/h4&gt;&lt;p&gt;컬렉션에 대해 Lazy 로딩을 유지하면서 성능을 개선하는 방법이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컬렉션이나 LAZY 로딩 관계의 객체들을 100개씩 in 절로 묶어서 한 번에 조회한다.&lt;/li&gt;
+&lt;li&gt;페이징 + 성능 최적화가 동시에 필요한 경우 유용하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;jpa&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;hibernate&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;default_batch_fetch_size&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Entity&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@OneToMany&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mappedBy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;order&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;OrderItem&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;items&lt;/code&gt; 조회 시 in 절로 묶여 일괄 조회된다.&lt;/li&gt;
+&lt;li&gt;페이징 가능한 쿼리에 적합한 방법이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="fetch-join-vs-entitygraph"&gt;Fetch Join VS &lt;code&gt;@EntityGraph&lt;/code&gt;
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;@EntityGraph&lt;/code&gt;와 JPQL &lt;code&gt;fetch join&lt;/code&gt;은 기능적으로 유사하지만 내부 동작 방식과 조인 타입에서 차이를 가진다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="핵심-차이-정리"&gt;핵심 차이 정리
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;&lt;code&gt;fetch join&lt;/code&gt; (JPQL/QueryDSL)&lt;/th&gt;
+&lt;th&gt;&lt;code&gt;@EntityGraph&lt;/code&gt; (Spring Data JPA)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;선언 위치&lt;/td&gt;
+&lt;td&gt;JPQL/QueryDSL 내부&lt;/td&gt;
+&lt;td&gt;Repository 메서드 어노테이션&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;기본 조인 방식&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;INNER JOIN&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;LEFT OUTER JOIN&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;연관 관계 없어도 조회됨?&lt;/td&gt;
+&lt;td&gt;❌ (자식 없으면 부모도 제외)&lt;/td&gt;
+&lt;td&gt;✅ (자식 없어도 부모 조회됨)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;런타임 FetchType 전환&lt;/td&gt;
+&lt;td&gt;❌&lt;/td&gt;
+&lt;td&gt;✅ (&lt;code&gt;LAZY → EAGER&lt;/code&gt;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;페이징 가능 여부&lt;/td&gt;
+&lt;td&gt;❌ (컬렉션과 함께 사용 불가)&lt;/td&gt;
+&lt;td&gt;❌ (컬렉션 시 동일)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;조건 활용 유연성&lt;/td&gt;
+&lt;td&gt;자유롭다&lt;/td&gt;
+&lt;td&gt;정적 메서드에 한정&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;중복 row 처리&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;distinct&lt;/code&gt; 필요&lt;/td&gt;
+&lt;td&gt;일부 자동 처리됨&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="예제-비교"&gt;예제 비교
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// fetch join: inner join → 자식 없으면 조회되지 않음&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; SELECT o FROM Order o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; JOIN FETCH o.member
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="c1"&gt;// entity graph: left outer join → 자식 없어도 조회됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@EntityGraph&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attributePaths&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;member&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;SELECT o FROM Order o&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="상황에-따른-선택-가이드"&gt;상황에 따른 선택 가이드
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;해결책&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;단일 객체 또는 ToOne 관계 조회&lt;/td&gt;
+&lt;td&gt;Fetch Join / EntityGraph&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;컬렉션 관계(&lt;code&gt;@OneToMany&lt;/code&gt; 등) 페치&lt;/td&gt;
+&lt;td&gt;Batch Size&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;페이징 처리와 병행해야 하는 경우&lt;/td&gt;
+&lt;td&gt;Batch Size 또는 DTO Projection&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;JPA N+1 문제는 자동화된 지연 로딩의 그림자다. 하지만 문제를 정확히 이해하면 해결은 어렵지 않다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;단 하나의 &lt;code&gt;@ManyToOne&lt;/code&gt; 관계에서 시작된 N+1 문제도, 반복 루프나 리스트 응답에서는 큰 성능 이슈로 이어질 수 있다.&lt;br&gt;
+&lt;code&gt;Fetch Join&lt;/code&gt;, &lt;code&gt;EntityGraph&lt;/code&gt;, &lt;code&gt;Batch Size&lt;/code&gt; 같은 다양한 전략을 상황에 맞게 적절히 조합하자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;JPA 기본 연관 관계(&lt;code&gt;@OneToMany&lt;/code&gt;, &lt;code&gt;@ManyToOne&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;LAZY vs EAGER 로딩 전략&lt;/li&gt;
+&lt;li&gt;JPQL 작성법&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching-batch" target="_blank" rel="noopener"
+&gt;[HIBERNATE] Batch Fetching&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html#jpa.entity-graph" target="_blank" rel="noopener"
+&gt;[Spring Data JPA] JPA Query Methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://jojoldu.tistory.com/457" target="_blank" rel="noopener"
+&gt;MultipleBagFetchException 발생시 해결 방법 by 향로&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

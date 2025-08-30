@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>무결성 on B9F1</title><link>https://b9f1.com/tags/%EB%AC%B4%EA%B2%B0%EC%84%B1/</link><description>Recent content in 무결성 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 15 Jun 2025 16:50:13 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EB%AC%B4%EA%B2%B0%EC%84%B1/index.xml" rel="self" type="application/rss+xml"/><item><title>ACID</title><link>https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</link><pubDate>Sun, 15 Jun 2025 16:50:13 +0900</pubDate><guid>https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/cover.png" alt="Featured image of post ACID" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;데이터베이스나 분산 시스템에서 트랜잭션은 안정성을 보장하는 핵심 개념이다.
+특히 ACID(원자성, 일관성, 고립성, 지속성) 속성은 신뢰할 수 있는 데이터 처리를 위한 기본 토대다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 ACID 각각의 속성이 보장되지 않을 때 어떤 문제들이 발생할 수 있는지 예시와 일반적인 해결책을 간단히 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="atomicity---원자성"&gt;Atomicity - 원자성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;모든 작업이 수행되거나, 아무것도 수행되지 않아야 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;원자성이 깨지면, 하나의 트랜잭션 안에서 일부 작업만 처리되고 나머지가 실패한 상태가 될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: A → B로 계좌 이체 중 A 계좌에서 출금은 됐지만 B 계좌로 입금이 되기 전 장애가 발생한 경우 → 금액 손실.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 시스템 상태가 불완전하게 갱신되어 데이터 손실 가능.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DBMS가 제공하는 &lt;strong&gt;트랜잭션 롤백&lt;/strong&gt;(Rollback) 메커니즘 사용.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;try-catch&lt;/code&gt;를 통해 예외 발생 시 &lt;code&gt;rollback()&lt;/code&gt; 호출하도록 처리.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setAutoCommit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;withdraw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fromAccount&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;deposit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;toAccount&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;commit&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Exception&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;rollback&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 전체 트랜잭션이 되돌아감&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="consistency---일관성"&gt;Consistency - 일관성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;트랜잭션 전후의 데이터 상태는 항상 시스템 규칙을 만족해야 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;일관성은 데이터베이스에 정의된 &lt;strong&gt;제약 조건, 외래키, 트리거, 비즈니스 규칙 등&lt;/strong&gt;이 항상 유지되어야 한다는 의미다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: 주문 시 존재하지 않는 상품 ID가 참조되거나, 재고가 음수가 되는 경우.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 무결성이 깨진 데이터가 DB에 저장될 수 있음.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DB 레벨: 외래 키, 유일성 제약, &lt;code&gt;CHECK&lt;/code&gt;, &lt;code&gt;NOT NULL&lt;/code&gt; 등의 &lt;strong&gt;제약 조건 설정&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;애플리케이션 레벨: 추가적인 &lt;strong&gt;비즈니스 유효성 검사&lt;/strong&gt; 코드 구현&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;단, 일관성은 트랜잭션이 &lt;strong&gt;성공적으로 끝났을 경우에만&lt;/strong&gt; 보장된다. 실패한 트랜잭션은 원자성과 함께 롤백되어 무결성을 해치지 않음.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="isolation---고립성"&gt;Isolation - 고립성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;각 트랜잭션은 서로 독립적으로 실행돼야 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;고립성이 깨지면 동시에 실행 중인 트랜잭션들이 서로 영향을 주며 비정상적인 데이터가 조회되거나 저장될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;주요 문제 유형:&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;문제&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;예시&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Dirty Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;다른 트랜잭션이 아직 커밋하지 않은 데이터를 읽음&lt;/td&gt;
+&lt;td&gt;B가 업데이트 중인 데이터를 A가 미리 읽음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Non-repeatable Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;같은 조건으로 두 번 조회했는데 결과가 달라짐&lt;/td&gt;
+&lt;td&gt;A가 한 사용자의 나이를 두 번 조회하는 사이 B가 그 값을 수정&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Phantom Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;같은 조건으로 조회했는데 행 개수가 달라짐&lt;/td&gt;
+&lt;td&gt;A가 “나이 ≥ 30” 조건으로 조회한 후 B가 새로운 30세 사용자를 삽입&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;격리 수준 비교 (ANSI SQL 기준):&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;수준&lt;/th&gt;
+&lt;th&gt;보장 범위&lt;/th&gt;
+&lt;th&gt;발생 가능한 문제&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;READ UNCOMMITTED&lt;/td&gt;
+&lt;td&gt;아무것도 보장 안 됨&lt;/td&gt;
+&lt;td&gt;Dirty Read, Non-repeatable Read, Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;READ COMMITTED&lt;/td&gt;
+&lt;td&gt;커밋된 데이터만 읽음&lt;/td&gt;
+&lt;td&gt;Non-repeatable Read, Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;REPEATABLE READ&lt;/td&gt;
+&lt;td&gt;동일 쿼리 결과 동일&lt;/td&gt;
+&lt;td&gt;Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SERIALIZABLE&lt;/td&gt;
+&lt;td&gt;가장 강력, 완전한 고립&lt;/td&gt;
+&lt;td&gt;성능 저하 가능성&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DB 격리 수준을 적절히 설정 (성능 vs 고립성 트레이드오프 고려)&lt;/li&gt;
+&lt;li&gt;비즈니스 중요도에 따라 적용 수준을 유연하게 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="durability---지속성"&gt;Durability - 지속성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;트랜잭션이 커밋되면, 그 결과는 영구히 저장되어야 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;지속성이 보장되지 않으면, 트랜잭션이 커밋되었더라도 시스템 장애 발생 시 데이터가 유실될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: 사용자가 결제를 완료했는데, 직후 서버 다운으로 주문 내역이 저장되지 않음 → 신뢰성 손상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 커밋 이후에도 데이터 유실 가능 → 사용자 신뢰도 하락&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DBMS의 &lt;strong&gt;WAL(Write-Ahead Logging)&lt;/strong&gt;: 로그를 먼저 디스크에 기록하고 나서 커밋 처리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RAID, 이중화 스토리지&lt;/strong&gt;, 디스크 플러시(sync) 전략&lt;/li&gt;
+&lt;li&gt;분산 시스템에서는 &lt;strong&gt;Replication, Quorum 기반의 커밋&lt;/strong&gt; 방식도 사용됨&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;트랜잭션의 ACID 속성은 단순한 개념이 아니라, 실제 시스템에서 &lt;strong&gt;데이터 무결성과 안정성의 최후 보루&lt;/strong&gt;다.&lt;/p&gt;
+&lt;p&gt;속성이 하나라도 무너지면 “커밋됐지만 저장되지 않음”, “이체했는데 금액이 사라짐”, “동시 접속 시 데이터 꼬임” 같은 치명적 문제가 발생할 수 있다.&lt;/p&gt;
+&lt;p&gt;결국 이는 &lt;strong&gt;비즈니스 신뢰성&lt;/strong&gt;과 &lt;strong&gt;사용자 경험&lt;/strong&gt;에 직결된다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;트랜잭션 정의와 트랜잭션 경계 설정&lt;/li&gt;
+&lt;li&gt;데이터베이스의 커밋/롤백 메커니즘&lt;/li&gt;
+&lt;li&gt;SQL 격리 수준과 락(lock) 종류 (공유 락, 배타 락 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener"
+&gt;PostgreSQL Isolation Levels 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html" target="_blank" rel="noopener"
+&gt;MySQL 트랜잭션 격리 수준 비교&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://martin.kleppmann.com/" target="_blank" rel="noopener"
+&gt;Martin Kleppmann&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

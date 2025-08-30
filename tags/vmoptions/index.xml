@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VMoptions on B9F1</title><link>https://b9f1.com/tags/vmoptions/</link><description>Recent content in VMoptions on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/vmoptions/index.xml" rel="self" type="application/rss+xml"/><item><title>IntelliJ 메모리 설정</title><link>https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/</link><pubDate>Sun, 06 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/</guid><description>&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/cover.png" alt="Featured image of post IntelliJ 메모리 설정" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;IntelliJ IDEA에서 메모리 힙 사이즈에 대해 전역 설정과 애플리케이션 별로 설정하는 방법을 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="전역-메모리-설정"&gt;전역 메모리 설정
+&lt;/h3&gt;&lt;h4 id="change-memory-settings"&gt;Change Memory Settings
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;Help &amp;gt; Change Memory Settings&lt;/code&gt; 선택 → 팝업에서 힙 사이즈 변경&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-1.png"
+width="1388"
+height="995"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-1_hu_6f84b7c7dbeeca5c.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-1_hu_eb4451e5584df4e2.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-2.png"
+width="1385"
+height="918"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-2_hu_31916ff654233040.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-2_hu_a7e1562e26b713d8.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="362px"
+&gt;&lt;/p&gt;
+&lt;h4 id="edit-custom-vm-options"&gt;Edit Custom VM Options
+&lt;/h4&gt;&lt;p&gt;IDE 메뉴에서 설정하는 방법도 있지만, 직접 설정 파일을 수정하는 방법도 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Help &amp;gt; Edit Custom VM Options&lt;/code&gt; 선택,
+또는 각 설정 파일 경로를 찾아가서 수정하는 방법이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows: &lt;code&gt;%USERPROFILE%\AppData\Roaming\JetBrains\&amp;lt;IntelliJ 버전&amp;gt;\idea64.exe.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;macOS: &lt;code&gt;~/Library/Application Support/JetBrains/&amp;lt;IntelliJ 버전&amp;gt;/idea.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux: &lt;code&gt;~/.config/JetBrains/&amp;lt;IntelliJ 버전&amp;gt;/idea64.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-3.png"
+width="1384"
+height="917"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-3_hu_d2715ae34a9bd5eb.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-3_hu_82773ad3ee9229e4.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="362px"
+&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 초기 힙 사이즈(최소 메모리)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms512m
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 최대 힙 사이즈 (권장: 시스템 메모리의 1/4 ~ 1/2)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms2048m
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파일 수정 후 IntelliJ를 재시작하여 변경 사항을 적용한다.&lt;/p&gt;
+&lt;h3 id="실행-프로필-별로-메모리-설정"&gt;실행 프로필 별로 메모리 설정
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Run/Debug Configurations&lt;/code&gt;에서 &lt;code&gt;VM Options&lt;/code&gt; 설정으로 특정 프로젝트의 애플리케이션을 실행할 때 사용되는 JVM의 메모리를 설정할 수 있다.&lt;/p&gt;
+&lt;p&gt;상단 툴바에서 &lt;code&gt;Edit Configurations&lt;/code&gt; 선택, 또는 &lt;code&gt;Shift + Alt + F10&lt;/code&gt; → &lt;code&gt;Edit Configurations&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-4.png"
+width="1384"
+height="917"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-4_hu_979f101c1146a18e.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-4_hu_94929ebb32c3f5d3.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="150"
+data-flex-basis="362px"
+&gt;&lt;/p&gt;
+&lt;p&gt;VM options에 메모리 설정 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms256m -Xmx1024m // 최소 256MB, 최대 1GB 할당
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-5.png"
+width="1384"
+height="1069"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-5_hu_b8747552bcdd146d.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-5_hu_55ed6e80a827f620.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+&gt;&lt;/p&gt;
+&lt;h3 id="메모리-사용량-표시"&gt;메모리 사용량 표시
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;IDE 하단 우클릭 &amp;gt; Memory Indicator&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-6.png"
+width="1384"
+height="1120"
+srcset="https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-6_hu_ae55777a94d65929.png 480w, https://b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/image-6_hu_d526f940ab368e2d.png 1024w"
+loading="lazy"
+alt="IntelliJ"
+class="gallery-image"
+data-flex-grow="123"
+data-flex-basis="296px"
+&gt;&lt;/p&gt;</description></item></channel></rss>
