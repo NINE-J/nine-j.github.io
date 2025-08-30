@@ -22,7 +22,8 @@
     overflow: visible;
 }
 
-.mermaid-container pre.mermaid > .btn.reset {
+.mermaid-container pre.mermaid > .mermaid-btn-wrapper > .btn,
+#mermaid-zoom-modal .mermaid-btn-wrapper > .btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,16 +34,17 @@
     opacity: .6;
     background: #ff0000;
     outline: none;
-    position: absolute;
     top: var(--card-padding);
     right: var(--card-padding);
 }
 
-.mermaid-container pre.mermaid > .btn.reset svg {
+.mermaid-container pre.mermaid > .mermaid-btn-wrapper > .btn svg,
+#mermaid-zoom-modal .mermaid-btn-wrapper > .btn svg {
     fill: #fff;
 }
 
-.mermaid-container pre.mermaid > .btn.reset:hover {
+.mermaid-container pre.mermaid > .mermaid-btn-wrapper > .btn:hover,
+#mermaid-zoom-modal .mermaid-btn-wrapper > .btn:hover {
     opacity: 1;
 }
 /* e: mermaid zoom */
