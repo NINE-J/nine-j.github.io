@@ -2,7 +2,7 @@
 title: 나만의 리눅스 터미널 설정
 description: 유용한 터미널 설정을 알아보자
 author: Nine
-Created: 2025-02-15
+date: 2025-02-15 10:00:00
 categories:
   - WSL
   - Terminal
@@ -488,6 +488,11 @@ This is Powerlevel10k configuration wizard. You are seeing it because you haven'
 
 이후 여러가지 설정을 묻는데 취향에 맞게 설정 후 `recommended` 옵션으로 마무리한다.
 기존에 적용했던 랜덤 임티와 이름 표현도 수정이 필요하다.
+
+- 테마 재설정
+    ```bash
+    p10k configure
+    ```
 
 #### `~/.p10k.zsh`
 

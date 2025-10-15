@@ -4,9 +4,10 @@ description: 네트워크 망에서 버전 관리
 author: Nine
 date: 2023-12-21T00:00:00
 categories:
-  - Version-control
+  - VersionControl
   - Gitea
 tags:
+  - devlog
   - VersionControl
   - Gitea
   - Git
@@ -21,8 +22,7 @@ image: cover.png
 
 ## 📌Gitea란?
 
-> [!INFO]
-> `Gitea`는 `Git` 저장소를 관리하기 위한 오픈 소스 분산 버전 관리 시스템이다.
+>[!info] `Gitea`는 `Git` 저장소를 관리하기 위한 오픈 소스 분산 버전 관리 시스템이다.
 
 `GitHub`와 유사한 기능을 제공하며, 자체 호스팅이 가능하여 사용자가 자신의 서버에 설치하고 운영할 수 있다.
 `Gitea`는 경량화된 애플리케이션으로, 개인 프로젝트나 소규모 팀에서 사용하기에 적합하다.
@@ -39,7 +39,7 @@ image: cover.png
 다운로드 받은 파일을 관리자 권한으로 실행하면 아래와 같은 명령창이 확인된다.
 기본 포트 3000으로 접속할 수 있다.
 
-![Image-1](image-1.png)
+![[Pasted image 20231221151334.png]]
 
 접속하면 `Github` UI와 비슷한 화면에서 형상 관리가 가능하다.
 
@@ -51,8 +51,8 @@ image: cover.png
 
 ### 각종 설정 
 
-- `app.ini` 파일에서 관리자 생성, 사용자 권한 등 설정할 수 있다.
-- 이번 경우 D드라이브에 설치했다. `These configuration options will be written into: D:\gitea_config\custom\conf\app.ini`
+- 관리자 생성, 사용자 권한 등 설정
+- `These configuration options will be written into: D:\gitea_config\custom\conf\app.ini`
 
 ### Uninstall
 
@@ -62,8 +62,7 @@ image: cover.png
 
 ## 📌보안 설정
 
-> [!WARNING]
-> 무엇보다 앞서 DNS가 필요하다. 외부 도메인 없이 내부 IP만으로 사용할 수가 없다. 유효하지 않은 인증서라고...
+>[!warning] 무엇보다 앞서 DNS가 필요하다. 외부 도메인 없이 내부 IP만으로 사용할 수가 없다. 유효하지 않은 인증서라고...
 
 - gitea 문서: https://docs.gitea.com/next/administration/https-setup
 - https 보안 설정을 위해 필요한 인증 파일을 발급해야 한다.

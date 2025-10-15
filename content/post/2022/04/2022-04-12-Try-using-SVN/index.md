@@ -4,9 +4,10 @@ description: "SVN: SubVersion"
 author: Nine
 date: 2022-04-12T10:00:00
 categories:
-  - Version-control
+  - VersionControl
   - SVN
 tags:
+  - devlog
   - SVN
   - SubVersion
   - VersionControl
@@ -48,8 +49,7 @@ SVN은 다양한 버전이 있고 사용하는 OS에 맞는 것을 선택할 수
  - Commit할 경우 Master Server로 적용된 후 Slave Server로 자동 복제 됨  
  - Slave Server로도 Commit 가능하며, 이 경우에 동이에 Master Server로도 자동 Commit 됨
 
-> [!info]
-> **Distributed VDFS는 FSFS repository와 기능적으론 동일**하다. 그렇기 때문에 **서버 구성을 어떻게 할 것인가**에 따라 FSFS / VDFS를 선택하면 된다.
+>[!info] **Distributed VDFS는 FSFS repository와 기능적으론 동일**하다. 그렇기 때문에 **서버 구성을 어떻게 할 것인가**에 따라 FSFS / VDFS를 선택하면 된다.
 
 ### 2.Repository Structure
 
@@ -98,7 +98,7 @@ Git에서는 로컬에 있는 작업 디렉토리에서 명시적으로 `git add
 그러나 변경 사항이 없다면 이를 무시하거나 커밋하지 않고 무시할 수 있다.
 Git과 SVN는 다르게 동작하므로, Git의 Clone과 SVN의 Checkout은 이러한 점에서 차이가 있다.
 
-## ⚙️EndNote
+## 🎯결론
 
 필요한 SVN을 설치해서 저장소와 사용자 인증을 생성하고 URL을 공유할 수 있는 형태로 만든다.
 

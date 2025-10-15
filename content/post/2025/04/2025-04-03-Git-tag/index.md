@@ -4,7 +4,7 @@ description: tag 기능을 이해하고 사용한다.
 author: Nine
 date: 2025-04-03
 categories:
-  - Version-control
+  - VersionControl
   - Git
 tags:
   - devlog

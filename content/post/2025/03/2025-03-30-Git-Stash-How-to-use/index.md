@@ -4,7 +4,7 @@ description: 지금 커밋하고 싶지 않아!
 author: Nine
 date: 2025-03-30
 categories:
-  - Version-control
+  - VersionControl
   - Git
 tags:
   - devlog
@@ -118,7 +118,7 @@ git stash show -p stash@{n}
 #### 특정 파일만 stash
 
 ```bash
-git bash push -m "메시지" 파일1 파일2
+git stash push -m "메시지" 파일1 파일2
 ```
 
 #### Untracked 파일도 함께 stash하기

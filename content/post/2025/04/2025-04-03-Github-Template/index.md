@@ -4,7 +4,7 @@ description: Github Template을 알아본다.
 author: Nine
 date: 2025-04-03
 categories:
-  - Version-control
+  - VersionControl
   - Github
 tags:
   - devlog
@@ -76,8 +76,7 @@ Repository templates 새 저장소 생성 시 기본 디렉터리 구조, 필수
 Github Template은 팀의 생산성과 코드 품질을 향상시키는 강력한 도구지만, 과도하거나 경직된 사용은 역효과를 낼 수 있다.
 팀의 실제 요구사항에 마주처 유연하게 적용하고 지속적으로 개선하는 접근 방식이 가장 효과적이다.
 
->[!INFO]
-> 효과적인 템플릿 사용을 위한 팁
+>[!info] 효과적인 템플릿 사용을 위한 팁
 >1. 점진적 도입: 필수 요소부터 시작해 점차 확장
 >2. 유연성 보장: 필수와 선택 항목을 명확히 구분
 >3. 정기적 검토: 분기별로 템플릿 현행화 여부 검토

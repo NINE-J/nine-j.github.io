@@ -4,7 +4,7 @@ description: 근데 이제 Fork를 곁들인
 author: Nine
 date: 2025-04-08
 categories:
-  - Version-control
+  - VersionControl
   - Git
 tags:
   - devlog

@@ -4,7 +4,7 @@ description: feat.싱글 브랜치 클론 환경
 author: Nine
 date: 2025-04-12T00:00:00
 categories:
-  - Version-control
+  - VersionControl
   - Git
 tags:
   - devlog
