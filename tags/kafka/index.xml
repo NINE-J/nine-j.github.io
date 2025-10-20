@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kafka on B9F1</title><link>https://b9f1.com/tags/kafka/</link><description>Recent content in Kafka on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 16 Oct 2025 14:48:14 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/kafka/index.xml" rel="self" type="application/rss+xml"/><item><title>Kafka vs Confluent</title><link>https://b9f1.com/p/2025-10-16-kafka-vs-confluent-open-source-and-managed-data-streaming-infrastructure/</link><pubDate>Thu, 16 Oct 2025 14:48:14 +0900</pubDate><guid>https://b9f1.com/p/2025-10-16-kafka-vs-confluent-open-source-and-managed-data-streaming-infrastructure/</guid><description>&lt;img src="https://b9f1.com/p/2025-10-16-kafka-vs-confluent-open-source-and-managed-data-streaming-infrastructure/cover.png" alt="Featured image of post Kafka vs Confluent" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;이벤트 기반 아키텍처에서 Kafka는 시스템 간 메시지 정합성을 유지하는 핵심 역할을 한다. 그런데 이 Kafka를 어떻게 배포할 것인지 선택해야 한다.&lt;/p&gt;
+&lt;p&gt;직접 서버에 구축할 수도 있고 AWS MSK 같은 클라우드 관리형 서비스를 쓸 수도 있고 Confluent Cloud처럼 Kafka 전문 업체의 완전 관리형 서비스를 이용할 수도 있다.&lt;/p&gt;
+&lt;p&gt;각 배포 방식의 특징과 장단점을 비교하여 프로젝트에 맞는 Kafka 인프라 선택 기준을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="kafka-배포-방법"&gt;Kafka 배포 방법
+&lt;/h3&gt;&lt;p&gt;Kafka를 배포하는 방법은 크게 세 가지로 나눌 수 있다.&lt;/p&gt;
+&lt;h4 id="1-자체-배포"&gt;1. 자체 배포
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;직접 서버에 Kafka 설치 및 운영&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;배포 환경&lt;/strong&gt;: 온프레미스 서버, AWS EC2, Azure VM, GCP Compute Engine 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;설치 방법&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;바이너리 다운로드 후 수동 설치&lt;/li&gt;
+&lt;li&gt;Docker/Kubernetes를 통한 컨테이너 배포&lt;/li&gt;
+&lt;li&gt;Ansible, Terraform 등 IaC 도구 활용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;구성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;Kafka 브로커 클러스터 (보통 3대 이상)&lt;/li&gt;
+&lt;li&gt;메타데이터 관리 (Kafka 4.x는 KRaft 자체 관리)&lt;/li&gt;
+&lt;li&gt;모니터링 스택 (Prometheus, Grafana 등)&lt;/li&gt;
+&lt;li&gt;Kafka Connect, Schema Registry 등 별도 구축&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;완전한 제어권: 모든 설정과 튜닝 가능&lt;/li&gt;
+&lt;li&gt;비용 최적화: 대규모 트래픽에서 인프라 비용 절감&lt;/li&gt;
+&lt;li&gt;데이터 주권: 온프레미스나 특정 리전에 데이터 보관&lt;/li&gt;
+&lt;li&gt;커스터마이징: 특수한 요구사항 반영 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;높은 운영 부담: 2-3명의 전담 인력 필요&lt;/li&gt;
+&lt;li&gt;전문성 요구: Kafka 내부 구조 이해 필수&lt;/li&gt;
+&lt;li&gt;장애 대응: 24/7 온콜 체계 구축 필요&lt;/li&gt;
+&lt;li&gt;초기 구축 시간: 안정화까지 수주~수개월 소요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-클라우드-관리형-서비스"&gt;2. 클라우드 관리형 서비스
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;클라우드 제공자의 Kafka 관리 서비스 이용&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AWS MSK (Managed Streaming for Kafka)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS가 Kafka 클러스터 및 인프라 관리&lt;/li&gt;
+&lt;li&gt;VPC 내부에서 프라이빗 연결&lt;/li&gt;
+&lt;li&gt;CloudWatch 통합 모니터링&lt;/li&gt;
+&lt;li&gt;자동 패치 및 버전 업그레이드&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Azure Event Hubs for Kafka&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka 프로토콜 호환 이벤트 스트리밍 서비스&lt;/li&gt;
+&lt;li&gt;Azure 네이티브 통합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Google Cloud Managed Kafka (Preview)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;GCP에서 관리하는 Kafka 서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;인프라 관리 자동화: 서버 관리, 패치 불필요&lt;/li&gt;
+&lt;li&gt;클라우드 생태계 통합: Lambda, S3, IAM 등 쉽게 연결&lt;/li&gt;
+&lt;li&gt;빠른 프로비저닝: 클릭 몇 번으로 클러스터 생성&lt;/li&gt;
+&lt;li&gt;자체 배포보다 낮은 운영 부담&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;제한된 제어권: 일부 고급 설정 불가&lt;/li&gt;
+&lt;li&gt;Kafka 지식 여전히 필요: 토픽, 파티션, 컨슈머 그룹 관리는 직접&lt;/li&gt;
+&lt;li&gt;추가 도구 별도 구축: Kafka Connect, Schema Registry 등&lt;/li&gt;
+&lt;li&gt;비용: 자체 배포보다 비쌈 (편의성 프리미엄)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-완전-관리형-서비스"&gt;3. 완전 관리형 서비스
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Kafka 전문 업체의 SaaS형 서비스&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Confluent Cloud&lt;/strong&gt;: Kafka 창시자들이 만든 엔터프라이즈 플랫폼&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Aiven for Apache Kafka&lt;/strong&gt;: 멀티 클라우드 지원&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Instaclustr&lt;/strong&gt;: 관리형 Kafka 서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Confluent Cloud 중심 설명&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;제공하는 것&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka 클러스터 완전 관리 (인프라부터 운영까지)&lt;/li&gt;
+&lt;li&gt;120+ 사전 구축 커넥터 (DB, SaaS, 클라우드)&lt;/li&gt;
+&lt;li&gt;Schema Registry 관리형 제공&lt;/li&gt;
+&lt;li&gt;ksqlDB 및 Apache Flink 통합 (스트림 처리)&lt;/li&gt;
+&lt;li&gt;Stream Catalog (데이터 계보 추적)&lt;/li&gt;
+&lt;li&gt;고급 보안 및 컴플라이언스 (SOC 2, HIPAA 등)&lt;/li&gt;
+&lt;li&gt;24/7 전문가 지원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;제로 운영 부담: 인프라 걱정 없이 바로 사용&lt;/li&gt;
+&lt;li&gt;개발 생산성 극대화: 커넥터, 스키마 관리 등 즉시 활용&lt;/li&gt;
+&lt;li&gt;자동 스케일링: 트래픽 변화에 자동 대응&lt;/li&gt;
+&lt;li&gt;멀티 클라우드/리전: 글로벌 서비스 쉽게 구축&lt;/li&gt;
+&lt;li&gt;빠른 실험: PoC부터 프로덕션까지 빠르게 전환&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;비용: 소규모에서는 경제적이나 대규모에서는 비쌈&lt;/li&gt;
+&lt;li&gt;벤더 락인: Confluent 고유 기능 사용 시 이전 어려움&lt;/li&gt;
+&lt;li&gt;제어권 제한: 내부 설정 접근 불가&lt;/li&gt;
+&lt;li&gt;데이터 외부 전송: 온프레미스 전용 환경에서는 사용 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="배포-방식별-비교-매트릭스"&gt;배포 방식별 비교 매트릭스
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;비교 항목&lt;/th&gt;
+&lt;th&gt;자체 배포&lt;/th&gt;
+&lt;th&gt;클라우드 관리형 (AWS MSK)&lt;/th&gt;
+&lt;th&gt;완전 관리형 (Confluent Cloud)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;높음 (전담 팀 필요)&lt;/td&gt;
+&lt;td&gt;중간 (Kafka 지식 필요)&lt;/td&gt;
+&lt;td&gt;낮음 (제로 운영)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;초기 구축 시간&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수주~수개월&lt;/td&gt;
+&lt;td&gt;수일~1주&lt;/td&gt;
+&lt;td&gt;수분~수시간&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;전문 인력 필요&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;필수 (2-3명)&lt;/td&gt;
+&lt;td&gt;필요 (1명)&lt;/td&gt;
+&lt;td&gt;선택 (개발자만)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Kafka 지식 요구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;깊은 이해 필수&lt;/td&gt;
+&lt;td&gt;중급 수준&lt;/td&gt;
+&lt;td&gt;기본 개념만&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용 (소규모)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;높음 (인력+인프라)&lt;/td&gt;
+&lt;td&gt;중간&lt;/td&gt;
+&lt;td&gt;낮음~중간&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용 (대규모)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;낮음 (최적화 시)&lt;/td&gt;
+&lt;td&gt;중간&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수동 계획 필요&lt;/td&gt;
+&lt;td&gt;반자동&lt;/td&gt;
+&lt;td&gt;완전 자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안/컴플라이언스&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;직접 구현&lt;/td&gt;
+&lt;td&gt;기본 제공&lt;/td&gt;
+&lt;td&gt;엔터프라이즈급&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;커넥터/도구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;직접 구축&lt;/td&gt;
+&lt;td&gt;직접 구축&lt;/td&gt;
+&lt;td&gt;120+ 즉시 사용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;글로벌 복제&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수동 구성&lt;/td&gt;
+&lt;td&gt;복잡함&lt;/td&gt;
+&lt;td&gt;클릭 몇 번&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;적합한 규모&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;월 10TB+&lt;/td&gt;
+&lt;td&gt;중소 규모&lt;/td&gt;
+&lt;td&gt;스타트업~중견&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실전-선택-가이드"&gt;실전 선택 가이드
+&lt;/h3&gt;&lt;h4 id="자체-배포를-선택해야-할-때"&gt;자체 배포를 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;대규모 트래픽&lt;/strong&gt;: 월 10TB 이상의 안정적인 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;온프레미스 필수&lt;/strong&gt;: 데이터 외부 반출이 불가능한 환경&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특수 커스터마이징&lt;/strong&gt;: Kafka 내부 동작을 깊이 제어해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장기적 비용 최적화&lt;/strong&gt;: 인프라 비용을 최소화해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이미 운영 중&lt;/strong&gt;: Kafka 운영 경험과 전담 팀이 있는 경우&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (AWS 기준, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EC2 브로커 3대 (t3.medium): 월 약 25만원&lt;/li&gt;
+&lt;li&gt;EBS 스토리지 500GB: 월 약 5만원&lt;/li&gt;
+&lt;li&gt;네트워크 비용: 변동&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 월 500만원+ (DevOps 엔지니어 1명)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 530만원+ (인프라만 30만원)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="클라우드-관리형aws-msk을-선택해야-할-때"&gt;클라우드 관리형(AWS MSK)을 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;AWS 중심 아키텍처&lt;/strong&gt;: Lambda, S3 등과 긴밀한 통합 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;중간 규모&lt;/strong&gt;: 월 1TB~10TB 정도의 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;운영 부담 경감&lt;/strong&gt;: 인프라 관리는 자동화하고 싶지만 Kafka는 직접 관리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;클라우드 벤더 선호&lt;/strong&gt;: AWS 생태계 내에서 모든 것을 해결&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 요구사항&lt;/strong&gt;: AWS IAM, VPC와의 통합 필요&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (AWS MSK, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kafka.t3.small 3대: 월 약 $150 (약 20만원)&lt;/li&gt;
+&lt;li&gt;스토리지: 별도 과금&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 월 300만원+ (Kafka 지식 보유 개발자)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 320만원+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="완전-관리형confluent-cloud을-선택해야-할-때"&gt;완전 관리형(Confluent Cloud)을 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;빠른 MVP 검증&lt;/strong&gt;: 이벤트 스트리밍 아키텍처를 신속하게 실험&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전담 인력 부족&lt;/strong&gt;: Kafka 전문가 채용이 어렵거나 비용 부담&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소규모 스타트업&lt;/strong&gt;: 월 100GB~1TB 정도의 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;글로벌 서비스&lt;/strong&gt;: 멀티 리전 복제가 필요한 경우&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;개발 집중&lt;/strong&gt;: 인프라 걱정 없이 비즈니스 로직에 집중&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;규제 산업&lt;/strong&gt;: SOC 2, HIPAA 등 컴플라이언스 인증 필요&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (Confluent Cloud, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;USD 1달러 = 약 1,419원 기준&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic 클러스터: 월 $730 (약 100만원)&lt;/li&gt;
+&lt;li&gt;스토리지 50GB: 월 $5 (약 7천원)&lt;/li&gt;
+&lt;li&gt;네트워크 100GB: 월 $9 (약 1만원)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 0원 (일반 개발자만 있으면 됨)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 101만원 (소규모)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프리 크레딧&lt;/strong&gt;: $400 제공 (약 55만원 상당)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="하이브리드-전략-단계적-접근"&gt;하이브리드 전략: 단계적 접근
+&lt;/h3&gt;&lt;p&gt;많은 기업이 채택하는 현실적인 전략:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Phase 1: 초기 단계 (Confluent Cloud)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PoC 및 MVP 빠르게 검증&lt;/li&gt;
+&lt;li&gt;초기 서비스 런칭 (월 트래픽 ~1TB)&lt;/li&gt;
+&lt;li&gt;팀 규모: 개발자 2-3명&lt;/li&gt;
+&lt;li&gt;비용: 월 100~200만원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Phase 2: 성장 단계 (계속 Confluent 또는 MSK 검토)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;트래픽 증가 (월 1TB~10TB)&lt;/li&gt;
+&lt;li&gt;비용 분석 시작&lt;/li&gt;
+&lt;li&gt;Kafka 전문 인력 1명 채용 고려&lt;/li&gt;
+&lt;li&gt;비용: 월 200~500만원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Phase 3: 성숙 단계 (자체 배포 전환 검토)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;대규모 트래픽 (월 10TB+)&lt;/li&gt;
+&lt;li&gt;전담 인프라 팀 구성&lt;/li&gt;
+&lt;li&gt;자체 배포로 전환하여 TCO 60% 절감&lt;/li&gt;
+&lt;li&gt;비용: 월 500~1,000만원 (하지만 트래픽은 10배+)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;병행 사용 예시&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;핵심 서비스: 자체 배포 (안정성, 비용 최적화)&lt;/li&gt;
+&lt;li&gt;실험적 프로젝트: Confluent Cloud (빠른 실험)&lt;/li&gt;
+&lt;li&gt;글로벌 리전: Confluent Cloud (멀티 리전 자동 복제)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;세 가지 배포 방식은 각각 명확한 장단점이 있으며 정답은 조직의 상황에 달려 있다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;자체 배포&lt;/strong&gt; 는 대규모 트래픽과 전문 인력이 있을 때 최적의 선택이다.
+완전한 제어권과 비용 최적화를 얻지만 운영 복잡도와 인력 투자가 크다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;클라우드 관리형(AWS MSK)&lt;/strong&gt; 은 AWS 생태계를 쓰면서 운영 부담을 줄이고 싶을 때 중간 지점이다. 인프라는 자동화되지만 Kafka 지식은 여전히 필요하다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;완전 관리형(Confluent Cloud)&lt;/strong&gt; 은 빠른 실행과 제로 운영 부담이 필요할 때 최선이다.
+소규모에서는 인력 비용 고려 시 가장 경제적이지만 대규모에서는 비용이 높아질 수 있다.&lt;/p&gt;
+&lt;p&gt;Kafka 인프라를 관리하는 데 시간을 쓸 것인지 아니면 고객 가치를 만드는 데 집중할 것인지 스스로 질문해보자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;필수 개념&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Apache Kafka 기본&lt;/strong&gt;: Topic, Partition, Producer, Consumer, Broker&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이벤트 기반 아키텍처&lt;/strong&gt;: 비동기 메시징, 이벤트 소싱&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;클라우드 서비스 모델&lt;/strong&gt;: IaaS, PaaS, SaaS 차이&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;알아두면 좋은 개념&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;분산 시스템&lt;/strong&gt;: 복제, 파티셔닝, 합의 알고리즘&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DevOps&lt;/strong&gt;: CI/CD, 모니터링, IaC (Infrastructure as Code)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kafka 생태계&lt;/strong&gt;: Kafka Connect, Kafka Streams, Schema Registry&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;공식 문서&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kafka.apache.org/documentation/" target="_blank" rel="noopener"
+&gt;Apache Kafka Documentation&lt;/a&gt; - 오픈소스 공식 문서&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.confluent.io/" target="_blank" rel="noopener"
+&gt;Confluent Documentation&lt;/a&gt; - Confluent Platform 문서&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/msk/" target="_blank" rel="noopener"
+&gt;AWS MSK Documentation&lt;/a&gt; - AWS 관리형 Kafka&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.confluent.io/ko-kr/apache-kafka-vs-confluent/" target="_blank" rel="noopener"
+&gt;CONFLUENT의 어필 - Confluent와 Apache Kafka® 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;핵심 개념 심화&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Connect&lt;/strong&gt;: 외부 시스템(DB, SaaS)과 데이터 파이프라인 구축&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Schema Registry&lt;/strong&gt;: Avro/Protobuf 스키마 버전 관리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Streams&lt;/strong&gt;: 자바 기반 스트림 처리 라이브러리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ksqlDB&lt;/strong&gt;: SQL로 스트림 처리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Apache Flink&lt;/strong&gt;: 대규모 상태 기반 복잡한 스트림 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;AWS 연동 가이드&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html" target="_blank" rel="noopener"
+&gt;AWS Lambda + Kafka 연동&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.confluent.io/cloud/current/networking/peering/aws-peering.html" target="_blank" rel="noopener"
+&gt;VPC 피어링으로 Confluent Cloud 연결&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.confluent.io/aws-msk-alternative/" target="_blank" rel="noopener"
+&gt;MSK vs Confluent Cloud 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>MSA Outbox 패턴</title><link>https://b9f1.com/p/2025-10-10-outbox-patterns-for-data-consistency-and-event-reliability-in-msa/</link><pubDate>Fri, 10 Oct 2025 19:41:23 +0900</pubDate><guid>https://b9f1.com/p/2025-10-10-outbox-patterns-for-data-consistency-and-event-reliability-in-msa/</guid><description>&lt;img src="https://b9f1.com/p/2025-10-10-outbox-patterns-for-data-consistency-and-event-reliability-in-msa/cover.png" alt="Featured image of post MSA Outbox 패턴" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;MSA에서 각 서비스는 독립적인 데이터베이스와 메시지 브로커를 사용하며 이를 통해 비동기 이벤트를 교환한다.&lt;/p&gt;
+&lt;p&gt;하지만 이 구조는 하나의 트랜잭션 내에서 데이터 저장과 이벤트 발행이 분리되기 때문에 데이터 일관성과 메시지 신뢰성을 보장하기 어렵다.&lt;/p&gt;
+&lt;p&gt;예를 들어 결제 서비스가 결제 정보를 DB에 저장한 후 kafka에 결제 완료 이벤트를 발행한다고 하자. 만약 DB 저장은 성공했지만 kafka 발행이 실패한다면?
+결제는 되었는데 알림 서비스나 배송 서비스는 이를 모르게 된다.&lt;/p&gt;
+&lt;p&gt;이런 문제를 해결하기 위한 안전한 전략이 바로 Outbox 패턴이다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;Outbox는 보낼 편지함이라는 뜻이며 &lt;code&gt;Transactional Outbox Pattern&lt;/code&gt;으로 조회했을 때 다양한 정보가 있었다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="문제-상황"&gt;문제 상황
+&lt;/h3&gt;&lt;p&gt;MSA 환경에서 다음과 같은 불일치가 자주 발생한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DB에는 반영되었지만 이벤트 발행 실패&lt;/li&gt;
+&lt;li&gt;이벤트는 발행되었지만 데이터 저장 실패&lt;/li&gt;
+&lt;li&gt;중복 발행 및 순서 불일치&lt;/li&gt;
+&lt;li&gt;서비스 간 재시도 로직으로 인한 중복 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이는 &lt;strong&gt;DB 트랜잭션과 메시지 발행이 원자적(atomic)&lt;/strong&gt; 으로 묶여있지 않기 때문에 발생한다.&lt;/p&gt;
+&lt;h3 id="기존-접근의-한계"&gt;기존 접근의 한계
+&lt;/h3&gt;&lt;h4 id="2pctwo-phase-commit"&gt;2PC(Two-Phase Commit)
+&lt;/h4&gt;&lt;p&gt;DB와 메시지 브로커가 XA 트랜잭션을 지원해야 하며, 락 경합과 네트워크 오버헤드로 인해 확장성 측면에서 부적합하다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;XS 트랜잭션&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;표준화된 분산 트랜잭션 구현 XA(eXtended Architecture)는 2PC(2 phase commit)을 통한 분산 트랜잭션 처리를 위해 X-Open에서 명시한 표준이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="application-level-retry"&gt;Application-Level Retry
+&lt;/h4&gt;&lt;p&gt;애플리케이션에서 발행 실패 시 재시도를 구현할 수 있지만 네트워크 장애나 장애 복구 시점에 따라 &lt;strong&gt;중복 이벤트&lt;/strong&gt; 또는 &lt;strong&gt;순서 역전&lt;/strong&gt;이 발생할 수 있다.&lt;/p&gt;
+&lt;h3 id="outbox-패턴으로-해결할-수-있는-것"&gt;Outbox 패턴으로 해결할 수 있는 것
+&lt;/h3&gt;&lt;p&gt;Outbox 패턴은 &lt;strong&gt;비즈니스 데이터와 이벤트를 동일 트랜잭션 내에서 처리하고&lt;/strong&gt; 이후 별도의 &lt;strong&gt;Message Relay 프로세스&lt;/strong&gt;가 메시지 브로커(Kafka, RabbitMQ 등)에 발행하는 구조다.&lt;/p&gt;
+&lt;p&gt;이 방식은 트랜잭션 일관성과 메시지 신뢰성을 모두 확보한다.&lt;/p&gt;
+&lt;h4 id="처리-흐름-요약"&gt;처리 흐름 요약
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;비즈니스 트랜잭션 수행&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ORDER&lt;/code&gt; 테이블에 INSERT / UPDATE / DELETE 수행&lt;/li&gt;
+&lt;li&gt;같은 트랜잭션 내에서 &lt;code&gt;OUTBOX&lt;/code&gt; 테이블에 이벤트 메시지(페이로드) 저장&lt;/li&gt;
+&lt;li&gt;두 테이블은 &lt;strong&gt;하나의 트랜잭션 단위&lt;/strong&gt;로 커밋됨, 원자성(Atomicity) 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메시지 릴레이(Message Relay)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;트랜잭션이 커밋된 후, 별도 프로세스가 &lt;code&gt;OUTBOX&lt;/code&gt; 테이블을 주기적으로 읽음&lt;/li&gt;
+&lt;li&gt;발행되지 않은 이벤트(&lt;code&gt;status = NEW&lt;/code&gt;)를 찾아 메시지 브로커에 Publish&lt;/li&gt;
+&lt;li&gt;발행 성공 시 &lt;code&gt;status = PUBLISHED&lt;/code&gt;로 갱신&lt;/li&gt;
+&lt;li&gt;실패 시 재시도 로직 또는 DLQ(Dead Letter Queue)로 이동&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메시지 브로커&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka, RabbitMQ, AWS SNS/SQS 등으로 메시지 전달&lt;/li&gt;
+&lt;li&gt;구독 서비스들이 해당 이벤트를 비동기적으로 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart LR
+A[Order Service] --&gt;|INSERT/UPDATE/DELETE| B[(ORDER table)]
+A --&gt;|INSERT event| C[(OUTBOX table)]
+subgraph Database
+B
+C
+end
+C --&gt;|Read Outbox| D[Message Relay]
+D --&gt;|Publish Event| E[Message Broker]
+classDef highlight fill:#f4f4f4,stroke:#666,stroke-width:1px;
+class B,C highlight
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="구성-요소"&gt;구성 요소
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Sender (Order Service):&lt;/strong&gt; 비즈니스 로직 수행 및 Outbox에 이벤트 기록&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Database:&lt;/strong&gt; 비즈니스 데이터(&lt;code&gt;ORDER&lt;/code&gt;)와 이벤트 로그(&lt;code&gt;OUTBOX&lt;/code&gt;)를 함께 저장&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Outbox:&lt;/strong&gt; 발행 대기 중인 이벤트를 저장하는 테이블 또는 컬렉션&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Relay:&lt;/strong&gt; Outbox 테이블에서 이벤트를 읽어 메시지 브로커로 발행&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Broker:&lt;/strong&gt; 이벤트를 다른 서비스에 전달 (Kafka, RabbitMQ 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="주요-장점"&gt;주요 장점
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;트랜잭션 일관성 보장&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;DB 저장과 이벤트 기록이 하나의 트랜잭션으로 처리됨&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;재처리 가능&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Outbox 테이블을 기준으로 실패한 이벤트를 재전송 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;멱등성(idempotency)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;이벤트 발행 시 &lt;code&gt;event_id&lt;/code&gt;로 중복 처리 방지&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Kafka Connect / Debezium 등을 통해 Change Data Capture(CDC) 기반으로 확장 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="outbox--cdcchange-data-capture"&gt;Outbox + CDC(Change Data Capture)
+&lt;/h3&gt;&lt;p&gt;단순 폴링 기반은 부하가 크기 때문에 &lt;strong&gt;Debezium + Kafka Connect&lt;/strong&gt; 조합을 사용하기도 한다.
+DB 트랜잭션 로그를 구독하여 outbox 테이블의 변경 사항만 캡처해 이벤트를 발행하므로 효율적이다.&lt;/p&gt;
+&lt;h3 id="유사-패턴과-비교"&gt;유사 패턴과 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;패턴&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;한계&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Saga 패턴&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;여러 서비스 트랜잭션을 보상 트랜잭션으로 관리&lt;/td&gt;
+&lt;td&gt;복잡한 보상 로직, 순차적 지연&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Event Sourcing&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;상태를 이벤트 스트림으로 저장&lt;/td&gt;
+&lt;td&gt;이벤트 재생 비용, 복잡한 쿼리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Outbox 패턴&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;이벤트를 별도 테이블에 기록 후 발행&lt;/td&gt;
+&lt;td&gt;Outbox 테이블 관리 필요&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="적용-시-고려사항"&gt;적용 시 고려사항
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Outbox 테이블은 주기적으로 정리(cleanup) 필요&lt;/li&gt;
+&lt;li&gt;이벤트 발행 실패 시 재시도 정책 및 DLQ(Dead Letter Queue) 구성&lt;/li&gt;
+&lt;li&gt;발행 순서 보장을 위한 파티셔닝 키 설계 (&lt;code&gt;aggregate_id&lt;/code&gt; 기반)&lt;/li&gt;
+&lt;li&gt;Kafka 등 메시지 브로커의 전달 보증 설정 (&lt;code&gt;at-least-once&lt;/code&gt; vs &lt;code&gt;exactly-once&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;발행 중복 대비를 위한 멱등 처리 전략 (&lt;code&gt;unique event_id&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="outbox-패턴-적용-관련-트러블슈팅"&gt;Outbox 패턴 적용 관련 트러블슈팅
+&lt;/h3&gt;&lt;p&gt;날씨 정보로 사용자의 OOTD를 추천하는 서비스(피드 공유, DM 등 SNS 기능 포함)
+날씨 도메인을 담당하는 팀원의 PR을 리뷰하다가 특이한 상황을 만났다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;배치 잡을 실행하며 특별한 날씨 변화가 감지되면 알림을 생성하는 케이스&lt;/li&gt;
+&lt;li&gt;해당 테스트는 다른 테스트의 DB와 충돌이 없도록 독립된 인메모리 DB로 실행.&lt;/li&gt;
+&lt;li&gt;로컬 테스트 코드에서 실행 시 성공 또는 무한 루프로 인한 실패. 성공 보장이 안 됨.&lt;/li&gt;
+&lt;li&gt;특이하게 CI 이력엔 성공 케이스만 있음.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="로직-점검"&gt;로직 점검
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;outboxes&lt;/code&gt;가 비었을 때만 &lt;code&gt;FINISHED&lt;/code&gt;, 기본은 &lt;code&gt;CONTINUABLE&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;모든 이벤트를 발송하기 위함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;수신 대상이 없어도 &lt;code&gt;SENDING&lt;/code&gt; 상태로 저장하는 결함 발견
+&lt;ul&gt;
+&lt;li&gt;수신 대상이 없어서 &lt;code&gt;outbox&lt;/code&gt;가 처리되지 않고 계속 남아있으며 &lt;code&gt;CONTINUABLE&lt;/code&gt; 무한 루프&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;하지만 간헐적인 성공과 CI에서만 성공하는 건 설명되지 않음.&lt;/p&gt;
+&lt;h4 id="성공-조건과-실패-조건-점검"&gt;성공 조건과 실패 조건 점검
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;왜 로컬에선 무한 루프로 실패하는 케이스가 있고 CI에선 정상 동작하지?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;성공의 조건
+&lt;ul&gt;
+&lt;li&gt;배치 실행 시점에 &lt;code&gt;PENDING&lt;/code&gt; &lt;code&gt;outbox&lt;/code&gt;가 비어있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;실패의 조건
+&lt;ul&gt;
+&lt;li&gt;배치 시작 후, &lt;code&gt;PENDING&lt;/code&gt; &lt;code&gt;outbox&lt;/code&gt; 조회 쿼리와 수신 대상 조회 쿼리가 반복&lt;/li&gt;
+&lt;li&gt;수신 대상이 0명인 경우: &lt;code&gt;SENDING&lt;/code&gt;으로 바꾸지 않음, 여전히 &lt;code&gt;PENDING&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Step이 종료되지 않고 같은 쿼리를 계속 내며 무한 반복&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;질문이 잘못됐다..! 로컬과 CI로 구분해서 볼 게 아니라 로직 점검에서 확인했던 &lt;code&gt;outbox&lt;/code&gt;의 생성 여부를 봤어야 했다. &amp;ldquo;outboxes가 비었을 때만 &lt;code&gt;FINISHED&lt;/code&gt;&amp;rdquo; 였으니까..&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;즉, 특별한 날씨 변화가 있는가? 였다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;날씨 조회에 대한 것도 Mocking 하거나 수신 대상을 보장하는 등 다양한 방법이 있었을텐데 정답이 없다 보니 발생했던 문제 같다.&lt;/p&gt;
+&lt;p&gt;특이하게 CI에 성공 이력만 있던 것도 마침 그때는 특별한 날씨 변화가 없던 것&amp;hellip;&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;Outbox 패턴은 &lt;strong&gt;MSA 환경에서 데이터 일관성과 이벤트 신뢰성을 확보하는 현실적인 대안&lt;/strong&gt;이 될 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;트랜잭션 ACID 속성&lt;/li&gt;
+&lt;li&gt;메시지 브로커의 전달 보증 (&lt;code&gt;at-least-once&lt;/code&gt;, &lt;code&gt;exactly-once&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Saga, 2PC, Event Sourcing 패턴&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://ssonzm.tistory.com/148" target="_blank" rel="noopener"
+&gt;분산 트랜잭션과 XA 트랜잭션에 대해&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://devocean.sk.com/blog/techBoardDetail.do?ID=165445&amp;amp;boardType=techBlog" target="_blank" rel="noopener"
+&gt;[MSA 패턴] SAGA, Transactional Outbox 패턴 활용하기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://microservices.io/patterns/data/transactional-outbox.html#:~:text=The%20solution%20is%20for%20the,messages%20to%20the%20message%20broker" target="_blank" rel="noopener"
+&gt;Pattern: Transactional outbox&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="추가-정리"&gt;추가 정리
+&lt;/h3&gt;&lt;h4 id="단일-인스턴스monolithic-환경"&gt;단일 인스턴스(Monolithic) 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;하나의 DB, 하나의 트랜잭션에서 모든 로직이 처리된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2PC(2-Phase Commit)&lt;/strong&gt; 같은 표준 트랜잭션 메커니즘으로 DB 저장과 이벤트 처리(예: 메시지 큐 발행)를 하나의 논리적 단위로 묶을 수 있다.&lt;/li&gt;
+&lt;li&gt;따라서 &lt;strong&gt;원자성(Atomicity)&lt;/strong&gt; 과 &lt;strong&gt;일관성(Consistency)&lt;/strong&gt; 이 보장된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="확장-시-한계-락-경쟁--처리-병목"&gt;확장 시 한계 (락 경쟁 &amp;amp; 처리 병목)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;트래픽 증가 → DB Connection Pool 경쟁 → 락 경합(lock contention) 증가&lt;/li&gt;
+&lt;li&gt;대규모 트랜잭션으로 인해 응답 지연 발생&lt;/li&gt;
+&lt;li&gt;DB가 &lt;strong&gt;트랜잭션 코디네이터&lt;/strong&gt; 역할까지 하므로 병목이 심화된다.&lt;/li&gt;
+&lt;li&gt;이 시점에서 &lt;strong&gt;단일 DB 트랜잭션 구조는 확장성의 한계&lt;/strong&gt;에 부딪힌다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="분산-환경-msa-도입"&gt;분산 환경(= MSA 도입)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;각 서비스가 &lt;strong&gt;독립된 DB&lt;/strong&gt;를 가지게 되고 서비스 간에는 &lt;strong&gt;비동기 메시지 큐(Kafka, RabbitMQ, SNS/SQS)&lt;/strong&gt; 로 이벤트를 전달한다.&lt;/li&gt;
+&lt;li&gt;이로 인해 처리 속도는 비약적으로 향상된다. (주요 비즈니스 로직만 빠르게 커밋, 나머지는 비동기로 후처리)&lt;/li&gt;
+&lt;li&gt;하지만 &lt;strong&gt;데이터 일관성 문제&lt;/strong&gt;가 새롭게 등장한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="새로운-문제-원자성-붕괴"&gt;새로운 문제: 원자성 붕괴
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;비즈니스 트랜잭션(DB 커밋)과 이벤트 발행(Message Send)이 &lt;strong&gt;서로 다른 시스템&lt;/strong&gt;에서 발생&lt;/li&gt;
+&lt;li&gt;두 작업 중 하나라도 실패하면 데이터 불일치 발생&lt;/li&gt;
+&lt;li&gt;메시지 순서가 바뀌거나 중복 이벤트가 발생할 수도 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="outbox-패턴의-해결-방식"&gt;Outbox 패턴의 해결 방식
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;서비스 로직 트랜잭션 안에서 &lt;strong&gt;비즈니스 데이터 + 이벤트 로그(Outbox)를 함께 커밋&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이로써 “이벤트 기록”까지는 &lt;strong&gt;원자성 보장&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이후 별도 프로세스(Message Relay)가 Outbox 테이블을 읽어 메시지 브로커(Kafka 등)에 발행&lt;/li&gt;
+&lt;li&gt;발행이 성공하면 상태를 &lt;code&gt;PUBLISHED&lt;/code&gt;로 변경 실패하면 재시도 또는 DLQ(Dead Letter Queue)로 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+autonumber
+participant Service as Order Service
+participant DB as Database
+participant Relay as Message Relay
+participant Kafka as Kafka Broker
+rect rgb(240, 248, 255)
+Note over Service,DB: [서비스 트랜잭션 - 동기 처리]
+Service-&gt;&gt;DB: INSERT INTO orders (...)
+Service-&gt;&gt;DB: INSERT INTO outbox_event (...)
+DB--&gt;&gt;Service: COMMIT (단일 트랜잭션으로 원자성 확보)
+end
+rect rgb(250, 250, 250)
+Note over Relay,Kafka: [비동기 메시지 릴레이 - Outbox Poller]
+Relay-&gt;&gt;DB: SELECT * FROM outbox_event WHERE status = 'NEW'
+Relay-&gt;&gt;Kafka: Publish Event to Kafka
+Kafka--&gt;&gt;Relay: ACK
+Relay-&gt;&gt;DB: UPDATE outbox_event SET status = 'PUBLISHED'
+end
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="결과적으로"&gt;결과적으로
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;기존 구조&lt;/th&gt;
+&lt;th&gt;Outbox 적용 후&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;원자성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;DB ↔ MQ 분리되어 깨짐&lt;/td&gt;
+&lt;td&gt;동일 트랜잭션 내 Outbox 기록으로 보장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단일 DB 락 병목&lt;/td&gt;
+&lt;td&gt;분산 환경 + 비동기 처리로 개선&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;신뢰성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;발행 실패 시 유실 가능&lt;/td&gt;
+&lt;td&gt;Outbox 재시도 / CDC로 회복 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단순&lt;/td&gt;
+&lt;td&gt;Outbox 테이블 관리 필요(운영비 증가)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</description></item></channel></rss>

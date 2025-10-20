@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>모니터링 on B9F1</title><link>https://b9f1.com/tags/%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81/</link><description>Recent content in 모니터링 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 17 Jun 2025 18:49:24 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81/index.xml" rel="self" type="application/rss+xml"/><item><title>봄 모니터링 지표</title><link>https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</link><pubDate>Tue, 17 Jun 2025 18:49:24 +0900</pubDate><guid>https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</guid><description>&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/cover.png" alt="Featured image of post 봄 모니터링 지표" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot 프로젝트에서 Prometheus, Grafana를 연동해 시간의 흐름에 따라 변동되는 메트릭(Metrics) 데이터를 시각화해보자.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image01.png"
+width="902"
+height="476"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image01_hu_7486b2971da70b7d.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image01_hu_f7b0dba1a3e9eb40.png 1024w"
+loading="lazy"
+alt="Image 1"
+class="gallery-image"
+data-flex-grow="189"
+data-flex-basis="454px"
+&gt;&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="사전-준비"&gt;사전 준비
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot 프로젝트
+&lt;ul&gt;
+&lt;li&gt;spring-boot-actuator&lt;/li&gt;
+&lt;li&gt;micrometer-registry-prometheus&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Docker 또는 Docker Desktop&lt;/li&gt;
+&lt;li&gt;docker-compose.yml&lt;/li&gt;
+&lt;li&gt;prometheus.yml&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="buildgradle"&gt;build.gradle
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;dependencies&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;io.micrometer:micrometer-registry-prometheus&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="applicationyml"&gt;application.yml
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;management&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;endpoints&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;web&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;exposure&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;include&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;export&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;enabled&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-composeyml"&gt;docker-compose.yml
+&lt;/h4&gt;&lt;p&gt;Docker 서비스 실행 자동화 설정
+여러 Docker 컨테이너(Prometheus, Grafana 등)를 한 번에 실행/종료/관리하기 위한 설정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prom/prometheus:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Prometheus 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prometheus &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정, 내부 DNS로도 사용돤다. ex)http://prometheus:9090&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;./prometheus.yml:/etc/prometheus/prometheus.yml &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 로컬 설정 파일을 컨테이너에 마운트&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;9090:9090&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 9090 → 컨테이너의 9090 (Prometheus 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 아래 정의한 사용자 정의 네트워크에 연결&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;grafana&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana/grafana:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Grafana 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;3000:3000&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 3000 → 컨테이너의 3000 (Grafana 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 같은 네트워크에 있어야 prometheus:9090 접근 가능&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="c"&gt;# 사용자 정의 네트워크 정의 (서로 통신 가능하게 함)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 네트워크 이름만 지정하면 default 설정으로 생성됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;왜 &lt;code&gt;networks.monitoring&lt;/code&gt;은 비어있는가?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이건 사용자 정의 브리지 네트워크를 선언하는 부분이고 따로 옵션(예 &lt;code&gt;driver&lt;/code&gt;)을 주지 않으면 Docoker가 기본값으로 설정된 브리지 네트워크를 생성한다.&lt;/li&gt;
+&lt;li&gt;명시적으로 정의도 가능하지만 대부분의 경우 생략해도 무방하다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;driver&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;bridge&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="실행-명령어"&gt;실행 명령어
+&lt;/h5&gt;&lt;p&gt;Docker Desktop이 설치되어 있어야 &lt;code&gt;docker-compose&lt;/code&gt; 명령 사용 가능&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up &lt;span class="c1"&gt;# 실행&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down &lt;span class="c1"&gt;# 종료&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="prometheusyml"&gt;prometheus.yml
+&lt;/h4&gt;&lt;p&gt;Prometheus 수집 대상 설정 파일
+Prometheus가 어떤 서버나 앱의 메트릭을 수집할지 설정하는 파일&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;host.docker.internal&lt;/code&gt;은 Docker 컨테이너가 로컬 호스트의 Spring Boot 앱에 접근하기 위한 주소다. (Mac/Windows 한정. Linux는 다르다)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;global&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;5s &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 모든 타겟을 5초마다 스크랩(메트릭 수집)함 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;scrape_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;job_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;spring-app&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 수집 작업 이름 (Prometheus UI에서 구분용) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics_path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/actuator/prometheus&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 메트릭이 노출되는 경로 (Spring Boot 기준) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;3s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 3초 마다 metrics_path의 경로에 접근하여 메트릭 데이터를 수집 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;static_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;targets&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;host.docker.internal:8080&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 타겟 주소 (로컬 Spring Boot 앱)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="실행"&gt;실행
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;docker-compose.yml&lt;/code&gt; 파일이 있는 경로로 이동해서 &lt;code&gt;docker-compose up&lt;/code&gt; 명령을 실행하면 Docker에 알맞게 Volume, Images, Container 생성되며 빌드된다.&lt;/p&gt;
+&lt;p&gt;정상적으로 아래 출력을 확인했다면 &lt;code&gt;localhost:9090&lt;/code&gt;에 접속하면 Prometheus UI를 확인할 수 있다.&lt;/p&gt;
+&lt;h4 id="변경-발생-시-사용할-명령어"&gt;변경 발생 시 사용할 명령어
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up --build
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker restart prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-compose-up-명령-시-출력-예시"&gt;&lt;code&gt;docker-compose up&lt;/code&gt; 명령 시 출력 예시
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;span class="lnt"&gt;44
+&lt;/span&gt;&lt;span class="lnt"&gt;45
+&lt;/span&gt;&lt;span class="lnt"&gt;46
+&lt;/span&gt;&lt;span class="lnt"&gt;47
+&lt;/span&gt;&lt;span class="lnt"&gt;48
+&lt;/span&gt;&lt;span class="lnt"&gt;49
+&lt;/span&gt;&lt;span class="lnt"&gt;50
+&lt;/span&gt;&lt;span class="lnt"&gt;51
+&lt;/span&gt;&lt;span class="lnt"&gt;52
+&lt;/span&gt;&lt;span class="lnt"&gt;53
+&lt;/span&gt;&lt;span class="lnt"&gt;54
+&lt;/span&gt;&lt;span class="lnt"&gt;55
+&lt;/span&gt;&lt;span class="lnt"&gt;56
+&lt;/span&gt;&lt;span class="lnt"&gt;57
+&lt;/span&gt;&lt;span class="lnt"&gt;58
+&lt;/span&gt;&lt;span class="lnt"&gt;59
+&lt;/span&gt;&lt;span class="lnt"&gt;60
+&lt;/span&gt;&lt;span class="lnt"&gt;61
+&lt;/span&gt;&lt;span class="lnt"&gt;62
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 22/22
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ grafana Pulled 12.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f18232174bc9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.6s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 055b9255fa03 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f61a19743345 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ b176d7edde70 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e60d9caeb0b8 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e032d0a5e409 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c49e0ee60bfb Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 7.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 384497dbce3b Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 9.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c53a11b7c6fc Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 8af57d8c9f49 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ prometheus Pulled 8.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7df673c7455d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 6ac0e4adf315 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 408012a7b118 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1ccde423731d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1617e25568b2 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.7s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7221d93db8a9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 9fa9226be034 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ bf70c5107ab5 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f3b09c502777 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 44986281b8b9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 3/3
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Network resources_monitoring Created 0.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container prometheus Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container grafana Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Attaching to grafana, prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:674 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;No time or size retention was set so using the default time retention&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;15d
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:725 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Prometheus Server&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;server &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(version=3.4.1, branch=HEAD, revision=aea6503d9bbaad6c5faff3ecf6f1025213356c92)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:730 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;operational information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;build_context&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(go=go1.24.3, platform=linux/amd64, user=root@16f976c24db1, date=20250531-10:44:38, tags=netgo,builtinassets,stringlabels)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;host_details&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(Linux 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 999bf7192f26 )&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fd_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=1048576, hard=1048576)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;vm_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=unlimited, hard=unlimited)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.322Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:806 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Leaving GOMAXPROCS=12: CPU quota undefined&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;automaxprocs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web.go:656 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Start listening for connections&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0.0.0.0:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1266 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting TSDB ...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:347 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Listening on&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:350 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TLS is disabled.&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;http2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;false&lt;/span&gt; &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:657 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying on-disk memory mappable chunks if any&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:744 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;On-disk memory mappable chunks replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:752 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying WAL, this may take a while&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:825 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL segment loaded&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;segment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;maxSegment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;156.935µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:862 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;checkpoint_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;28.265µs &lt;span class="nv"&gt;wal_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;187.212µs &lt;span class="nv"&gt;wbl_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;133ns &lt;span class="nv"&gt;chunk_snapshot_load_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0s &lt;span class="nv"&gt;mmap_chunk_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns &lt;span class="nv"&gt;total_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;249.607µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1287 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;filesystem information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fs_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;EXT4_SUPER_MAGIC
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1290 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TSDB started&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1475 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Loading configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1514 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;updated GOGC&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;old&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="nv"&gt;new&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;75&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1524 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Completed loading of configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;db_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;820ns &lt;span class="nv"&gt;remote_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;800ns &lt;span class="nv"&gt;web_handler&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;248ns &lt;span class="nv"&gt;query_engine&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;572ns &lt;span class="nv"&gt;scrape&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;325.871µs &lt;span class="nv"&gt;scrape_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;23.08µs &lt;span class="nv"&gt;notify&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;68.448µs &lt;span class="nv"&gt;notify_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;7.122µs &lt;span class="nv"&gt;rules&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1.01µs &lt;span class="nv"&gt;tracing&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2.927µs &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml &lt;span class="nv"&gt;totalDuration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;641.79µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1251 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Server is ready to receive web requests.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;manager.go:175 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting rule manager...&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;rule manager&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.580946399Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Grafana&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;12.0.1+security-01 &lt;span class="nv"&gt;commit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ff20b06681749873999bb0a8e365f24fddaee33f &lt;span class="nv"&gt;branch&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;HEAD &lt;span class="nv"&gt;compiled&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19Z
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581187455Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/share/grafana/conf/defaults.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581202298Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/grafana/grafana.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581205854Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.data=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581208666Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.logs=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581212098Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.plugins=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581215368Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.provisioning=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.5812188Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.log.mode=console&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581222384Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_DATA=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.58122533Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_LOGS=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581228361Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PLUGINS=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581230583Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PROVISIONING=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="prometheus-ui"&gt;Prometheus UI
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;http://localhost:9090&lt;/code&gt;으로 접속했다면 &lt;code&gt;Status &amp;gt; Targets&lt;/code&gt;의 타겟 상태가 UP 상태로 잘 올라와 있는지 확인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02.png"
+width="1538"
+height="768"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02_hu_4a178a8a1038c46f.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02_hu_3c0a4ae5d177f9c9.png 1024w"
+loading="lazy"
+alt="Image 2"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+&gt;&lt;/p&gt;
+&lt;h3 id="grafana-ui"&gt;Grafana UI
+&lt;/h3&gt;&lt;p&gt;설정해둔 주소 &lt;code&gt;localhost:3000&lt;/code&gt; 접속 후 별다른 설정을 하지 않았다면 기본 로그인 정보인 (id: admin, pw: admin)으로 로그인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image03.png"
+width="1539"
+height="769"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image03_hu_1819ce26e01e0047.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image03_hu_b131622dd7dd1f57.png 1024w"
+loading="lazy"
+alt="Image 3"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;DATA SOURCES Add your first data source 클릭 이동&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image04.png"
+width="1525"
+height="769"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image04_hu_dfef758353aa35f3.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image04_hu_7ffdeeeff6be69df.png 1024w"
+loading="lazy"
+alt="Image 4"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="475px"
+&gt;&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Prometheus 클릭&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image05.png"
+width="1524"
+height="769"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image05_hu_d7a925333401a7c.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image05_hu_3ae5a06c3435e95d.png 1024w"
+loading="lazy"
+alt="Image 5"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="475px"
+&gt;&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;설정했던 &lt;code&gt;http://prometheus:9090&lt;/code&gt; 입력 후 저장&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06.png"
+width="1524"
+height="769"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06_hu_674e4a3376187ac7.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06_hu_2eff3707f7c3f9b1.png 1024w"
+loading="lazy"
+alt="Image 6"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="475px"
+&gt;&lt;/p&gt;
+&lt;ol start="4"&gt;
+&lt;li&gt;주의할 것은 &lt;code&gt;localhost&lt;/code&gt; 아니고 &lt;code&gt;docker-compose.yml&lt;/code&gt;에서 설정한 컨테이너 이름이자 내부 DNS를 &lt;code&gt;prometheus&lt;/code&gt;로 사용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07.png"
+width="1525"
+height="770"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07_hu_782f7b38c2f20067.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07_hu_fb4a3886490ea5bf.png 1024w"
+loading="lazy"
+alt="Image 7"
+class="gallery-image"
+data-flex-grow="198"
+data-flex-basis="475px"
+&gt;&lt;/p&gt;
+&lt;ol start="5"&gt;
+&lt;li&gt;대시보드 생성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image08.png"
+width="1537"
+height="769"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image08_hu_d31c127cec551c89.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image08_hu_b0d4682b064fa73.png 1024w"
+loading="lazy"
+alt="Image 8"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="479px"
+&gt;&lt;/p&gt;
+&lt;ol start="6"&gt;
+&lt;li&gt;대시보드 추가 과정&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image09.png"
+width="1538"
+height="768"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image09_hu_ec8f6456ae016cc7.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image09_hu_a0b3986a1b786596.png 1024w"
+loading="lazy"
+alt="Image 9"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+&gt;
+&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image10.png"
+width="1529"
+height="728"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image10_hu_d0d8b5abe39d71c6.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image10_hu_4f46ae39b5a72757.png 1024w"
+loading="lazy"
+alt="Image 10"
+class="gallery-image"
+data-flex-grow="210"
+data-flex-basis="504px"
+&gt;
+&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image11.png"
+width="1526"
+height="728"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image11_hu_2a5edf45fba4cec2.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image11_hu_41b7913a42ca1211.png 1024w"
+loading="lazy"
+alt="Image 11"
+class="gallery-image"
+data-flex-grow="209"
+data-flex-basis="503px"
+&gt;
+&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image12.png"
+width="1526"
+height="728"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image12_hu_f6073a120b470c8a.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image12_hu_e5e7052d28a3e2d1.png 1024w"
+loading="lazy"
+alt="Image 12"
+class="gallery-image"
+data-flex-grow="209"
+data-flex-basis="503px"
+&gt;
+&lt;img src="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image13.png"
+width="2039"
+height="1036"
+srcset="https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image13_hu_f831f79e3231d41d.png 480w, https://b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image13_hu_65c00285883d4e3a.png 1024w"
+loading="lazy"
+alt="Image 13"
+class="gallery-image"
+data-flex-grow="196"
+data-flex-basis="472px"
+&gt;&lt;/p&gt;
+&lt;h4 id="yml-yaml"&gt;yml? yaml?
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;yaml&lt;/code&gt; 확장자로 했을 때 Prometheus Status 잘 올라오지 않았고 별다른 설정 문제가 아니라면 기본적으로 찾게되는 확장자가 &lt;code&gt;yml&lt;/code&gt;인가 싶어 변경했더니 잘 올라왔다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Gemini&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;YAML과 YML은 ==파일 확장자만 다를 뿐, 본질적으로 같은 것을 가리킵니다==. YAML은 &amp;ldquo;YAML Ain&amp;rsquo;t Markup Language&amp;quot;의 약자로, 사람이 읽기 쉬운 데이터 직렬화 언어입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Yaml Ain&amp;rsquo;t Markup Language 또는 Yet Another Markup Language&lt;/p&gt;
+&lt;p&gt;.html 대신 .htm으로도 사용된 것과 같이 옛날 옛날 한 옛날 Windows에서 Extensions는 파일 확장자가 3자로 제한되는 특성이 있었기 때문이라고 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;시스템의 가시성과 안정성을 높이기 위한 가장 빠르고 효과적인 방법은 Prometheus와 Grafana를 Docker로 연동해 메트릭을 시각화하는 것이다.&lt;/p&gt;
+&lt;p&gt;이 방식은 별도 설치 없이 빠르게 시작할 수 있으며 Spring Boot의 Actuator와 Micrometer를 활용하면 애플리케이션의 상태와 예외 흐름까지도 실시간으로 모니터링할 수 있다.&lt;/p&gt;
+&lt;p&gt;운영 환경 이전에 개발 및 테스트 단계부터 시각화 환경을 구축해두는 것이 예외 대응력과 시스템 품질을 높이는 핵심 전략이 된다.&lt;/p&gt;</description></item></channel></rss>

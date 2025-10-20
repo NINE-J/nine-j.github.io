@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ElastiCache on B9F1</title><link>https://b9f1.com/tags/elasticache/</link><description>Recent content in ElastiCache on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 16 Oct 2025 17:17:14 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/elasticache/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS ECS + ElastiCache Redis 배포</title><link>https://b9f1.com/p/2025-10-16-deploy-elasticache-redis-with-aws-ecs/</link><pubDate>Thu, 16 Oct 2025 17:17:14 +0900</pubDate><guid>https://b9f1.com/p/2025-10-16-deploy-elasticache-redis-with-aws-ecs/</guid><description>&lt;img src="https://b9f1.com/p/2025-10-16-deploy-elasticache-redis-with-aws-ecs/cover.png" alt="Featured image of post AWS ECS + ElastiCache Redis 배포" /&gt;&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;ECS Fargate 기반 분산 환경에서 Redis를 어떻게 배포하고 연결하는지 간단히 정리해본다.&lt;/p&gt;
+&lt;p&gt;현재 프로젝트에서는 PostgreSQL(RDS), Kafka(Confluent Cloud)와 함께 Redis를 세션/캐시용으로 운영해야 하는 상황이다.&lt;/p&gt;
+&lt;p&gt;Redis를 로컬에서 &lt;code&gt;docker-compose&lt;/code&gt;로 테스트는 했지만 운영 환경에서의 연결 구조와 설정 원리를 명확히 이해하고자 한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="redis는-기본-구성만으로-동작한다"&gt;Redis는 기본 구성만으로 동작한다
+&lt;/h3&gt;&lt;p&gt;Redis는 HTTP 기반이 아닌 TCP 기반의 Key-Value 서버다.
+HTTP처럼 경로 개념이 없고 단순히 정의된 포트(기본 6379)로 열려 있는 소켓을 통해 명령을 주고 받는다.&lt;/p&gt;
+&lt;p&gt;즉, Redis는 복잡한 인증이나 핸드셰이크 없이도 클라이언트가 IP와 포트를 알고 있으면 바로 접근 가능한 구조다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis는 &lt;code&gt;host:port&lt;/code&gt; 기반의 TCP 프로토콜만 있으면 동작한다.&lt;/li&gt;
+&lt;li&gt;별도의 서비스 레이어가 없으므로 설정의 핵심은 어디로 붙을 것인가.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="spring-boot에서-redis-연결-구조"&gt;Spring Boot에서 Redis 연결 구조
+&lt;/h3&gt;&lt;p&gt;Spring Boot는 &lt;code&gt;spring-boot-starter-data-redis&lt;/code&gt; 의존성만 추가하면 간단하게 &lt;code&gt;LettuceConnectionFactory&lt;/code&gt;, &lt;code&gt;RedisTemplate&lt;/code&gt;, &lt;code&gt;CacheManager&lt;/code&gt; 등을 등록한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;host&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;redis-cluster.xxxxxx.apn2.cache.amazonaws.com&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;port&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6379&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;별도의 Bean을 등록하지 않아도 Spring Boot는 이를 감지해 자동 연결한다.
+설정을 생략하면 기본값(&lt;code&gt;localhost:6379&lt;/code&gt;)으로 시도한다.&lt;/p&gt;
+&lt;h3 id="elastic-redis-배포-개요"&gt;Elastic Redis 배포 개요
+&lt;/h3&gt;&lt;p&gt;AWS에서는 ElastiCache Redis OSS를 사용하면 서버 설치 없이 관리형 Redis 클러스터를 사용할 수 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구성 요소&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Primary Node&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;쓰기 담당 Redis 노드&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Replica Node&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;읽기 전용 복제본 (선택사항)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Cluster&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;여러 샤드로 데이터를 분산 저장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Endpoint&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;연결용 주소 (&lt;code&gt;.cache.amazonaws.com&lt;/code&gt;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="ecs-fargate-연결-구조"&gt;ECS Fargate 연결 구조
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;보안 그룹 규칙&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Inbound: 6379 허용 (ECS -&amp;gt; Redis)&lt;/li&gt;
+&lt;li&gt;Outbound: ECS에서 Redis SG(Security Group)로 접근 허용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;VPC&lt;/strong&gt;: 같은 VPC 또는 피어링된 네트워크에 존재해야 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="로컬-docker와-운영-redis의-관계"&gt;로컬 Docker와 운영 Redis의 관계
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;로컬 환경&lt;/th&gt;
+&lt;th&gt;운영 환경&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;호스트&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;localhost:6379&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Elasticache Endpoint&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;목적&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;개발 및 단위 테스트&lt;/td&gt;
+&lt;td&gt;실제 서비스 운영&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;공유 여부&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;완전히 분리&lt;/td&gt;
+&lt;td&gt;완전히 분리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;차이점&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단일 인스턴스&lt;/td&gt;
+&lt;td&gt;멀티 AZ, 클러스터링, 모니터링 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;즉, 코드상으로는 동일한 RedisTemplate을 사용하지만 환경 변수(&lt;code&gt;SPRING_DATA_REDIS_HOST&lt;/code&gt;, &lt;code&gt;SPRING_DATA_REDIS_PORT&lt;/code&gt;)만 달라진다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;호스트와 포트를 맞추어&lt;/strong&gt; TCP 레벨에서 연결만 되면 Redis는 별도 복잡한 설정 없이 바로 동작한다.&lt;/p&gt;
+&lt;h3 id="운영-시-고려사항"&gt;운영 시 고려사항
+&lt;/h3&gt;&lt;p&gt;운영 환경에서는 다음 항목들을 통해 &lt;strong&gt;보안과 안정성을 강화&lt;/strong&gt;할 수 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안 그룹 제한&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Redis 포트(6379)는 오직 ECS 서비스의 보안 그룹에서만 접근 가능하도록 설정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;VPC 내부 통신&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;퍼블릭 액세스를 비활성화하고, VPC 내부 트래픽으로만 접근을 제한한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;암호화 옵션&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Elasticache 생성 시 ‘전송 중 암호화(Encryption in-transit)’ 및 ‘저장 시 암호화(Encryption at-rest)’를 활성화한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Redis AUTH (선택)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;OSS 기본은 인증 미지원이지만, 필요 시 Redis Enterprise 또는 프록시 계층을 통해 비밀번호 인증을 구성할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;세션 공유 설정&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Spring Boot 세션 스토어를 Redis로 변경 (&lt;code&gt;spring.session.store-type=redis&lt;/code&gt;).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;TTL 관리&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;캐시 만료시간을 반드시 설정 (&lt;code&gt;Duration.ofMinutes(...)&lt;/code&gt; 등).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;모니터링&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;CloudWatch, Redis SlowLog, CloudWatch Metrics 등을 활용해 지표와 성능을 추적한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;Redis는 기본적으로 포트만 맞으면 동작하지만,&lt;br&gt;
+운영 환경에서는 &lt;strong&gt;보안 그룹, VPC, 암호화 옵션&lt;/strong&gt;을 통해 최소한의 방어선을 만들 수 있다.&lt;/p&gt;
+&lt;p&gt;Spring Boot에서는 host와 port만 지정하면 자동으로 연결되고 Elasticache Redis는 이를 VPC 내부에서 안전하게 관리해준다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS ECS / VPC / Security Group 개념&lt;/li&gt;
+&lt;li&gt;Redis Key-Value 구조 및 기본 명령&lt;/li&gt;
+&lt;li&gt;Spring Boot 자동 설정 (&lt;code&gt;spring-boot-starter-data-redis&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/ko/elasticache/redis/" target="_blank" rel="noopener"
+&gt;Redis OSS 호환 Amazon ElastiCache&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-data/redis/reference/" target="_blank" rel="noopener"
+&gt;Spring Data Redis Reference&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://redis.io/docs/latest/develop/reference/protocol-spec/" target="_blank" rel="noopener"
+&gt;Redis serialization protocol specification&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-peering.html" target="_blank" rel="noopener"
+&gt;VPC 피어링을 사용하여 VPC 연결&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://devoong2.tistory.com/entry/Kafka-%EC%99%80-Redis-%EC%9D%98-PubSub-%EB%B9%84%EA%B5%90" target="_blank" rel="noopener"
+&gt;Kafka 와 Redis 의 Pub/Sub 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
