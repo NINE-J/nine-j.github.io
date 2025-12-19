@@ -91,7 +91,7 @@ SSG로 블로그를 운영하다가 다시 돌아가거나 둘 다 운영하는 
 >
 >직관적인 이름에 걸맞게 옵시디언에서 관리하는 문서들의 데이터를 가지고 내가 원하는 뷰를 만들 수 있다.
 
-![](/static/assets/images/Pasted%20image%2020251219044301.png)
+![](/assets/images/Pasted%20image%2020251219044301.png)
 
 ### 무엇을 하고자 하는가?
 
@@ -115,9 +115,9 @@ Templater 플러그인을 사용해서 문서 성격에 따라 개인적으로 �
 ##### 문법은 왜 달라?
 
 왜 불편하냐면 옵시디언에서 붙여 넣거나 링크한 건 이런 위키링크 형태다.
-- `![](/static/assets/images/location/image.png)`
+- `![](/assets/images/location/image.png)`
 Markdown 문법이 기대하는 이미지 첨부는 이런 형태다.
-- `![alt](/static/assets/images/location/image.png)`
+- `![alt](/assets/images/location/image.png)`
 
 사실 이건 설정에서 끌 수 있고 직접 만들어서 간단히 치환하는 방법을 사용할 수도 있다.
 `설정 > Options/Files and Links > Use[[WikiLinks]]` 이거 비활성화 하면 기본 마크다운 형태로 삽입할 수 있다.
@@ -476,11 +476,13 @@ jobs:
             cp "$file" "$dest"
 
             # 4. Perl 스트림 치환 (성능 최적화 버전)
-            # 위키링크 치환: ![](/static/assets/images/image.png) -> ![](/static/assets/images/image.png)
-            perl -i -pe 's/!\[\[(?!https?:\/\/)(.*?)\]\]/![](/static/assets/images/\/static\/assets\/images\/$1)/g' "$dest"
+            # 위키링크 치환: ![](/assets/images/image.png) -> ![](/assets/images/image.png)
+            # http/https로 시작하지 않는 로컬 파일명만 타겟팅
+            perl -i -pe 's/!\[\[(?!https?:\/\/)(.*?)\]\]/![](/assets/images/\/assets\/images\/$1)/g' "$dest"
 
-            # 표준 마크다운 경로 보정: ![](/static/assets/images/) -> ![](/static/assets/images/...)
-            perl -i -pe 's/!\[(.*?)\]\((?!https?:\/\/|\/assets\/|\/static\/assets\/images\/)(.*?)\)/!\[$1\](\/static\/assets\/images\/$2)/g' "$dest"
+            # 표준 마크다운 경로 보정: ![](/assets/images/) -> ![](/assets/images/...)
+            # 1) 외부 링크(http) 제외 2) 이미 올바른 경로(/assets/images/) 제외
+            perl -i -pe 's/!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$1\](\/assets\/images\/$2)/g' "$dest"
           done
 
       - name: Push to Hugo Repo
@@ -510,7 +512,7 @@ jobs:
 - **Static Site Generator (SSG)**: 정적 사이트 생성기. 마크다운 같은 텍스트 파일을 빌드 시점에 정적 HTML로 변환해주는 도구로 Hugo, Jekyll, Quartz 등이 대표적이다.
 - **Git Submodule**: 하나의 Git 저장소 안에 다른 Git 저장소를 하위 폴더로 포함하는 기능이다.
 - **GitHub Actions (CI/CD)**: 코드가 Push될 때 특정 작업을 자동으로 수행하는 도구다. 여기서는 문서 필터링, 문법 치환, 파일 전송의 자동화 엔진 역할을 한다.
-- **Regular Expression (Regex)**: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(`![](/static/assets/images/)`)를 마크다운 링크(`![](/static/assets/images/)`)로 변환하는 등에 핵심적으로 사용된다.
+- **Regular Expression (Regex)**: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(`![](/assets/images/)`)를 마크다운 링크(`![](/assets/images/)`)로 변환하는 등에 핵심적으로 사용된다.
 
 ### 더 알아보기
 
