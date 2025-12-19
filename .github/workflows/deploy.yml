@@ -43,8 +43,8 @@ jobs:
                   hugo-version: "latest"
                   extended: true
 
-                        - name: Init submodules
-                            run: git submodule update --init --recursive
+            - name: Init submodules
+              run: git submodule update --init --recursive
 
             - name: Build
               run: hugo --minify --gc
