@@ -3,7 +3,7 @@ publish: true
 title: Spring에서 AOP란
 description: OOP & AOP
 author: Nine
-date: 2025-05-18T15:20
+date: 2025-05-18 15:20:00
 categories:
   - Spring
 tags:
