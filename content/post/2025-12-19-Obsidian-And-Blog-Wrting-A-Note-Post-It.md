@@ -20,7 +20,7 @@ tags:
   - Jekyll
   - Hugo
   - Submodule
-# image: Status: Testing
+# image: Status: InProgress
 ---
 ## 📌개요
 
@@ -434,6 +434,10 @@ Obsidian 저장소가 Hugo 저장소에 접근하여 파일을 push해야 하므
 
 #### .github/workflows/deploy.yml 작성
 
+우선 지금은 문서의 양이 많지 않으니 가장 효율적인 방법으로 Hugo의 post 폴더를 비우고 새롭게 넣는다.
+
+이후엔 게시된 문서를 유지하며 신규 문서 추가, 변경된 파일만 업데이트 방식으로 변경 필요.
+
 ```yaml
 name: Deploy Posts to Hugo
 
@@ -441,9 +445,10 @@ on:
   push:
     branches:
       - main  # 브랜치명
-    paths:
-      - '02.Resource/**'  # PARA 체계 중 배포 대상이 포함된 폴더만 감시
+    paths: # TODO: PARA 체계 중 배포 대상이 포함된 폴더만 감시
+      - '02.Resource/**'
       - '03.Area/**'
+      - '04.Archive/**'
 
 jobs:
   deploy:
@@ -463,17 +468,21 @@ jobs:
 
       - name: Filter and Transform Posts
         run: |
-          # 1. Hugo의 기존 포스트 폴더 비우기 (새롭게 채우기 위해)
+          # 1. Hugo 포스트 폴더 비우기
           rm -rf hugo-dest/content/post/*
           mkdir -p hugo-dest/content/post/
 
-          # 2. 'publish: true'인 파일 고속 필터링 (Resource, Area 폴더 대상)
-          # grep으로 파일 목록을 먼저 뽑아 성능 최적화
-          # 파일 상단 10줄 내에 publish: true가 있는 파일만 추출
-          PUBLISH_FILES=$(find 02.Resource 03.Area -name "*.md" -exec sh -c 'head -n 10 "$1" | grep -q "publish: true"' _ {} \; -print)
+          # 2. 고속 상단 스캔 (상단 10줄 이내만 검사)
+          # 대상 폴더들을 나열합니다.
+          TARGET_PATHS="02.Resource/*.md 03.Area/*.md 04.Archive/*.md"
+          
+          PUBLISH_FILES=$(awk '
+            FNR <= 10 && /^publish: true/ { print FILENAME; nextfile } 
+            FNR > 10 { nextfile }
+          ' $TARGET_PATHS || true)
 
           if [ -z "$PUBLISH_FILES" ]; then
-            echo "배포할 문서가 없습니다."
+            echo "배포 대상 파일이 없습니다."
             exit 0
           fi
 
@@ -516,6 +525,14 @@ jobs:
             echo "변경 사항이 없어 생략합니다."
           fi
 ```
+
+#### 파일 탐색 방식 기술 비교
+
+| 방식                | 기술적 명칭       | 특징 (비유)                                                | 효율성                  |
+| ----------------- | ------------ | ------------------------------------------------------ | -------------------- |
+| **`grep`**        | 고속 전수 조사     | 책을 아주 빨리 넘기며 단어를 찾지만, **결국 끝까지 다 읽음**.                 | **중간** (단순하지만 낭비 있음) |
+| **`find + head`** | 개별 정밀 조사     | 책 한 권을 꺼내 **앞부분만 보고 다시 꽂기를 반복**. (책을 꺼내고 넣는 동작이 너무 많음) | **낮음** (오버헤드 큼)      |
+| **`awk`**         | 조건부 조기 종료 스캔 | 책을 펼쳐 **앞부분에 단어가 없으면 즉시 다음 책으로 넘어감**.                  | **최상** (가장 지능적임)     |
 
 ### 이미지가 왜 자꾸 안 나와?
 
