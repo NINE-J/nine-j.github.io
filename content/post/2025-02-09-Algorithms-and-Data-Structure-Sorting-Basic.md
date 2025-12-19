@@ -19,8 +19,7 @@ tags:
   - bubble-sort
   - selection-sort
   - insertion-sort
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

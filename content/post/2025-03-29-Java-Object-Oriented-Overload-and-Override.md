@@ -14,8 +14,7 @@ tags:
   - OOP
   - Overload
   - Override
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

@@ -19,8 +19,7 @@ tags:
   - counting-sort
   - radix-sort
   - tim-sort
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

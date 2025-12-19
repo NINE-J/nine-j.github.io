@@ -13,8 +13,7 @@ tags:
   - algorithms
   - 이론
   - theory
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

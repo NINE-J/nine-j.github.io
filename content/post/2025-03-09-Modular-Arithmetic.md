@@ -12,8 +12,7 @@ tags:
   - modular
   - MathJax
   - Latex
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

@@ -13,8 +13,7 @@ tags:
   - Class
   - 객체지향
   - OOP
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

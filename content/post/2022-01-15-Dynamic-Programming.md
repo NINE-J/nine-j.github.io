@@ -12,8 +12,7 @@ tags:
   - DP
   - 동적계획법
   - 기저사례
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌DP란
 

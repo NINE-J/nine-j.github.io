@@ -12,8 +12,7 @@ tags:
   - Java
   - JLS
   - MainClass
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

@@ -5,11 +5,22 @@ description: 노트가 곧 포스팅
 author: Nine
 date: 2025-12-19 03:24:06
 categories:
+  - DevOps
 tags:
   - devlog
-  - note-template
-image:
-Status: InProgress
+  - Obsidian
+  - Blog
+  - Infra
+  - CI/CD
+  - 옵시디언
+  - 통합배포
+  - 유지운영
+  - SSoT
+  - Quartz
+  - Jekyll
+  - Hugo
+  - Submodule
+# image: Status: Testing
 ---
 ## 📌개요
 
@@ -467,23 +478,29 @@ jobs:
           fi
 
           # 3. 파일 복사 및 변환
+          # 공백이 포함된 파일명을 안전하게 처리하기 위해 IFS 설정
+          SAVEIFS=$IFS
+          IFS=$'\n'
+
           for file in $PUBLISH_FILES; do
             # 파일명만 추출
             filename=$(basename "$file")
             dest="hugo-dest/content/post/$filename"
             
-            # 복사
+            # 복사 (파일 경로에 따옴표 필수)
             cp "$file" "$dest"
 
             # 4. Perl 스트림 치환 (성능 최적화 버전)
-            # 위키링크 치환: ![](/assets/images/image.png) -> ![](/assets/images/image.png)
-            # http/https로 시작하지 않는 로컬 파일명만 타겟팅
+            # 변수 $dest를 따옴표로 감싸서 공백 대응
             perl -i -pe 's/!\[\[(?!https?:\/\/)(.*?)\]\]/![](/assets/images/\/assets\/images\/$1)/g' "$dest"
-
-            # 표준 마크다운 경로 보정: ![](/assets/images/) -> ![](/assets/images/...)
-            # 1) 외부 링크(http) 제외 2) 이미 올바른 경로(/assets/images/) 제외
             perl -i -pe 's/!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$1\](\/assets\/images\/$2)/g' "$dest"
+            
+            # image: 속성이 비어있으면 주석 처리하여 Hugo 에러 방지
+            perl -i -pe 's/^image:\s*$/# image: /g' "$dest"
           done
+
+          # IFS 복구
+          IFS=$SAVEIFS
 
       - name: Push to Hugo Repo
         run: |
@@ -514,9 +531,31 @@ GitHub 저장소의 소스를 다른 곳에 서빙하기 위한 권한 문제인
 
 Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 빌드할 때 포함되지 않았던 것. 빌드할 때 submodule에 대한 정의가 없어서 그냥 빈 폴더처럼 다루고 있었던 것이었다. 경로는 내가 계획한 게 맞았고 Actions 실행되는 동안 내부적으로 그 소스에 접근해서 빌드를 생성할 수 있게 설정이 필요했다.
 
+올바르게 구성하고 이미지 확인까지 한 후 기존의 포스팅을 다시 점검하는 시간을 가지게 됐다.
+
+### Properties 관리
+
+문서 상단 Properties를 표준화해서 관리한다면 이후에 다른 모듈로 변경할 때 상당히 간편한 전환을 기대할 수 있겠다.
+
+```yaml
+publish: true
+title: 문서 제목
+description: 문서 설명
+author: 작성자
+date: 작성일시
+categories:
+  - Level1
+  - Level2
+tags:
+  - tag1
+  - tag2
+# image: Status: ToDo
+```
+
 ## 🎯결론
 
-올바르게 구성하고 이미지 확인까지 한 후 기존의 포스팅을 다시 점검하는 시간을 가지게 됐다.
+옵시디언 데이터를 SSoT로 삼아 GitHub Actions 환경에서 입맛에 맞게 소스를 가공한 뒤 원하는 배포 툴을 이용해 빌드 및 배포하며 GitHub 저장소를 활용해서 첨부 파일을 서빙하는 구조를 완성했다.
+
 호스팅 쓰자. 🙂
 
 ## ⚙️EndNote

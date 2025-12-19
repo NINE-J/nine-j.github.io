@@ -13,8 +13,7 @@ tags:
   - trigonometric
   - 수학
   - 삼각함수
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

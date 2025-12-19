@@ -14,8 +14,7 @@ tags:
   - OOP
   - Polymorphism
   - Dynamic-Binding
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 

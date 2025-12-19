@@ -19,8 +19,7 @@ tags:
   - merge-sort
   - quick-sort
   - heap-sort
-image:
-Status: Done
+# image: Status: Done
 ---
 ## 📌개요
 
