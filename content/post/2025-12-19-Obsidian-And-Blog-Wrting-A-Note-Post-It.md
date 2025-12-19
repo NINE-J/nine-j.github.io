@@ -472,14 +472,14 @@ jobs:
           rm -rf hugo-dest/content/post/*
           mkdir -p hugo-dest/content/post/
 
-          # 2. 고속 상단 스캔 (상단 10줄 이내만 검사)
-          # 대상 폴더들을 나열합니다.
-          TARGET_PATHS="02.Resource/*.md 03.Area/*.md 04.Archive/*.md"
+          # 2. 하위 폴더 탐색 활성화 및 awk 실행
+          # shopt -s globstar: ** 패턴 사용을 위한 셸 옵션 활성화
+          shopt -s globstar 
           
           PUBLISH_FILES=$(awk '
-            FNR <= 10 && /^publish: true/ { print FILENAME; nextfile } 
-            FNR > 10 { nextfile }
-          ' $TARGET_PATHS || true)
+            FNR <= 15 && /publish: true/ { print FILENAME; nextfile } 
+            FNR > 15 { nextfile }
+          ' 02.Resource/**/*.md 03.Area/**/*.md 04.Archive/**/*.md || true)
 
           if [ -z "$PUBLISH_FILES" ]; then
             echo "배포 대상 파일이 없습니다."
@@ -568,6 +568,12 @@ tags:
   - tag2
 # image: Status: ToDo
 ```
+
+### 상태 유지형 업데이트 개선 방향
+
+현재는 문서량이 적으므로 전수 조사 후 전체 복사 방식이 가장 에러가 없고 관리하기 편하다.
+
+지금처럼 모두 지우고 새로 복사하는 것이 아니라 **파일의 변경 상태를 비교**하여 필요한 동작만 수행하는 방식으로 개선해보자.
 
 ## 🎯결론
 
