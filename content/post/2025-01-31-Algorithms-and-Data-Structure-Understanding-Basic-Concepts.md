@@ -14,9 +14,6 @@ tags:
   - 이론
   - theory
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

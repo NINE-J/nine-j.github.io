@@ -14,9 +14,6 @@ tags:
   - 객체지향
   - OOP
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

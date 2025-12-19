@@ -15,9 +15,6 @@ tags:
   - Overload
   - Override
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

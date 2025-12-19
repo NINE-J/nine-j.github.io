@@ -14,9 +14,6 @@ tags:
   - 수학
   - 삼각함수
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

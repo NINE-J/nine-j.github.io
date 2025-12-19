@@ -20,9 +20,6 @@ tags:
   - quick-sort
   - heap-sort
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

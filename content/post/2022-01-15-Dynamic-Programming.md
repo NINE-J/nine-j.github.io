@@ -13,9 +13,6 @@ tags:
   - 동적계획법
   - 기저사례
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌DP란

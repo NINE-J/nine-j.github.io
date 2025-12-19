@@ -15,9 +15,6 @@ tags:
   - Polymorphism
   - Dynamic-Binding
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

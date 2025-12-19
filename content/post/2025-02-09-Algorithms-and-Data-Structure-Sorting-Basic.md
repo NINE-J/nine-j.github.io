@@ -20,9 +20,6 @@ tags:
   - selection-sort
   - insertion-sort
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

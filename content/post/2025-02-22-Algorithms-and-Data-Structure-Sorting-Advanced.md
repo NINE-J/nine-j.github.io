@@ -20,9 +20,6 @@ tags:
   - radix-sort
   - tim-sort
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요

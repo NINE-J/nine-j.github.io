@@ -13,9 +13,6 @@ tags:
   - MathJax
   - Latex
 image:
-  path:
-  lqip:
-  alt:
 Status: Done
 ---
 ## 📌개요
