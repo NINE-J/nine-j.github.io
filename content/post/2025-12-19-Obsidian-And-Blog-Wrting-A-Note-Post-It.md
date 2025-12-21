@@ -441,7 +441,12 @@ Obsidian 저장소가 Hugo 저장소에 접근하여 파일을 push해야 하므
 
 이후엔 게시된 문서를 유지하며 신규 문서 추가, 변경된 파일만 업데이트 방식으로 변경 필요.
 
-```yaml
+>[!TIP]
+>마크다운 표준에서는 코드 블록 내부에 ` ``` `이 들어갈 경우 외부 감싸개는 그보다 많은 백틱 4개(` ```` `)를 사용하도록 권장한다.
+>
+>예를 들어 코드 블록을 설명하기 위한 코드 블럭을 작성할 때, 중첩 코드 블럭이 작성되는 경우 백틱 4개를 사용한다면 정규식으로 정의하기 편리해진다.
+
+````yaml
 name: Deploy Posts to Hugo
 
 on:
@@ -505,15 +510,16 @@ jobs:
             # 4. Perl 스트림 치환 (성능 최적화 및 코드 블록 보호 버전)
             # 변수 $dest를 따옴표로 감싸서 공백 대응
             # (*SKIP)(*F)를 사용하여 백틱(`) 또는 코드 블록(```) 내부의 텍스트는 치환에서 제외함
-            # 1. (^|\n)``` : 줄의 시작이거나 줄바꿈 뒤에 오는 백틱 3개만 시작으로 인정
-            # 2. [\s\S]*? : 내부 내용은 무엇이든 포함
-            # 3. (?=\n```|$) : 다음에 오는 줄바꿈+백틱 3개 또는 파일의 끝을 미리 보기(Lookahead)하여 거기까지만 매칭
+            # 줄의 시작이거나 줄바꿈 뒤에 오는 백틱 4개, 3개만 시작으로 인정
+            # [\s\S]*? : 내부 내용은 무엇이든 포함
+            # 다음에 오는 줄바꿈+백틱 4개 또는 백틱 3개 또는 파일의 끝을 미리 보기(Lookahead)하여 거기까지만 매칭
+            # 백틱 4개 블록 먼저 스킵 -> 백틱 3개 블록 스킵 -> 인라인 백틱 스킵 순서
 
-            # 4-1. WikiLink 형태 치환: ![](/assets/images/image.png) -> ![](/assets/images/image.png)
-            perl -i -0777 -pe 's/(^|\n)```[\s\S]*?\n```(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[\[(?!https?:\/\/)(.*?)\]\]/![](/assets/images/\/assets\/images\/$2)/gs' "$dest"
+            # 4-1. WikiLink 형태 치환: ![[image.png]] -> ![](/assets/images/image.png)
+            perl -i -0777 -pe 's/(?:^|\n)````[\s\S]*?\n````(?:\n|$)(*SKIP)(*F)|(?:^|\n)```[\s\S]*?\n```(?:\n|$)(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[\[(?!https?:\/\/)(.*?)\]\]/![](\/assets\/images\/$1)/gs' "$dest"
 
-            # 4-2. 표준 Markdown 형태 경로 보정: ![alt](/assets/images/image.png) -> ![alt](/assets/images/image.png)
-            perl -i -0777 -pe 's/(^|\n)```[\s\S]*?\n```(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$2\](/assets/images/\/assets\/images\/$3)/gs' "$dest"
+            # 4-2. 표준 Markdown 형태 경로 보정: ![alt](image.png) -> ![alt](/assets/images/image.png)
+            perl -i -0777 -pe 's/(^|\n)```[\s\S]*?\n```(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$2\](\/assets\/images\/$3)/gs' "$dest"
             
             # image: 속성이 비어있으면 주석 처리하여 Hugo 에러 방지
             perl -i -pe 's/^image:\s*$/# image: /g' "$dest"
@@ -535,7 +541,7 @@ jobs:
           else
             echo "변경 사항이 없어 생략합니다."
           fi
-```
+````
 
 #### 파일 탐색 방식 기술 비교
 
@@ -599,7 +605,7 @@ tags:
 - **Static Site Generator (SSG)**: 정적 사이트 생성기. 마크다운 같은 텍스트 파일을 빌드 시점에 정적 HTML로 변환해주는 도구로 Hugo, Jekyll, Quartz 등이 대표적이다.
 - **Git Submodule**: 하나의 Git 저장소 안에 다른 Git 저장소를 하위 폴더로 포함하는 기능이다.
 - **GitHub Actions (CI/CD)**: 코드가 Push될 때 특정 작업을 자동으로 수행하는 도구다. 여기서는 문서 필터링, 문법 치환, 파일 전송의 자동화 엔진 역할을 한다.
-- **Regular Expression (Regex)**: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(`![[]]`)를 마크다운 링크(`![](/assets/images/)`)로 변환하는 등에 핵심적으로 사용된다.
+- **Regular Expression (Regex)**: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(`![](/assets/images/)`)를 마크다운 링크(`![](/assets/images/)`)로 변환하는 등에 핵심적으로 사용된다.
 
 ### 더 알아보기
 
