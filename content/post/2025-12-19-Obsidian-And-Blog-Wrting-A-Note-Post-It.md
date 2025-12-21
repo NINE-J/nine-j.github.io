@@ -507,10 +507,10 @@ jobs:
             # (*SKIP)(*F)를 사용하여 백틱(`) 또는 코드 블록(```) 내부의 텍스트는 치환에서 제외함
 
             # 4-1. WikiLink 형태 치환: ![](/assets/images/image.png) -> ![](/assets/images/image.png)
-            perl -i -0777 -pe 's/```.*?```(*SKIP)(*F)|`.*?`(*SKIP)(*F)|!\[\[(?!https?:\/\/)(.*?)\]\]/![](/assets/images/\/assets\/images\/$1)/gs' "$dest"
+            perl -i -0777 -pe 's/```[\s\S]*?```(*SKIP)(*F)|`.*?`(*SKIP)(*F)|!\[\[(?!https?:\/\/)(.*?)\]\]/![](/assets/images/\/assets\/images\/$1)/g' "$dest"
 
             # 4-2. 표준 Markdown 형태 경로 보정: ![alt](/assets/images/image.png) -> ![alt](/assets/images/image.png)
-            perl -i -0777 -pe 's/```.*?```(*SKIP)(*F)|`.*?`(*SKIP)(*F)|!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$1\](/assets/images/\/assets\/images\/$2)/gs' "$dest"
+            perl -i -0777 -pe 's/```[\s\S]*?```(*SKIP)(*F)|`.*?`(*SKIP)(*F)|!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$1\](/assets/images/\/assets\/images\/$2)/g' "$dest"
             
             # image: 속성이 비어있으면 주석 처리하여 Hugo 에러 방지
             perl -i -pe 's/^image:\s*$/# image: /g' "$dest"
