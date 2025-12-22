@@ -1,5 +1,6 @@
 ---
-publish: true
+publish: false
+draft: true
 title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
@@ -446,8 +447,6 @@ Obsidian 저장소가 Hugo 저장소에 접근하여 파일을 push해야 하므
 >
 >만약 코드 내부에 백틱 4개가 들어있다면 외부는 5개로 감싸야 하며, 이 개수에는 제한이 없다.
 >반드시 바깥쪽이 안쪽보다 최소 1개는 더 많아야 한다.
->
->예를 들어 코드 블록을 설명하기 위한 코드 블럭을 작성할 때, 중첩 코드 블럭이 작성되는 경우 백틱 4개를 사용한다면 정규식으로 정의하기 편리해진다.
 
 ````yaml
 name: Deploy Posts to Hugo
@@ -578,6 +577,7 @@ Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 
 
 ```yaml
 publish: true
+draft: false
 title: 문서 제목
 description: 문서 설명
 author: 작성자
@@ -597,9 +597,155 @@ tags:
 
 지금처럼 모두 지우고 새로 복사하는 것이 아니라 **파일의 변경 상태를 비교**하여 필요한 동작만 수행하는 방식으로 개선해보자.
 
+````yaml
+# AS-IS: 전체 삭제 후 복사
+# 1. 일단 다 지움 (이 때문에 Git 히스토리가 매번 끊김)
+rm -rf hugo-dest/content/post/*
+mkdir -p hugo-dest/content/post/
+
+# 2. 파일마다 바로 Hugo 저장소로 복사
+for file in $PUBLISH_FILES; do
+  dest="hugo-dest/content/post/$filename"
+  cp "$file" "$dest"
+  # 여기서 치환을 수행 (치환 중 실패하면 Hugo 저장소 파일이 오염됨)
+done
+
+# TO-BE: 임시 폴더 작업 후 rsync 동기화
+# 1. 기존 파일을 지우지 않고 임시 작업장 생성
+mkdir -p temp_posts
+
+# 2. 임시 폴더에서 안전하게 모든 변환 완료
+for file in $PUBLISH_FILES; do
+  dest="temp_posts/$filename"
+  cp "$file" "$dest"
+  # Perl 치환 수행 (성공한 결과물만 임시 폴더에 쌓임)
+done
+
+# 3. rsync로 실제 바뀐 파일만 골라서 Hugo 저장소에 '동기화'
+rsync -av --checksum temp_posts/ hugo-dest/content/post/
+````
+
+"신규 게시, 업데이트하고 싶은 건 `Resource`로 가져온다"는 단 하나의 원칙만 지키면 된다.
+**Obsidian은 UPSERT에 집중하고 Hugo는 게시 상태를 판단한다.**
+
+- **수정(Update):** `Resource`에서 내용을 고치고 배포하면 Hugo에 이미 있는 같은 이름의 파일을 덮어쓴다.
+- **누적(Accumulate):** `Resource`에서 작업이 끝나 `Area`로 옮겨버려도 다음 배포 시 `Resource`만 스캔하므로 Hugo에 이미 들어가 있는 파일은 건드리지 않고 그대로 유지된다.
+
+>[!INFO]
+>[Hugo - Front matter](https://gohugo.io/content-management/front-matter/)
+>문서 상단 속성의 `publish` 값으로 게시 상태를 판단하려고 했는데 Hugo에서 기본적으로 `draft` 값으로 게시 상태를 다룰 수 있어서 이걸 활용한다.
+
+````yaml
+name: Deploy Posts to Hugo
+
+on:
+  push:
+    branches:
+      - main  # 브랜치명
+    paths: # PARA 체계 중 배포 대상이 포함된 폴더만 감시
+      - '02.Resource/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Obsidian Vault
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 증분 배포(diff)를 위해 전체 이력 가져오기
+
+      - name: Set up Hugo Repo
+        uses: actions/checkout@v4
+        with:
+          repository: [계정]/[Hugo_저장소_이름]
+          token: ${{ secrets.HUGO_DEPLOY_TOKEN }}
+          path: hugo-dest # Hugo 저장소를 임시 폴더에 체크아웃
+
+      - name: Filter and Transform Posts
+        run: |
+          # 1. 폴더를 비우지 않고, 변환 작업을 위한 임시 스테이징 폴더 생성
+          mkdir -p temp_posts
+          mkdir -p hugo-dest/content/post/ # 대상 폴더가 없을 경우 대비
+
+          # 2. 하위 폴더 탐색 및 awk 실행
+          # shopt -s globstar: ** 패턴 사용을 위한 셸 옵션 활성화
+          shopt -s globstar 
+          
+          PUBLISH_FILES=$(awk '
+            FNR <= 15 && /publish: (true|false)/ { print FILENAME; nextfile }
+            FNR > 15 { nextfile }
+          ' 02.Resource/**/*.md || true)
+
+          if [ -z "$PUBLISH_FILES" ]; then
+            echo "배포 대상 파일이 없습니다."
+            exit 0
+          fi
+
+          # 3. 파일 복사 및 변환 대상을 temp_posts로 지정
+          # 공백이 포함된 파일명을 안전하게 처리하기 위해 IFS 설정
+          SAVEIFS=$IFS
+          IFS=$'\n'
+
+          for file in $PUBLISH_FILES; do
+            # 파일명만 추출
+            filename=$(basename "$file")
+            # hugo-dest가 아닌 임시 폴더(temp_posts)에 먼저 복사
+            dest="temp_posts/$filename"
+            
+            # 복사 (파일 경로에 따옴표 필수)
+            cp "$file" "$dest"
+
+            # 4. Perl 통합 치환 (코드 블록 보호 및 경로 보정)
+            # - 동적 백틱 개수 대응: 시작한 백틱 개수만큼 닫는 백틱이 나올 때까지 스킵
+            # - 인라인 코드 보호: 한 줄 내의 백틱 영역 스킵
+            # - 위키링크 변환 및 표준링크 프리픽스 보정을 한 번의 스캔으로 처리
+            perl -i -0777 -pe '
+              s/
+                (?:^|\n)(`{3,})[\s\S]*?\n\1(?:\n|$) (*SKIP)(*F) |
+                `[^`\n]+` (*SKIP)(*F) |
+                (?:
+                  !\[\[(?!https?:\/\/)(.*?)\]\] |
+                  !\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)
+                )
+              /
+                $2 ? "![](\/assets\/images\/$2)" : "!\[$3\](\/assets\/images\/$4)"
+              /gex' "$dest"
+            
+            # [추가] publish: false 발견 시 바로 다음 줄에 draft: true 삽입, Hugo에서 제공하는 front matter 활용
+            # s/찾을패턴/대체패턴/g 활용
+            perl -i -pe 's/^(publish:\s*false)/$1\ndraft: true/g' "$dest"
+            perl -i -pe 's/^(publish:\s*true)/$1\ndraft: false/g' "$dest"
+            
+            perl -i -pe 's/^image:\s*$/# image: /g' "$dest"
+          done
+
+          # 5. rsync를 이용한 UPSERT (변경 상태 비교 및 동기화)
+          # --checksum: 파일 내용이 실제로 변했는지 체크
+          rsync -av --checksum temp_posts/ hugo-dest/content/post/
+
+          # IFS 복구
+          IFS=$SAVEIFS
+
+      - name: Push to Hugo Repo
+        run: |
+          cd hugo-dest
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          # 변경사항이 있을 때만 커밋
+          if ! git diff --cached --quiet; then
+            git commit -m "Update posts from Obsidian (at $(date +'%Y-%m-%d %H:%M:%S'))"
+            git push origin master
+          else
+            echo "변경 사항이 없어 배포를 진행하지 않습니다."
+          fi
+````
+
 ## 🎯결론
 
 옵시디언 데이터를 SSoT로 삼아 GitHub Actions 환경에서 입맛에 맞게 소스를 가공한 뒤 원하는 배포 툴을 이용해 빌드 및 배포하며 GitHub 저장소를 활용해서 첨부 파일을 서빙하는 구조를 완성했다.
+
+각 저장소가 어떤 책임을 가지는지, GitHub Actions에서 어떤 처리를 해주면 처리가 간편해지는지 고민해볼 수 있어서 좋았다.
 
 호스팅 쓰자. 🙂
 
