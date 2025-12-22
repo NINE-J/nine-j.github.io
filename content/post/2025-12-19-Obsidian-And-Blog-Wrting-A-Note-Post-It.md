@@ -510,15 +510,21 @@ jobs:
             # 복사 (파일 경로에 따옴표 필수)
             cp "$file" "$dest"
 
-            # 4. Perl 스트림 치환 (성능 최적화 및 코드 블록 보호 버전)
-            # 변수 $dest를 따옴표로 감싸서 공백 대응
-            # (*SKIP)(*F)를 사용하여 백틱(`) 또는 코드 블록((```)(3개 이상 동적 백틱 개수 대응)) 내부의 텍스트는 치환에서 제외함
-
-            # 4-1. WikiLink 형태 치환: ![[image.png]] -> ![](/assets/images/image.png)
-            perl -i -0777 -pe 's/(?:^|\n)(`{3,})[\s\S]*?\n\1(?:\n|$)(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[\[(?!https?:\/\/)(.*?)\]\]/![](\/assets\/images\/$2)/gs' "$dest"
-
-            # 4-2. 표준 Markdown 형태 경로 보정: ![alt](image.png) -> ![alt](/assets/images/image.png)
-            perl -i -0777 -pe 's/(^|\n)```[\s\S]*?\n```(*SKIP)(*F)|`[^`\n]+`(*SKIP)(*F)|!\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)/!\[$2\](\/assets\/images\/$3)/gs' "$dest"
+            # 4. Perl 통합 치환 (성능 최적화 및 중첩 코드 블록 완벽 보호)
+            # - 동적 백틱 개수 대응: 시작한 백틱 개수만큼 닫는 백틱이 나올 때까지 스킵
+            # - 인라인 코드 보호: 한 줄 내의 백틱 영역 스킵
+            # - 위키링크 변환 및 표준링크 프리픽스 보정을 한 번의 스캔으로 처리
+            perl -i -0777 -pe '
+              s/
+                (?:^|\n)(`{3,})[\s\S]*?\n\1(?:\n|$) (*SKIP)(*F) |
+                `[^`\n]+` (*SKIP)(*F) |
+                (?:
+                  !\[\[(?!https?:\/\/)(.*?)\]\] |
+                  !\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)
+                )
+              /
+                $2 ? "![](\/assets\/images\/$2)" : "!\[$3\](\/assets\/images\/$4)"
+              /gex' "$dest"
             
             # image: 속성이 비어있으면 주석 처리하여 Hugo 에러 방지
             perl -i -pe 's/^image:\s*$/# image: /g' "$dest"
