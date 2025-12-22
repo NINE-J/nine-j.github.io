@@ -1,6 +1,6 @@
 ---
-publish: false
-draft: true
+publish: true
+draft: false
 title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
