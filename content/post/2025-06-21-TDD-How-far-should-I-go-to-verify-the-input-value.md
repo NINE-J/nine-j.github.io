@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: 입력값 검증 어디까지 해야 할까?
 description: 중복 없는 계층별 검증 전략과 트레이드오프 분석
 author: Nine

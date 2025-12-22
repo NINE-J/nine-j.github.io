@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: SVN을 사용해보자.
 description: "SVN: SubVersion"
 author: Nine

@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: IAM 사용자로 AWS 관리
 description: 권한 관리 이유 및 방법
 author: Nine

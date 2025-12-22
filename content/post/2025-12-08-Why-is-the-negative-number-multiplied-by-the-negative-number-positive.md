@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: 음수 * 음수 = 양수?
 description: 태세전환 뭔데
 author: Nine

@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: ACID
 description: 트랜잭션 4대 원칙
 author: Nine

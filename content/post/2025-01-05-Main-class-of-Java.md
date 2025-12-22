@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Java의 main 클래스
 description: main은 왜 main이지?
 author: Nine

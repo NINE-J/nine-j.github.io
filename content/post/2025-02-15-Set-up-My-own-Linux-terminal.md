@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: 나만의 리눅스 터미널 설정
 description: 유용한 터미널 설정을 알아보자
 author: Nine

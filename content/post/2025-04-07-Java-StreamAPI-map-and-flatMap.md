@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Java Stream API
 description: map() vs flatMap()
 author: Nine

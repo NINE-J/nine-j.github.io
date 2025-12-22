@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Github Template
 description: Github Template을 알아본다.
 author: Nine

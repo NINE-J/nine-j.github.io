@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: AWS 배포 기초
 description: 가장 기초적인 개념
 author: Nine

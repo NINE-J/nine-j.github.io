@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: 자주 사용하는 특수 문자 정리
 description: 개발, 설계 구조화, 기술 블로그 표현 등
 author: Nine

@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: No static resource
 description: .well-known/appspecific/com.chrome.devtools.json.
 author: Nine

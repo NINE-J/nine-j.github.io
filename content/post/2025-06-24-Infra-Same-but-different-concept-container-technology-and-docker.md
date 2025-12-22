@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: 컨테이너 기술 vs Docker
 description: 컨테이너 기술의 본질을 이해하자
 author: Nine

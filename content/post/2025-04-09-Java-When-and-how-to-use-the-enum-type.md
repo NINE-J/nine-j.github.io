@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Java Enum
 description: 제한된 상수의 타입 안정성
 author: Nine

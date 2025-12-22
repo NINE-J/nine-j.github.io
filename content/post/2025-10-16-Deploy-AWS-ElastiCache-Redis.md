@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: AWS ElastiCache Redis 배포
 description: Spring Boot 분산 환경 Redis AWS 운영 구성
 author: Nine

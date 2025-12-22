@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Spring 핵심 철학
 description: feat.POJO, DRY, SRP, SoC, TDD
 author: Nine

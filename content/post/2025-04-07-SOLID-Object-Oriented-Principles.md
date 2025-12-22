@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: "SOLID 원칙: 객체지향의 5가지 원칙"
 description: 더 유연한 소프트웨어를 위한 설계 지침
 author: Nine

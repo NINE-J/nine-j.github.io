@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: "알고리즘과 자료구조: 고급 정렬"
 description: 고급 정렬을 이해할 수 있다.
 author: Nine

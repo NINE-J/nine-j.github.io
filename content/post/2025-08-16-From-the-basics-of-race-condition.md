@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Race condition 뿌리부터 잡기
 description: 자바 실전 대응 전략
 author: Nine

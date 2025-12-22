@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: "Java 객체지향: 추상 클래스"
 description: 개념과 필요성을 알아보자
 author: Nine

@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: TCP vs UDP
 description: 신뢰와 속도 프로토콜 비교
 author: Nine

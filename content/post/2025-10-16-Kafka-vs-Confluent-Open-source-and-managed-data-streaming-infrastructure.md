@@ -1,5 +1,6 @@
 ---
 publish: true
+draft: false
 title: Kafka vs Confluent
 description: 오픈 소스와 관리형 데이터 스트리밍 인프라
 author: Nine
