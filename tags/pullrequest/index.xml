@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PullRequest on B9F1</title><link>https://b9f1.com/tags/pullrequest/</link><description>Recent content in PullRequest on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://b9f1.com/tags/pullrequest/index.xml" rel="self" type="application/rss+xml"/><item><title>VSCode에서 PR 보기</title><link>https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://b9f1.com/p/2025-05-06-vscode-github-pull-requests/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;VSCode에서 PR 보려는데 복잡시럽다 복잡시러.
+IntelliJ Ultimate/Community에선 GitHub 플러그인으로 손쉽게 확인이 가능하다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ide에서-pr을-확인하면-좋은-점"&gt;IDE에서 PR을 확인하면 좋은 점
+&lt;/h3&gt;&lt;p&gt;코드 리뷰에 대한 코멘트를 &lt;strong&gt;바로 파일의 라인에서 확인&lt;/strong&gt;할 수 있다.
+의견이 있어서 Reply를 남기거나 수정 완료를 곧바로 처리할 수 있다.&lt;/p&gt;
+&lt;p&gt;![](/assets/images/Pasted image 20250506022741.png)&lt;/p&gt;
+&lt;h3 id="github-pull-requests"&gt;GitHub Pull Requests
+&lt;/h3&gt;&lt;p&gt;![](/assets/images/Pasted image 20250506021354.png)&lt;/p&gt;
+&lt;p&gt;현재 기준 GitHub Pull Requests를 설치한다. &lt;a class="link" href="https://marketplace.visualstudio.com/items/?itemName=GitHub.vscode-pull-request-github" target="_blank" rel="noopener"
+&gt;VSCode marketplace - GitHub Pull Requests&lt;/a&gt;
+예전 이름은 GitHub Pull Requests and Issues였나 보다.
+기능은 같아서 PR, Issues를 확인할 수 있다.&lt;/p&gt;
+&lt;h3 id="근데-이게-문제였다"&gt;근데 이게 문제였다
+&lt;/h3&gt;&lt;p&gt;확장 설치하면 열려 있는 PR만 확인이 됐다.
+필요한 다른 항목은 쿼리를 수정해줘야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Ctrl + Shift + P&lt;/code&gt; 명령 팔레트&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;gt;GitHub Pull Requests: Configure
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 엔터 치면 두 개 나온다&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Configure Remotes...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Configure Queries...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;![](/assets/images/Pasted image 20250506024023.png)&lt;/p&gt;
+&lt;p&gt;나는 닫힌 PR을 확인해야 해서 추가했다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// settings.json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// ... others
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;githubPullRequests.queries&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;// ... others
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;label&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;My Closed PRs&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;query&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;is:closed assignee:${user}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;필요에 맞게 수정 후 새로고침하면 잘 확인된다.&lt;/p&gt;
+&lt;p&gt;![](/assets/images/Pasted image 20250506023804.png)&lt;/p&gt;</description></item></channel></rss>
