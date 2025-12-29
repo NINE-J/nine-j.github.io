@@ -4,7 +4,7 @@ draft: false
 title: Spring 핵심 철학
 description: feat.POJO, DRY, SRP, SoC, TDD
 author: Nine
-date: 2025-04-29T00:00:00
+date: 2025-04-29 00:00:00
 categories:
   - Spring
 tags:

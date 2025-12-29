@@ -4,7 +4,7 @@ draft: false
 title: Dynamic Programming
 description: DP를 알아보자
 author: Nine
-date: 2022-01-15T10:00
+date: 2022-01-15 10:00:00
 categories:
   - 알고리즘
 tags:

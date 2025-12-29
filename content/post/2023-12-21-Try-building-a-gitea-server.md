@@ -4,7 +4,7 @@ draft: false
 title: Gitea 서버 구축해보기
 description: 네트워크 망에서 버전 관리
 author: Nine
-date: 2023-12-21T00:00:00
+date: 2023-12-21 00:00:00
 categories:
   - VersionControl
   - Gitea
