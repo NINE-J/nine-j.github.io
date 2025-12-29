@@ -4,7 +4,7 @@ draft: false
 title: "Java 문법: 가변 인자"
 description: Java의 가변 인자를 이해하고 적절히 사용할 수 있다.
 author: Nine
-Created: 2025-03-29
+date: 2025-03-29
 categories:
   - Java
   - 문법

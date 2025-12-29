@@ -4,7 +4,7 @@ draft: false
 title: "Docker 시작하기: 기초 개념과 필수 지식 정리"
 description: 기초 개념과 필수 지식 정리
 author: Nine
-Created: 2025-01-27
+date: 2025-01-27
 categories:
   - Docker
 tags:

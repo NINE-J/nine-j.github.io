@@ -4,7 +4,7 @@ draft: false
 title: "Java 객체지향: 오버로드와 오버라이딩"
 description: 오버로드와 오버라이딩의 차이를 안다.
 author: Nine
-Created: 2025-03-29
+date: 2025-03-29
 categories:
   - Java
   - 객체지향

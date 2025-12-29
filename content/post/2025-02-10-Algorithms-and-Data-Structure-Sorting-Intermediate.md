@@ -4,7 +4,7 @@ draft: false
 title: "알고리즘과 자료구조: 중급 정렬"
 description: 중급 정렬을 이해할 수 있다.
 author: Nine
-Created: 2025-02-10
+date: 2025-02-10
 categories:
   - 알고리즘
   - 이론

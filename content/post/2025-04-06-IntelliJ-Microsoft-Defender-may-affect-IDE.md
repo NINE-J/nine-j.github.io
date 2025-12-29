@@ -4,7 +4,7 @@ draft: false
 title: IntelliJ IDEA에서 프로젝트 경고
 description: Microsoft Defender may affect IDE
 author: Nine
-Created: 2025-04-06
+date: 2025-04-06
 categories:
   - IDE
   - IntelliJ

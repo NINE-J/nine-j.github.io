@@ -4,7 +4,7 @@ draft: false
 title: IntelliJ 메모리 설정
 description: 전역 또는 애플리케이션 별 메모리 설정
 author: Nine
-Created: 2025-04-06
+date: 2025-04-06
 categories:
   - IDE
   - IntelliJ

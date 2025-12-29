@@ -4,7 +4,7 @@ draft: false
 title: SOLID 원칙
 description: 단일 책임 원칙(SRP)과 개방-폐쇄 원칙(OCP)
 author: Nine
-Created: 2025-04-07
+date: 2025-04-07
 categories:
   - 설계
 tags:

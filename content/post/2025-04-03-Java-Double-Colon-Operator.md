@@ -4,7 +4,7 @@ draft: false
 title: Java의 이중 콜론 연산자
 description: Double Colon Operator
 author: Nine
-Created: 2025-04-03
+date: 2025-04-03
 categories:
   - Java
   - 문법

@@ -4,7 +4,7 @@ draft: false
 title: "Java 실행 환경: JVM 메모리 구조의 이해"
 description: JVM 메모리 구조의 이해하고 Java를 실행하자.
 author: Nine
-Created: 2025-04-06
+date: 2025-04-06
 categories:
   - Java
   - 런타임

@@ -4,7 +4,7 @@ draft: false
 title: Java Enum
 description: 제한된 상수의 타입 안정성
 author: Nine
-Created: 2025-04-09
+date: 2025-04-09
 categories:
   - Java
   - 문법

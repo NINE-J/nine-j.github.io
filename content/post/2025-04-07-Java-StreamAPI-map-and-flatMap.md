@@ -4,7 +4,7 @@ draft: false
 title: Java Stream API
 description: map() vs flatMap()
 author: Nine
-Created: 2025-04-07
+date: 2025-04-07
 categories:
   - Java
   - 문법

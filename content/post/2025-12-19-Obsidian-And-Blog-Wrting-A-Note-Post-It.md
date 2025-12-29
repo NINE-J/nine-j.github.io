@@ -21,7 +21,7 @@ tags:
   - Jekyll
   - Hugo
   - Submodule
-# image: Status: InProgress
+# image: Status: Done
 ---
 ## 📌개요
 

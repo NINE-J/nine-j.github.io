@@ -4,7 +4,7 @@ draft: false
 title: Java HashSet
 description: 내부 동작 방식과 중복 제거 메커니즘
 author: Nine
-Created: 2025-04-18
+date: 2025-04-18
 categories:
   - Java
   - 자료구조

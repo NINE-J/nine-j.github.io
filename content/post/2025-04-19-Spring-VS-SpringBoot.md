@@ -4,7 +4,7 @@ draft: false
 title: Spring VS Spring Boot
 description: 개념적 차이, 특징, 언제 어떤 걸 써야 하는지
 author: Nine
-Created: 2025-04-19 12:00:00
+date: 2025-04-19 12:00:00
 categories:
   - Spring
 tags:

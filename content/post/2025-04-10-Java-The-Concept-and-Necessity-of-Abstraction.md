@@ -4,7 +4,7 @@ draft: false
 title: "Java 객체지향: 추상 클래스"
 description: 개념과 필요성을 알아보자
 author: Nine
-Created: 2025-04-10
+date: 2025-04-10
 categories:
   - Java
   - 객체지향
