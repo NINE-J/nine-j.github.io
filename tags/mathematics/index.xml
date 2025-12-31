@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Mathematics on B9F1</title><link>https://b9f1.com/tags/mathematics/</link><description>Recent content in Mathematics on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 08 Dec 2025 23:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/mathematics/index.xml" rel="self" type="application/rss+xml"/><item><title>음수 * 음수 = 양수?</title><link>https://b9f1.com/p/2025-12-08-why-is-the-negative-number-multiplied-by-the-negative-number-positive/</link><pubDate>Mon, 08 Dec 2025 23:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-12-08-why-is-the-negative-number-multiplied-by-the-negative-number-positive/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;누구나 한 번쯤 음수와 음수를 곱할 때($(-) \times (-)$) 또는 음수 앞에 마이너스 기호가 있을 때($-(-)$) 왜 그 결과가 양수가 되는지 근원적인 의문을 가져봤을 것이다.&lt;/p&gt;
+&lt;p&gt;이 현상은 단순히 외워야 할 규칙이 아니라, &lt;strong&gt;수학적 일관성&lt;/strong&gt;이라는 거대한 논리적 체계를 유지하기 위해 &lt;strong&gt;필연적으로 도출된 정의의 산물&lt;/strong&gt;이다. 이 정의가 어떻게 확립되었는지 그리고 그 논리적 배경을 알아 보고 싶다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="0먼저-정수-연산의-약속들을-보자"&gt;0.먼저 정수 연산의 약속들을 보자
+&lt;/h3&gt;
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;공리(公理, Axiom)&lt;/strong&gt;: 증명 없이 참으로 받아들이는 가장 기본적인 원리나 가정
+&lt;ul&gt;
+&lt;li&gt;이론 체계의 출발점이 되는 &amp;lsquo;자명한 진리&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;즉, 근거가 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정의(定義, Definition)&lt;/strong&gt;: 어떤 사물이나 개념의 뜻을 명확하게 정해 놓은 약속
+&lt;ul&gt;
+&lt;li&gt;&amp;lsquo;개념을 규정&amp;rsquo;하는 것&lt;/li&gt;
+&lt;li&gt;이름 붙이기, 불릴 수 있는 이름이 생긴다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;우리가 다루는 정수의 사칙연산 구조를 이해하기 위해서는 이 구조가 성립하기 위해 필수적으로 필요한 몇 가지 공리와 정의를 짚고 넘어가야 한다.&lt;/p&gt;
+&lt;h4 id="공리-연산의-근본-규칙"&gt;공리: 연산의 근본 규칙
+&lt;/h4&gt;&lt;p&gt;공리는 어떤 수학적 체계를 세울 때 증명 없이 참이라고 인정하고 출발하는 근본적인 규칙이다.
+정수의 연산을 규정하는 핵심 공리 중 하나가 바로 &lt;strong&gt;분배 법칙&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;분배 법칙&lt;/strong&gt;: 곰셈과 덧셈을 연결하는 기본 규칙
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;역할&lt;/strong&gt;: 이 법칙은 정수의 세계가 무너지지 않고 일관성 있게 작동하기 위한 최소한의 약속이다.&lt;/li&gt;
+&lt;li&gt;$(a(b + c) = ab + ac)$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="정의-용어와-기호의-약속"&gt;정의: 용어와 기호의 약속
+&lt;/h4&gt;&lt;p&gt;정의는 특정 개념이나 기호가 수학적 맥락에서 무엇을 의미하는지 명확하게 약속하는 것&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;덧셈에 대한 항등원($0$의 정의)&lt;/strong&gt;: 어떤 수와 더해도 그 수 자체가 되는 수
+&lt;ul&gt;
+&lt;li&gt;$a+0 = a$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;덧셈에 대한 역원($-a$의 정의)&lt;/strong&gt;: 어떤 수 $a$와 더했을 때 반드시 $0$이 되게 하는 수. 우리는 이 역원을 $-a$라고 표기하기로 약속한다.
+&lt;ul&gt;
+&lt;li&gt;$a+(-a) = 0$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1의문-이-규칙은-정의인가-설명-가능한가"&gt;1.의문: 이 규칙은 정의인가? 설명 가능한가?
+&lt;/h3&gt;&lt;p&gt;질문은 다음과 같다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;$(-a) \times (-b) = ab$&lt;/strong&gt; 가 성립하는 이유.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;$-(-a) = a$&lt;/strong&gt; 가 성립하는 이유.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이 두 가지 현상은 &lt;strong&gt;수학적 일관성을 유지하기 위한 정의&lt;/strong&gt;인 동시에, 그 정의가 &lt;strong&gt;필연적&lt;/strong&gt;으로 도출되는 &lt;strong&gt;명확한 설명&lt;/strong&gt;이 가능한 현상이다.&lt;/p&gt;
+&lt;p&gt;만약 이 규칙이 아니라면, 우리가 이미 알고 있는 &lt;strong&gt;분배 법칙&lt;/strong&gt; 등의 기본적인 수학 규칙이 정수 전체에서 성립하지 않는 &lt;strong&gt;모순&lt;/strong&gt;에 빠지게 된다.&lt;/p&gt;
+&lt;h3 id="2해결-이중-마이너스-부호의-필연성"&gt;2.해결: 이중 마이너스 부호의 필연성
+&lt;/h3&gt;&lt;p&gt;두 가지 의문 중 $-(-a) = a$ 규칙은 &lt;strong&gt;덧셈의 역원&lt;/strong&gt; 정의만 가지고도 직관적으로 해결된다.&lt;/p&gt;
+&lt;h4 id="이중-마이너스의-의미"&gt;이중 마이너스의 의미
+&lt;/h4&gt;&lt;p&gt;$-(-a)$는 $-a$라는 수의 덧셈에 대한 역원을 의미한다.&lt;/p&gt;
+&lt;h4 id="논리적-필연성"&gt;논리적 필연성
+&lt;/h4&gt;&lt;p&gt;우리는 이미 정의에 의해 $-a+a = 0$ 임을 알고 있다.&lt;/p&gt;
+&lt;p&gt;이 식은 $-a$라는 수에 $a$를 더했더니 $0$이 되었다는 뜻이다.
+따라서 $-a$의 덧셈에 대한 역원은 필연적으로 $a$일 수밖에 없다.&lt;/p&gt;
+$$
+\therefore -(-a) = a
+$$&lt;p&gt;이것은 수직선 상에서 반대의 반대로 돌아와 원래 위치가 되는 것과 같다.&lt;/p&gt;
+&lt;h3 id="3해결-음수-곱하기-음수의-필연적-증명"&gt;3.해결: 음수 곱하기 음수의 필연적 증명
+&lt;/h3&gt;&lt;p&gt;$(-a) \times (-b) = ab$가 성립해야 하는 이유는 우리가 가장 신뢰하는 분배 법칙을 정수 전체에 걸쳐 일관성 있게 유지하기 위함이다.&lt;/p&gt;
+&lt;p&gt;우리는 가장 기본적인 형태인 $(-1) \times (-1) = 1$을 증명함으로써 그 필연성을 확인한다.&lt;/p&gt;
+&lt;h4 id="10을-통한-출발"&gt;1.0을 통한 출발
+&lt;/h4&gt;&lt;p&gt;곱셈에서 어떤 수와 0을 곱하면 0이 되어야 한다는 규칙을 사용한다.&lt;/p&gt;
+$$
+(-1) \times 0 = 0
+$$&lt;h4 id="2역원-정의와-분배-법칙의-적용"&gt;2.역원 정의와 분배 법칙의 적용
+&lt;/h4&gt;&lt;p&gt;$0$ 대신 역원의 정의$(1+(-1)=0)$를 대입한다.&lt;/p&gt;
+$$
+(-1) \times (1+(-1)) = 0
+$$&lt;p&gt;이제 공리인 분배 법칙을 적용하여 괄호를 풀어준다.&lt;/p&gt;
+$$
+((-1) \times 1) + ((-1) \times (-1)) = 0
+$$&lt;h4 id="3일관성-유지를-위한-대입"&gt;3.일관성 유지를 위한 대입
+&lt;/h4&gt;&lt;p&gt;우리는 이미 $양수 \times 음수 = 음수$라는 규칙이 일관성을 위해 필연적으로 정해졌음을 알고 있다. 따라서 $(-1) \times 1 = -1$이다.&lt;/p&gt;
+$$
+(-1) + ((-1) \times (-1)) = 0
+$$&lt;h4 id="4결론-역원의-위치"&gt;4.결론: 역원의 위치
+&lt;/h4&gt;&lt;p&gt;위 식은 $-1$에 $(-1) \times (-1)$을 더했더니 $0$이 되었다는 뜻이다.
+따라서 $(-1) \times (-1)$은 $-1$의 덧셈에 대한 역원이어야 한다.&lt;/p&gt;
+$$
+\therefore (-1) \times (-1) = 1
+$$&lt;p&gt;이 증명은 $음수 \times 음수 = 양수$ 규칙이 수학적 모순을 피하고 기존의 분배 법칙이라는 공리를 지키기 위한 선택이었음을 보여준다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;음수의 부호가 양수로 변하는 조건은 덧셈의 역원의 정의와 분배 법칙이라는 근본적인 공리를 모든 정수에서 일관성 있게 적용하려는 수학적 필연성이다.&lt;/p&gt;
+&lt;p&gt;이 규칙들은 단순한 암기가 아닌 모순이 없는 완벽한 논리 구조를 구축하고자 했던 수학자들의 노력이 담긴 정의의 산물이 아닐까&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;공리 (Axiom):&lt;/strong&gt; 증명 없이 참으로 간주되는 수학적 출발점
+&lt;ul&gt;
+&lt;li&gt;수학에는 분배 법칙 외에도 결합 법칙, 교환 법칙 등 다양한 공리가 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정의 (Definition):&lt;/strong&gt; 특정 개념이나 기호의 의미를 명확하게 약속하는 것&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;덧셈에 대한 역원 (Additive Inverse):&lt;/strong&gt; 어떤 수 $a$와 더했을 때 $0$이 되게 하는 수 ($-a$)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;수학적 일관성(Mathematical Consistency)&lt;/li&gt;
+&lt;li&gt;환(Ring)과 체(field)의 공리&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>삼각함수의 탄젠트 법칙 증명</title><link>https://b9f1.com/p/2025-03-15-proof-of-the-law-of-tangent/</link><pubDate>Sat, 15 Mar 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-03-15-proof-of-the-law-of-tangent/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;탄젠트 법칙이 모든 삼각형에서 어떻게 성립하는지 증명을 정리&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;탄젠트 법칙은 삼각법에서 삼각형의 두 변과 그에 끼인 두 각 사이의 관계를 나타내는 공식이다.
+삼각형의 변과 각을 구하는 데 유용하며, 사인 법칙(Sine Rule)이나 코사인 법칙(Cosine Rule)과 함께 삼각형 문제를 해결하는 데 사용된다.&lt;/p&gt;
+&lt;h3 id="탄젠트-법칙의-증명"&gt;탄젠트 법칙의 증명
+&lt;/h3&gt;&lt;p&gt;![](/assets/images/Drawing Proof-of-the-law-of-tangent 2025-03-22 22.14.22.excalidraw.png)&lt;/p&gt;
+&lt;p&gt;$\triangle ABC$에서 변의 길이를 $a,b,c$ 각각의 대변에 대응하는 각을 $A,B,C$라고 할 때, 탄젠트 법칙은 다음과 같이 표현된다.&lt;/p&gt;
+$$
+\begin{gathered}
+\frac{a-b}{a+b} = \frac{\tan{(\frac{A-B}{2})}}{\tan{(\frac{A+B}{2})}}
+\end{gathered}
+$$&lt;p&gt;
+즉, 두 변의 차와 합의 비율이 두 각의 반각에 대한 탄젠트 비율과 같다는 것을 의미한다.&lt;/p&gt;
+&lt;h4 id="탄젠트-법칙을-삼각함수로-변형"&gt;탄젠트 법칙을 삼각함수로 변형
+&lt;/h4&gt;&lt;p&gt;삼각형의 내각합 성질에 의해&lt;/p&gt;
+$$
+\begin{gathered}
+A + B + C = 180^\circ \\
+A + B = 180^\circ - C
+\end{gathered}
+$$&lt;h4 id="사인-법칙-활용"&gt;사인 법칙 활용
+&lt;/h4&gt;&lt;p&gt;삼각형에서 사인 법칙을 적용한다.&lt;/p&gt;
+$$
+\begin{gathered}
+\frac{a}{\sin{A}} = \frac{b}{\sin{B}} = \frac{c}{\sin{C}} \\
+\frac{a}{b} = \frac{\sin{A}}{\sin{B}}
+\end{gathered}
+$$&lt;p&gt;
+양 변을 변형한다.
+&lt;/p&gt;
+$$
+\begin{gathered}
+\frac{a-b}{a+b} = \frac{\sin{A}-\sin{B}}{\sin{A}+\sin{B}}
+\end{gathered}
+$$&lt;h4 id="삼각함수-변형"&gt;삼각함수 변형
+&lt;/h4&gt;&lt;p&gt;사인 함수의 덧셈과 뺄셈 공식
+&lt;/p&gt;
+$$
+\begin{gathered}
+\sin{A} - \sin{B} = 2\cos{\frac{A+B}{2}}\sin{\frac{A-B}{2}} \\
+\sin{A} + \sin{B} = 2\sin{\frac{A+B}{2}}\cos{\frac{A-B}{2}}
+\end{gathered}
+$$&lt;p&gt;위의 결과를 이용하여 변형한다.
+&lt;/p&gt;
+$$
+\frac{a-b}{a+b} = \frac{2\cos{\frac{A+B}{2}}\sin{\frac{A-B}{2}}}
+{2\sin{\frac{A+B}{2}}\cos{\frac{A-B}{2}}}
+$$&lt;p&gt;
+양 변의 2를 약분한다.
+&lt;/p&gt;
+$$
+\frac{a-b}{a+b} = \frac{\cos{\frac{A+B}{2}}\sin{\frac{A-B}{2}}}
+{\sin{\frac{A+B}{2}}\cos{\frac{A-B}{2}}}
+$$&lt;p&gt;
+분자와 분모를 나누어 확인한다.&lt;/p&gt;
+&lt;p&gt;분자 : $\cos{\frac{A+B}{2}}\sin{\frac{A-B}{2}}$, 분모 : $\sin{\frac{A+B}{2}}\cos{\frac{A-B}{2}}$&lt;/p&gt;
+&lt;p&gt;그럼 이 식은 다음과 같이 분리할 수 있다.&lt;/p&gt;
+$$
+\frac{\sin{\frac{A-B}{2}}}{\cos{\frac{A-B}{2}}} \times \frac{\cos{\frac{A+B}{2}}}{\sin{\frac{A+B}{2}}}
+$$&lt;p&gt;
+이때 첫 번째 항과 두 번째 항을 다음과 같이 정리할 수 있다.&lt;/p&gt;
+&lt;p&gt;첫 번째 항 : $\tan{\frac{A-B}{2}}$, 두 번째 항 : $\frac{1}{\tan{\frac{A+B}{2}}}$&lt;/p&gt;
+&lt;p&gt;즉, 전체 식이 다음과 같이 정리된다.
+&lt;/p&gt;
+$$
+\begin{gathered}
+\frac{\tan{\frac{A-B}{2}}}{\tan{\frac{A+B}{2}}} \\
+\therefore \frac{a-b}{a+b} = \frac{\tan{(\frac{A-B}{2})}}{\tan{(\frac{A+B}{2})}}
+\end{gathered}
+$$&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사인-법칙"&gt;사인 법칙
+&lt;/h3&gt;&lt;p&gt;삼각형의 각 변과 대응하는 내각의 사인값의 비율이 같음을 의미한다.
+&lt;/p&gt;
+$$
+\frac{a}{\sin{A}} = \frac{b}{\sin{B}} = \frac{c}{\sin{C}}
+$$&lt;h3 id="사인-덧셈뺄셈-공식"&gt;사인 덧셈/뺄셈 공식
+&lt;/h3&gt;$$
+\begin{gathered}
+\sin{A} - \sin{B} = 2\cos{\frac{A+B}{2}}\sin{\frac{A-B}{2}} \\
+\sin{A} + \sin{B} = 2\sin{\frac{A+B}{2}}\cos{\frac{A-B}{2}}
+\end{gathered}
+$$&lt;h3 id="탄젠트-함수의-정의"&gt;탄젠트 함수의 정의
+&lt;/h3&gt;&lt;p&gt;탄젠트 함수의 정의는 다음과 같다.
+&lt;/p&gt;
+$$\tan{x} = \frac{\sin{x}}{\cos{x}}$$</description></item><item><title>삼각함수의 코사인 법칙 증명</title><link>https://b9f1.com/p/2025-03-13-proof-of-the-law-of-cosine/</link><pubDate>Thu, 13 Mar 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-03-13-proof-of-the-law-of-cosine/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;코사인 법칙이 모든 삼각형에서 어떻게 성립하는지 증명을 정리&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;코사인 법칙은 삼각형에서 두 변의 길이와 끼인각(사이의 각)을 이용하여 나머지 한 변의 길이를 구할 수 있는 중요한 공식이다.&lt;/p&gt;
+$$a^2=b^2+c^2−2bc\cos A$$&lt;p&gt;위 식은 직각삼각형뿐만 아니라 모든 삼각형에서 성립하는데, 이는 피타고라스 정리를 일반 삼각형으로 확장한 개념이라고 볼 수 있다.&lt;/p&gt;
+&lt;h3 id="코사인-법칙-증명"&gt;코사인 법칙 증명
+&lt;/h3&gt;&lt;p&gt;![](/assets/images/Drawing 2025-03-13 14.16.22.excalidraw.png)&lt;/p&gt;
+&lt;h4 id="점-a에서-bc에-대한-수선의-발을-내림"&gt;점 A에서 BC에 대한 수선의 발을 내림
+&lt;/h4&gt;&lt;p&gt;$\triangle ABC$의 점$A$에서 $\overline{BC}$에 수선의 발을 내려서 점 $D$를 만든다고 하자.
+이때 삼각형은 두 개의 직각삼각형 $\triangle{ABD}$와 $\triangle{ACD}$로 나뉜다.&lt;/p&gt;
+&lt;h4 id="직각삼각형에서-피타고라스-정리-적용"&gt;직각삼각형에서 피타고라스 정리 적용
+&lt;/h4&gt;&lt;p&gt;삼각형의 구성 요소 정리&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\angle{ABC} = B$라고 하자.&lt;/li&gt;
+&lt;li&gt;점 $A$에서 $\overline{BC}$에 내린 수선의 발을 $D$라고 하자.&lt;/li&gt;
+&lt;li&gt;이때 $\overline{BD} = c\cos{B}$, $\overline{AD} = c\sin{B}$이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;피타고라스 정리 사용&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\triangle{ACD}$에서 $\overline{AD}^2+\overline{CD}^2=\overline{AC}^2$
+$$
+\begin{gathered}
+b^2 = (c\sin B)^2 + (a-c\cos B)^2 \\
+\end{gathered}
+$$
+위 피타고라스 정리를 전개
+$$b^2=c^2\sin^2{B} + (a^2-2ac\cos{B}+c^2\cos^2{B})$$
+삼각함수의 항을 묶어서 정리
+$$b^2=c^2(\sin^2{B}+\cos^2{B})+a^2-2ac\cos{B}$$
+삼각함수의 기본 항등식 $\sin^2{B} + \cos^2{B} = 1$을 적용
+$$b^2 = c^2+a^2-2ac\cos{B}$$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="코사인-값-구하기"&gt;코사인 값 구하기
+&lt;/h4&gt;&lt;p&gt;위 식을 코사인에 대해 정리&lt;/p&gt;
+$$\cos{B} = \frac{c^2+a^2-b^2}{2ac}$$&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="단위원unit-circle-개념"&gt;단위원(Unit Circle) 개념
+&lt;/h3&gt;&lt;p&gt;단위원이란 반지름이 1인 원으로, 원점 (0,0)을 중심으로 하는 원이다.&lt;br&gt;
+단위원의 방정식은 다음과 같이 주어진다.&lt;/p&gt;
+$$x^2+y^2=1$$&lt;p&gt;삼각함수를 정의할 때, 단위원을 사용하면 다음과 같이 표현할 수 있다.
+한 점 $P(x,y)$가 원 위에 있고, 이 점이 원점과 이루는 각이 $\theta$일 때,&lt;/p&gt;
+$$
+\begin{gathered}
+x = \cos{\theta} \\
+y = \sin{\theta}
+\end{gathered}
+$$&lt;p&gt;단위원의 정의에 따라 점 $P(x,y)$는 항상 원 위에 있어야 하므로, 다음이 성립한다.&lt;/p&gt;
+$$\cos^2{\theta} + \sin^2{\theta} = 1$$&lt;p&gt;즉, 단위원 위의 모든 점이 원의 방정식을 만족하기 때문에 위의 기본 삼각함수 항등식이 성립한다.&lt;/p&gt;</description></item><item><title>삼각함수의 사인 법칙 증명</title><link>https://b9f1.com/p/2025-03-12-proof-of-the-law-of-sine/</link><pubDate>Wed, 12 Mar 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-03-12-proof-of-the-law-of-sine/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;사인 법칙이 모든 삼각형에서 어떻게 성립하는지 외접원을 이용한 증명을 정리&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="사인-법칙-증명"&gt;사인 법칙 증명
+&lt;/h3&gt;&lt;p&gt;모든 삼각형에는 외접원이 존재한다.
+$\triangle{ABC}$가 있고, 이 삼각형을 둘러싸는 외접원(circumcircle)을 고려하자.
+외접원의 반지름을 R이라고 했을 때, 사인 법칙은 다음과 같이 성립한다.
+&lt;/p&gt;
+$$
+\frac{a}{\sin{A}} = \frac{b}{\sin{B}} = \frac{c}{\sin{C}} = 2R
+$$&lt;ul&gt;
+&lt;li&gt;여기서 $A,B,C$는 삼각형의 각(angle)&lt;/li&gt;
+&lt;li&gt;$a,b,c$는 각각 그에 대응하는 변의 길이(length)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;![](/assets/images/Drawing 2025-03-12 16.39.42.excalidraw.png)&lt;/p&gt;
+&lt;h3 id="a--90"&gt;A &amp;lt; 90
+&lt;/h3&gt;&lt;p&gt;$A$가 $\overparen{BC}$에 대한 원주각을 이루는 점이다.
+외접원의 중심을 포함하며 $\overparen{BC}$에 대한 원주각이 동일하도록 $A&amp;rsquo;$을 설정하면, $\triangle{ABC}$의 외접원의 지름($2R$)을 빗변으로 갖는 $\triangle{A&amp;rsquo;BC}$을 확인할 수 있다.&lt;/p&gt;
+$$
+\begin{gathered}
+\angle A = \angle A' \\
+\sin A' = \frac{a}{2R} = \sin A \\
+\therefore 2R = \frac{a}{\sin A}
+\end{gathered}
+$$&lt;p&gt;
+같은 방식으로 $B$, $C$에 대해서도 확인할 수 있다.&lt;/p&gt;
+&lt;h3 id="a--90-1"&gt;A = 90
+&lt;/h3&gt;&lt;p&gt;단위 원(circle of unit radius)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$\sin{\theta}$ 는 각 $\theta$ 에 대한 y좌표&lt;/li&gt;
+&lt;li&gt;$\cos{\theta}$ 는 각 $\theta$ 에 대한 x좌표&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$\theta = \frac{\pi}{2}$​(즉, $90^\circ$)일 때 좌표 확인, y축의 가장 위쪽에 해당하는 점
+&lt;/p&gt;
+$$(\cos{\frac{\pi}{2}},\sin{\frac{\pi}{2}}) = (0,1)$$&lt;p&gt;
+직각인 $A$를 이용해서 $\sin A$가 1임을 확인한다.
+&lt;/p&gt;
+$$\sin{A} = \sin{90^\circ} = 1$$&lt;p&gt;
+그 다음 반원에 대한 지름 $R$, 빗변 $a$를 이용해 확인한다.
+&lt;/p&gt;
+$$
+\begin{gathered}
+a = 2R = 2R \times 1 = 2R \times \sin{A} \\
+a = 2R \times \sin{A} \\
+\therefore 2R = \frac{a}{\sin{A}}
+\end{gathered}
+$$&lt;p&gt;
+같은 방식으로 $B$, $C$에 대해서도 확인할 수 있다.&lt;/p&gt;
+&lt;h3 id="a--90-2"&gt;A &amp;gt; 90
+&lt;/h3&gt;&lt;p&gt;내접 사각형의 성질을 활용하여 마주보는 두 각의 합이 $\pi (180^\circ)$임을 이용한다.&lt;/p&gt;
+&lt;p&gt;$\triangle{ABC}$의 빗변인 $a = \overline {BC}$ 를 한 변으로 갖는 $\triangle{A&amp;rsquo;BC}$(직각삼각형)를 설정한다.
+외접원에 내접하는 사각형 $ABA&amp;rsquo;C$의 성질을 이용한다.
+&lt;/p&gt;
+$$\angle A + \angle A' = 180 ^\circ$$&lt;p&gt;
+$A$, $A&amp;rsquo;$은 서로 다른 각이지만, 삼각함수의 성질에 의해 $A$, $A&amp;rsquo;$이 보완각 관계를 가지므로 사인 값이 동일하다.
+$\sin$ 함수는 원을 기준으로 y축 값을 측정하는 거라서, 비록 $A$와 $A&amp;rsquo;$이 다르게 생겼다고 해도 사인 값 자체는 동일하게 유지된다.
+&lt;/p&gt;
+$$
+\begin{gathered}
+\sin{A'} = \frac{a}{2R} = \sin{(180 ^\circ - A)} = \sin{A} \\
+\sin{A} = \frac{a}{2R} \\
+\therefore 2R = \frac{a}{\sin{A}}
+\end{gathered}
+$$&lt;p&gt;
+같은 방식으로 $B$, $C$에 대해서도 확인할 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="보완각-성질의-본질"&gt;보완각 성질의 본질
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;단위원(Unit Circle)을 생각하자.&lt;/li&gt;
+&lt;li&gt;$\angle A$가 1사분면에 있을 때, 이를 2사분면으로 반사 시키면 $180^\circ - A$가 된다.&lt;/li&gt;
+&lt;li&gt;이때 삼각비의 정의에 따라 $\sin (180 ^\circ - A) = \sin A$ 왜냐하면, 단위원에서 y좌표는 그대로 유지되기 때문이다.&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>

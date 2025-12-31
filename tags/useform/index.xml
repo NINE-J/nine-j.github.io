@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>UseForm on B9F1</title><link>https://b9f1.com/tags/useform/</link><description>Recent content in UseForm on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 25 Jan 2025 21:00:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/useform/index.xml" rel="self" type="application/rss+xml"/><item><title>useWatch 사용한 리렌더링 최적화</title><link>https://b9f1.com/p/2025-01-25-optimizing-rerendering-with-usewatch/</link><pubDate>Sat, 25 Jan 2025 21:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-01-25-optimizing-rerendering-with-usewatch/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;폼 제출을 필요로하는 부모 페이지에서 &lt;code&gt;useForm&lt;/code&gt;을 생하고 각 값을 자식 컴포넌트와 연결한다.&lt;/li&gt;
+&lt;li&gt;특정 조건에 따라 동적으로 자식 컴포넌트의 &lt;code&gt;disabled&lt;/code&gt;, &lt;code&gt;readonly&lt;/code&gt; 등을 반영하되 리렌더링을 최소화한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;진행 중인 &lt;code&gt;React + typescript&lt;/code&gt; 프로젝트에서 &lt;code&gt;form&lt;/code&gt; 전략을 고민했고,
+&lt;code&gt;useForm&lt;/code&gt;을 생성해서 &lt;code&gt;FormProvider&lt;/code&gt;로 감싼 내부에 입력 컴포넌트들을 배치한다.&lt;/p&gt;
+&lt;h3 id="직접-참조와-함수-내부에서-할당하여-반환하는-방식의-차이"&gt;직접 참조와 함수 내부에서 할당하여 반환하는 방식의 차이
+&lt;/h3&gt;
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;code&gt;useWatch&lt;/code&gt;를 직접 참조하는 것과 참조한 값을 반환하는 것은 다르게 동작한다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="직접-참조"&gt;직접 참조
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;useForm&lt;/code&gt;에서 해당 필드의 값이 변경되면 리렌더링이 발생한다.
+&lt;code&gt;useWatch&lt;/code&gt;를 직접 참조하는 컴포넌트는 값이 변경될 때마다 리렌더링되며, 자식 컴포넌트들도 모두 리렌더링된다.&lt;/p&gt;
+&lt;p&gt;이는 &lt;code&gt;useState&lt;/code&gt;와 &lt;code&gt;useEffect&lt;/code&gt;를 사용하여 값이 변경될 때마다 상태가 업데이트되고, 컴포넌트가 리렌더링되기 때문이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;useWatch&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someName&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someControl&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="함수-내부에서-할당하여-반환"&gt;함수 내부에서 할당하여 반환
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;test&lt;/code&gt; 함수는 &lt;code&gt;useWatch&lt;/code&gt;를 직접 참조하지 않고, 내부의 &lt;code&gt;nameValue&lt;/code&gt;가 &lt;code&gt;useWatch&lt;/code&gt;를 통해 최신 값을 가지게 된다.
+따라서 &lt;code&gt;test&lt;/code&gt; 함수는 리렌더링을 발생 시키지 않고 &lt;code&gt;useForm&lt;/code&gt;의 특정 필드에 대한 최신 값을 반환하는 함수가 된다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;useWatch&lt;/code&gt; 훅을 함수 내부에서 사용하여 값을 반환하는 경우, 해당 함수는 리액트 컴포넌트의 리렌더링을 트리거하지 않는다.
+이는 함수가 호출될 때마다 최신 값을 반환하지만, 해당 함수가 리렌더링을 직접적으로 유발하지 않기 때문이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;nameValue&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;useWatch&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someName&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someControl&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;nameValue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;test&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;useWatch&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someName&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;someControl&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="watch-vs-usewatch"&gt;watch VS useWatch
+&lt;/h3&gt;&lt;p&gt;직접 참조를 기준으로 테스트한 결과를 정리해본다.&lt;/p&gt;
+&lt;h4 id="useformwatch"&gt;useForm.watch
+&lt;/h4&gt;&lt;p&gt;useForm 훅에서 제공하는 watch 메서드를 사용하면 값이 변경될 때 useForm의 값을 사용하는 컴포넌트들을 모두 리렌더링한다.&lt;/p&gt;
+&lt;h4 id="usewatch"&gt;useWatch
+&lt;/h4&gt;&lt;p&gt;useWatch 훅은 useForm의 특정 값을 참조하는 컴포넌트만 리렌더링한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;일단, 각 방식의 장단점을 고려하여 적절히 사용하면 된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;useForm의 값을 사용하는 폼이 몇 개 안 될 땐 useForm.watch를 사용해서 간편하게 리렌더링을 발생 시키며 UI를 업데이트할 수 있다.&lt;/li&gt;
+&lt;li&gt;폼이 꽤 많아지거나 리렌더링으로 인해 데이터 핸들링이 복잡한 경우 &lt;code&gt;useWatch&lt;/code&gt;를 사용해 내부적으로 변경된 최신 값을 적용하며 불필요한 리렌더링을 방지할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useWatch&lt;/code&gt;를 직접 참조하는 방식은 간결하고 이해하기 쉽지만, 리렌더링이 발생할 수 있다.&lt;/li&gt;
+&lt;li&gt;함수 내부에서 할당하여 반환하는 방식은 리렌더링을 최소화할 수 있지만, 사용 방식이 다소 복잡할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;React 훅은 기본적으로 상태나 컨텍스트의 변화를 감지하고 리렌더링을 트리거한다.
+훅을 함수 내부에서 사용하고 값을 반환하는 방식은 참조 불변성을 이용한 접근법이라고 볼 수 있고특정 상황에 유리할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;useWatch&lt;/code&gt;뿐만 아니라 다른 React 훅들도 직접 참조하지 않고 함수 내부에서 사용한다면 리렌더링을 트리거하지 않을 수도 있다.&lt;/p&gt;
+&lt;p&gt;결국, 커스텀 훅을 정의하는 것과 같은 행위라고 볼 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="useform"&gt;useForm
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;code&gt;useForm&lt;/code&gt;은 &lt;code&gt;react-hook-form&lt;/code&gt; 라이브러리에서 제공하는 훅으로 폼 상태 및 유효성 검사를 관리하는 데 사용된다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;useForm&lt;/code&gt; 훅을 사용하면 폼을 쉽게 설정하고 관리할 수 있다.
+이를 통해 폼의 각 입력 필드를 등록하고, 폼 상태를 추적하며, 유효성 검사를 수행할 수 있다.
+또한, 폼 제출 시 처리할 함수를 정의할 수 있다.&lt;/p&gt;
+&lt;h4 id="장점"&gt;장점
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;간편한 설정&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useForm&lt;/code&gt;은 사용하기 매우 간단하며, 폼 상태 관리와 유효성 검사를 쉽게 구현할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;성능 최적화&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;react-hook-form&lt;/code&gt;은 리렌더링을 최소화하도록 설계되어 있어 성능이 뛰어나다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;유연성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;다양한 유효성 검사 규칙을 쉽게 적용할 수 있으며, 커스텀 유효성 검사도 지원한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;타입스크립트 지원&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;타입스크립트를 완벽히 지원하여 타입 안전성을 보장한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;작은 번들 크기&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;라이브러리의 번들 크기가 작아 애플리케이션의 전체 크기에 거의 영향을 주지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="단점"&gt;단점
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;러닝 커브&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;초기 설정과 사용법을 익히는 데 약간의 러닝 커브가 있을 수 있다.&lt;/li&gt;
+&lt;li&gt;특히 초보자에게는 복잡하게 느껴질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;제한된 내장 구성 요소&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;다른 폼 라이브러리와 달리 &lt;code&gt;react-hook-form&lt;/code&gt;은 내장된 스타일링이나 UI 구성 요소를 제공하지 않으므로, 직접 스타일링을 해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;외부 라이브러리와의 통합&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;일부 외부 컴포넌트 라이브러리와의 통합이 까다로울 수 있다.
+&lt;ul&gt;
+&lt;li&gt;이 경우, 별도의 어댑터나 커스텀 훅을 작성해야 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="usewatch-1"&gt;useWatch
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;code&gt;useWatch&lt;/code&gt;는 &lt;code&gt;react-hook-form&lt;/code&gt; 라이브러리에서 제공하는 훅으로 &lt;code&gt;useForm&lt;/code&gt;의 특정 필드를 실시간으로 관찰(watch)한다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;관련 필드의 값이 변경될 때마다 업데이트된 값을 반환하는 훅이다.
+이를 통해 사용자는 특정 필드의 값이 변경될 때마다 적절한 동작을 수행할 수 있다.&lt;/p&gt;
+&lt;h4 id="장점-1"&gt;장점
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;실시간 값 추적&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useWatch&lt;/code&gt;를 사용하면 특정 필드의 값을 실시간으로 추적할 수 있다.&lt;/li&gt;
+&lt;li&gt;사용자가 입력한 값에 따라 즉각적으로 UI를 업데이트할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;간편한 사용&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useWatch&lt;/code&gt;는 간단한 API를 제공한다.&lt;/li&gt;
+&lt;li&gt;복잡한 상태 관리나 값 추적 로직을 간단하게 구현할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;성능 최적화&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;필요한 필드만 관찰할 수 있다.&lt;/li&gt;
+&lt;li&gt;불필요한 렌더링을 줄이고 성능을 최적화할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;동적 폼 구성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;특정 필드의 값에 따라 다른 필드나 UI 요소를 동적으로 변경하거나 조건부 렌더링을 쉽게 구현할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="단점-1"&gt;단점
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;복잡한 폼에서는 코드 관리가 어려울 수 있음&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;여러 필드를 관찰해야 하는 복잡한 폼의 경우, &lt;code&gt;useWatch&lt;/code&gt;를 사용한 코드가 복잡해질 수 있다. 이 경우 코드의 가독성과 유지보수성이 떨어질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;의존성 관리 필요&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useWatch&lt;/code&gt; 훅을 사용할 때, 관찰할 필드가 변경되면 의존성을 적절히 관리해야 한다.&lt;/li&gt;
+&lt;li&gt;그렇지 않으면 예상치 못한 동작이 발생할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;초기 값 설정&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;폼 필드의 초기 값을 설정할 때 주의가 필요하다. &lt;code&gt;useWatch&lt;/code&gt;는 폼 필드의 초기 값을 제대로 반영하기 위해 초기 값을 명확히 설정해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;제한된 문서화&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;useWatch&lt;/code&gt;는 비교적 새로운 훅이기 때문에 관련 문서나 예제가 부족할 수 있다. (작성 시점)&lt;/li&gt;
+&lt;li&gt;따라서 복잡한 사용 사례에 대한 정보를 찾기가 어려울 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="코드"&gt;코드
+&lt;/h4&gt;&lt;p&gt;&lt;a class="link" href="https://github.com/react-hook-form/react-hook-form" target="_blank" rel="noopener"
+&gt;react-hook-form&lt;/a&gt;
+useWatch에서 useEffect, useState를 어떻게 사용하고 있는지 간단하게 확인해본다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-javascript" data-lang="javascript"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;useEffect&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;useState&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;from&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;react&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;useFormContext&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;from&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;./useFormContext&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;useWatch&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt; &lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;name&lt;/span&gt; &lt;span class="p"&gt;})&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;methods&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;useFormContext&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;actualControl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;control&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;control&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;setValue&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;useState&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;actualControl&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;getValues&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;useEffect&lt;/span&gt;&lt;span class="p"&gt;(()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;subscription&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;actualControl&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;watch&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nx"&gt;setValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;values&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;subscription&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;unsubscribe&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;actualControl&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>
