@@ -41,7 +41,7 @@ tags:
 다운로드 받은 파일을 관리자 권한으로 실행하면 아래와 같은 명령창이 확인된다.
 기본 포트 3000으로 접속할 수 있다.
 
-![](/assets/images/Pasted image 20231221151334.png)
+![](/assets/images/Pasted%20image%2020231221151334.png)
 
 접속하면 `Github` UI와 비슷한 화면에서 형상 관리가 가능하다.
 
