@@ -46,6 +46,16 @@ jobs:
             - name: Init submodules
               run: git submodule update --init --recursive
 
+            - name: Update submodules to latest
+              run: |
+                git submodule foreach --recursive 'git fetch origin || true'
+                git submodule foreach --recursive '
+                  remote_head=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed "s|origin/||")
+                  branch=${remote_head:-main}
+                  git checkout "$branch" || git checkout -B "$branch"
+                  git pull --no-rebase origin "$branch" || true
+                '
+
             - name: Build
               run: hugo --minify --gc
 
