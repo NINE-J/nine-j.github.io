@@ -34,7 +34,7 @@ Java Stream API는 Java 8에서 도입된 강력한 데이터 처리 도구로,�
 
 ### 동작 방식
 
-![](/assets/images/Drawing Java-StreamAPI-map-and-flatMap 2025-04-07 14.44.08.excalidraw.png)
+![](/assets/images/Drawing%20Java-StreamAPI-map-and-flatMap%202025-04-07%2014.44.08.excalidraw.png)
 
 #### map()
 

@@ -27,7 +27,7 @@ tags:
 
 ### 탄젠트 법칙의 증명
 
-![](/assets/images/Drawing Proof-of-the-law-of-tangent 2025-03-22 22.14.22.excalidraw.png)
+![](/assets/images/Drawing%20Proof-of-the-law-of-tangent%202025-03-22%2022.14.22.excalidraw.png)
 
 $\triangle ABC$에서 변의 길이를 $a,b,c$ 각각의 대변에 대응하는 각을 $A,B,C$라고 할 때, 탄젠트 법칙은 다음과 같이 표현된다.
 

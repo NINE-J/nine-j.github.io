@@ -30,7 +30,7 @@ $$a^2=b^2+c^2−2bc\cos A$$
 
 ### 코사인 법칙 증명
 
-![](/assets/images/Drawing 2025-03-13 14.16.22.excalidraw.png)
+![](/assets/images/Drawing%202025-03-13%2014.16.22.excalidraw.png)
 
 #### 점 A에서 BC에 대한 수선의 발을 내림
 

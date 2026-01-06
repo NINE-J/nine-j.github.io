@@ -27,9 +27,9 @@ IntelliJ IDEA에서 메모리 힙 사이즈에 대해 전역 설정과 애플리
 
 `Help > Change Memory Settings` 선택 → 팝업에서 힙 사이즈 변경
 
-![](/assets/images/Pasted image 20250406132822.png)
+![](/assets/images/Pasted%20image%2020250406132822.png)
 
-![](/assets/images/Pasted image 20250406133006.png)
+![](/assets/images/Pasted%20image%2020250406133006.png)
 
 #### Edit Custom VM Options
 
@@ -42,7 +42,7 @@ IDE 메뉴에서 설정하는 방법도 있지만, 직접 설정 파일을 수�
 - macOS: `~/Library/Application Support/JetBrains/<IntelliJ 버전>/idea.vmoptions`
 - Linux: `~/.config/JetBrains/<IntelliJ 버전>/idea64.vmoptions`
 
-![](/assets/images/Pasted image 20250406135244.png)
+![](/assets/images/Pasted%20image%2020250406135244.png)
 
 ```text
 # 초기 힙 사이즈(최소 메모리)
@@ -60,7 +60,7 @@ IDE 메뉴에서 설정하는 방법도 있지만, 직접 설정 파일을 수�
 
 상단 툴바에서 `Edit Configurations` 선택, 또는 `Shift + Alt + F10` → `Edit Configurations`
 
-![](/assets/images/Pasted image 20250406153727.png)
+![](/assets/images/Pasted%20image%2020250406153727.png)
 
 VM options에 메모리 설정 추가
 
@@ -68,10 +68,10 @@ VM options에 메모리 설정 추가
 -Xms256m -Xmx1024m // 최소 256MB, 최대 1GB 할당
 ```
 
-![](/assets/images/Pasted image 20250406154105.png)
+![](/assets/images/Pasted%20image%2020250406154105.png)
 
 ### 메모리 사용량 표시
 
 `IDE 하단 우클릭 > Memory Indicator`
 
-![](/assets/images/Pasted image 20250406133250.png)
+![](/assets/images/Pasted%20image%2020250406133250.png)

@@ -33,7 +33,7 @@ $$
 - 여기서 $A,B,C$는 삼각형의 각(angle)
 - $a,b,c$는 각각 그에 대응하는 변의 길이(length)
 
-![](/assets/images/Drawing 2025-03-12 16.39.42.excalidraw.png)
+![](/assets/images/Drawing%202025-03-12%2016.39.42.excalidraw.png)
 
 ### A < 90
 

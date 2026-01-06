@@ -78,7 +78,7 @@ FIFO(First In, First Out) 구조로, 처음에 삽입된 요소가 가장 먼저
 
 ### 빅오 표기법(Big-O Notation)
 
-![](/assets/images/Pasted image 20250209174524.png)
+![](/assets/images/Pasted%20image%2020250209174524.png)
 
 [bigocheatsheet](https://www.bigocheatsheet.com/)
 

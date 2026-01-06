@@ -111,7 +111,7 @@ DI(의존성 주입), AOP 같은 개념이 결국 각자의 역할에 집중할 
 
 ### Spring은 테스트를 위한 구조다
 
-![](/assets/images/Drawing 2025-05-06 00.35.36.excalidraw.png)
+![](/assets/images/Drawing%202025-05-06%2000.35.36.excalidraw.png)
 
 이건 체감이 정말 컸던 부분이다.
 TDD는 테스트 환경 세팅이 어려운데 Spring은 POJO와 DI 덕분에 이게 정말 단순해진다.

@@ -29,11 +29,11 @@ IntelliJ Ultimate/Community에선 GitHub 플러그인으로 손쉽게 확인이 
 코드 리뷰에 대한 코멘트를 **바로 파일의 라인에서 확인**할 수 있다.
 의견이 있어서 Reply를 남기거나 수정 완료를 곧바로 처리할 수 있다.
 
-![](/assets/images/Pasted image 20250506022741.png)
+![](/assets/images/Pasted%20image%2020250506022741.png)
 
 ### GitHub Pull Requests
 
-![](/assets/images/Pasted image 20250506021354.png)
+![](/assets/images/Pasted%20image%2020250506021354.png)
 
 현재 기준 GitHub Pull Requests를 설치한다. [VSCode marketplace - GitHub Pull Requests](https://marketplace.visualstudio.com/items/?itemName=GitHub.vscode-pull-request-github)
 예전 이름은 GitHub Pull Requests and Issues였나 보다.
@@ -53,7 +53,7 @@ IntelliJ Ultimate/Community에선 GitHub 플러그인으로 손쉽게 확인이 
 # Configure Queries...
 ```
 
-![](/assets/images/Pasted image 20250506024023.png)
+![](/assets/images/Pasted%20image%2020250506024023.png)
 
 나는 닫힌 PR을 확인해야 해서 추가했다.
 
@@ -73,4 +73,4 @@ IntelliJ Ultimate/Community에선 GitHub 플러그인으로 손쉽게 확인이 
 
 필요에 맞게 수정 후 새로고침하면 잘 확인된다.
 
-![](/assets/images/Pasted image 20250506023804.png)
+![](/assets/images/Pasted%20image%2020250506023804.png)
