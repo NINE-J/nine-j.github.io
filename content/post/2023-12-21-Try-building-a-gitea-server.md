@@ -16,7 +16,7 @@ tags:
   - GitServer
   - 형상관리
   - 버전관리
-# image: Status: InProgress
+# image: Status: Done
 ---
 ## 📌개요
 
