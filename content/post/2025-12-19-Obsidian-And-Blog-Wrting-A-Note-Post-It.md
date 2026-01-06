@@ -1,6 +1,5 @@
 ---
 publish: true
-draft: false
 title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
@@ -21,7 +20,8 @@ tags:
   - Jekyll
   - Hugo
   - Submodule
-# image: Status: Done
+image:
+Status: Done
 ---
 ## 📌개요
 
@@ -103,7 +103,7 @@ SSG로 블로그를 운영하다가 다시 돌아가거나 둘 다 운영하는 
 >
 >직관적인 이름에 걸맞게 옵시디언에서 관리하는 문서들의 데이터를 가지고 내가 원하는 뷰를 만들 수 있다.
 
-![](/assets/images/Pasted%20image%2020251219044301.png)
+![](Pasted%20image%2020251219044301.png)
 
 ### 무엇을 하고자 하는가?
 
@@ -612,7 +612,6 @@ Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 
 
 ```yaml
 publish: true
-draft: false
 title: 문서 제목
 description: 문서 설명
 author: 작성자
@@ -623,7 +622,8 @@ categories:
 tags:
   - tag1
   - tag2
-# image: Status: ToDo
+image:
+Status: ToDo
 ```
 
 ### 상태 유지형 업데이트 개선 방향
