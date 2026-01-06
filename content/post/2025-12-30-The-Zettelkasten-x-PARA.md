@@ -15,7 +15,7 @@ tags:
   - Obsidian
   - 지식관리
   - KnowledgeManagement
-# image: Status: InProgress
+# image: Status: Done
 ---
 ## 📌개요
 
