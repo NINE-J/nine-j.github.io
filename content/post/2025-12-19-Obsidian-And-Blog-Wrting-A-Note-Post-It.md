@@ -22,7 +22,7 @@ tags:
   - Hugo
   - Submodule
 
-Status: Testing
+Status: Done
 ---
 ## 📌개요
 
