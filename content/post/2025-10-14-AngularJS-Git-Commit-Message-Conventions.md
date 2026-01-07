@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: AngularJS 커밋 컨벤션
 description: 자동화와 협업을 만드는 규칙
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - AngularJS
   - Conventions
   - VersionControl
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

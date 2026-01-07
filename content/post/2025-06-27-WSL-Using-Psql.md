@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: WSL에서 PSQL 사용하기
 description: Windows PostgreSQL 서버와의 연결 설정
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - 데이터베이스
   - 개발환경
   - 리눅스설정
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

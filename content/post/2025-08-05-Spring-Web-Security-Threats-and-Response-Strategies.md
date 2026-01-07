@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring 웹 보안 위협과 대응 전략
 description: CSRF, XSS, 세션 고정, JWT 탈취 대응법
 author: Nine
@@ -20,7 +20,8 @@ tags:
   - 토큰보안
   - 세션하이재킹
   - 인증인프라
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

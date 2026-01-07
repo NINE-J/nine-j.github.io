@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: "Java 객체지향: 추상 클래스"
 description: 개념과 필요성을 알아보자
 author: Nine
@@ -12,7 +12,8 @@ tags:
   - devlog
   - Java
   - Abstract
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

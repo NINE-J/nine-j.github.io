@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java 정적 팩토리 메서드
 description: 생성자 대신 팩토리 메서드를 고려하라
 author: Nine
@@ -12,7 +12,8 @@ tags:
   - devlog
   - Java
   - 객체지향
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

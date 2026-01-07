@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: No static resource
 description: .well-known/appspecific/com.chrome.devtools.json.
 author: Nine
@@ -14,7 +14,8 @@ tags:
   - automatic-workspace
   - debugging
   - Spring-MVC
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

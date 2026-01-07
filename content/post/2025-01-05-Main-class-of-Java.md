@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java의 main 클래스
 description: main은 왜 main이지?
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - Java
   - JLS
   - MainClass
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

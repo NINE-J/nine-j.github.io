@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java 예외 처리의 구조와 진화
 description: Checked VS Unchecked
 author: Nine
@@ -20,7 +20,8 @@ tags:
   - Spring
   - Transactional
   - 트랜잭션
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

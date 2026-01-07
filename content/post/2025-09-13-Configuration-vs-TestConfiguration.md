@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 설정 어노테이션 비교
 description: "@Configuration vs @TestConfiguration"
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - SpringBoot
   - Configuration
   - TestConfiguration
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

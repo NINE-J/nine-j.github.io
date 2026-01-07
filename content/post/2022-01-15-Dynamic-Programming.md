@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Dynamic Programming
 description: DP를 알아보자
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - DP
   - 동적계획법
   - 기저사례
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌DP란
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: OAuth 2.0 핵심 구조 이해하기
 description: Authorization Code Grant
 author: Nine
@@ -16,7 +16,8 @@ tags:
   - 보안
   - Security
   - Spring-Security
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

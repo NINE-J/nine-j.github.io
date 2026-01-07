@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 봄 모니터링 지표
 description: feat.Prometheus&Grafana
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - 가시화
   - 가시성
   - DevOps
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

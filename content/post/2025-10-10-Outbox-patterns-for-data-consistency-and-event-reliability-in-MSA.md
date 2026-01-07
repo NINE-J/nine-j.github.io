@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: MSA Outbox 패턴
 description: 트랜잭션 일관성, 이벤트 발행의 신뢰성
 author: Nine
@@ -22,7 +22,8 @@ tags:
   - InfiniteLoopBug
   - Idempotency
   - Kafka
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

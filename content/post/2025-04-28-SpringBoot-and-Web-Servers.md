@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring Boot와 웹서버
 description: 웹 서버와 WAS의 차이, 내장 톰캣의 역할
 author: Nine
@@ -16,7 +16,8 @@ tags:
   - Bean
   - Java
   - Backend
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: ACID
 description: 트랜잭션 4대 원칙
 author: Nine
@@ -17,7 +17,8 @@ tags:
   - 격리성
   - 무결성
   - 분산시스템
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

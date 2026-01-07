@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 테스트 더블 - Test Doubles
 description: feat.Mockito, Mock, Spy
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - Stub
   - Spy
   - 테스트전략
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java Record로 DTO 구현하기
 description: 불변성과 간결성을 동시에 잡는 Java Record
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - Java
   - DTO
   - Record
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

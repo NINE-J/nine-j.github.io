@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: O(n) VS O(log n)
 description: 데이터의 크기가 1백만 개 이상이라면?
 author: Nine
@@ -10,7 +10,8 @@ categories:
 tags:
   - devlog
   - algorithms
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

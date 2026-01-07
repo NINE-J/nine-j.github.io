@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git 멀티 SSH 키 관리
 description: Git/Linux/WSL 환경별 대응
 author: Nine
@@ -22,7 +22,8 @@ tags:
   - VersionControl
   - Infra
   - DevOps
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

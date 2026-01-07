@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 나만의 리눅스 터미널 설정
 description: 유용한 터미널 설정을 알아보자
 author: Nine
@@ -14,7 +14,8 @@ tags:
   - terminal
   - 리눅스
   - 터미널
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

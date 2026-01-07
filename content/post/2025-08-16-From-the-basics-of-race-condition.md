@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Race condition 뿌리부터 잡기
 description: 자바 실전 대응 전략
 author: Nine
@@ -23,7 +23,8 @@ tags:
   - LongAdder
   - ConcurrentHashMap
   - jcstrees
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

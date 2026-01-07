@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: DTO VS Command
 description: Request를 그대로 사용하지 말자
 author: Nine
@@ -19,7 +19,8 @@ tags:
   - 도메인설계
   - 계층분리
   - CleanArchitecture
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

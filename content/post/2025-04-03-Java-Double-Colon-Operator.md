@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java의 이중 콜론 연산자
 description: Double Colon Operator
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - Java
   - lambda
   - 함수형_프로그래밍
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: IAM 사용자로 AWS 관리
 description: 권한 관리 이유 및 방법
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - 클라우드
   - Cloud
   - 최소권한원칙
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

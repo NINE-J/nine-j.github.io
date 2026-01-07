@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: DDL VS DML
 description: DDL과 DML의 차이점과 주요 명령어
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - DML
   - 데이터베이스
   - DB
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

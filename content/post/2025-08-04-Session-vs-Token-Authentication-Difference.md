@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 세션 vs 토큰 인증 차이
 description: 인증 방식의 구조와 보안 포인트
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - CSRF
   - 보안
   - Security
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

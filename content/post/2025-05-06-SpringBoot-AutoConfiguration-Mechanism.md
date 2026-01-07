@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring Boot 자동 설정
 description: Auto-Configuration 원리
 author: Nine
@@ -21,7 +21,8 @@ tags:
   - actuator
   - springboot-tips
   - springboot-testing
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Java Enum
 description: 제한된 상수의 타입 안정성
 author: Nine
@@ -12,7 +12,8 @@ tags:
   - devlog
   - Java
   - enum
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

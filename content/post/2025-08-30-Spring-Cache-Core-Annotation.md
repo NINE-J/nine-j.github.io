@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring Cache 핵심 어노테이션 정리
 description: 캐시 제어 3가지 방식
 author: Nine
@@ -16,7 +16,8 @@ tags:
   - CachePut
   - CacheEvict
   - 캐시전략
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

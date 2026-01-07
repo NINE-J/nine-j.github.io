@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 역정규화, 언제 그리고 왜 사용하는가?
 description: 실전에서 역정규화를 선택하는 전략적 사고
 author: Nine
@@ -17,7 +17,8 @@ tags:
   - 최적화
   - 데이터베이스
   - 데이터모델링
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

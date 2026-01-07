@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 음수 * 음수 = 양수?
 description: 태세전환 뭔데
 author: Nine
@@ -17,7 +17,8 @@ tags:
   - 수의체계
   - 음수
   - 마이너스
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

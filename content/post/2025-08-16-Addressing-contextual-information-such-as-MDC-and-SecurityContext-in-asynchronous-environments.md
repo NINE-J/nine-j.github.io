@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 컨텍스트 안전 전파
 description: 비동기에서도 잃지 않는 컨텍스트
 author: Nine
@@ -20,7 +20,8 @@ tags:
   - Reactor
   - WebFlux
   - Context-Propagation
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

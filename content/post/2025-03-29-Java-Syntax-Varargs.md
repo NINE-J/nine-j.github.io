@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: "Java 문법: 가변 인자"
 description: Java의 가변 인자를 이해하고 적절히 사용할 수 있다.
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - OOP
   - Polymorphism
   - Dynamic-Binding
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

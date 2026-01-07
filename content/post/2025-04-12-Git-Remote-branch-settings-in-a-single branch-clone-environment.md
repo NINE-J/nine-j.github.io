@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git 원격 브랜치 설정
 description: feat.싱글 브랜치 클론 환경
 author: Nine
@@ -11,7 +11,8 @@ categories:
 tags:
   - devlog
   - Git
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring MVC
 description: Controller VS RestController
 author: Nine
@@ -14,7 +14,8 @@ tags:
   - Spring-MVC
   - Controller
   - RestController
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

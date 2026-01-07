@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 당신은 5년 차인가요, 1년 차 5번인가요?
 description: 5년 차 자바 경력이 단 60분의 면접으로 무너졌다
 author: Nine
@@ -22,7 +22,8 @@ tags:
   - 개발자경험
   - 회고
   - Insight
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

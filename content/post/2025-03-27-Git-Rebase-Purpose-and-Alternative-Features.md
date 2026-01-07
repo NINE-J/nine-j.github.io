@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git Rebase 사용 목적 및 대체 기능
 description: Rebase를 대체할 기능이 있음에도 사용하는 이유가 궁금하다.
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - 형상관리
   - VersionControl
   - Git
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

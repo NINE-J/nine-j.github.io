@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: JPA의 대표적인 성능 병목
 description: N+1 문제, 왜 생기고 어떻게 해결할까?
 author: Nine
@@ -17,7 +17,8 @@ tags:
   - Batch_Fetching
   - Hibernate
   - 성능최적화
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Kafka vs Confluent
 description: 오픈 소스와 관리형 데이터 스트리밍 인프라
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - DataPipeline
   - Infra
   - CloudService
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

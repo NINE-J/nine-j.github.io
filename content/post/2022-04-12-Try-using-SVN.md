@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: SVN을 사용해보자.
 description: "SVN: SubVersion"
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - VersionControl
   - 버전관리
   - 형상관리
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring에서 AOP란
 description: OOP & AOP
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - 설계
   - 프록시패턴
   - SpringBoot
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

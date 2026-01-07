@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git 추적 브랜치 관리
 description: 근데 이제 Fork를 곁들인
 author: Nine
@@ -10,7 +10,8 @@ categories:
   - Git
 tags:
   - devlog
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

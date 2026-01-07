@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: JWT 구조를 구체적으로 알아보자
 description: 보안 토큰의 3단계 구조 분석
 author: Nine
@@ -19,7 +19,8 @@ tags:
   - JSON-Web-Token
   - Spring-Security
   - 인증토큰구조
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

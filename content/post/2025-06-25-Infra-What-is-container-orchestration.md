@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 컨테이너 오케스트레이션
 description: 자동 확장, 자가 복구, 선언형 인프라
 author: Nine
@@ -22,7 +22,8 @@ tags:
   - 운영자동화
   - 마이크로서비스
   - MSA
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

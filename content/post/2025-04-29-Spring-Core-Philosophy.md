@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Spring 핵심 철학
 description: feat.POJO, DRY, SRP, SoC, TDD
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - 객체지향
   - Framework
   - 프레임워크
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

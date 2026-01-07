@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: AWS
 description: What is Amazon Web Services
 author: Nine
@@ -11,7 +11,8 @@ tags:
   - devlog
   - AWS
   - AmazonWebServices
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

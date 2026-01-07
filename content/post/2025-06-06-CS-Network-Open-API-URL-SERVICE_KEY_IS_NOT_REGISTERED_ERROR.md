@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 공공데이터포털 API
 description: SERVICE_KEY_IS_NOT_REGISTERED_ERROR
 author: Nine
@@ -19,7 +19,8 @@ tags:
   - Java
   - Spring
   - SpringBoot
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

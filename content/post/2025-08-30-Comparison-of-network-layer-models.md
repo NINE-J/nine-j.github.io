@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: 네트워크 계층 모델 비교
 description: TCP/IP vs OSI
 author: Nine
@@ -19,7 +19,8 @@ tags:
   - Protocol
   - 계층모델
   - LayeredModel
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

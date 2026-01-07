@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git을 사용한 형상 관리 전략
 description: 변경을 추적하고 체계적으로 관리하기 위한 전략
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - 형상관리
   - VersionControl
   - Git
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

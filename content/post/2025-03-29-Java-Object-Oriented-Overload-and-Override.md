@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: "Java 객체지향: 오버로드와 오버라이딩"
 description: 오버로드와 오버라이딩의 차이를 안다.
 author: Nine
@@ -15,7 +15,8 @@ tags:
   - OOP
   - Overload
   - Override
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

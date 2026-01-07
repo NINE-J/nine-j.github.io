@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: Git Stash
 description: 지금 커밋하고 싶지 않아!
 author: Nine
@@ -13,7 +13,8 @@ tags:
   - 형상관리
   - VersionControl
   - Git
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 

@@ -1,6 +1,6 @@
 ---
 publish: true
-draft: false
+ draft: false
 title: AWS 배포 클래식
 description: EC2 & RDS
 author: Nine
@@ -18,7 +18,8 @@ tags:
   - 클라우드
   - 클라우드배포
   - 실전배포
-# image: Status: Done
+
+Status: Done
 ---
 ## 📌개요
 
