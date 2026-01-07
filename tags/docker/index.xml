@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on B9F1</title><link>https://b9f1.com/tags/docker/</link><description>Recent content in Docker on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 15 Oct 2025 18:30:33 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 멀티 SSH 키 관리</title><link>https://b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</link><pubDate>Wed, 15 Oct 2025 18:30:33 +0900</pubDate><guid>https://b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ssh-키-구성-예시"&gt;SSH 키 구성 예시
+&lt;/h3&gt;&lt;h4 id="ssh-키-파일들"&gt;SSH 키 파일들
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519 &lt;span class="c1"&gt;# 기본/개인 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519.pub &lt;span class="c1"&gt;# 기본/개인 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company &lt;span class="c1"&gt;# 회사 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company.pub &lt;span class="c1"&gt;# 회사 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── config &lt;span class="c1"&gt;# SSH 설정 파일&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="ssh-config-설정-sshconfig"&gt;SSH Config 설정 (&lt;code&gt;~/.ssh/config&lt;/code&gt;)
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 경로는 대부분의 OS에서 사용자 폴더를 의미한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 GitHub 설정 (개인 계정용)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정용 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="사용-방법"&gt;사용 방법
+&lt;/h3&gt;&lt;h4 id="1-기본-사용"&gt;1. 기본 사용
+&lt;/h4&gt;&lt;p&gt;일반적인 GitHub URL을 그대로 사용:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com:username/my-project.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-명시적-개인-계정-사용"&gt;2. 명시적 개인 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-회사-계정-사용"&gt;3. 회사 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="새로운-계정키-추가-방법"&gt;새로운 계정/키 추가 방법
+&lt;/h3&gt;&lt;h4 id="1-새-ssh-키-생성"&gt;1. 새 SSH 키 생성
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-keygen -t ed25519 -C &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt; -f ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-ssh-config에-설정-추가"&gt;2. SSH Config에 설정 추가
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# ~/.ssh/config에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-github에-공개-키-등록"&gt;3. GitHub에 공개 키 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 내용 복사&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cat ~/.ssh/id_ed25519_newaccount.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub Settings &amp;gt; SSH and GPG keys&lt;/code&gt;에서 등록&lt;/p&gt;
+&lt;h4 id="4-사용"&gt;4. 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-newaccount:NewAccount/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ssh-연결-테스트"&gt;SSH 연결 테스트
+&lt;/h3&gt;&lt;p&gt;각 계정별로 SSH 연결을 테스트할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 테스트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;성공시 다음과 같은 메시지가 출력된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hi [계정명]! You&amp;#39;ve successfully authenticated, but GitHub does not provide shell access.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="프로젝트별-설정-확인"&gt;프로젝트별 설정 확인
+&lt;/h3&gt;&lt;p&gt;현재 프로젝트가 어떤 SSH 키를 사용하는지 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --list &lt;span class="p"&gt;|&lt;/span&gt; grep remote.origin.url
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="권한-설정"&gt;권한 설정
+&lt;/h3&gt;&lt;p&gt;SSH 파일들의 올바른 권한 설정은 &lt;strong&gt;Unix/Linux 기반 시스템에서 필수&lt;/strong&gt;다.&lt;/p&gt;
+&lt;h4 id="권한-설정이-필요한-환경"&gt;권한 설정이 필요한 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;✅ &lt;strong&gt;Linux/Ubuntu&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;macOS&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;WSL (Windows Subsystem for Linux)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;Docker 컨테이너&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;개발 컨테이너 (Dev Container)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;❌ &lt;strong&gt;Windows 네이티브&lt;/strong&gt; (NTFS 권한으로 자동 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="windows-vs-unixlinux-차이점"&gt;Windows vs Unix/Linux 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;환경&lt;/th&gt;
+&lt;th&gt;권한 시스템&lt;/th&gt;
+&lt;th&gt;SSH 권한 설정&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Windows 네이티브&lt;/td&gt;
+&lt;td&gt;NTFS ACL&lt;/td&gt;
+&lt;td&gt;불필요 (자동)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WSL/Linux/macOS&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker/Dev Container&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="windows에서-ssh-사용하기"&gt;Windows에서 SSH 사용하기
+&lt;/h4&gt;&lt;h5 id="windows-네이티브-환경"&gt;Windows 네이티브 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# PowerShell 또는 Command Prompt에서&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;ssh-keygen&lt;/span&gt; &lt;span class="n"&gt;-t&lt;/span&gt; &lt;span class="n"&gt;ed25519&lt;/span&gt; &lt;span class="n"&gt;-C&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 권한 설정은 Windows가 자동으로 관리&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Windows 네이티브 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;chmod&lt;/code&gt; 명령어 없음&lt;/li&gt;
+&lt;li&gt;NTFS 권한으로 자동 관리&lt;/li&gt;
+&lt;li&gt;SSH 클라이언트가 적절한 권한 자동 설정&lt;/li&gt;
+&lt;li&gt;수동 권한 설정 불필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="wsl-환경"&gt;WSL 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# WSL에서는 Linux와 동일하게 권한 설정 필요&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;WSL 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux 파일 시스템 사용&lt;/li&gt;
+&lt;li&gt;Unix 권한 모델 적용&lt;/li&gt;
+&lt;li&gt;권한 설정 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="macos-darwin"&gt;macOS: Darwin
+&lt;/h3&gt;&lt;h4 id="ssh가-권한을-엄격하게-요구하는-이유-unixlinux"&gt;SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;보안 정책&lt;/strong&gt;: 개인 키가 다른 사용자에게 노출되는 것을 방지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증 무결성&lt;/strong&gt;: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 보호&lt;/strong&gt;: 중요한 인증 정보의 무단 접근 차단&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="올바른-권한-설정"&gt;올바른 권한 설정
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# SSH 디렉토리 권한 (소유자만 접근 가능)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# config 파일 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 키 파일들 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 소유권 설정 (현재 사용자로 설정)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="권한-확인"&gt;권한 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 권한 상태 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 올바른 출력 예시:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# drwx------ (700) 소유자만 SSH 디렉토리 접근&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw------- (600) 소유자만 개인 키/config 파일 접근 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw-r--r-- (644) 공개 키는 다른 사용자도 읽기 가능&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="문제-해결"&gt;문제 해결
+&lt;/h3&gt;&lt;h4 id="권한-오류-해결"&gt;권한 오류 해결
+&lt;/h4&gt;&lt;p&gt;오류 메시지&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Bad owner or permissions on /home/node/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;원인:&lt;/strong&gt; SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 단계:&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;권한 확인&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한이 &lt;code&gt;777&lt;/code&gt; (rwxrwxrwx)인 경우 수정&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소유권 문제인 경우&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한 설정 후 테스트&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="ssh-키가-인식되지-않는-경우"&gt;SSH 키가 인식되지 않는 경우
+&lt;/h4&gt;&lt;p&gt;SSH Agent에 키 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="잘못된-키-사용"&gt;잘못된 키 사용
+&lt;/h4&gt;&lt;p&gt;원격 URL 확인 및 수정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 설정 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 URL 변경&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-url origin git@github.com-&lt;span class="o"&gt;[&lt;/span&gt;account&lt;span class="o"&gt;]&lt;/span&gt;:owner/repository.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="예시-프로젝트-설정"&gt;예시 프로젝트 설정
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;my-blog&lt;/strong&gt;: 기본 설정 사용 (&lt;code&gt;git@github.com:username/my-blog.git&lt;/code&gt;)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH 키: &lt;code&gt;~/.ssh/id_ed25519&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GitHub 계정: 개인 계정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="확장-계획"&gt;확장 계획
+&lt;/h3&gt;&lt;p&gt;향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="현재-구성-검증"&gt;현재 구성 검증
+&lt;/h3&gt;&lt;p&gt;현재 SSH 구성이 올바르게 작동하는지 확인해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;권한 설정 (필수!)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 모든 권한을 한 번에 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SSH 연결 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 성공시: &amp;#34;Hi [username]! You&amp;#39;ve successfully authenticated...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Git push 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;⚠️ 중요:&lt;/strong&gt; 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+&lt;code&gt;Bad owner or permissions&lt;/code&gt; 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새 계정 추가는 키 생성, &lt;code&gt;~/.ssh/config&lt;/code&gt;에 Host 추가, 공개키 등록, &lt;code&gt;ssh -T&lt;/code&gt; 테스트, 원격 URL 설정의 5단계&lt;/li&gt;
+&lt;li&gt;WSL은 &lt;strong&gt;리눅스 홈 경로&lt;/strong&gt;에 &lt;code&gt;.ssh&lt;/code&gt;를 두고, 필요 시 &lt;code&gt;includeIf&lt;/code&gt;/&lt;code&gt;url.insteadOf&lt;/code&gt;로 &lt;strong&gt;디렉터리별 자동 라우팅&lt;/strong&gt;을 적용하면 실수할 일이 줄어든다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SSH 키 쌍&lt;/strong&gt;: &lt;code&gt;ed25519&lt;/code&gt;가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH 설정 파일&lt;/strong&gt;: &lt;code&gt;~/.ssh/config&lt;/code&gt;로 Host 단위 설정(별칭, &lt;code&gt;IdentityFile&lt;/code&gt;, &lt;code&gt;IdentitiesOnly&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퍼미션 기초&lt;/strong&gt;: &lt;code&gt;~/.ssh&lt;/code&gt;(700), 개인키(600), 공개키/&lt;code&gt;config&lt;/code&gt;(644~600).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSL/NTFS 차이&lt;/strong&gt;: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. &lt;strong&gt;리눅스 홈&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → &lt;code&gt;IdentitiesOnly&lt;/code&gt;로 해결.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 원격 URL 형태&lt;/strong&gt;: &lt;code&gt;git@HOST:OWNER/REPO.git&lt;/code&gt;(SCP 구문) 또는 &lt;code&gt;ssh://git@HOST/OWNER/REPO.git&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 라우팅 자동화(선택)&lt;/strong&gt;: &lt;code&gt;~/.gitconfig&lt;/code&gt;의 &lt;code&gt;includeIf&lt;/code&gt;(디렉터리 기준 설정), &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;(호스트 치환).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GitHub Docs: &lt;em&gt;Connecting to GitHub with SSH&lt;/em&gt;, &lt;em&gt;About SSH certificate authorities&lt;/em&gt;, &lt;em&gt;Managing multiple accounts&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;OpenSSH Manual: &lt;code&gt;ssh(1)&lt;/code&gt;, &lt;code&gt;ssh_config(5)&lt;/code&gt;, &lt;code&gt;ssh-agent(1)&lt;/code&gt;, &lt;code&gt;ssh-add(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git Documentation: &lt;code&gt;git-config(1)&lt;/code&gt;(특히 &lt;code&gt;includeIf&lt;/code&gt;, &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;), &lt;code&gt;git-remote(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft Docs: &lt;em&gt;WSL 파일 권한 &amp;amp; NTFS 상호작용&lt;/em&gt; 가이드&lt;/li&gt;
+&lt;li&gt;보안 심화: &lt;em&gt;ed25519-sk&lt;/em&gt;(FIDO2/보안키 기반), &lt;code&gt;ProxyJump&lt;/code&gt;(점프호스트), &lt;code&gt;KnownHosts&lt;/code&gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>컨테이너 오케스트레이션</title><link>https://b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</link><pubDate>Wed, 25 Jun 2025 22:17:57 +0900</pubDate><guid>https://b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Docker는 컨테이너 단위의 애플리케이션 패키징과 실행이 뛰어나지만 실제 운영 환경에서는 수십, 수백 개의 컨테이너를 배포하고 유지해야 하는 복잡한 상황이 발생한다.&lt;/p&gt;
+&lt;p&gt;이 문제를 해결하기 위해 등장한 개념이 컨테이너 오케스트레이션(Container Orchestration)이다.&lt;/p&gt;
+&lt;p&gt;오케스트레이션의 핵심 개념과 필요성, Docker 단독 환경의 한계, Kubernetes를 중심으로 오케스트레이터가 해결하는 세 가지 주요 문제를 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-오케스트레이션이란"&gt;컨테이너 오케스트레이션이란?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;오케스트라(orchestra)에서 유래&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;오케스트라: 수십 개의 악기가 각자 연주하지만 지휘자가 이를 정해진 순서와 규칙에 따라 통제하여 하나의 음악으로 만들어낸다.&lt;/li&gt;
+&lt;li&gt;개발 시스템: 수많은 컨테이너, 서비스, 배포, 트래픽, 설정이 따로따로 존재하지만 오케스트레이터가 이를 자동으로 조율하여 하나의 애플리케이션처럼 작동하도록 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;컨테이너 오케스트레이션은 다음과 같은 작업을 자동화한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨테이너의 배포 및 종료&lt;/li&gt;
+&lt;li&gt;헬스 체크 및 실패 시 자동 복구&lt;/li&gt;
+&lt;li&gt;트래픽에 따라 컨테이너 자동 확장/축소&lt;/li&gt;
+&lt;li&gt;로드 밸런싱, 서비스 디스커버리&lt;/li&gt;
+&lt;li&gt;YAML을 활용한 선언적 구성(Declarative Configuration)을 통한 인프라 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;단일 컨테이너 환경에서는 수작업이나 스크립트로 관리가 가능하지만 수십 개 이상의 컨테이너를 운영하는 클러스터 환경에서는 비효율과 오류를 피하기 어렵다.&lt;/p&gt;
+&lt;h3 id="docker-단독-사용-환경의-한계"&gt;Docker 단독 사용 환경의 한계
+&lt;/h3&gt;&lt;p&gt;Docker는 다음과 같은 측면에서 한계가 존재한다.&lt;/p&gt;
+&lt;h4 id="수동-스케일링"&gt;수동 스케일링
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 명령어로 컨테이너 개수를 수동 조정&lt;/li&gt;
+&lt;li&gt;실시간 트래픽 변화에 대응 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="제한된-복구-기능"&gt;제한된 복구 기능
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--restart&lt;/code&gt; 자동 재시작은 가능하지만, 헬스 체크 기반 복구, 다중 노드 상태 관리는 불가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="서비스-수준-추상화-부족"&gt;서비스 수준 추상화 부족
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Docker Compose로 일부 기능(네트워크, 볼륨, 환경변수)은 구성 가능&lt;/li&gt;
+&lt;li&gt;하지만 로드밸런싱, 트래픽 분산, 서비스 디스커버리 등은 부족하거나 수동 구성 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="오케스트레이션이-해결하는-주요-문제-3가지"&gt;오케스트레이션이 해결하는 주요 문제 3가지
+&lt;/h3&gt;&lt;h4 id="자동-확장---auto-scaling"&gt;자동 확장 - Auto Scaling
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 트래픽 급증 시 컨테이너 수를 사람이 조정해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;Horizontal Pod Autoscaler&lt;/code&gt;를 통해 리소스(CPU, 메모리) 사용량 기준으로 Pod 수를 자동 조절&lt;/li&gt;
+&lt;li&gt;예시: CPU 사용률이 80% 이상일 때 3개에서 10개로 자동 확장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자가-복구---self-healing"&gt;자가 복구 - Self-Healing
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 컨테이너가 비정상 종료될 경우 사람이 직접 조치해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;livenessProbe&lt;/code&gt;, &lt;code&gt;readinessProbe&lt;/code&gt;를 통해 주기적으로 상태를 체크하고 실패한 컨테이너는 자동 재시작 또는 교체
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;livenessProbe&lt;/code&gt;: &amp;ldquo;얘가 아직 살아 있나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;자동 재시작&lt;/li&gt;
+&lt;li&gt;컨테이너가 비정상 상태일 경우 자동으로 재시작해줌&lt;/li&gt;
+&lt;li&gt;예: 무한 루프에 빠졌거나 내부적으로는 죽었는데 프로세스는 살아 있는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readinessProbe&lt;/code&gt;: &amp;ldquo;얘가 트래픽 받을 준비가 됐나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;장애 확산 방지&lt;/li&gt;
+&lt;li&gt;준비되지 않은 컨테이너는 Service에 등록되지 않음&lt;/li&gt;
+&lt;li&gt;앱이 시작은 됐지만 DB 연결이 아직 안 됐다면 트래픽 받지 않도록 막아줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="선언적-인프라---declarative-infrastructure"&gt;선언적 인프라 - Declarative Infrastructure
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 수동 명령어는 현재 상태를 명확히 알기 어렵고 일관성 유지가 어려움&lt;/li&gt;
+&lt;li&gt;해결: k8s에서는 YAML 파일에 &amp;ldquo;이 시스템은 이래야 한다&amp;quot;고 선언하면 클러스터가 이를 자동으로 유지
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 선언 예시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;apiVersion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;apps/v1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deployment&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;replicas&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;template&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;containers&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker-compose-vs-kubernetes-비교"&gt;Docker Compose vs Kubernetes 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;Docker Compose&lt;/th&gt;
+&lt;th&gt;Kubernetes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;스케일링&lt;/td&gt;
+&lt;td&gt;수동 조정 (&lt;code&gt;--scale&lt;/code&gt;)&lt;/td&gt;
+&lt;td&gt;HPA 기반 자동 확장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;복구&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--restart&lt;/code&gt;로 기본 재시작&lt;/td&gt;
+&lt;td&gt;상태 기반 자가 복구&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;디스커버리&lt;/td&gt;
+&lt;td&gt;내부 DNS 미지원 (v2 기준)&lt;/td&gt;
+&lt;td&gt;서비스명 기반 자동 디스커버리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;낮음&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;운영 복잡도&lt;/td&gt;
+&lt;td&gt;낮음 (로컬)&lt;/td&gt;
+&lt;td&gt;높지만 강력함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="오케스트레이터-선택-기준"&gt;오케스트레이터 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;오케스트레이터&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;th&gt;적합한 상황&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Kubernetes&lt;/td&gt;
+&lt;td&gt;CNCF 주도, 생태계 광범위&lt;/td&gt;
+&lt;td&gt;MSA 기반 대규모 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker Swarm&lt;/td&gt;
+&lt;td&gt;Docker와 연동 용이, 간결함&lt;/td&gt;
+&lt;td&gt;중소 규모 단일 클러스터&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AWS ECS / Fargate&lt;/td&gt;
+&lt;td&gt;서버리스, 비용 최적화&lt;/td&gt;
+&lt;td&gt;AWS 중심의 배포 전략&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너 오케스트레이션은 현대적인 서비스 운영을 위한 기본이자 필수 인프라 기술이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;학습과 실험엔 Docker만으로 충분하지만 실전에서는 운영 자동화, 복구, 확장성, 일관된 인프라 구성이 가능한 오케스트레이터가 반드시 필요하다.&lt;/p&gt;
+&lt;p&gt;특히 Kubernetes는 클라우드 네이티브 환경의 표준으로 자리 잡았다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Docker의 기본 사용법&lt;/li&gt;
+&lt;li&gt;컨테이너 개념 (이미지, 레지스트리, 실행 등)&lt;/li&gt;
+&lt;li&gt;YAML 파일의 구조 이해&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/ko/docs/home/" target="_blank" rel="noopener"
+&gt;Kubernetes 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" target="_blank" rel="noopener"
+&gt;Kubernetes Horizontal Pod Autoscaler&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://landscape.cncf.io/" target="_blank" rel="noopener"
+&gt;CNCF Landscape&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>컨테이너 기술 vs Docker</title><link>https://b9f1.com/p/2025-06-24-infra-same-but-different-concept-container-technology-and-docker/</link><pubDate>Tue, 24 Jun 2025 14:04:36 +0900</pubDate><guid>https://b9f1.com/p/2025-06-24-infra-same-but-different-concept-container-technology-and-docker/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Docker와 컨테이너는 다르다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;많은 개발자가 처음 접하는 컨테이너 기술은 Docker로 이어지지만 사실 Docker는 컨테이너 기술을 기반으로 만들어진 하나의 구현체일 뿐이다.&lt;/p&gt;
+&lt;p&gt;Docker보다 훨씬 이전에 등장했던 컨테이너 기술의 뿌리를 짚고 Docker가 어떤 혁신을 만들어냈는지, 또 최근에는 어떤 대체 도구들이 등장했는지 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-기술의-본질"&gt;컨테이너 기술의 본질
+&lt;/h3&gt;&lt;p&gt;컨테이너란 운영체제 수준에서 프로세스를 격리(isolation)하여 마치 독립된 시스템처럼 동작하게 하는 기술이다.&lt;/p&gt;
+&lt;p&gt;이 격리는 주로 아래 두 가지 리눅스 커널 기능을 조합해서 이루어진다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;네임스페이스(namespace)
+&lt;ul&gt;
+&lt;li&gt;프로세스, 파일 시스템, 사용자 ID, 네트워크 등 다양한 시스템 리소스를 다른 컨테이너와 분리하는 기술&lt;/li&gt;
+&lt;li&gt;첫 등장: 2002년 mount namespace (&lt;code&gt;Linux 2.4.19&lt;/code&gt;), 본격적으로 컨테이너화 가능해진 시점은 &lt;code&gt;2008년 2.6.24&lt;/code&gt; 이후&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;cgroups(control groups)
+&lt;ul&gt;
+&lt;li&gt;CPU, 메모리, 디스크 등 리소스 사용량을 제한하고 분리할 수 있도록 해주는 기능&lt;/li&gt;
+&lt;li&gt;구글이 2006년 내부적으로 개발, &lt;code&gt;2008년 리눅스 2.6.24&lt;/code&gt;에 정식 포함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;link rel="stylesheet" href="https://b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;리눅스 커널 2.6.24부터 namespace와 cgroups가 안정적으로 통합되며 현대적인 컨테이너 개념이 실현 가능해졌다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="docker-이전에도-컨테이너는-있었다"&gt;Docker 이전에도 컨테이너는 있었다
+&lt;/h3&gt;&lt;p&gt;컨테이너 기술이 단지 Docker로부터 시작되었다고 생각하지 말자.
+대표적인 두 가지 사례만 봐도 충분하다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Google Borg(2006~)
+&lt;ul&gt;
+&lt;li&gt;구글은 자체 클러스터 관리 시스템인 Borg에서 &lt;code&gt;process containers&lt;/code&gt;라는 이름으로 컨테이너 기술을 도입해 사용하고 있었다. 이 경험은 나중에 &lt;code&gt;Kubernetes&lt;/code&gt;(&lt;code&gt;k8s&lt;/code&gt;)로 이어지게 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LXC(Linux Containers)
+&lt;ul&gt;
+&lt;li&gt;2008년 등장한 LXC는 리눅스 네임스페이스와 cgroups를 조합해 독립된 사용자 공간을 제공하는 최초의 완전한 리눅스 컨테이너 런타임이었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;즉, Docker 이전에도 컨테이너는 실제 운영 환경에서 사용되고 있었다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;k8s&lt;/code&gt;(kubernetes), &lt;code&gt;i18n&lt;/code&gt;(internationalization), &lt;code&gt;a11y&lt;/code&gt;(accessibility) 같은 축약어는 단어의 첫 글자 + 생략된 글자 수 + 마지막 글자 형태로 만들어진 축약어다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;긴 단어를 짧게 줄여서 쓰기 편하게&lt;/li&gt;
+&lt;li&gt;기술 문서나 코드에서 가독성과 공간 절약을 위해&lt;/li&gt;
+&lt;li&gt;축약하면서도 고유성을 유지&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="docker는-무엇이-달랐나"&gt;Docker는 무엇이 달랐나?
+&lt;/h3&gt;&lt;p&gt;Docker는 2013년에 등장하여 기존 컨테이너 기술을 개발자 친화적으로 쉽게 쓸 수 있도록 UX를 패키징한 도구로서 주목받았다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Docker는 컨테이너 기술 자체를 발명한 게 아니라 그것을 &amp;lsquo;쉽게 쓸 수 있도록&amp;rsquo; 만들어 낸 데 혁신이 있다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Docker의 핵심 혁신:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DockerFile&lt;/code&gt;로 정의 가능한 이미지 기반 환경 구성&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 같은 직관적인 CLI&lt;/li&gt;
+&lt;li&gt;Docker Hub를 통한 이미지 공유 및 배포&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="또-다른-컨테이너-도구들"&gt;또 다른 컨테이너 도구들
+&lt;/h3&gt;&lt;p&gt;컨테이너 기술은 OCI(Open Container Initiative)라는 표준에 의해 정의된다.
+이 표준을 기반으로 다양한 런타임이 Docker 외에도 등장하고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Container Runtime: 컨테이너를 실행하는 역할
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;runc&lt;/code&gt;: Docker도 내부적으로 사용하는 기본 실행기&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;conatinerd&lt;/code&gt;: CNCF가 관리하는 Docker 독립형 런타임&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CRI-O&lt;/code&gt;: Kubernetes 전용으로 설계된 경량 런타임임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Docker 대체 도구:
+&lt;ul&gt;
+&lt;li&gt;Podman: rootless 컨테이너, systemd 통합 지원, Docker Daemon 없이 작동&lt;/li&gt;
+&lt;li&gt;Buildah: Dockerfile 없이 이미지 빌드 가능, Podman과 연동&lt;/li&gt;
+&lt;li&gt;Kubernetes: 직접 컨테이너를 실행하지 않지만 런타임 인터페이스(Container Runtime Interface - CRI)를 통해 위 런타임과 연동&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker는-이제-표준이-아니다"&gt;Docker는 이제 표준이 아니다?
+&lt;/h3&gt;&lt;p&gt;2020년 이후 Kubernetes는 Docker를 기본 런타임에서 제외했고 대신 &lt;code&gt;containered&lt;/code&gt;, &lt;code&gt;CRI-O&lt;/code&gt;와 같은 런타임을 사용한다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Docker가 문제가 아니라 Docker의 구조가 Kubernetes와 궁합이 맞지 않아서다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Kubernetes는 CRI라는 표준 API로 런타임을 호출한다.
+하지만 Docker는 이 CRI를 직접 구현하지 않고 중간 계층(containerd + shim)을 사용해 간접적으로 연동된다.&lt;/p&gt;
+&lt;p&gt;오히려 containerd나 CRI-O처럼 CRI를 직접 구현한 런타임이 더 효율적이다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너는 기술이고 Docker는 그 기술을 손쉽게 만든 하나의 도구다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Docker는 훌륭한 UX 도구지만 그 자체가 컨테이너 기술의 전부는 아니다.
+컨테이너 생태계는 이제 Docker를 넘어 다양화되고 있으며 오픈소스 커뮤니티와 표준화가 이를 이끌고 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;이미지 빌드와 레이어 개념&lt;/li&gt;
+&lt;li&gt;Kubernetes의 CRI(Container Runtime Interface)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Linux_namespaces" target="_blank" rel="noopener"
+&gt;Linux namespaces - Wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Cgroups" target="_blank" rel="noopener"
+&gt;Cgroups - Wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Linux_namespaces" target="_blank" rel="noopener"
+&gt;리눅스 커널 2.6 - 네임스페이스 기반 컨테이너 기술&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://news.ycombinator.com/item?id=30327507" target="_blank" rel="noopener"
+&gt;Google Borg (2006~) – Docker 이전부터 컨테이너 활용&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.aquasec.com/blog/a-brief-history-of-containers-from-1970s-chroot-to-docker-2016" target="_blank" rel="noopener"
+&gt;LXC (Linux Containers) – Docker보다 선행한 사례&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://opencontainers.org/" target="_blank" rel="noopener"
+&gt;Open Container Initiative (OCI)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://podman.io/" target="_blank" rel="noopener"
+&gt;Podman 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://containerd.io/" target="_blank" rel="noopener"
+&gt;containerd 공식 사이트&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Docker 시작하기: 기초 개념과 필수 지식 정리</title><link>https://b9f1.com/p/2025-01-27-getting-started-with-docker/</link><pubDate>Mon, 27 Jan 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-01-27-getting-started-with-docker/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;란 무엇이고 왜 사용하는지 정리한다.&lt;/p&gt;
+&lt;h2 id="docker란"&gt;📌Docker란?
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 애플리케이션을 컨테이너라는 독립된 환경에서 실행할 수 있게 해주는 플랫폼이다.
+&lt;code&gt;Docker&lt;/code&gt;를 이해하기 위해 필요한 기본 개념들과 지식에 대해 알아본다.&lt;/p&gt;
+&lt;h2 id="왜-사용하지"&gt;📌왜 사용하지?
+&lt;/h2&gt;&lt;h3 id="1-일관된-환경-제공"&gt;1. 일관된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 컨테이너를 통해 애플리케이션과 그 종속성들을 포함하는 독립된 환경을 제공한다.
+이를 통해 개발, 테스트, 배포 환경에서 일관된 실행 환경을 보장할 수 있다.
+이는 &amp;ldquo;내 컴에선 잘 되네요. (Works on my machine)&amp;rdquo; 문제를 해결하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="2-효율적인-리소스-사용"&gt;2. 효율적인 리소스 사용
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 컨테이너는 가상 머신보다 가볍고 빠르다.
+컨테이너는 호스트 운영 체제의 커널을 공유하면서 실행되기 때문에, 리소스 오버헤드가 적고 빠른 성능을 제공한다.&lt;/p&gt;
+&lt;h3 id="3-빠른-배포와-스케일링"&gt;3. 빠른 배포와 스케일링
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 사용하면 애플리케이션의 배포와 스케일링이 용이하다.
+이미지를 통해 컨테이너를 빠르게 생성하고 실행할 수 있으며, 필요한 경우 컨테이너를 쉽게 확장할 수 있다.&lt;/p&gt;
+&lt;h3 id="4-이식성"&gt;4. 이식성
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 어디서나 일관된 환경을 제공하기 때문에, 애플리케이션을 다양한 플랫폼에서 쉽게 실행할 수 있다.
+이는 로컬 개발 환경, 테스트 서버, 클라우드 환경 등에서 동일하게 동작한다.&lt;/p&gt;
+&lt;h3 id="5-버전-관리와-롤백"&gt;5. 버전 관리와 롤백
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 버전 관리가 가능하며, 특정 버전으로 롤백할 수 있다.
+이는 애플리케이션의 안정성과 일관성을 유지하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="6-분리된-환경-제공"&gt;6. 분리된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 각 애플리케이션을 분리된 컨테이너에서 실행하기 때문에, 서로 간섭 없이 독립적으로 실행할 수 있다.
+이는 보안성과 안정성을 높이는 데 기여한다.&lt;/p&gt;
+&lt;h3 id="7-devops와-cicd-통합"&gt;7. DevOps와 CI/CD 통합
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 &lt;code&gt;DevOps&lt;/code&gt;와 &lt;code&gt;CI/CD&lt;/code&gt; 파이프라인과 쉽게 통합할 수 있다.
+이를 통해 자동화된 빌드, 테스트, 배포 프로세스를 구현할 수 있다.&lt;/p&gt;
+&lt;h2 id="docker를-이해하기-위한-기본-지식"&gt;📌Docker를 이해하기 위한 기본 지식
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 이해하고 사용하기 위해 다음과 같은 기본 지식이 필요하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;리눅스 명령어와 기초 운영 체제 지식&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 주로 리눅스 환경에서 사용되므로 리눅스 명령어와 파일 시스템 구조에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;가상화 개념&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 가상화 기술의 한 형태이므로, 전통적인 가상 머신과 비교하여 컨테이너의 장점과 차이점을 이해하는 것이 도움이 된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워킹 기초&lt;/strong&gt;: 컨테이너 간의 통신과 네트워킹 설정을 이해하기 위해 기본적인 네트워킹 개념이 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;버전 관리 시스템&lt;/strong&gt;: &lt;code&gt;Dockerfile&lt;/code&gt;과 이미지를 버전 관리하는 데 도움이 되므로 &lt;code&gt;Git&lt;/code&gt;과 같은 버전 관리 시스템에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="docker의핵심-개념"&gt;📌Docker의 핵심 개념
+&lt;/h2&gt;&lt;h3 id="1-containers-컨테이너"&gt;1. Containers (컨테이너)
+&lt;/h3&gt;&lt;p&gt;컨테이너는 애플리케이션과 그 종속성들을 포함하는 경량의 독립 실행 환경이다.&lt;/p&gt;
+&lt;p&gt;컨테이너는 동일한 호스트 운영 체제 커널을 공유하면서도 서로 격리되어 실행된다.
+이를 통해 애플리케이션이 어디서나 일관되게 실행될 수 있다.&lt;/p&gt;
+&lt;h3 id="2-images-이미지"&gt;2. Images (이미지)
+&lt;/h3&gt;&lt;p&gt;이미지는 &lt;code&gt;Docker&lt;/code&gt; 컨테이너를 생성하기 위한 읽기 전용 템플릿이다.&lt;/p&gt;
+&lt;p&gt;이미지는 여러 개의 레이어로 구성되며, 각 레이어는 기존 이미지에서 변경된 내용을 포함한다.
+이미지는 재사용 가능하며, &lt;code&gt;Docker Hub&lt;/code&gt;와 같은 레지스트리에 저장하고 배포할 수 있다.&lt;/p&gt;
+&lt;h3 id="3-volumes-볼륨"&gt;3. Volumes (볼륨)
+&lt;/h3&gt;&lt;p&gt;볼륨은 컨테이너와 호스트 간의 데이터를 지속적으로 저장하고 공유하기 위한 메커니즘이다.&lt;/p&gt;
+&lt;p&gt;컨테이너가 삭제되더라도 볼륨에 저장된 데이터는 유지된다.
+볼륨은 컨테이너 간에 데이터를 공유할 때도 유용하하다.&lt;/p&gt;
+&lt;h3 id="4-builds-빌드"&gt;4. Builds (빌드)
+&lt;/h3&gt;&lt;p&gt;빌드는 &lt;code&gt;Dockerfile&lt;/code&gt;을 사용하여 이미지를 생성하는 과정이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Dockerfile&lt;/code&gt;은 애플리케이션 환경을 설정하는 명령어들의 스크립트다.
+&lt;code&gt;docker build&lt;/code&gt; 명령어를 사용하여 &lt;code&gt;Dockerfile&lt;/code&gt;을 기반으로 이미지를 생성할 수 있다.&lt;/p&gt;</description></item></channel></rss>

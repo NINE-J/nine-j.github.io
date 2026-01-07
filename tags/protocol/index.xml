@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Protocol on B9F1</title><link>https://b9f1.com/tags/protocol/</link><description>Recent content in Protocol on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 30 Aug 2025 13:33:52 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/protocol/index.xml" rel="self" type="application/rss+xml"/><item><title>네트워크 계층 모델 비교</title><link>https://b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</link><pubDate>Sat, 30 Aug 2025 13:33:52 +0900</pubDate><guid>https://b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;네트워크를 이해할 때 가장 먼저 마주하는 개념이 바로 &lt;strong&gt;계층 모델(Layered Model)&lt;/strong&gt; 이다.&lt;/p&gt;
+&lt;p&gt;대표적으로 &lt;strong&gt;TCP/IP 4계층 모델&lt;/strong&gt;과 &lt;strong&gt;OSI 7계층 모델&lt;/strong&gt;이 있는데, 두 모델은 네트워크 통신을 구조적으로 설명하는 기준이 된다.&lt;/p&gt;
+&lt;p&gt;두 모델을 각각 설명하고, 어떤 차이가 있으며 실무에서는 어떻게 이해하면 좋은지 다뤄본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="osi-7계층-모델"&gt;OSI 7계층 모델
+&lt;/h3&gt;&lt;p&gt;국제표준화기구(ISO)에서 제정한 &lt;strong&gt;OSI(Open Systems Interconnection)&lt;/strong&gt; 모델은 네트워크 통신 과정을 7단계로 나눈다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;물리 계층 (Physical)&lt;/strong&gt;: 전기 신호, 케이블, 하드웨어 전송 매체&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 링크 계층 (Data Link)&lt;/strong&gt;: MAC 주소, 프레임 전송, 오류 검출 (예: Ethernet, Switch)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 계층 (Network)&lt;/strong&gt;: IP 주소 기반 라우팅 (예: IP, Router)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: 종단 간 통신, 신뢰성 보장 (예: TCP, UDP)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;세션 계층 (Session)&lt;/strong&gt;: 세션 관리, 연결 유지/종료 (예: NetBIOS)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;표현 계층 (Presentation)&lt;/strong&gt;: 데이터 형식 변환, 암호화 (예: SSL/TLS, JPEG)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 사용자 서비스 제공 (예: HTTP, FTP, SMTP)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart LR
+%% 송신 측
+subgraph Sender[송신 측 - Encapsulation]
+direction TB
+A1[응용 계층] --&gt; A2[전송 계층] --&gt; A3[네트워크 계층] --&gt; A4[데이터 링크 계층] --&gt; A5[물리 계층]
+A1_side[Data] --- A1
+A2_side[TCP/UDP Header + Data] --- A2
+A3_side[IP Header + TCP Segment] --- A3
+A4_side[MAC Header + IP Packet + CRC] --- A4
+A5_side[010101 비트 스트림] --- A5
+end
+%% 수신 측
+subgraph Receiver[수신 측 - Decapsulation]
+direction TB
+B5[물리 계층] --&gt; B4[데이터 링크 계층] --&gt; B3[네트워크 계층] --&gt; B2[전송 계층] --&gt; B1[응용 계층]
+B5_side[010101 비트 스트림] --- B5
+B4_side[프레임 해제 → IP Packet] --- B4
+B3_side[패킷 해제 → TCP Segment] --- B3
+B2_side[세그먼트 해제 → Data] --- B2
+B1_side[Application Data 복원] --- B1
+end
+%% 송수신 연결
+A5 --전송--&gt; B5
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="tcpip-4계층-모델"&gt;TCP/IP 4계층 모델
+&lt;/h3&gt;&lt;p&gt;실제 인터넷 프로토콜에서 사용되는 구조는 &lt;strong&gt;TCP/IP 모델&lt;/strong&gt;이다. OSI보다 단순화되어 있으며, 실무에서는 이 모델을 주로 따른다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 액세스 계층 (Network Access)&lt;/strong&gt;: 하드웨어 인터페이스, 데이터 링크 &amp;amp; 물리 계층 포함&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인터넷 계층 (Internet)&lt;/strong&gt;: IP 주소 기반 라우팅 (IP, ICMP 등)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: TCP/UDP 기반 통신 제어&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 애플리케이션 서비스 (HTTP, FTP, DNS, SMTP 등)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;오늘날 인터넷이 동작하는 실제 표준 구조다.&lt;/p&gt;
+&lt;h3 id="두-모델의-비교"&gt;두 모델의 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;OSI 7계층&lt;/th&gt;
+&lt;th&gt;TCP/IP 4계층&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;계층 수&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;TCP/IP는 실용적으로 단순화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;정의 기관&lt;/td&gt;
+&lt;td&gt;ISO&lt;/td&gt;
+&lt;td&gt;ARPANET/DoD&lt;/td&gt;
+&lt;td&gt;목적 차이: 이론 vs 실무&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;표현/세션&lt;/td&gt;
+&lt;td&gt;독립 계층 존재&lt;/td&gt;
+&lt;td&gt;응용 계층에 통합&lt;/td&gt;
+&lt;td&gt;OSI는 세밀, TCP/IP는 실용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;전송 계층&lt;/td&gt;
+&lt;td&gt;TCP/UDP 모두 포함&lt;/td&gt;
+&lt;td&gt;동일&lt;/td&gt;
+&lt;td&gt;신뢰성(연결형 vs 비연결형) 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보급&lt;/td&gt;
+&lt;td&gt;이론/교육 중심&lt;/td&gt;
+&lt;td&gt;인터넷 표준&lt;/td&gt;
+&lt;td&gt;TCP/IP가 사실상 전세계 표준&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+subgraph OSI_7
+OSI1["응용 계층&lt;br/&gt;(Application)"]
+OSI2["표현 계층&lt;br/&gt;(Presentation)"]
+OSI3["세션 계층&lt;br/&gt;(Session)"]
+OSI4["전송 계층&lt;br/&gt;(Transport)"]
+OSI5["네트워크 계층&lt;br/&gt;(Network)"]
+OSI6["데이터 링크 계층&lt;br/&gt;(Data Link)"]
+OSI7["물리 계층&lt;br/&gt;(Physical)"]
+end
+subgraph TCPIP_4
+TCP1["응용 계층&lt;br/&gt;(Application)"]
+TCP2["전송 계층&lt;br/&gt;(Transport)"]
+TCP3["인터넷 계층&lt;br/&gt;(Internet)"]
+TCP4["네트워크 액세스 계층&lt;br/&gt;(Network Access)"]
+end
+%% 매핑 관계
+OSI1 --&gt; TCP1
+OSI2 --&gt; TCP1
+OSI3 --&gt; TCP1
+OSI4 --&gt; TCP2
+OSI5 --&gt; TCP3
+OSI6 --&gt; TCP4
+OSI7 --&gt; TCP4
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;네트워크 공부 초기에 &amp;ldquo;OSI 7계층&amp;quot;을 무조건 외워야 하는지 의문이었다.
+하지만 실무에서는 “이론적 설명”보다 TCP/IP 모델이 더 쓰인다.
+결국 “OSI는 네트워크 교과서의 언어, TCP/IP는 인터넷의 언어”라고 이해하면 쉽다.
+즉, &lt;strong&gt;OSI는 이상적인 개념도, TCP/IP는 현실 세계 지도&lt;/strong&gt;라고 비유할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;OSI 7계층은 개념적 학습과 문제 진단에 유용하고, TCP/IP 4계층은 인터넷의 실제 동작 표준이다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;즉, 공부할 때는 OSI로 세밀하게 이해하고, 실무에서는 TCP/IP로 단순하게 적용하는 것이 가장 효율적이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;네트워크 기본 용어 (패킷, 프레임, 포트, 프로토콜)&lt;/li&gt;
+&lt;li&gt;인터넷 프로토콜(IP), TCP/UDP 개념&lt;/li&gt;
+&lt;li&gt;OSI와 TCP/IP 모델의 역사적 배경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/OSI_model" target="_blank" rel="noopener"
+&gt;Wikipedia - OSI model&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>URL 입력 후 ENTER 키</title><link>https://b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</link><pubDate>Tue, 08 Apr 2025 00:00:00 +0900</pubDate><guid>https://b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;사용자가 브라우저에 URL을 입력하고 엔터를 누르면, 요청한 웹페이지를 가져와 화면에 표시하기까지 복잡한 일련의 과정이 진행된다.&lt;/p&gt;
+&lt;p&gt;이 과정은 여러 시스템, 프로토콜, 그리고 인터넷 스택의 다양한 계층을 포함한다.
+엔지니어에게 이 과정을 이해하는 것은 성능 최적화, 보안 강화, 문제 해결에 필수적이다.&lt;/p&gt;
+&lt;p&gt;이 과정을 기술적으로 상세히 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="네트워킹"&gt;네트워킹
+&lt;/h3&gt;&lt;p&gt;브라우저는 언제 URL을 분석해서 요청을 처리할 방법을 결정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;URL의 구성 요소&lt;/strong&gt; (예: &lt;code&gt;https://www.example.com:443/path?query=value#fragment&lt;/code&gt;)
+&lt;ul&gt;
+&lt;li&gt;스키마/프로토콜: &lt;code&gt;https&lt;/code&gt;는 사용할 프로토콜(HTTP/HTTPS)을 나타낸다.&lt;/li&gt;
+&lt;li&gt;도메인: &lt;code&gt;www.example.com&lt;/code&gt;은 서버를 지정한다.&lt;/li&gt;
+&lt;li&gt;포트: &lt;code&gt;:443&lt;/code&gt;(선택 사항 HTTP는 기본 80, HTTPS는 443)&lt;/li&gt;
+&lt;li&gt;경로: &lt;code&gt;/path&lt;/code&gt;는 요청할 리소스를 식별한다.&lt;/li&gt;
+&lt;li&gt;쿼리: &lt;code&gt;?query=value&lt;/code&gt;는 추가 매개변수를 제공한다.&lt;/li&gt;
+&lt;li&gt;프래그먼트: &lt;code&gt;#fragment&lt;/code&gt;는 페이지 내 특정 섹션을 가리킨다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;유효성 검사&lt;/strong&gt;: 브라우저는 URL의 문법이 올바른지 확인한다.
+&lt;ul&gt;
+&lt;li&gt;잘못된 경우 검색 쿼리로 처리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HSTS 확인&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTPS 연결을 위해 브라우저는 HSTS(HTTP Strict Transport Security) 목록을 확인하여 도메인이 보안 연결을 요구하는지 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인코딩&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;특수 문자는 URL 인코딩 (예: 공백을 &lt;code&gt;%20&lt;/code&gt;으로 변환)을 통해 처리된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="dns-조회"&gt;DNS 조회
+&lt;/h3&gt;&lt;p&gt;도메인 이름을 실제 서버의 IP 주소로 변환하는 과정.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;로컬 캐시 확인&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;브라우저와 OS는 먼저 로컬 DNS 캐시를 확인한다.
+&lt;ul&gt;
+&lt;li&gt;예: 브라우저 캐시, &lt;code&gt;/etc/hosts&lt;/code&gt; 파일&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;재귀적 DNS 쿼리&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;캐시에 없으면 시스템은 ISP의 DNS 리졸버 또는 공용 DNS (예: 8.8.8.8)에 쿼리를 보낸다.
+&lt;ul&gt;
+&lt;li&gt;ISP: Internet Service Provider, DNS: Domain Name System&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;리졸버는 루트 DNS 서버, TLD(최상위 도메인, &lt;code&gt;.com&lt;/code&gt;) 서버, 권한 있는 네임 서버를 순차적으로 질의하여 IP 주소를 얻는다.
+&lt;ul&gt;
+&lt;li&gt;TLD: Top-Level Domain&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 레코드&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;A&lt;/code&gt; 레코드(IPv4 주소) 또는 &lt;code&gt;AAAA&lt;/code&gt; 레코드(IPv6 주소)를 반환.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CNAME&lt;/code&gt; 레코드가 있으면 추가 조회가 필요할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 캐싱&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;조회된 IP는 TTL에 따라 로컬에 캐싱되어 이후 요청을 가속화한다.
+&lt;ul&gt;
+&lt;li&gt;TTL: Time To Live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 보안&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;DNSSEC을 사용하면 응답의 무결성을 보장한다.
+&lt;ul&gt;
+&lt;li&gt;DNSSEC: DNS Security Extensions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="tcp-연결"&gt;TCP 연결
+&lt;/h3&gt;&lt;p&gt;브라우저는 서버와 안정적인 연결을 설정하기 위해 TCP 프로토콜을 사용한다.
+TCP: Transmission Control Protocol (전송 제어 프로토콜)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;3 Way 핸드셰이크&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;SYN&lt;/code&gt; 패킷을 서버로 전송&lt;/li&gt;
+&lt;li&gt;서버가 &lt;code&gt;SYN-ACK&lt;/code&gt;로 응답&lt;/li&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;ACK&lt;/code&gt;로 보내 연결을 완료
+&lt;ul&gt;
+&lt;li&gt;SYN: SYNchronization (동기화), ACK: ACKnowledgement (확인)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소켓 생성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트와 서버는 각각 소켓을 열어 데이터를 주고 받을 준비를 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;지연 요소&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;네트워크 레이턴시와 패킷 손실은 연결 시간을 늘릴 수 있다.&lt;/li&gt;
+&lt;li&gt;TCP Slow Start는 초기 전송 속도를 조절한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Keep-Alive&lt;/strong&gt;: HTTP/1.1부터는 연결을 재사용하여 오버헤드를 줄인다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="tls-핸드셰이크-https"&gt;TLS 핸드셰이크 (HTTPS)
+&lt;/h3&gt;&lt;p&gt;HTTPS 요청의 경우 데이터 보안을 위해 TLS(Transport Layer Security) 연결을 설정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;TLS 협상&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트는 &lt;code&gt;ClientHello&lt;/code&gt; 메시지로 지원하는 암호화 스위트와 TLS 버전을 전송.&lt;/li&gt;
+&lt;li&gt;서버는 &lt;code&gt;SeverHello&lt;/code&gt;로 선택한 암호화 방식과 인증서를 응답&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증서 검증&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트는 서버의 인증서를 CA로 검증
+&lt;ul&gt;
+&lt;li&gt;CA: Certificate Authority&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인증서의 도메인 일치 여부와 유효 기간을 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;키 교환&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Diffie-Hellman 또는 RSA를 사용해 세션 키를 생성&lt;/li&gt;
+&lt;li&gt;이후 데이터는 대칭 암호화(예: AES)로 보호&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;성능 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;TLS 1.3은 핸드셰이크를 단순화하여 지연을 줄임&lt;/li&gt;
+&lt;li&gt;세션 재개는 이전 연결의 캐시를 활용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="http-통신"&gt;HTTP 통신
+&lt;/h3&gt;&lt;h4 id="http-요청"&gt;HTTP 요청
+&lt;/h4&gt;&lt;p&gt;브라우저는 서버에 HTTP 요청을 보내 리소스를 요청한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;요청 구성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;메서드: &lt;code&gt;GET&lt;/code&gt;, &lt;code&gt;POST&lt;/code&gt; 등.&lt;/li&gt;
+&lt;li&gt;헤더: &lt;code&gt;Host&lt;/code&gt;, &lt;code&gt;User-Agent&lt;/code&gt;, &lt;code&gt;Accept&lt;/code&gt;, &lt;code&gt;Cookie&lt;/code&gt; 등.&lt;/li&gt;
+&lt;li&gt;바디: &lt;code&gt;POST&lt;/code&gt; 요청 시 데이터 포함 (예: JSON, Form 데이터).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HTTP/2 및 HTTP/3&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTP/2는 멀티플렉싱과 헤더 압축을 지원&lt;/li&gt;
+&lt;li&gt;HTTP/3는 UDP 기반 QUIC를 사용하여 성능을 개선&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프록시 및 CDN&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;요청은 프록시 서버나 CDN(예: Cloudflare)을 거칠 수 있음&lt;/li&gt;
+&lt;li&gt;CDN은 캐싱된 콘텐츠를 제공해 지연을 줄임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="서버-응답"&gt;서버 응답
+&lt;/h4&gt;&lt;p&gt;서버는 요청을 처리하고 응답을 반환한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;응답 구성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;상태 코드
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;200 OK&lt;/code&gt;, &lt;code&gt;404 Not Found&lt;/code&gt;, &lt;code&gt;301 Moved Permanently&lt;/code&gt; 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;헤더
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Content-Type&lt;/code&gt;, &lt;code&gt;Content-Length&lt;/code&gt;, &lt;code&gt;Cache-Control&lt;/code&gt; 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;바디
+&lt;ul&gt;
+&lt;li&gt;HTML, JSON, 이미지 등의 콘텐츠&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;리다이렉션&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;301&lt;/code&gt; 또는 &lt;code&gt;302&lt;/code&gt; 상태 코드는 브라우저를 다른 URL로 이동시킴&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;압축&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;gzip&lt;/code&gt; 또는 &lt;code&gt;brotli&lt;/code&gt;로 콘텐츠를 압축해 전송 속도를 높임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="렌더링"&gt;렌더링
+&lt;/h3&gt;&lt;h4 id="html-파싱-및-dom-구축"&gt;HTML 파싱 및 DOM 구축
+&lt;/h4&gt;&lt;p&gt;브라우저는 서버에서 받은 HTML을 파싱하여 DOM을 생성한다.
+DOM: Document Object Model&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;파싱 과정
+&lt;ul&gt;
+&lt;li&gt;HTML은 바이트 스트림에서 토큰으로 분해됨&lt;/li&gt;
+&lt;li&gt;토큰은 노드로 변환되어 DOM 트리로 조립&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;오류 처리
+&lt;ul&gt;
+&lt;li&gt;잘못된 HTML(예: 닫히지 않은 태그)도 최대한 파싱&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;비동기 로딩
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; 태그는 기본적으로 파싱을 차단하나, &lt;code&gt;async&lt;/code&gt; 또는 &lt;code&gt;defer&lt;/code&gt; 속성으로 최적화 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="css-파싱-및-렌더-트리"&gt;CSS 파싱 및 렌더 트리
+&lt;/h4&gt;&lt;p&gt;CSS는 스타일을 정의하고 렌더 트리를 생성해 화면에 표시할 요소를 결정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;CSSOM 생성
+&lt;ul&gt;
+&lt;li&gt;CSS는 CSSOM으로 변환
+&lt;ul&gt;
+&lt;li&gt;CSSOM: CSS Object Model&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;렌더 트리
+&lt;ul&gt;
+&lt;li&gt;DOM과 CSSOM을 결합해 보이는 요소만 표함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;리플로우
+&lt;ul&gt;
+&lt;li&gt;스타일 변경 시 레이아웃을 재계산&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="자바스크립트-실행"&gt;자바스크립트 실행
+&lt;/h4&gt;&lt;p&gt;자바스크립트는 동적 콘텐츠를 생성하고 페이지를 조작한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;엔진
+&lt;ul&gt;
+&lt;li&gt;V8(Chrome), SpiderMonkey(Firefox) 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;이벤트 루프
+&lt;ul&gt;
+&lt;li&gt;비동기 작업(예: &lt;code&gt;setTimeout&lt;/code&gt;, AJAX)을 처리.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;성능 병목
+&lt;ul&gt;
+&lt;li&gt;무거운 스크립트는 렌더링을 지연시킬 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="화면-렌더링"&gt;화면 렌더링
+&lt;/h4&gt;&lt;p&gt;브라우저는 렌더 트리를 기반으로 픽셀을 화면에 그린다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;레이아웃: 요소의 위치와 크기를 계산&lt;/li&gt;
+&lt;li&gt;페인팅: 계산된 스타일을 픽셀로 변환&lt;/li&gt;
+&lt;li&gt;합성: GPU를 활용해 레이어를 합성&lt;/li&gt;
+&lt;li&gt;최적화: 하드웨어 가속과 캐싱으로 성능 개선&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;URL 입력부터 화면 표시까지의 과정은 네트워킹(DNS, TCP, TLS, HTTP)과 웹 기술(파싱, 렌더링)의 긴밀한 협력으로 이루어진다.&lt;/p&gt;
+&lt;p&gt;각 단계는 성능, 보안, 사용자 경험에 직접적인 영향을 미치며 엔지니어는 이를 이해함으로써 최적화와 문제 해결의 기반을 마련할 수 있다.&lt;/p&gt;
+&lt;h3 id="과정-요약"&gt;과정 요약
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;URL 파싱: 브라우저는 URL을 분석하여 프로토콜(예: HTTPS), 도메인, 경로 등을 식별하고 요청 준비를 한다.&lt;/li&gt;
+&lt;li&gt;DNS 조회: 도메인 이름을 IP 주소로 변환하며, 로컬 캐시 또는 DNS 서버를 통해 빠르게 처리된다.&lt;/li&gt;
+&lt;li&gt;TCP 연결: 클라이언트와 서버 간 안정적인 연결을 위해 3Way 핸드셰이크를 수행한다.&lt;/li&gt;
+&lt;li&gt;TLS 핸드셰이크 (HTTPS): 보안 연결을 위해 인증서 검증과 세션 키 교환을 통해 데이터를 암호화 한다.&lt;/li&gt;
+&lt;li&gt;HTTP 요청/응답: 브라우저가 서버에 리소스를 요청하고, 서버는 HTML, CSS, 이미지 등으로 응답한다.&lt;/li&gt;
+&lt;li&gt;렌더링
+&lt;ul&gt;
+&lt;li&gt;HTML을 파싱해 DOM을 구축하고 CSS를 적용해 렌더 트리를 생성&lt;/li&gt;
+&lt;li&gt;자바스크립트를 실행해 동적 콘텐츠를 처리&lt;/li&gt;
+&lt;li&gt;레이아웃 계산, 페인팅, 합성을 통해 화면에 페이지를 표시&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;OSI 7계층&lt;/strong&gt;: DNS(TCP/UDP), HTTP, TLS는 응용/전송 계층에서 동작.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TCP/IP 모델&lt;/strong&gt;: 인터넷 프로토콜 스택의 기본 구조 이해.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;브라우저 엔진&lt;/strong&gt;: Webkit, Blink, Gecko의 렌더링 방식 차이.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알면-좋을-것들"&gt;더 알면 좋을 것들
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;웹 성능 최적화&lt;/strong&gt;: Critical Rendering Path, Lazy Loading.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안&lt;/strong&gt;: CORS, CSRF, XSS 방지 기법.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;모니터링&lt;/strong&gt;: Lighthouse, Web Vitals로 성능 측정.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프로그레시브 웹 앱(PWA)&lt;/strong&gt;: 오프라인 캐싱과 빠른 로딩.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;브라우저 개발자 도구&lt;/strong&gt;: 네트워크 탭과 성능 분석 활용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="참조-자료"&gt;참조 자료
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://velog.io/@forest_xox/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%A3%BC%EC%86%8C%EC%B0%BD%EC%97%90-URL%EC%9D%84-%EC%9E%85%EB%A0%A5%ED%95%98%EB%A9%B4-%EC%9D%BC%EC%96%B4%EB%82%98%EB%8A%94-%EC%9D%BC" target="_blank" rel="noopener"
+&gt;[네트워크] 주소창에 URL을 입력하면 일어나는 일&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://medium.com/@alysachan830/what-happens-from-typing-in-a-url-to-displaying-a-website-part-1-dns-cache-and-dns-lookup-86441848ea59" target="_blank" rel="noopener"
+&gt;DNS cache and DNS lookup: What happens from typing in a URL to displaying a website? (Part 1)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://hyunki99.tistory.com/109" target="_blank" rel="noopener"
+&gt;[네트워크] 브라우저 주소창에 URL을 입력 시 일어나는 일 정리 (DNS)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

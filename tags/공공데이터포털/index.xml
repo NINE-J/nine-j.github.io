@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>공공데이터포털 on B9F1</title><link>https://b9f1.com/tags/%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%8F%AC%ED%84%B8/</link><description>Recent content in 공공데이터포털 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Jun 2025 11:28:27 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%8F%AC%ED%84%B8/index.xml" rel="self" type="application/rss+xml"/><item><title>공공데이터포털 API</title><link>https://b9f1.com/p/2025-06-06-cs-network-open-api-url-service_key_is_not_registered_error/</link><pubDate>Fri, 06 Jun 2025 11:28:27 +0900</pubDate><guid>https://b9f1.com/p/2025-06-06-cs-network-open-api-url-service_key_is_not_registered_error/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;공공데이터포털의 API 사용 시&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;포털에서 발급 받은 Encoding 또는 Decoding 키를 이용해 포털에서 테스트 응답 확인이 가능하다.&lt;/li&gt;
+&lt;li&gt;Postman 등 REST API를 테스트할 수 있는 툴에서 동일하게 응답 확인이 가능하다.&lt;/li&gt;
+&lt;li&gt;프로젝트에서 &lt;code&gt;.http&lt;/code&gt; 테스트하거나 프로그램 실행 시 &lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt; 오류를 만난다?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="url-인코딩"&gt;URL 인코딩
+&lt;/h3&gt;&lt;h4 id="퍼센트-인코딩"&gt;퍼센트 인코딩
+&lt;/h4&gt;&lt;p&gt;URL 인코딩에서는 퍼센트 인코딩(Percent encoding)이라는 방식을 사용한다.
+퍼센트 인코딩은 &lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank" rel="noopener"
+&gt;RFC 3986&lt;/a&gt;에 정의되어 있다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;퍼센트 인코딩 URL 인코딩&amp;rdquo; 뿐만 아니라 URI, URN에도 사용될 수 있고 정확히는 &amp;lsquo;퍼센트 인코딩(Percent encoding)&amp;lsquo;이라는 용어가 더 적합하다고 한다.&lt;/p&gt;
+&lt;p&gt;퍼센트 인코딩을 하는 이유는 인터넷에서 주고 받을 수 있는 문자는 ASCII 문자 뿐이기 때문이다.
+따라서 ASCII가 아닌 문자는 전송 가능한 형태로 인코딩을 해야 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;퍼센트 인코딩은 URL에서 URL로 사용할 수 없는 문자나 URL로 사용할 순 없지만 의미가 외곡될 수 있는 문자를 &lt;code&gt;%XX&lt;/code&gt; (XX는 16진수)로 변환하는 방법이다.
+&lt;ul&gt;
+&lt;li&gt;예를 들어 한글은 ASCII가 아니기 때문에 UTF-8과 같은 방식으로 인코딩해야 한다.
+&lt;ul&gt;
+&lt;li&gt;예: 감자 -&amp;gt; %EA%B0%90%EC%9E%90&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ASCII라도 예약된 의미를 가진 문자의 경우 그 문자 자체를 전달하고 싶다면 escape 처리가 필요하다.
+&lt;ul&gt;
+&lt;li&gt;예를 들어 &lt;code&gt;/&lt;/code&gt; URL의 각 레벨을 구분, &lt;code&gt;&amp;amp;&lt;/code&gt; 쿼리 파라미터를 구분, &lt;code&gt;=&lt;/code&gt; 쿼리 파라미터 값 지정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A&amp;amp;B&lt;/code&gt;라는 글자를 보내고 싶을 땐 &lt;code&gt;A%26B&lt;/code&gt; 이런 식으로 &lt;code&gt;&amp;amp;&lt;/code&gt;을 이스케이프 처리
+URL Encoding 사이트를 이용할 수도 있다.
+&lt;a class="link" href="https://www.url-encode-decode.com/" target="_blank" rel="noopener"
+&gt;https://www.url-encode-decode.com/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="공공데이터포털-open-api"&gt;공공데이터포털 Open API
+&lt;/h4&gt;&lt;p&gt;공공데이터포털에서 제공하는 apiKey는 W3C recommendations for URI addressing에 따라 &lt;code&gt;+&lt;/code&gt;를 &lt;code&gt;%2B&lt;/code&gt;로 변환한다.&lt;/p&gt;
+&lt;p&gt;문제는 &lt;code&gt;new URI()&lt;/code&gt;, &lt;code&gt;URIComponents&lt;/code&gt; 등을 사용해도 발생하는 &lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt; 오류였다.&lt;/p&gt;
+&lt;h5 id="resttemplategetforentity"&gt;&lt;code&gt;RestTemplate.getForEntity()&lt;/code&gt;
+&lt;/h5&gt;&lt;p&gt;내부 코드를 좀 살펴보면 첫 번째 파라미터가 &lt;code&gt;URI&lt;/code&gt; 타입인 것을 확인할 수 있고 &lt;code&gt;new URI()&lt;/code&gt;로 맛있게 말아서 넘겨도 똑같은 오류를 만난다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;getForEntity&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;URI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Class&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;throws&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RestClientException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RequestCallback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;requestCallback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;acceptHeaderRequestCallback&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseExtractor&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseExtractor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseEntityExtractor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;nonNull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HttpMethod&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;GET&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;requestCallback&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseExtractor&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;그 원인은 &lt;code&gt;+&lt;/code&gt; 기호가 인코딩 시 제외되는 문자이기 때문이었다.
+따라서 아래와 같이 문제가 되는 기호를 먼저 정리하고 넘기는 방식으로 성공적인 응답을 받을 수 있었다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// + 기호는 인코딩에서 제외되기 때문에 미리 변환하고 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// URI 클래스를 사용하면 URL 전송 할 때 문자열 그대로 날아가는 것이 아닌, 한 번 인코딩을 해서 보내준다 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;URI&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;+&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;%2B&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;물론 이런 패턴 말고 다른 방법도 있을 수 있지만 인터넷에서 주고 받는 URL 인코딩에 대해 더 알아 볼 수 있었다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt;의 원인은 잘못된 URL 인코딩 처리였다.&lt;/p&gt;
+&lt;p&gt;공공데이터포털에서 제공하는 Open API는 &lt;code&gt;+&lt;/code&gt; 기호를 &lt;code&gt;%2B&lt;/code&gt;로 인코딩해야 하며, 이를 올바르게 처리하지 않으면 인증 오류가 발생한다. &lt;code&gt;RestTemplate&lt;/code&gt;이나 &lt;code&gt;URI&lt;/code&gt;를 사용할 때도 인코딩 방식의 차이를 주의 깊게 살펴야 한다.&lt;/p&gt;
+&lt;p&gt;퍼센트 인코딩의 정확한 이해와 사전 처리만으로도 오류를 쉽게 해결할 수 있었다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;퍼센트 인코딩(Percent Encoding) 또는 URL 인코딩의 개념&lt;/li&gt;
+&lt;li&gt;ASCII 문자 집합과 URL에서 허용되는 문자&lt;/li&gt;
+&lt;li&gt;Java의 &lt;code&gt;URI&lt;/code&gt;, &lt;code&gt;URLEncoder&lt;/code&gt;, &lt;code&gt;RestTemplate&lt;/code&gt;의 동작 방식 차이&lt;/li&gt;
+&lt;li&gt;공공데이터포털의 OpenAPI 인증 구조&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank" rel="noopener"
+&gt;RFC 3986 - URI Generic Syntax&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URLEncoder.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;URLEncoder&lt;/code&gt; vs &lt;code&gt;URI&lt;/code&gt; 차이점&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html" target="_blank" rel="noopener"
+&gt;Spring Framework RestTemplate 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="참고-자료"&gt;참고 자료
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://velog.io/@yeahg_dev/%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%8F%AC%ED%84%B8-SERVICEKEYISNOTREGISTEREDERROR-%EC%9B%90%EC%9D%B8-%ED%8C%8C%ED%97%A4%EC%B9%98%EA%B8%B0" target="_blank" rel="noopener"
+&gt;공공데이터포털 SERVICE_KEY_IS_NOT_REGISTERED_ERROR 원인 파헤치기&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

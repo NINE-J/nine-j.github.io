@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Controller on B9F1</title><link>https://b9f1.com/tags/controller/</link><description>Recent content in Controller on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 18 May 2025 15:20:00 +0900</lastBuildDate><atom:link href="https://b9f1.com/tags/controller/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring MVC</title><link>https://b9f1.com/p/2025-05-18-spring-mvc-controller-and-restcontroller/</link><pubDate>Sun, 18 May 2025 15:20:00 +0900</pubDate><guid>https://b9f1.com/p/2025-05-18-spring-mvc-controller-and-restcontroller/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring MVC는 클라이언트의 요청을 처리하고 응답을 반환하는 웹 프레임워크다.
+이때 핵심적인 역할을 하는 것이 &lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@RestController&lt;/code&gt;이다.&lt;/p&gt;
+&lt;p&gt;두 어노테이션은 비슷해보이지만 응답 방식에서 중요한 차이를 가진다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="요청-처리-흐름"&gt;요청 처리 흐름
+&lt;/h3&gt;&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant ViewResolver
+participant HttpMessageConverter
+Client-&gt;&gt;DispatcherServlet: HTTP 요청
+DispatcherServlet-&gt;&gt;HandlerMapping: 핸들러 탐색
+HandlerMapping--&gt;&gt;DispatcherServlet: 핸들러 반환
+DispatcherServlet-&gt;&gt;HandlerAdapter: 핸들러 실행 위임
+HandlerAdapter-&gt;&gt;Controller: 메서드 실행
+alt @Controller
+Controller--&gt;&gt;HandlerAdapter: View 이름 반환
+HandlerAdapter-&gt;&gt;ViewResolver: View 이름으로 View 객체 생성
+ViewResolver--&gt;&gt;DispatcherServlet: View 객체 (HTML 포함)
+else @RestController
+Controller--&gt;&gt;HandlerAdapter: 객체 반환
+HandlerAdapter-&gt;&gt;HttpMessageConverter: 객체를 JSON으로 직렬화
+HttpMessageConverter--&gt;&gt;DispatcherServlet: 직렬화된 JSON
+end
+DispatcherServlet--&gt;&gt;Client: 응답 전송
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;Client&lt;/code&gt;가 HTTP 요청을 하게 되면 &lt;code&gt;DispatcherServlet&lt;/code&gt;이 가로챔
+&lt;ul&gt;
+&lt;li&gt;모든 HTTP 요청은 &lt;code&gt;DispatcherServlet&lt;/code&gt;이 가로채며 시작된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DispatcherServlet&lt;/code&gt;은 &lt;code&gt;HandlerMapping&lt;/code&gt;을 통해 해당 요청을 처리할 Handler를 찾은 다음 HandlerAdapter에게 해당 핸들러를 실행하도록 위임한다.
+&lt;ul&gt;
+&lt;li&gt;실행을 위임한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HandlerAdapter&lt;/code&gt;는 &lt;code&gt;Controller&lt;/code&gt;의 메서드를 실행한다.
+&lt;ul&gt;
+&lt;li&gt;어떤 Handler가 됐든 &lt;code&gt;HandlerAdapter&lt;/code&gt;가 실제 메서드를 실행한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@RestController&lt;/code&gt; 케이스의 Resolver 호출
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;@Controller&lt;/code&gt; 어노테이션으로 등록된 메서드의 경우 &lt;code&gt;Controller&lt;/code&gt;가 반환한 View 이름과 Model 데이터를 기반으로 &lt;code&gt;DispatcherServlet&lt;/code&gt;이 &lt;code&gt;ViewResolver&lt;/code&gt;를 통해 View 객체를 생성한 뒤 이를 렌더링하여 응답을 생성한다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ViewResolver&lt;/code&gt;는 단순히 View를 찾아주는 역할&lt;/li&gt;
+&lt;li&gt;실제 렌더링은 View 객체가 수행한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RestController&lt;/code&gt; 어노테이션으로 등록된 메서드가 반환한 객체는 &lt;code&gt;DispatcherServlet&lt;/code&gt; → &lt;code&gt;HandlerAdapter&lt;/code&gt; → &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 JSON을 생성한 뒤 &lt;code&gt;DispatcherServlet&lt;/code&gt;에게 전달한다.
+&lt;ul&gt;
+&lt;li&gt;직렬화 처리를 위임한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@RestController&lt;/code&gt; 케이스의 응답 반환
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;@Controller&lt;/code&gt;의 경우 &lt;code&gt;ViewResolver&lt;/code&gt;는 View 이름에 해당하는 View 객체를 찾는 역할만 하고 해당 View 객체가 DispatcherServlet의 호출에 의해 실제 HTML을 렌더링해 클라이언트에 전달한다.
+&lt;ul&gt;
+&lt;li&gt;ViewResolver → View 객체 탐색&lt;/li&gt;
+&lt;li&gt;View → HTML 렌더링&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RestController&lt;/code&gt;의 경우 &lt;code&gt;HttpMessageConverter&lt;/code&gt;는 객체를 JSON으로 직렬화만 하고 직렬화된 결과는 &lt;code&gt;DispatcherServelet&lt;/code&gt;을 통해 클라이언트에게 반환된다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DispatcherServlet&lt;/code&gt;이 응답의 시작과 끝을 담당하며 &lt;code&gt;HttpMessageConverter&lt;/code&gt;는 응답 본문 생성을 돕는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="controller"&gt;&lt;code&gt;@Controller&lt;/code&gt;
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;전통적인 MVC 구조에서 사용&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Model&lt;/code&gt;에 데이터를 담고 View 이름을 반환&lt;/li&gt;
+&lt;li&gt;View Resolver가 View 템플릿을 렌더링하여 응답&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Controller&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;HelloController&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@GetMapping&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;addAttribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Nine&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// templates/hello.html&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;JSON 응답을 위해 &lt;code&gt;@ResponseBody&lt;/code&gt;와 함께 사용
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Controller&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;ApiController&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@ResponseBody&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@GetMapping&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/api/hello&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;apiHello&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Hello from Controller!&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="restcontroller"&gt;&lt;code&gt;@RestController&lt;/code&gt;
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;RESTful 웹 서비스에서 주로 사용&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Controller + @ResponseBody&lt;/code&gt;의 조합&lt;/li&gt;
+&lt;li&gt;리턴값을 그대로 JSON 등으로 직렬화하여 Response Body로 전달&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@RestController&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;HelloRestController&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@GetMapping&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;hello&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Hello, Nine!&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="차이점-비교"&gt;차이점 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분 항목&lt;/th&gt;
+&lt;th&gt;@Controller&lt;/th&gt;
+&lt;th&gt;@RestController&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;리턴 타입&lt;/td&gt;
+&lt;td&gt;View 이름 또는 ModelAndView 객체 / ResponseEntity 직접 직렬화한 데이터&lt;/td&gt;
+&lt;td&gt;객체 또는 문자열 (자동 JSON 직렬화됨)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 목적&lt;/td&gt;
+&lt;td&gt;템플릿 렌더링 기반 웹 앱 (HTML) / 필요시 JSON 응답도 가능&lt;/td&gt;
+&lt;td&gt;API 응답을 위한 JSON/데이터 전송용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;응답 처리&lt;/td&gt;
+&lt;td&gt;ViewResolver를 통해 HTML 렌더링&lt;/td&gt;
+&lt;td&gt;HttpMessageConverter를 통해 JSON 직렬화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;조합 어노테이션&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@ResponseBody&lt;/code&gt; 필요&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;@RestController&lt;/code&gt; 단독 사용 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@Controller&lt;/code&gt;는 View 기반 응답을 기본으로 하지만 &lt;code&gt;@ResponseBody&lt;/code&gt;나 &lt;code&gt;ResponseEntity&lt;/code&gt;를 사용하면 JSON 데이터도 응답할 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RestController&lt;/code&gt;는 모든 메서드가 데이터(JSON 등) 응답을 기본으로 하며, API 서버 구현에 적합하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Spring MVC에서 클라이언트 요청을 처리하는 흐름을 이해하면, 상황에 맞는 어노테이션 선택이 쉬워진다. View 기반 웹 페이지와 RESTful API를 구분하여 설계하는 것이 핵심이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;MVC 디자인 패턴&lt;/li&gt;
+&lt;li&gt;Servlet과 DispatcherServlet의 역할&lt;/li&gt;
+&lt;li&gt;View Resolver, HttpMessageConverter 작동 원리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc" target="_blank" rel="noopener"
+&gt;Spring MVC Architecture&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/RestController.html" target="_blank" rel="noopener"
+&gt;@RestController Javadoc&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.baeldung.com/spring-controller-vs-restcontroller" target="_blank" rel="noopener"
+&gt;Baeldung - Controller vs RestController&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://spring.io/guides/gs/rest-service" target="_blank" rel="noopener"
+&gt;Spring 공식 가이드 - RESTful Web Service&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
