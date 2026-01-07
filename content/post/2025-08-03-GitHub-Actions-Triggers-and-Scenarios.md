@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: GitHub Actions 트리거와 시나리오
 description: 자동화된 CI/CD 파이프라인
 author: Nine

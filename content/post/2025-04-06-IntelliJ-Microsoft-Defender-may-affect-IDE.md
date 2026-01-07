@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: IntelliJ IDEA에서 프로젝트 경고
 description: Microsoft Defender may affect IDE
 author: Nine

@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: "알고리즘과 자료구조: 기본 개념 이해"
 description: 알고리즘과 자료구조의 기본 원리를 이해하고 간단한 문제를 해결할 수 있다.
 author: Nine

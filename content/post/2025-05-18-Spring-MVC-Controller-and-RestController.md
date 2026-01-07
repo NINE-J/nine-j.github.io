@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Spring MVC
 description: Controller VS RestController
 author: Nine

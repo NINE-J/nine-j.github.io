@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Zettelkasten x PARA
 description: 수집을 넘어 체득하여 가치를 만드는 지식 관리
 author: Nine

@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 웹 API 진화의 핵심 전환
 description: 왜 우리는 REST를 선택했는가
 author: Nine

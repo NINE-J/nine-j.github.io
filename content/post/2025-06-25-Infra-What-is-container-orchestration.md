@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 컨테이너 오케스트레이션
 description: 자동 확장, 자가 복구, 선언형 인프라
 author: Nine

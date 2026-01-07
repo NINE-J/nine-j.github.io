@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: AWS 배포 클래식
 description: EC2 & RDS
 author: Nine

@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Gitea 서버 구축해보기
 description: 네트워크 망에서 버전 관리
 author: Nine

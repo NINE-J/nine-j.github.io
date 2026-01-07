@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Spring 왜 태어났을까?
 description: Java 생태계의 한계를 돌파한 IoC의 미학
 author: Nine

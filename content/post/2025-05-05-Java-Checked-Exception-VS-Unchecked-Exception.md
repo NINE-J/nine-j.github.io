@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Java 예외 처리의 구조와 진화
 description: Checked VS Unchecked
 author: Nine

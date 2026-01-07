@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: useWatch 사용한 리렌더링 최적화
 description: react에서 form을 다룰 때 리렌더링 최적화 전략
 author: Nine

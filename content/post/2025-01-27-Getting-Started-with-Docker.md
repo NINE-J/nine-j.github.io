@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: "Docker 시작하기: 기초 개념과 필수 지식 정리"
 description: 기초 개념과 필수 지식 정리
 author: Nine

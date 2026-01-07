@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Jekyll 블로그 빌드 속도 개선
 description: 빌드 시간을 최적화 하는 방법
 author: Nine

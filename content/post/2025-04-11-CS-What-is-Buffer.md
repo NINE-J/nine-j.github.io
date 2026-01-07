@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Buffer란 무엇인가?
 description: 컴퓨터 과학에서 버퍼 이해하기
 author: Nine

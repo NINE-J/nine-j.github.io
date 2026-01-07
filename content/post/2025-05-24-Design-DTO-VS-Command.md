@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: DTO VS Command
 description: Request를 그대로 사용하지 말자
 author: Nine

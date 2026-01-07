@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
@@ -22,7 +22,7 @@ tags:
   - Hugo
   - Submodule
 
-Status: Done
+Status: Testing
 ---
 ## 📌개요
 
@@ -613,7 +613,7 @@ Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 
 
 ```yaml
 publish: true
- draft: false
+draft: false
 title: 문서 제목
 description: 문서 설명
 author: 작성자

@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 로컬 캐시 vs 분산 캐시
 description: 선택 기준과 실무 활용
 author: Nine

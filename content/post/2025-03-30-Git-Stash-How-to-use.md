@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Git Stash
 description: 지금 커밋하고 싶지 않아!
 author: Nine

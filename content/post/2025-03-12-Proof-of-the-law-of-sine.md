@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 삼각함수의 사인 법칙 증명
 description: 사인 법칙이 성립하는 이유
 author: Nine

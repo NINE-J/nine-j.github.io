@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: "Java 객체지향: 클래스의 구성 멤버"
 description: 필드, 생성자, 메서드를 이해한다.
 author: Nine

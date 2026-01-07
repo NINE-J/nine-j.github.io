@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: "알고리즘과 자료구조: 학습 로드맵"
 description: 알고리즘과 자료구조를 단계별로 학습할 수 있는 로드맵
 author: Nine

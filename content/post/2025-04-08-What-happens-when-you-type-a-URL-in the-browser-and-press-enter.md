@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: URL 입력 후 ENTER 키
 description: 무슨 일이 벌어질까?
 author: Nine

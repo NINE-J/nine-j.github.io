@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Dynamic Programming
 description: DP를 알아보자
 author: Nine

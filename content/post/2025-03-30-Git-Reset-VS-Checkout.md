@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Git Reset VS Checkout
 description: reset과 checkout의 차이를 이해한다.
 author: Nine

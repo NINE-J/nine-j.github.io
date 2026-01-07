@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Java HashSet
 description: 내부 동작 방식과 중복 제거 메커니즘
 author: Nine

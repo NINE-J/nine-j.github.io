@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: 트랜잭션 격리성 - Isolation
 description: 동시성 환경에서 데이터를 지키기 위한 전략
 author: Nine

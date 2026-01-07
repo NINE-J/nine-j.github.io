@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: AWS
 description: What is Amazon Web Services
 author: Nine

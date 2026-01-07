@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: IntelliJ 메모리 설정
 description: 전역 또는 애플리케이션 별 메모리 설정
 author: Nine

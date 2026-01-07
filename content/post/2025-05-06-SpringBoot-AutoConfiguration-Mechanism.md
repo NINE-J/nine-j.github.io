@@ -1,6 +1,6 @@
 ---
 publish: true
- draft: false
+draft: false
 title: Spring Boot 자동 설정
 description: Auto-Configuration 원리
 author: Nine
