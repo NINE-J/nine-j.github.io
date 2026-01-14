@@ -1,0 +1,1441 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SpringBoot on B9F1</title><link>https://blog.b9f1.com/categories/springboot/</link><description>Recent content in SpringBoot on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 17 Jun 2025 18:49:24 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/categories/springboot/index.xml" rel="self" type="application/rss+xml"/><item><title>봄 모니터링 지표</title><link>https://blog.b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</link><pubDate>Tue, 17 Jun 2025 18:49:24 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot 프로젝트에서 Prometheus, Grafana를 연동해 시간의 흐름에 따라 변동되는 메트릭(Metrics) 데이터를 시각화해보자.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image01.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="사전-준비"&gt;사전 준비
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot 프로젝트
+&lt;ul&gt;
+&lt;li&gt;spring-boot-actuator&lt;/li&gt;
+&lt;li&gt;micrometer-registry-prometheus&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Docker 또는 Docker Desktop&lt;/li&gt;
+&lt;li&gt;docker-compose.yml&lt;/li&gt;
+&lt;li&gt;prometheus.yml&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="buildgradle"&gt;build.gradle
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;dependencies&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;io.micrometer:micrometer-registry-prometheus&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="applicationyaml"&gt;application.yaml
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;management&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;endpoints&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;web&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;exposure&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;include&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;export&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;enabled&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-composeyml"&gt;docker-compose.yml
+&lt;/h4&gt;&lt;p&gt;Docker 서비스 실행 자동화 설정
+여러 Docker 컨테이너(Prometheus, Grafana 등)를 한 번에 실행/종료/관리하기 위한 설정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prom/prometheus:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Prometheus 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prometheus &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정, 내부 DNS로도 사용돤다. ex)http://prometheus:9090&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;./prometheus.yml:/etc/prometheus/prometheus.yml &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 로컬 설정 파일을 컨테이너에 마운트&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;9090:9090&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 9090 → 컨테이너의 9090 (Prometheus 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 아래 정의한 사용자 정의 네트워크에 연결&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;grafana&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana/grafana:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Grafana 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;3000:3000&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 3000 → 컨테이너의 3000 (Grafana 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 같은 네트워크에 있어야 prometheus:9090 접근 가능&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 사용자 정의 네트워크 정의 (서로 통신 가능하게 함)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 네트워크 이름만 지정하면 default 설정으로 생성됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;왜 &lt;code&gt;networks.monitoring&lt;/code&gt;은 비어있는가?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이건 사용자 정의 브리지 네트워크를 선언하는 부분이고 따로 옵션(예 &lt;code&gt;driver&lt;/code&gt;)을 주지 않으면 Docoker가 기본값으로 설정된 브리지 네트워크를 생성한다.&lt;/li&gt;
+&lt;li&gt;명시적으로 정의도 가능하지만 대부분의 경우 생략해도 무방하다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;driver&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;bridge&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="실행-명령어"&gt;실행 명령어
+&lt;/h5&gt;&lt;p&gt;Docker Desktop이 설치되어 있어야 &lt;code&gt;docker-compose&lt;/code&gt; 명령 사용 가능&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up &lt;span class="c1"&gt;# 실행&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down &lt;span class="c1"&gt;# 종료&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="prometheusyml"&gt;prometheus.yml
+&lt;/h4&gt;&lt;p&gt;Prometheus 수집 대상 설정 파일
+Prometheus가 어떤 서버나 앱의 메트릭을 수집할지 설정하는 파일&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;host.docker.internal&lt;/code&gt;은 Docker 컨테이너가 로컬 호스트의 Spring Boot 앱에 접근하기 위한 주소다. (Mac/Windows 한정. Linux는 다르다)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;global&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;5s &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 모든 타겟을 5초마다 스크랩(메트릭 수집)함 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;scrape_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;job_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;spring-app&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 수집 작업 이름 (Prometheus UI에서 구분용) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics_path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/actuator/prometheus&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 메트릭이 노출되는 경로 (Spring Boot 기준) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;3s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 3초 마다 metrics_path의 경로에 접근하여 메트릭 데이터를 수집 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;static_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;targets&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;host.docker.internal:8080&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 타겟 주소 (로컬 Spring Boot 앱)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="실행"&gt;실행
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;docker-compose.yml&lt;/code&gt; 파일이 있는 경로로 이동해서 &lt;code&gt;docker-compose up&lt;/code&gt; 명령을 실행하면 Docker에 알맞게 Volume, Images, Container 생성되며 빌드된다.&lt;/p&gt;
+&lt;p&gt;정상적으로 아래 출력을 확인했다면 &lt;code&gt;localhost:9090&lt;/code&gt;에 접속하면 Prometheus UI를 확인할 수 있다.&lt;/p&gt;
+&lt;h4 id="변경-발생-시-사용할-명령어"&gt;변경 발생 시 사용할 명령어
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up --build
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker restart prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-compose-up-명령-시-출력-예시"&gt;&lt;code&gt;docker-compose up&lt;/code&gt; 명령 시 출력 예시
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;span class="lnt"&gt;44
+&lt;/span&gt;&lt;span class="lnt"&gt;45
+&lt;/span&gt;&lt;span class="lnt"&gt;46
+&lt;/span&gt;&lt;span class="lnt"&gt;47
+&lt;/span&gt;&lt;span class="lnt"&gt;48
+&lt;/span&gt;&lt;span class="lnt"&gt;49
+&lt;/span&gt;&lt;span class="lnt"&gt;50
+&lt;/span&gt;&lt;span class="lnt"&gt;51
+&lt;/span&gt;&lt;span class="lnt"&gt;52
+&lt;/span&gt;&lt;span class="lnt"&gt;53
+&lt;/span&gt;&lt;span class="lnt"&gt;54
+&lt;/span&gt;&lt;span class="lnt"&gt;55
+&lt;/span&gt;&lt;span class="lnt"&gt;56
+&lt;/span&gt;&lt;span class="lnt"&gt;57
+&lt;/span&gt;&lt;span class="lnt"&gt;58
+&lt;/span&gt;&lt;span class="lnt"&gt;59
+&lt;/span&gt;&lt;span class="lnt"&gt;60
+&lt;/span&gt;&lt;span class="lnt"&gt;61
+&lt;/span&gt;&lt;span class="lnt"&gt;62
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 22/22
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ grafana Pulled 12.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f18232174bc9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.6s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 055b9255fa03 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f61a19743345 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ b176d7edde70 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e60d9caeb0b8 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e032d0a5e409 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c49e0ee60bfb Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 7.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 384497dbce3b Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 9.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c53a11b7c6fc Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 8af57d8c9f49 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ prometheus Pulled 8.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7df673c7455d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 6ac0e4adf315 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 408012a7b118 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1ccde423731d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1617e25568b2 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.7s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7221d93db8a9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 9fa9226be034 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ bf70c5107ab5 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f3b09c502777 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 44986281b8b9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 3/3
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Network resources_monitoring Created 0.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container prometheus Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container grafana Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Attaching to grafana, prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:674 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;No time or size retention was set so using the default time retention&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;15d
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:725 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Prometheus Server&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;server &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(version=3.4.1, branch=HEAD, revision=aea6503d9bbaad6c5faff3ecf6f1025213356c92)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:730 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;operational information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;build_context&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(go=go1.24.3, platform=linux/amd64, user=root@16f976c24db1, date=20250531-10:44:38, tags=netgo,builtinassets,stringlabels)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;host_details&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(Linux 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 999bf7192f26 )&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fd_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=1048576, hard=1048576)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;vm_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=unlimited, hard=unlimited)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.322Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:806 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Leaving GOMAXPROCS=12: CPU quota undefined&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;automaxprocs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web.go:656 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Start listening for connections&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0.0.0.0:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1266 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting TSDB ...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:347 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Listening on&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:350 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TLS is disabled.&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;http2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;false&lt;/span&gt; &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:657 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying on-disk memory mappable chunks if any&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:744 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;On-disk memory mappable chunks replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:752 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying WAL, this may take a while&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:825 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL segment loaded&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;segment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;maxSegment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;156.935µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:862 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;checkpoint_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;28.265µs &lt;span class="nv"&gt;wal_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;187.212µs &lt;span class="nv"&gt;wbl_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;133ns &lt;span class="nv"&gt;chunk_snapshot_load_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0s &lt;span class="nv"&gt;mmap_chunk_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns &lt;span class="nv"&gt;total_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;249.607µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1287 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;filesystem information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fs_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;EXT4_SUPER_MAGIC
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1290 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TSDB started&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1475 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Loading configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1514 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;updated GOGC&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;old&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="nv"&gt;new&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;75&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1524 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Completed loading of configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;db_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;820ns &lt;span class="nv"&gt;remote_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;800ns &lt;span class="nv"&gt;web_handler&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;248ns &lt;span class="nv"&gt;query_engine&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;572ns &lt;span class="nv"&gt;scrape&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;325.871µs &lt;span class="nv"&gt;scrape_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;23.08µs &lt;span class="nv"&gt;notify&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;68.448µs &lt;span class="nv"&gt;notify_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;7.122µs &lt;span class="nv"&gt;rules&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1.01µs &lt;span class="nv"&gt;tracing&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2.927µs &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml &lt;span class="nv"&gt;totalDuration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;641.79µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1251 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Server is ready to receive web requests.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;manager.go:175 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting rule manager...&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;rule manager&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.580946399Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Grafana&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;12.0.1+security-01 &lt;span class="nv"&gt;commit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ff20b06681749873999bb0a8e365f24fddaee33f &lt;span class="nv"&gt;branch&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;HEAD &lt;span class="nv"&gt;compiled&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19Z
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581187455Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/share/grafana/conf/defaults.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581202298Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/grafana/grafana.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581205854Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.data=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581208666Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.logs=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581212098Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.plugins=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581215368Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.provisioning=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.5812188Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.log.mode=console&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581222384Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_DATA=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.58122533Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_LOGS=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581228361Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PLUGINS=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581230583Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PROVISIONING=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="prometheus-ui"&gt;Prometheus UI
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;http://localhost:9090&lt;/code&gt;으로 접속했다면 &lt;code&gt;Status &amp;gt; Targets&lt;/code&gt;의 타겟 상태가 UP 상태로 잘 올라와 있는지 확인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="grafana-ui"&gt;Grafana UI
+&lt;/h3&gt;&lt;p&gt;설정해둔 주소 &lt;code&gt;localhost:3000&lt;/code&gt; 접속 후 별다른 설정을 하지 않았다면 기본 로그인 정보인 (id: admin, pw: admin)으로 로그인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image03.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;DATA SOURCES Add your first data source 클릭 이동&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image04.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Prometheus 클릭&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image05.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;설정했던 &lt;code&gt;http://prometheus:9090&lt;/code&gt; 입력 후 저장&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="4"&gt;
+&lt;li&gt;주의할 것은 &lt;code&gt;localhost&lt;/code&gt; 아니고 &lt;code&gt;docker-compose.yml&lt;/code&gt;에서 설정한 컨테이너 이름이자 내부 DNS를 &lt;code&gt;prometheus&lt;/code&gt;로 사용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="5"&gt;
+&lt;li&gt;대시보드 생성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image08.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="6"&gt;
+&lt;li&gt;대시보드 추가 과정&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image09.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image10.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image11.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image12.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image13.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h4 id="yml-yaml"&gt;yml? yaml?
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;yaml&lt;/code&gt; 확장자로 했을 때 Prometheus Status 잘 올라오지 않았고 별다른 설정 문제가 아니라면 기본적으로 찾게되는 확장자가 &lt;code&gt;yml&lt;/code&gt;인가 싶어 변경했더니 잘 올라왔다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Gemini&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;YAML과 YML은 ==파일 확장자만 다를 뿐, 본질적으로 같은 것을 가리킵니다==. YAML은 &amp;ldquo;YAML Ain&amp;rsquo;t Markup Language&amp;quot;의 약자로, 사람이 읽기 쉬운 데이터 직렬화 언어입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Yaml Ain&amp;rsquo;t Markup Language 또는 Yet Another Markup Language&lt;/p&gt;
+&lt;p&gt;.html 대신 .htm으로도 사용된 것과 같이 옛날 옛날 한 옛날 Windows에서 Extensions는 파일 확장자가 3자로 제한되는 특성이 있었기 때문이라고 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;시스템의 가시성과 안정성을 높이기 위한 가장 빠르고 효과적인 방법은 Prometheus와 Grafana를 Docker로 연동해 메트릭을 시각화하는 것이다.&lt;/p&gt;
+&lt;p&gt;이 방식은 별도 설치 없이 빠르게 시작할 수 있으며 Spring Boot의 Actuator와 Micrometer를 활용하면 애플리케이션의 상태와 예외 흐름까지도 실시간으로 모니터링할 수 있다.&lt;/p&gt;
+&lt;p&gt;운영 환경 이전에 개발 및 테스트 단계부터 시각화 환경을 구축해두는 것이 예외 대응력과 시스템 품질을 높이는 핵심 전략이 된다.&lt;/p&gt;</description></item><item><title>JPA의 대표적인 성능 병목</title><link>https://blog.b9f1.com/p/2025-06-15-springboot-jpa-causes-and-solutions-for-n-plus-1-problems/</link><pubDate>Sun, 15 Jun 2025 15:34:08 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-15-springboot-jpa-causes-and-solutions-for-n-plus-1-problems/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;JPA를 사용하면서 가장 자주 마주치는 성능 문제 중 하나가 바로 N+1 문제다.
+&amp;ldquo;나는 하나의 쿼리만 호출했는데 왜 수십 개의 쿼리가 날아가지?&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;이번엔 N+1 문제가 발생하는 원인과 이를 해결하는 방법을 Spring Boot 환경 중심으로 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="n1-문제란"&gt;N+1 문제란?
+&lt;/h3&gt;&lt;p&gt;N+1 문제는 1개의 쿼리로 N개의 결과를 가져온 후 각 결과에 대해 N번 추가 쿼리를 실행하는 현상을 의미한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orders&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orderRepository&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;findAll&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 1번&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orders&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getMember&lt;/span&gt;&lt;span class="p"&gt;().&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// N번&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;orders&lt;/code&gt;를 조회하는 &lt;code&gt;findAll()&lt;/code&gt; 쿼리 1회&lt;/li&gt;
+&lt;li&gt;각 &lt;code&gt;order&lt;/code&gt;의 연관된 &lt;code&gt;member&lt;/code&gt;를 지연 로딩(LAZY)하면서 &lt;code&gt;order&lt;/code&gt; 수만큼 N회 추가 쿼리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;결과적으로 1+N회의 쿼리가 발생하게 된다.&lt;/p&gt;
+&lt;h3 id="왜-이런-문제가-발생할까"&gt;왜 이런 문제가 발생할까?
+&lt;/h3&gt;&lt;p&gt;기본적으로 JPA는 연관 관계를 지연 로딩으로 설정하기 때문이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Entity&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@ManyToOne&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fetch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;FetchType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;LAZY&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Member&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;member&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;지연 로딩의 목적은 불필요한 데이터를 미리 조회하지 않기 위한 것이지만 반복문처럼 연관 객체를 순차적으로 접근할 때 N+1 문제가 발생한다.&lt;/p&gt;
+&lt;h3 id="해결-방법"&gt;해결 방법
+&lt;/h3&gt;&lt;h4 id="1-fetch-join"&gt;1. Fetch Join
+&lt;/h4&gt;&lt;p&gt;가장 직관적인 해결책이다.
+연관된 엔티티를 함께 조회하는 조인 쿼리를 사용한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; Select o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; FROM Order o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; JOIN FETCH o.member
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;JPA는 이 쿼리 결과를 기반으로 &lt;code&gt;Order&lt;/code&gt;와 &lt;code&gt;Member&lt;/code&gt;를 한 번에 메모리에 올린다.&lt;/li&gt;
+&lt;li&gt;Hibernate는 더 이상 각 &lt;code&gt;member&lt;/code&gt;에 대해 추가 쿼리를 실행하지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;가장 강력하고 빠른 방법이지만 &lt;code&gt;Fetch Join&lt;/code&gt;은 컬렉션(&lt;code&gt;@OneToMany&lt;/code&gt; 등)에 사용할 경우 페이징이 불가능하다는 단점이 있다.&lt;/p&gt;
+&lt;h4 id="2-entitygraph"&gt;2. &lt;code&gt;@EntityGraph&lt;/code&gt;
+&lt;/h4&gt;&lt;p&gt;엔티티 수준에서 &lt;code&gt;Fetch Join&lt;/code&gt;과 유사한 효과를 얻을 수 있는 선언적 방법이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@EntityGraph&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attributePaths&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;member&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Select o FROM Order o&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;코드 가독성이 좋아지고 재사용 가능한 설정을 만들 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;Fetch Join&lt;/code&gt;을 간결하게 사용하기 위한 어노테이션이고 내부적으로 기능이 비슷해서 비슷한 단점을 가진다.
+실제로는 &lt;code&gt;left outer join&lt;/code&gt;을 사용한다는 점을 주의해야 한다.&lt;/p&gt;
+&lt;h4 id="3-batch-size-설정"&gt;3. Batch Size 설정
+&lt;/h4&gt;&lt;p&gt;컬렉션에 대해 Lazy 로딩을 유지하면서 성능을 개선하는 방법이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컬렉션이나 LAZY 로딩 관계의 객체들을 100개씩 in 절로 묶어서 한 번에 조회한다.&lt;/li&gt;
+&lt;li&gt;페이징 + 성능 최적화가 동시에 필요한 경우 유용하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;jpa&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;hibernate&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;default_batch_fetch_size&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Entity&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@OneToMany&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mappedBy&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;order&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;OrderItem&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;items&lt;/code&gt; 조회 시 in 절로 묶여 일괄 조회된다.&lt;/li&gt;
+&lt;li&gt;페이징 가능한 쿼리에 적합한 방법이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="fetch-join-vs-entitygraph"&gt;Fetch Join VS &lt;code&gt;@EntityGraph&lt;/code&gt;
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;@EntityGraph&lt;/code&gt;와 JPQL &lt;code&gt;fetch join&lt;/code&gt;은 기능적으로 유사하지만 내부 동작 방식과 조인 타입에서 차이를 가진다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="핵심-차이-정리"&gt;핵심 차이 정리
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;&lt;code&gt;fetch join&lt;/code&gt; (JPQL/QueryDSL)&lt;/th&gt;
+&lt;th&gt;&lt;code&gt;@EntityGraph&lt;/code&gt; (Spring Data JPA)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;선언 위치&lt;/td&gt;
+&lt;td&gt;JPQL/QueryDSL 내부&lt;/td&gt;
+&lt;td&gt;Repository 메서드 어노테이션&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;기본 조인 방식&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;INNER JOIN&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;LEFT OUTER JOIN&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;연관 관계 없어도 조회됨?&lt;/td&gt;
+&lt;td&gt;❌ (자식 없으면 부모도 제외)&lt;/td&gt;
+&lt;td&gt;✅ (자식 없어도 부모 조회됨)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;런타임 FetchType 전환&lt;/td&gt;
+&lt;td&gt;❌&lt;/td&gt;
+&lt;td&gt;✅ (&lt;code&gt;LAZY → EAGER&lt;/code&gt;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;페이징 가능 여부&lt;/td&gt;
+&lt;td&gt;❌ (컬렉션과 함께 사용 불가)&lt;/td&gt;
+&lt;td&gt;❌ (컬렉션 시 동일)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;조건 활용 유연성&lt;/td&gt;
+&lt;td&gt;자유롭다&lt;/td&gt;
+&lt;td&gt;정적 메서드에 한정&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;중복 row 처리&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;distinct&lt;/code&gt; 필요&lt;/td&gt;
+&lt;td&gt;일부 자동 처리됨&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="예제-비교"&gt;예제 비교
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// fetch join: inner join → 자식 없으면 조회되지 않음&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; SELECT o FROM Order o
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt; JOIN FETCH o.member
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s"&gt;&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// entity graph: left outer join → 자식 없어도 조회됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@EntityGraph&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attributePaths&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;member&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;SELECT o FROM Order o&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;findAllWithMember&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="상황에-따른-선택-가이드"&gt;상황에 따른 선택 가이드
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;해결책&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;단일 객체 또는 ToOne 관계 조회&lt;/td&gt;
+&lt;td&gt;Fetch Join / EntityGraph&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;컬렉션 관계(&lt;code&gt;@OneToMany&lt;/code&gt; 등) 페치&lt;/td&gt;
+&lt;td&gt;Batch Size&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;페이징 처리와 병행해야 하는 경우&lt;/td&gt;
+&lt;td&gt;Batch Size 또는 DTO Projection&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;JPA N+1 문제는 자동화된 지연 로딩의 그림자다. 하지만 문제를 정확히 이해하면 해결은 어렵지 않다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;단 하나의 &lt;code&gt;@ManyToOne&lt;/code&gt; 관계에서 시작된 N+1 문제도, 반복 루프나 리스트 응답에서는 큰 성능 이슈로 이어질 수 있다.&lt;br&gt;
+&lt;code&gt;Fetch Join&lt;/code&gt;, &lt;code&gt;EntityGraph&lt;/code&gt;, &lt;code&gt;Batch Size&lt;/code&gt; 같은 다양한 전략을 상황에 맞게 적절히 조합하자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;JPA 기본 연관 관계(&lt;code&gt;@OneToMany&lt;/code&gt;, &lt;code&gt;@ManyToOne&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;LAZY vs EAGER 로딩 전략&lt;/li&gt;
+&lt;li&gt;JPQL 작성법&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching-batch" target="_blank" rel="noopener"
+&gt;[HIBERNATE] Batch Fetching&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html#jpa.entity-graph" target="_blank" rel="noopener"
+&gt;[Spring Data JPA] JPA Query Methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://jojoldu.tistory.com/457" target="_blank" rel="noopener"
+&gt;MultipleBagFetchException 발생시 해결 방법 by 향로&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>@RestController 요청이 응답으로 반환되기까지</title><link>https://blog.b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</link><pubDate>Wed, 21 May 2025 21:28:02 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-05-21-springboot-until-restcontrollers-request-is-returned-in-response/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot를 활용한 REST API 개발에서 &lt;code&gt;@RestController&lt;/code&gt;는 가장 많이 사용되는 어노테이션 중 하나다. 하지만 그 이면에서 실제 HTTP 요청이 어떻게 애플리케이션으로 전달되고, 어떤 과정을 거쳐 클라이언트에게 JSON 등으로 응답이 전달되는지는 자주 간과된다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 Spring MVC의 요청 처리 흐름을 DispatcherServlet을 기점으로 전반적으로 살펴보고, 특히 &lt;code&gt;HttpMessageConverter&lt;/code&gt;가 어떤 역할을 하며 언제 동작하는지 명확히 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="요청-처리-흐름-요약"&gt;요청 처리 흐름 요약
+&lt;/h3&gt;&lt;p&gt;Spring Boot 애플리케이션에서 HTTP 요청이 들어오면 다음과 같은 순서로 처리된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;요청 수신 – &lt;code&gt;DispatcherServlet&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모든 HTTP 요청은 먼저 &lt;code&gt;DispatcherServlet&lt;/code&gt;에서 수신된다.&lt;/li&gt;
+&lt;li&gt;이 서블릿은 Front Controller로서 전체 요청의 진입점이며, Spring Boot에서는 자동으로 등록된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;핸들러 탐색 – &lt;code&gt;HandlerMapping&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;어떤 컨트롤러 메서드가 이 요청을 처리할지 결정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RequestMapping&lt;/code&gt;, &lt;code&gt;@GetMapping&lt;/code&gt; 등으로 설정된 경로 정보를 기반으로 매핑이 일어난다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;핸들러 실행 – &lt;code&gt;HandlerAdapter&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;찾은 핸들러(즉, &lt;code&gt;@RestController&lt;/code&gt;의 메서드)를 실행하는 어댑터.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@RequestBody&lt;/code&gt;가 선언되어 있다면 이 시점에 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 JSON → 객체 변환이 이뤄진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;응답 변환 – &lt;code&gt;HttpMessageConverter&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨트롤러 메서드가 반환한 Java 객체는 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 다시 JSON 등의 HTTP 응답 본문으로 변환된다.&lt;/li&gt;
+&lt;li&gt;이때 사용되는 대표적인 구현체로는 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;가 있으며, 내부적으로 Jackson을 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;응답 반환 – &lt;code&gt;DispatcherServlet&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;변환된 응답은 다시 &lt;code&gt;DispatcherServlet&lt;/code&gt;을 통해 클라이언트에게 반환된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="httpmessageconverter의-동작-시점과-역할"&gt;&lt;code&gt;HttpMessageConverter&lt;/code&gt;의 동작 시점과 역할
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;HttpMessageConverter&lt;/code&gt;는 &lt;strong&gt;요청과 응답의 바디(body)를 변환&lt;/strong&gt;하는 컴포넌트로서 다음과 같은 역할을 한다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@RequestBody&lt;/code&gt;가 있는 경우:
+&lt;ul&gt;
+&lt;li&gt;요청 바디를 JSON → Java 객체로 역직렬화 (ex. DTO로 바인딩)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ResponseBody&lt;/code&gt; 또는 &lt;code&gt;@RestController&lt;/code&gt;가 있는 경우:
+&lt;ul&gt;
+&lt;li&gt;반환되는 객체를 Java 객체 → JSON으로 직렬화&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이 변환은 &lt;code&gt;RequestMappingHandlerAdapter&lt;/code&gt;에 등록된 &lt;code&gt;messageConverters&lt;/code&gt; 리스트를 순회하며 타입과 Content-Type 헤더를 기반으로 적절한 컨버터를 찾아 자동으로 수행된다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant Client
+participant DispatcherServlet
+participant HandlerMapping
+participant HandlerAdapter
+participant Controller
+participant HttpMessageConverter
+Client-&gt;&gt;DispatcherServlet: HTTP 요청 전송
+DispatcherServlet-&gt;&gt;HandlerMapping: 핸들러 조회
+HandlerMapping--&gt;&gt;DispatcherServlet: 핸들러 반환
+DispatcherServlet-&gt;&gt;HandlerAdapter: 핸들러 실행 요청
+HandlerAdapter-&gt;&gt;HttpMessageConverter: 요청 바디 역직렬화 (JSON → 객체)
+HttpMessageConverter--&gt;&gt;HandlerAdapter: 객체 반환
+HandlerAdapter-&gt;&gt;Controller: 메서드 호출
+Controller--&gt;&gt;HandlerAdapter: 객체 반환
+HandlerAdapter-&gt;&gt;HttpMessageConverter: 객체 직렬화 (객체 → JSON)
+HttpMessageConverter--&gt;&gt;HandlerAdapter: JSON 반환
+HandlerAdapter--&gt;&gt;DispatcherServlet: 응답 반환
+DispatcherServlet--&gt;&gt;Client: 응답 전송
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="mappingjackson2httpmessageconverter"&gt;MappingJackson2HttpMessageConverter
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;는 Spring MVC에서 **Java 객체를 JSON으로 직렬화하거나 JSON을 Java 객체로 역직렬화할 때 사용되는 기본 &lt;code&gt;HttpMessageConverter&lt;/code&gt;**이다. 내부적으로 &lt;a class="link" href="https://github.com/FasterXML/jackson" target="_blank" rel="noopener"
+&gt;Jackson&lt;/a&gt; 라이브러리를 활용하여 JSON 처리 기능을 수행한다.&lt;/p&gt;
+&lt;p&gt;Spring Boot를 사용하면 기본적으로 Jackson이 의존성에 포함되며, 이로 인해 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;는 자동으로 등록되어 동작한다. 주로 다음과 같은 상황에서 사용된다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;Content-Type: application/json&lt;/code&gt;으로 JSON 요청을 보낼 경우, &lt;code&gt;@RequestBody&lt;/code&gt;에 해당 JSON이 자동으로 매핑된다.&lt;/li&gt;
+&lt;li&gt;컨트롤러가 객체를 반환할 때 &lt;code&gt;@ResponseBody&lt;/code&gt; 또는 &lt;code&gt;@RestController&lt;/code&gt;가 붙어 있으면, 해당 객체는 JSON으로 변환되어 응답된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@PostMapping&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;/users&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;UserResponse&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;createUser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nd"&gt;@RequestBody&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserCreateRequest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;User&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;userService&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;ok&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위의 예시에서 &lt;code&gt;@RequestBody&lt;/code&gt;를 통해 들어온 JSON은 Jackson이 &lt;code&gt;UserCreateRequest&lt;/code&gt;로 역직렬화하며, 반환되는 &lt;code&gt;UserResponse&lt;/code&gt;는 JSON으로 직렬화되어 클라이언트로 전달된다.&lt;/p&gt;
+&lt;h4 id="커스터마이징"&gt;커스터마이징
+&lt;/h4&gt;&lt;p&gt;Jackson 설정은 다양하게 커스터마이징할 수 있다. 예를 들어:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ObjectMapper&lt;/code&gt;의 설정 변경 (&lt;code&gt;@JsonNaming&lt;/code&gt;, &lt;code&gt;@JsonProperty&lt;/code&gt;, &lt;code&gt;@JsonIgnore&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;날짜 포맷 지정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;null&lt;/code&gt; 필드 무시&lt;/li&gt;
+&lt;li&gt;필드 snake_case ↔ camelCase 자동 변환&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Jackson2ObjectMapperBuilderCustomizer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;customizer&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;featuresToDisable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SerializationFeature&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;WRITE_DATES_AS_TIMESTAMPS&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;propertyNamingStrategy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PropertyNamingStrategies&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;SNAKE_CASE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;serializationInclusion&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;JsonInclude&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;Include&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;NON_NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이렇게 하면 &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt;에 연결된 &lt;code&gt;ObjectMapper&lt;/code&gt;가 위 설정을 따라 동작하게 된다.&lt;/p&gt;
+&lt;h4 id="기타-팁"&gt;기타 팁
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot는 &lt;code&gt;spring.jackson.*&lt;/code&gt; 속성을 통해 설정을 간편하게 지원한다.&lt;/li&gt;
+&lt;li&gt;필요에 따라 &lt;code&gt;WebMvcConfigurer&lt;/code&gt;에서 직접 &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 설정해 특정 타입만 Jackson 대신 다른 컨버터로 처리하게 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;configureMessageConverters&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;HttpMessageConverter&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;?&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;converters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;converters&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MappingJackson2HttpMessageConverter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;myCustomObjectMapper&lt;/span&gt;&lt;span class="p"&gt;()));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Spring MVC의 요청 처리 흐름은 &lt;code&gt;DispatcherServlet&lt;/code&gt;에서 시작해 &lt;code&gt;HandlerMapping&lt;/code&gt;, &lt;code&gt;HandlerAdapter&lt;/code&gt;, &lt;code&gt;HttpMessageConverter&lt;/code&gt;를 통해 RESTful 서비스를 완성한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;특히 &lt;code&gt;HttpMessageConverter&lt;/code&gt;는 요청과 응답을 Java 객체 ↔ JSON 사이에서 자동 변환해주는 핵심적인 컴포넌트로, 동작 시점과 역할을 명확히 이해하는 것이 REST API 개발의 안정성과 유지보수성을 높이는 데 매우 중요하다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;서블릿 기반 웹 애플리케이션 구조&lt;/li&gt;
+&lt;li&gt;Spring MVC의 &lt;code&gt;@Controller&lt;/code&gt;, &lt;code&gt;@RestController&lt;/code&gt; 어노테이션 차이&lt;/li&gt;
+&lt;li&gt;Jackson의 직렬화/역직렬화 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc.html" target="_blank" rel="noopener"
+&gt;Spring Web MVC 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/web.html#web.servlet.spring-mvc.message-converters" target="_blank" rel="noopener"
+&gt;Spring Boot의 HttpMessageConverters 설정&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html" target="_blank" rel="noopener"
+&gt;DispatcherServlet 내부 구조&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Spring Boot 자동 설정</title><link>https://blog.b9f1.com/p/2025-05-06-springboot-autoconfiguration-mechanism/</link><pubDate>Tue, 06 May 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-05-06-springboot-autoconfiguration-mechanism/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot는 Spring에 비해 설정을 따로 해주지 않아도 자동으로 설정해주는 게 많아서 더 간편하다.
+이전에 Spring과 Spring Boot을 비교하며 자동 설정 기능에 대해 간단히 알아봤다.&lt;/p&gt;
+&lt;p&gt;이번엔 Spring Boot의 자동 설정(AutoConfiguration) 메커니즘을 이해하고 커스텀 설정을 구성할 수 있는지 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;Spring Boot의 &lt;code&gt;@SpringBootApplication&lt;/code&gt; 어노테이션은 내부적으로 &lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;, &lt;code&gt;@ComponentScan&lt;/code&gt;, &lt;code&gt;@Configuration&lt;/code&gt;을 조합한 메타 어노테이션(복합 구성)이다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+A["@SpringBootApplication"]
+A --&gt; B["@ComponentScan"]
+A --&gt; C["@SpringBootConfiguration"]
+C --&gt; C1["@Configuration"]
+C1 --&gt; C2["@Component"]
+A --&gt; D["@EnableAutoConfiguration"]
+D --&gt; D1["@Import"]
+D --&gt; D2["@AutoConfigurationPackage"]
+D2 --&gt; D3["@Import"]
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Auto-configuration&lt;/strong&gt; 은 Spring Boot의 핵심 기능 중 하나로, 클래스패스에 있는 라이브러리와 환경 설정에 따라 적절한 Bean을 자동으로 구성해주는 메커니즘이다.&lt;/p&gt;
+&lt;p&gt;자세히 알아보기 앞서 용어를 정리하고 내려가보자.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;자동 설정(Auto-configuration)
+&lt;ul&gt;
+&lt;li&gt;Spring Boot가 클래스 패스와 설정에 따라 자동으로 Bean 등을 구성하는 기능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자동 설정 클래스(auto-configuration class)
+&lt;ul&gt;
+&lt;li&gt;자동 설정을 수행하는 실제 Java 클래스&lt;/li&gt;
+&lt;li&gt;내부적으로 조건부 어노테이션(&lt;code&gt;@ConditionalOn&lt;/code&gt;, &amp;hellip;)으로 구성된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;자동 설정 기능을 활성화하는 트리거&lt;/li&gt;
+&lt;li&gt;일반적으로 &lt;code&gt;@SpringBootApplication&lt;/code&gt; 안에 포함되어 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@AutoConfiguration&lt;/code&gt; (Spring Boot 3.0 이상)
+&lt;ul&gt;
+&lt;li&gt;이전의 &lt;code&gt;@Configuration&lt;/code&gt; + &lt;code&gt;spring.factories&lt;/code&gt; 조합을 대체하는 새 방식.&lt;/li&gt;
+&lt;li&gt;이 어노테이션을 붙인 클래스는 자동 설정 후보로 간주된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Configuration&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Java 기반 설정을 정의하는 기본 Spring 어노테이션&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@AutoConfiguration&lt;/code&gt;은 이를 확장한 것.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="spring-boot-자동-설정-매커니즘-자세히-이해하기"&gt;Spring Boot 자동 설정 매커니즘 자세히 이해하기
+&lt;/h3&gt;&lt;h4 id="자동-설정이란"&gt;자동 설정이란?
+&lt;/h4&gt;&lt;p&gt;자동 설정(Auto-Configuration)은 Spring Boot가 클래스패스에 있는 라이브러리, 설정값, Bean 존재 여부 등을 기반으로 적절한 Bean 설정을 자동으로 구성해주는 기능이다.&lt;/p&gt;
+&lt;p&gt;예를 들어 &lt;code&gt;spring-boot-starter-data-jpa&lt;/code&gt;를 추가하면 자동으로 &lt;code&gt;DataSource&lt;/code&gt;, &lt;code&gt;EntityManagerFactory&lt;/code&gt;, &lt;code&gt;TransactionManager&lt;/code&gt; 같은 Bean이 구성된다.&lt;/p&gt;
+&lt;p&gt;Spring Boot가 내부에서 이를 위한 자동 설정 클래스를 탐지하고 적용하기 때문이다.&lt;/p&gt;
+&lt;h4 id="springbootapplication-실행-흐름-시각화"&gt;&lt;code&gt;@SpringBootApplication&lt;/code&gt; 실행 흐름 시각화
+&lt;/h4&gt;&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart TD
+A["public static void main"] --&gt; B["SpringApplication.run(...)"]
+B --&gt; C["@SpringBootApplication"]
+C --&gt; D_sub
+D_sub --&gt; E["ApplicationContext 초기화"]
+E --&gt; F["내장 Tomcat 등 서버 구동"]
+F --&gt; G["클라이언트 요청 대기 상태 진입"]
+subgraph D_sub [구성 어노테이션]
+DA["@EnableAutoConfiguration"]
+DB["@ComponentScan"]
+DC["@SpringBootConfiguration"]
+end
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;main()&lt;/code&gt; : 애플리케이션의 단순한 진입점이 아니라 Spring Boot 전체 실행의 기준점&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SpringApplication.run()&lt;/code&gt; : 실행 컨텍스트 구성, 리스너 등록, 설정 파일 로딩 등 수행&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt; : 클래스패스를 기반으로 설정 후보 자동 로딩 및 적용&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ComponentScan&lt;/code&gt; : 지정된 패키지에서 컴포넌트(@Component, @Service 등) 자동 탐색&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@SpringBootConfiguration&lt;/code&gt; : Java 기반 설정 클래스 등록. 수동 Bean 정의에 사용&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ApplicationContext&lt;/code&gt; 초기화 : 의존성 주입 및 라이프사이클 콜백 수행&lt;/li&gt;
+&lt;li&gt;내장 서버 실행 : 기본 포트(8080)에서 HTTP 요청을 수신할 수 있는 상태로 전환됨&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이 흐름은 단순히 외워야 할 절차가 아니라, &lt;strong&gt;설정 누락, 컴포넌트 인식 실패, 자동 설정 충돌&lt;/strong&gt; 등의 문제를 디버깅할 때 반드시 이해하고 있어야 하는 구조이다.&lt;/p&gt;
+&lt;h4 id="자동-설정을-활성화하려면"&gt;자동 설정을 활성화하려면?
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;공식 문서 명시&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;You need to opt-in to auto-configuration by adding the &lt;a class="link" href="https://docs.spring.io/spring-boot/3.4.5/api/java/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;&lt;/a&gt; or &lt;a class="link" href="https://docs.spring.io/spring-boot/3.4.5/api/java/org/springframework/boot/autoconfigure/SpringBootApplication.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;@SpringBootApplication&lt;/code&gt;&lt;/a&gt; annotations to one of your &lt;a class="link" href="https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/context/annotation/Configuration.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;@Configuration&lt;/code&gt;&lt;/a&gt; classes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;즉, 자동 설정은 opt-in 기반이다.
+자동 설정은 &amp;ldquo;설정이 필요 없는 간편함&amp;quot;을 제공하지만, &amp;ldquo;조건&amp;rdquo; 기반이라는 점을 반드시 이해해야 한다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Opt-in/Opt-out&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;Opt-in: 기본적으로 비활성화, 직접 명시적으로 활성화해야 동작하는 방식.&lt;/li&gt;
+&lt;li&gt;Opt-out: 기본이 활성화, 원하면 명시적인 비활성화 처리 필요.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@SpringBootApplication&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 내부에 @EnableAutoConfiguration 포함&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyApp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SpringApplication&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="내부-구성"&gt;내부 구성
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Target&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ElementType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;TYPE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Retention&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RetentionPolicy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;RUNTIME&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Documented&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Inherited&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@SpringBootConfiguration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@EnableAutoConfiguration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@ComponentScan&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;excludeFilters&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;FilterType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;CUSTOM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TypeExcludeFilter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Filter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;FilterType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;CUSTOM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;AutoConfigurationExcludeFilter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@interface&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SpringBootApplication&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="enableautoconfiguration의-동작-원리"&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;의 동작 원리
+&lt;/h4&gt;&lt;p&gt;핵심은 &lt;code&gt;@Import(AutoConfigurationImportSelector.class)&lt;/code&gt; 이 클래스가 자동 설정 클래스들을 로드해온다는 것이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;@EnableAutoConfiguration&lt;/code&gt;은 단순 트리거이고 실제로 자동 설정 클래스를 로드하고 필터링하는 핵심 로직은 바로 &lt;code&gt;AutoConfigurationImportSelector&lt;/code&gt; 클래스에 들어 있다.&lt;/p&gt;
+&lt;p&gt;이 클래스는 &lt;code&gt;Spring-boot-autoconfigure.jar&lt;/code&gt;에 포함되어 있으므로 Spring Boot starter를 프로젝트에 추가하면 자동으로 로드 가능한 구조다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Target&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ElementType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;TYPE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Retention&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RetentionPolicy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;RUNTIME&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Documented&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Inherited&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@AutoConfigurationPackage&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Import&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AutoConfigurationImportSelector&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@interface&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;EnableAutoConfiguration&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;ImportSelector&lt;/code&gt;가 내부적으로 다음 파일들을 스캔한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Spring Boot 2.x
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;META-INF/spring.factories&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Spring Boot 3.x 이상
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자동-설정-클래스는-어떤-형태인가"&gt;자동 설정 클래스는 어떤 형태인가?
+&lt;/h4&gt;&lt;p&gt;자동 설정 클래스는 &lt;code&gt;@Configuration&lt;/code&gt; 또는 &lt;code&gt;@AutoConfiguration&lt;/code&gt;으로 선언된 설정 클래스 형태를 갖는다.&lt;/p&gt;
+&lt;p&gt;내부에 &lt;code&gt;@ConditionalOnClass&lt;/code&gt;, &lt;code&gt;@ConditionalOnMissingBean&lt;/code&gt;, &lt;code&gt;@ConditionalOnProperty&lt;/code&gt; 등의 조건부 어노테이션을 사용하여 상황에 맞게 설정을 자동 적용한다.&lt;/p&gt;
+&lt;h5 id="jacksonautoconfiguration-예시"&gt;JacksonAutoConfiguration 예시
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@AutoConfiguration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@ConditionalOnClass&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ObjectMapper&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;JacksonAutoConfiguration&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@ConditionalOnMissingBean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ObjectMapper&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;objectMapper&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ObjectMapper&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;자동 설정 클래스는 일반적으로 다음 조건부 어노테이션을 사용한다.
+자동 설정 클래스는 조건에 따라 설정을 &amp;ldquo;선택적으로 적용&amp;quot;하기 위한 전략 집합이다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;어노테이션&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@ConditionalOnClass&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;특정 클래스가 클래스패스에 존재할 때만 활성화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@ConditionalOnMissingBean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;같은 타입의 Bean이 없을 때만 등록&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@ConditionalOnProperty&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;application.yml에 설정된 프로퍼티가 조건과 일치할 때만 활성화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;@ConditionalOnWebApplication&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;웹 애플리케이션일 때만 활성화 등&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="자동-설정이-실제로-등록되었는지-확인하는-방법"&gt;자동 설정이 실제로 등록되었는지 확인하는 방법
+&lt;/h4&gt;&lt;p&gt;Spring Boot Actuator + 조건 리포트&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;build.gradle&lt;/code&gt; 또는 &lt;code&gt;pom.xml&lt;/code&gt;에 actuator 추가
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// build.gradle
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;application.yaml&lt;/code&gt;에 아래와 같이 설정
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;management&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;endpoints&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;web&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;exposure&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;include&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;conditions&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;브라우저에서 &lt;code&gt;http://localhost:8080/actuator/conditions&lt;/code&gt;로 접속 후 어떤 자동 설정 클래스가 적용(positiveMatches)됐고 어떤 조건이 왜 실패했는지(negativeMatches) 확인 가능.
+&lt;ul&gt;
+&lt;li&gt;IntelliJ IDE에서 제공하는 패널을 확인하는 방법도 있다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Spring Boot Dashboard&lt;/code&gt; 또는 &lt;code&gt;View &amp;gt; Tool Windows &amp;gt; Spring&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Beans&lt;/code&gt;, &lt;code&gt;Mappings&lt;/code&gt;, &lt;code&gt;Endpoints&lt;/code&gt; 등으로 전체 컨텍스트 확인 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="커스텀-autoconfiguration-테스트"&gt;커스텀 AutoConfiguration 테스트
+&lt;/h3&gt;&lt;p&gt;작성한 &lt;code&gt;HelloAutoConfiguration&lt;/code&gt;과 &lt;code&gt;HelloService&lt;/code&gt;가 &lt;strong&gt;자동으로 빈 등록되는지 실제 확인&lt;/strong&gt;하려면,&lt;br&gt;
+다음과 같은 방식으로 별도 테스트 프로젝트를 만들어 사용하는 것이 가장 확실하다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;/actuator/conditions&lt;/code&gt;에서 &lt;code&gt;HelloAutoConfiguration&lt;/code&gt; 자동 설정 작동 여부 확인&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;context.containsBean(&amp;quot;helloService&amp;quot;)&lt;/code&gt; or &lt;code&gt;@Autowired HelloService&lt;/code&gt; Bean 등록 확인&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@ConditionalOnMissingBean&lt;/code&gt;, &lt;code&gt;@ConditionalOnProperty&lt;/code&gt; 등 추가 후 조건 적용 확인 테스트&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="프로젝트-구성-방식"&gt;프로젝트 구성 방식
+&lt;/h4&gt;&lt;h5 id="autoconfiguration-모듈-라이브러리-역할"&gt;AutoConfiguration 모듈 (라이브러리 역할)
+&lt;/h5&gt;&lt;p&gt;Gradle 또는 Maven으로 별도 모듈로 분리하여 사용할 프로젝트.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;hello-autoconfig&lt;/code&gt; 프로젝트를 생성해서 모듈을 &lt;code&gt;jar&lt;/code&gt;로 빌드하거나 &lt;code&gt;settings.gradle&lt;/code&gt;에 &lt;code&gt;includeBuild(...)&lt;/code&gt; 방식으로 연결하여 테스트할 예정이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Java + Gradle로 빠르게 프로젝트 생성
+&lt;ul&gt;
+&lt;li&gt;모듈은 Spring Boot로 만들지 않아도 된다는 점&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;hello-autoconfig/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── src/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ ├── main/java/com/example/autoconfig/HelloService.java
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └── main/java/com/example/autoconfig/HelloAutoConfiguration.java
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └── main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── build.gradle
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;build.gradle
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;plugins&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;java-library&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;group&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;com.example&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;version&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;1.0-SNAPSHOT&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;repositories&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;mavenCentral&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;dependencies&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-autoconfigure:3.1.5&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;// 버전은 호환을 고려해야 한다.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;test&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;useJUnitPlatform&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;HelloService.java
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;package&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;com.example.autoconfig&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;HelloService&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;sayHello&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;Hello from AutoConfiguration!&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;HelloAutoConfiguration.java
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;package&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;com.example.autoconfig&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.boot.autoconfigure.AutoConfiguration&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.context.annotation.Bean&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@AutoConfiguration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;HelloAutoConfiguration&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HelloService&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;helloService&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HelloService&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports&lt;/code&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;com.example.autoconfig.HelloAutoConfiguration
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;프로젝트 생성과 클래스 작성이 완료됐다면 모듈로 사용하기 위해 jar 파일로 빌드한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;./gradlew clean build
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# `hello-autoconfig-1.0-SNAPSHOT.jar` 생성됨&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="테스트용-실제-앱-프로젝트에서-사용"&gt;테스트용 실제 앱 프로젝트에서 사용
+&lt;/h5&gt;&lt;p&gt;Spring Boot 프로젝트(initializr 등) 생성&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;my-app&lt;/code&gt; 프로젝트는 위에서 만든 모듈을 연결해 테스트하는 용도다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;build.gradle&lt;/code&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;plugins&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;java&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;3.1.5&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;// 버전은 호환을 고려해야 한다.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;io.spring.dependency-management&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;1.1.3&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;group&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;com.example&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;version&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;0.0.1-SNAPSHOT&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;java&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;toolchain&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;languageVersion&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;JavaLanguageVersion&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;of&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;17&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;repositories&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;mavenCentral&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;flatDir&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;dirs&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;../hello-autoconfig/build/libs&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;// jar 경로 지정 (지금은 테스트 용도로 같은 경로에 두 프젝을 만들었으니.)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;dependencies&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="nl"&gt;name:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;hello-autoconfig-1.0-SNAPSHOT&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;// .jar 이름 그대로
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-starter&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;tasks&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;named&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;test&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;useJUnitPlatform&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;DemoApplication.java
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;package&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;com.example&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;com.example.autoconfig.HelloService&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.boot.SpringApplication&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;org.springframework.boot.autoconfigure.SpringBootApplication&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;jakarta.annotation.PostConstruct&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@SpringBootApplication&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;DemoApplication&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Autowired&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HelloService&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloService&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SpringApplication&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;DemoApplication&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@PostConstruct&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;printHello&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;helloService&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sayHello&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;실행해보면 &lt;code&gt;Hello from AutoConfiguration!&lt;/code&gt; 메시지를 잘 확인할 수 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;자동 설정의 작동 원리, 조건부 어노테이션, 확인 방법 등을 알아봤다.&lt;/p&gt;
+&lt;p&gt;Spring Boot의 자동 설정은 &amp;ldquo;있는지 보고 알아서 설정&amp;quot;하는 전략이다.
+우리가 할 일은 조건과 우선 순위를 명확히 하여 Spring의 똑똑한 판단을 유도하는 것이다.&lt;/p&gt;
+&lt;p&gt;자동 설정의 아키텍처와 커스텀 구성 전략까지 이해하고 설계 수준에서 응용이 가능한지 다음 기회에 더 알아보자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java 어노테이션 이해&lt;/li&gt;
+&lt;li&gt;Spring &lt;code&gt;@Configuration&lt;/code&gt; 및 Bean 등록 방식&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.developing-auto-configuration" target="_blank" rel="noopener"
+&gt;Spring Boot 공식 문서 - 나만의 자동 구성 만들기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-autoconfigure" target="_blank" rel="noopener"
+&gt;spring-boot-autoconfigure GitHub 소스코드&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

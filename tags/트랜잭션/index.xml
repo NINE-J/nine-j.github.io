@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>트랜잭션 on B9F1</title><link>https://blog.b9f1.com/tags/%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98/</link><description>Recent content in 트랜잭션 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 15 Jun 2025 17:31:13 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98/index.xml" rel="self" type="application/rss+xml"/><item><title>트랜잭션 격리성 - Isolation</title><link>https://blog.b9f1.com/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/</link><pubDate>Sun, 15 Jun 2025 17:31:13 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;트랜잭션의 ACID 속성 중 &lt;strong&gt;Isolcation(격리성)&lt;/strong&gt; 은 다수의 트랜잭션이 동시에 실행될 때 각 트랜잭션이 서로에게 미치는 영향을 통제하기 위한 핵심 요소이며 가장 복잡하고 이해하기 어려운 속성이다.&lt;/p&gt;
+&lt;p&gt;격리 수준이 보장하는 것은 단순히 일관성이 아니라 &lt;strong&gt;데이터 무결성과 비즈니스의 신뢰성&lt;/strong&gt; 이다.
+특히 동시성 환경에서 격리 수준이 부족하면 데이터는 꼬이고, 그 피해는 실시간으로 사용자에게 전달된다.&lt;/p&gt;
+&lt;p&gt;이번 글에서 정리하는 건 모두 이해하고 작성할 수 없어서 관련 자료를 정리한 후 상세한 내용에 대해 더 깊게 파고들 예정이다.&lt;/p&gt;
+&lt;p&gt;격리성이 무너지면서 발생하는 문제들을 예제로 설명하고, 이를 막기 위해 존재하는 격리 수준들에 대해 단계적으로 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="격리성은-기본값으로-보장되고-있을까"&gt;격리성은 기본값으로 보장되고 있을까?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;대부분의 RDBMS의 기본 격리 수준은 &lt;code&gt;READ COMMITED&lt;/code&gt; 또는 &lt;code&gt;REPEATABLE READ&lt;/code&gt;이지만 이름은 같아도 구현 방식과 보장 수준은 다르다.&lt;/li&gt;
+&lt;li&gt;예를 들어 Oracle의 &lt;code&gt;SERIALIZABLE&lt;/code&gt;은 실제론 &lt;code&gt;SNAPSHOT ISOLATION&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;MySQL의 &lt;code&gt;REPEATABLE READ&lt;/code&gt;는 기본적으로 Phantom Read를 방지하지 않으며&lt;/li&gt;
+&lt;li&gt;PostgreSQL은 MVCC 기반이지만 &lt;code&gt;Serializable&lt;/code&gt;을 명시해야만 실제 직렬화 보장을 한다.
+&lt;ul&gt;
+&lt;li&gt;MVCC: Multi-Version Concurrency Control, 다중 버전 동시성 제어&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;격리 수준은 이름이 같다고 같은 게 아니다.
+반드시 DB별 구현 방식을 확인해야 한다.&lt;/p&gt;
+&lt;h3 id="격리-수준이-깨질-때-벌어지는-현상들"&gt;격리 수준이 깨질 때 벌어지는 현상들
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;유형&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;예시&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Dirty Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;커밋되지 않은 데이터를 읽음&lt;/td&gt;
+&lt;td&gt;A가 송금 처리 중인데, B가 중간 상태의 금액을 읽고 합산하여 중복 송금 발생&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Non-Repeatable Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;동일 조건으로 두 번 조회했는데 결과가 다름&lt;/td&gt;
+&lt;td&gt;A가 상품 재고를 두 번 조회하는 사이, B가 재고를 변경함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Phantom Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;같은 쿼리인데 행 개수가 달라짐&lt;/td&gt;
+&lt;td&gt;A가 &lt;code&gt;&amp;quot;나이 &amp;gt; 30&amp;quot;&lt;/code&gt; 조건으로 조회 → B가 35세 사용자를 삽입 → A가 다시 조회하면 결과 달라짐&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실무에서-실제-발생한-사례"&gt;실무에서 실제 발생한 사례
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;동시 송금 시스템에서의 경쟁 조건&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;사용자가 잔액이 100인 상태에서 거의 동시에 두 번 송금 요청을 보냄&lt;/li&gt;
+&lt;li&gt;둘 다 잔액 조회 결과 100을 읽고, 각각 80을 송금 → 총 160 송금됨&lt;/li&gt;
+&lt;li&gt;이유: &lt;code&gt;READ COMMITTED&lt;/code&gt; 상태에서는 두 트랜잭션이 서로를 고려하지 못함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결책은?&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;SERIALIZABLE&lt;/code&gt; 수준의 격리 또는 &lt;strong&gt;애플리케이션 차원의 락&lt;/strong&gt; 적용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="ansi-sql-격리-수준-비교표"&gt;ANSI SQL 격리 수준 비교표
+&lt;/h3&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;격리 수준을 올리면 오류는 줄지만, 성능에 영향을 미친다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;격리 수준 4가지와 이에 따른 현상 3가지가 있다.
+이 3가지 현상을 읽기 현상(Read Phenomena)라고 표현한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Dirty Read&lt;/strong&gt;: 커밋되지 않은(trash) 데이터를 읽는 현상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Non-Repeatable Read&lt;/strong&gt;: 같은 쿼리를 두 번 실행했을 때 결과가 달라지는 현상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Phantom Read&lt;/strong&gt;: 동일 조건의 쿼리에서 행 개수가 달라지는 현상 (삽입/삭제로 인해)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;격리 수준&lt;/th&gt;
+&lt;th&gt;Dirty Read&lt;/th&gt;
+&lt;th&gt;Non-Repeatable Read&lt;/th&gt;
+&lt;th&gt;Phantom Read&lt;/th&gt;
+&lt;th&gt;비고&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;READ UNCOMMITTED&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;최저 성능, 실사용 거의 없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;READ COMMITTED&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;대부분 DB의 기본값&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;REPEATABLE READ&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;허용&lt;/td&gt;
+&lt;td&gt;MySQL 기본값 (하지만 Phantom Read 방지는 불완전함)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;SERIALIZABLE&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;방지&lt;/td&gt;
+&lt;td&gt;가장 강력하나 성능 저하 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="spring에서의-설정-방법"&gt;Spring에서의 설정 방법
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Transactional&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;isolation&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Isolation&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;SERIALIZABLE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;processTransaction&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Isolation.DEFAULT&lt;/code&gt;: DBMS 기본 설정 따름&lt;/li&gt;
+&lt;li&gt;프로젝트에 따라 &lt;code&gt;.yml&lt;/code&gt;, &lt;code&gt;.yaml&lt;/code&gt; 또는 DB 설정에서 전역 기본값을 조정할 수도 있음&lt;/li&gt;
+&lt;li&gt;트랜잭션을 사용할 때 &lt;code&gt;@Transactional&lt;/code&gt;만 선언하고 끝이 아니라 어떤 &lt;code&gt;isolation level&lt;/code&gt;이 적용되는지 알아본다면 좋을 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;트랜잭션은 선언만으로 안전하지 않다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;격리 수준은 코드의 동작 방식과 데이터 신뢰성을 결정짓는 중요한 요소다.&lt;br&gt;
+문제를 겪고 나서야 &amp;ldquo;왜 데이터가 꼬였지?&amp;ldquo;를 고민하기보다, 미리 격리 수준을 설정하고 이해하는 것이 훨씬 값지다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;트랜잭션과 커밋/롤백의 개념&lt;/li&gt;
+&lt;li&gt;DB 락: Shared Lock vs Exclusive Lock&lt;/li&gt;
+&lt;li&gt;MVCC(Multi-Version Concurrency Control)&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://oimbook.tistory.com/entry/Read-Phenomena-in-Transactions" target="_blank" rel="noopener"
+&gt;Read Phenomena in Transactions by oim_&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener"
+&gt;PostgreSQL 공식 문서: Isolation Levels&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html" target="_blank" rel="noopener"
+&gt;MySQL InnoDB 트랜잭션 격리 수준&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative.html" target="_blank" rel="noopener"
+&gt;Spring Declarative Transaction Management&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://martin.kleppmann.com/2014/11/25/hermitage-testing-the-i-in-acid.html" target="_blank" rel="noopener"
+&gt;Hermitage: Testing the “I” in ACID&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://sesoc.tistory.com/317" target="_blank" rel="noopener"
+&gt;I-9. 표준 SQL 이란?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Isolation_%28database_systems%29" target="_blank" rel="noopener"
+&gt;Isolation (database systems)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Java 예외 처리의 구조와 진화</title><link>https://blog.b9f1.com/p/2025-05-05-java-checked-exception-vs-unchecked-exception/</link><pubDate>Mon, 05 May 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-05-05-java-checked-exception-vs-unchecked-exception/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Java 예외 처리는 프로그램의 안정성, 복원력, 유지보수성을 결정 짓는 핵심 설계 요소다.&lt;/p&gt;
+&lt;p&gt;예외는 크게 다음 세 가지로 구분된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Checked Exception: 외부 자원 접근 등 복구 가능한 예외 상황을 명시적으로 선언 (컴파일 타임에 처리)&lt;/li&gt;
+&lt;li&gt;Unchecked Exception: 실행 중 발생하는 로직 오류, 주로 프로그래머의 실수에서 기인, 명시적 처리 강제가 없다.&lt;/li&gt;
+&lt;li&gt;Error: OutOfMemory, StackOverflowError와 같은 시스템 레벨의 치명적 오류&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;특히 Checked, Unchecked Exception 간의 선택은 단순한 문법 차원이 아니라 설계 전략과 깊은 연관이 있다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="java-예외-계층-구조"&gt;Java 예외 계층 구조
+&lt;/h3&gt;&lt;p&gt;해당 계보도가 전부는 아니며 필요한 부분만 그렸다는 점을 참고하자.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+classDiagram
+Object &lt;|-- Throwable
+Throwable &lt;|-- Exception
+Throwable &lt;|-- Error
+%% === Unchecked Exceptions
+Exception &lt;|-- RuntimeException
+RuntimeException &lt;|-- NullPointerException
+RuntimeException &lt;|-- IllegalArgumentException
+RuntimeException &lt;|-- ArithmeticException
+RuntimeException &lt;|-- IllegalStateException
+RuntimeException &lt;|-- UnsupportedOperationException
+%% === Checked Exceptions
+Exception ..&gt; IOException : checked
+Exception ..&gt; SQLException : checked
+IOException ..&gt; FileNotFoundException : checked
+%% === Errors
+Error &lt;|-- OutOfMemoryError
+Error &lt;|-- StackOverflowError
+Error &lt;|-- LinkageError
+Error &lt;|-- VirtualMachineError
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="checked-exception"&gt;Checked Exception
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;RuntimeException&lt;/code&gt;을 상속하지 않는 예외&lt;/li&gt;
+&lt;li&gt;컴파일 시점에 강제적으로 처리 필요(&lt;code&gt;try/catch&lt;/code&gt; 또는 &lt;code&gt;throws&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;복구 가능성이 있는 외부 자원 오류 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="예시-코드"&gt;예시 코드
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;java.io.*&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;java.util.*&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CheckedExceptionExample&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Scanner&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;scanner&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Scanner&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;example.txt&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;while&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scanner&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;hasNextLine&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scanner&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;nextLine&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;scanner&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;close&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;FileNotFoundException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;파일을 찾을 수 없습니다: &amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getMessage&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="unchecked-exception"&gt;Unchecked Exception
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;RuntimeException&lt;/code&gt; 또는 그 하위 클래스&lt;/li&gt;
+&lt;li&gt;컴파일러 검사 없음, 개발자 의도에 따라 예외 처리 선택&lt;/li&gt;
+&lt;li&gt;대부분 개발자의 실수 또는 버그로 발생&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;UncheckedExceptionExample&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;3&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;numbers&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ArrayIndexOutOfBoundsException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;잘못된 인덱스 접근: &amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getMessage&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="언제-어떤-예외를-사용할까"&gt;언제 어떤 예외를 사용할까?
+&lt;/h3&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Effective Java &amp;gt; Item 70&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;복구 가능한 경우에만 Checked Exception을 사용하고 그렇지 않다면 RuntimeException을 사용하라.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;추천 예외&lt;/th&gt;
+&lt;th&gt;이유&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;복구 가능한 외부 리소스 오류&lt;/td&gt;
+&lt;td&gt;Checked&lt;/td&gt;
+&lt;td&gt;IO, DB 등은 사용자 안내 및 재시도 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;프로그래머 실수나 버그&lt;/td&gt;
+&lt;td&gt;Unchecked&lt;/td&gt;
+&lt;td&gt;NPE, IllegalArgument 등 빠른 실패 유도&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;공통된 예외 추상화&lt;/td&gt;
+&lt;td&gt;Custom Unchecked&lt;/td&gt;
+&lt;td&gt;도메인 중심 예외 설계에 유리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="예외-처리의-진화-흐름-요약"&gt;예외 처리의 진화 흐름 요약
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;시대/환경&lt;/th&gt;
+&lt;th&gt;트렌드&lt;/th&gt;
+&lt;th&gt;주요 배경 및 이유&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;초기 Java (JDK 1.0~1.4)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Checked 중심 설계&lt;/td&gt;
+&lt;td&gt;- 강력한 컴파일 타임 검사&lt;br&gt;- API 사용자의 실수 방지&lt;br&gt;- &amp;ldquo;복구 가능한 예외는 명시적으로 처리하라&amp;quot;는 철학&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;현업 개발자들의 반발 증가 (2000년대 중반)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Checked 회의론&lt;/td&gt;
+&lt;td&gt;- 반복적인 &lt;code&gt;throws&lt;/code&gt; 선언으로 &lt;strong&gt;코드 노이즈 증가&lt;/strong&gt;&lt;br&gt;- 예외 처리 로직이 무분별해짐&lt;br&gt;- 대부분의 클라이언트가 catch 후 무시하거나 로그만 남김&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Effective Java (2008~2018)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;선택적 사용 권장&lt;/td&gt;
+&lt;td&gt;- Joshua Bloch: &amp;ldquo;복구 가능한 경우에만 Checked 사용하라&amp;rdquo;&lt;br&gt;- &lt;code&gt;RuntimeException&lt;/code&gt; 기반 설계 권장&lt;br&gt;- 예외는 &lt;strong&gt;API 설계의 계약&lt;/strong&gt;이므로 의미 있게 사용 권장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Spring Framework 대중화 (2005~현재)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Unchecked 기반 설계&lt;/td&gt;
+&lt;td&gt;- 대부분의 Spring 예외는 &lt;code&gt;RuntimeException&lt;/code&gt; 기반&lt;br&gt;- 선언적 트랜잭션, AOP 등과 결합해 Checked 예외가 불편함&lt;br&gt;- 개발자에게 &lt;strong&gt;선택적 예외 처리 자유&lt;/strong&gt;를 부여&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;모던 자바 개발 &amp;amp; DDD 확산 (2010s~)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;도메인 기반 Unchecked 전략&lt;/td&gt;
+&lt;td&gt;- 예외는 “도메인 규칙 위반”을 표현&lt;br&gt;- 예외를 catch하지 말고 &lt;strong&gt;전파 후 해석&lt;/strong&gt;하는 방식 선호&lt;br&gt;- API, 도메인, 인프라 계층별로 예외 책임 분리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;지금의 흐름 (2020s~)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;명확한 계층 전략 + RuntimeException 기반 커스터마이징&lt;/td&gt;
+&lt;td&gt;- 예외를 try-catch로 무조건 처리하는 시대는 끝남&lt;br&gt;- Unchecked 중심이지만 무분별하지 않게 도메인화&lt;br&gt;- 예외 메시지는 로깅, 사용자 응답, 추적 가능성까지 고려&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="예외를-설계-관점에서-본다는-것"&gt;예외를 설계 관점에서 본다는 것
+&lt;/h3&gt;
+&lt;div class="admonition note"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"&gt;&lt;path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 125.7-86.8 86.8c-10.3 10.3-17.5 23.1-21 37.2l-18.7 74.9c-2.3 9.2-1.8 18.8 1.3 27.5L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128zM549.8 235.7l14.4 14.4c15.6 15.6 15.6 40.9 0 56.6l-29.4 29.4-71-71 29.4-29.4c15.6-15.6 40.9-15.6 56.6 0zM311.9 417L441.1 287.8l71 71L382.9 487.9c-4.1 4.1-9.2 7-14.9 8.4l-60.1 15c-5.5 1.4-11.2-.2-15.2-4.2s-5.6-9.7-4.2-15.2l15-60.1c1.4-5.6 4.3-10.8 8.4-14.9z"/&gt;&lt;/svg&gt;
+&lt;span&gt;예외는 &amp;ldquo;실행 흐름의 탈출권&amp;quot;이다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;예외는 단순한 코드 에러가 아니라 소프트웨어의 책임 구조를 드러내는 설계 도구다.&lt;/li&gt;
+&lt;li&gt;예외를 어디서 발생시키고 어디서 잡을지는 팀의 기술 철학과 도메인 전략이 반영되어야 한다.&lt;/li&gt;
+&lt;li&gt;결국 예외는 도메인의 경계를 지키는 마지막 방패 역할을 해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;누가, 언제, 어떤 책임을 갖고 이 탈출권을 행사해야 할까?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사용자 입력 오류가 발생했을 때?&lt;/li&gt;
+&lt;li&gt;DB 연결 실패가 발생했을 때?&lt;/li&gt;
+&lt;li&gt;도메인 규칙을 어겼을 때?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;del&gt;···사람들에게서 잊혀졌을 때다···!!!&lt;/del&gt;&lt;/p&gt;
+&lt;p&gt;모든 예외를 try-catch로 처리할 수도 있지만 그건 제어 흐름의 책임을 흐트러뜨리고 도메인의 진실을 숨기는 위험한 선택일 수 있다.&lt;/p&gt;
+&lt;h4 id="예외-설계의-3요소"&gt;예외 설계의 3요소
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;요소&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;책임 주체&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;예외 발생 (throw)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;어디에서, 어떤 상황에서 예외를 발생시킬 것인가&lt;/td&gt;
+&lt;td&gt;도메인, 인프라 계층&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;예외 전파 (throws)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;예외를 호출자에게 넘길 것인가, wrapping할 것인가&lt;/td&gt;
+&lt;td&gt;서비스 계층&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;예외 처리 (catch)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;예외를 어디에서 처리하고 사용자에게 어떤 메시지를 줄 것인가&lt;/td&gt;
+&lt;td&gt;API 계층 (Controller, Filter)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="예외는-무조건-처리하는-것이-아니라-올바른-계층에서-해석하는-것"&gt;예외는 무조건 처리하는 것이 아니라 올바른 계층에서 해석하는 것
+&lt;/h4&gt;&lt;p&gt;예외를 너무 빨리 처리해버리면 문제를 숨기게 된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예시 코드
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;orderService&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;placeOrder&lt;/span&gt;&lt;span class="p"&gt;(...);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Exception&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;warn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;에러 발생&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 그리고 그냥 끗-⭐.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이렇게 하면 실제로 어떤 문제가 발생했는지 알 수 없고 서비스 로직에서의 책임 분리가 흐려진다.
+반대로 모든 예외를 끝까지 전파하면 Controller, API 계층이 도메인의 모든 세부사항을 알아야 한다.&lt;/p&gt;
+&lt;h4 id="좋은-예외-설계의-기준"&gt;좋은 예외 설계의 기준
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;도메인 계층에서는 의미 있는 커스텀 예외를 발생 시킨다.
+&lt;ul&gt;
+&lt;li&gt;예: &lt;code&gt;InsufficientBalanceException&lt;/code&gt;, &lt;code&gt;InvalidCouponException&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;서비스 계층에서는 예외를 변환하거나 해석하지 않는다.
+&lt;ul&gt;
+&lt;li&gt;가능한 한 도메인 예외 그대로 전파 (또는 기술 예외를 도메인 예외로 래핑)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;컨트롤러/외부 인터페이스 계층에서 예외를 해석하고 사용자 메시지로 변환한다.
+&lt;ul&gt;
+&lt;li&gt;예: &lt;code&gt;@ControllerAdvice&lt;/code&gt;, &lt;code&gt;@ExceptionHandler&lt;/code&gt;, HTTP 상태 코드 매핑&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="예외와-트랜잭션-롤백의-관계"&gt;예외와 트랜잭션 롤백의 관계
+&lt;/h3&gt;
+&lt;div class="admonition quote"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"&gt;&lt;path d="M448 296c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72zm-256 0c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Quote&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;예외는 단순한 오류가 아니라, &lt;strong&gt;트랜잭션의 커밋 여부를 결정짓는 시그널&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Spring에서는 &lt;code&gt;@Transactional&lt;/code&gt;을 사용할 경우, 예외 발생 시 해당 트랜잭션의 &lt;strong&gt;롤백 여부&lt;/strong&gt;는 예외의 종류에 따라 자동으로 결정된다.&lt;/p&gt;
+&lt;h4 id="용어-정리부터"&gt;용어 정리부터
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;용어&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비즈니스 예외&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;사용자의 입력 실수, 제약 조건 위반, 정책 위반 등 &amp;ldquo;업무 규칙을 어긴 것&amp;quot;을 의미함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;복구 가능한 예외&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;catch 후 재시도하거나 사용자 안내를 통해 정상 흐름으로 회복할 수 있는 예외&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;복구 불가능한 예외&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;시스템 오류, null 포인터, DB 연결 끊김 등 외부적이거나 근본적으로 해결 불가능한 예외&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="spring의-기본-트랜잭션-롤백-규칙"&gt;Spring의 기본 트랜잭션 롤백 규칙
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;예외 유형&lt;/th&gt;
+&lt;th&gt;롤백 여부&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;RuntimeException&lt;/code&gt; 계열&lt;/td&gt;
+&lt;td&gt;롤백&lt;/td&gt;
+&lt;td&gt;기본적으로 트랜잭션을 롤백한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;Error&lt;/code&gt; 계열&lt;/td&gt;
+&lt;td&gt;롤백&lt;/td&gt;
+&lt;td&gt;시스템 오류로 간주하고 롤백한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;Checked Exception&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;커밋&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;기본적으로 롤백하지 않고 커밋된다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="admonition quote"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"&gt;&lt;path d="M448 296c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72zm-256 0c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Quote&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;In its default configuration, the Spring Framework’s transaction infrastructure code marks a transaction for rollback only in the case of runtime, unchecked exceptions. That is, when the thrown exception is an instance or subclass of &lt;code&gt;RuntimeException&lt;/code&gt;. (&lt;code&gt;Error&lt;/code&gt; instances also, by default, result in a rollback).
+Checked exceptions that are thrown from a transactional method do not result in a rollback in the default configuration. You can configure exactly which &lt;code&gt;Exception&lt;/code&gt; types mark a transaction for rollback, including checked exceptions by specifying &lt;em&gt;rollback rules&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;기본 설정에서, Spring Framework의 트랜잭션 인프라 코드는 런타임, 언체크 예외의 경우에만 트랜잭션을 롤백하도록 표시합니다. 즉, 발생한 예외가 &lt;code&gt;RuntimeException&lt;/code&gt;의 인스턴스이거나 하위 클래스인 경우입니다. (&lt;code&gt;Error&lt;/code&gt; 인스턴스도 기본적으로 롤백을 유발합니다). 체크 예외가 트랜잭션 메서드에서 발생하면 기본 설정에서는 롤백되지 않습니다.
+롤백 규칙을 지정하여 확인된 예외를 포함하여 어떤 예외 유형이 트랜잭션을 롤백할지 정확하게 구성할 수 있습니다.&amp;rdquo;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="예시-코드-1"&gt;예시 코드
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Transactional&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;processPayment&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;throws&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PaymentException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// ...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;paymentGateway&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;charge&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;throw&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PaymentException&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;결제 실패&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// Checked Exception&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위 예시는 기본적으로 트랜잭션이 커밋된다.
+하지만 결제 실패 시에도 롤백되길 원할 수 있다.&lt;/p&gt;
+&lt;h4 id="롤백-대상-명시-방법"&gt;롤백 대상 명시 방법
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;rollbackFor&lt;/code&gt; 속성 사용
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Transactional&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rollbackFor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PaymentException&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;processPayment&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;throws&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PaymentException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// ...&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;noRollbackFor&lt;/code&gt;로 반대로 명시도 가능
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Transactional&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;noRollbackFor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ValidationException&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;실무팁&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;비즈니스 로직에서 &lt;strong&gt;롤백을 유도하고 싶다면&lt;/strong&gt; Unchecked Exception을 사용하거나, &lt;code&gt;rollbackFor&lt;/code&gt;를 반드시 명시하자.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Transactional&lt;/code&gt;은 &lt;strong&gt;프록시 기반&lt;/strong&gt;이므로 &lt;strong&gt;public 메서드에서만 작동&lt;/strong&gt;하며 &lt;strong&gt;내부 호출 시 적용되지 않는다&lt;/strong&gt;는 점도 주의해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Spring은 예외의 의미나 복구 가능성에 관계 없이 &lt;strong&gt;예외의 타입&lt;/strong&gt;만을 기준으로 트랜잭션 롤백 여부를 결정한다.&lt;/li&gt;
+&lt;li&gt;기본적으로 &lt;code&gt;RuntimeException&lt;/code&gt; 및 &lt;code&gt;Error&lt;/code&gt; 만 롤백 대상이며, &lt;strong&gt;체크 예외&lt;/strong&gt;는 롤백되지 않는다.&lt;/li&gt;
+&lt;li&gt;체크 예외에 대해서도 롤백이 필요하다면, &lt;code&gt;@Transactional&lt;/code&gt; 애너테이션의 &lt;code&gt;rollbackFor&lt;/code&gt; 속성을 사용하여 명시적으로 지정하거나, 언체크 예외로 감싸서 던져야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java의 상속 구조 (&lt;code&gt;Object&lt;/code&gt;, &lt;code&gt;Throwable&lt;/code&gt;, &lt;code&gt;Exception&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;try-catch-finally 구문 이해&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;throws&lt;/code&gt;와 &lt;code&gt;throw&lt;/code&gt;의 차이&lt;/li&gt;
+&lt;li&gt;Java의 기본 예외 클래스 예시 (&lt;code&gt;NullPointerException&lt;/code&gt;, &lt;code&gt;IOException&lt;/code&gt; 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Effective Java &amp;gt; Item 69~77: 예외 처리의 정석&lt;/li&gt;
+&lt;li&gt;Spring의 전역 예외 처리 방식: &lt;code&gt;@ControllerAdvice&lt;/code&gt;, &lt;code&gt;@ExceptionHandler&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;도메인 기반 예외 설계: &lt;code&gt;BusinessException&lt;/code&gt;, &lt;code&gt;ValidationException&lt;/code&gt;, &lt;code&gt;PolicyViolationException&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;DDD에서의 예외 처리 전략: 도메인 규칙 위반 표현, 계층 간 책임 분리&lt;/li&gt;
+&lt;li&gt;Exception vs Error: JVM에서의 메모리 관리와 예외 차이&lt;/li&gt;
+&lt;li&gt;로깅과 예외: &lt;code&gt;log.warn&lt;/code&gt;, &lt;code&gt;log.error&lt;/code&gt; 언제 쓰고, StackTrace는 어떻게 다룰 것인가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="참고-자료"&gt;참고 자료
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://f-lab.kr/insight/java-exception-handling-evolution?gad_source=1&amp;amp;gad_campaignid=22368870602&amp;amp;gbraid=0AAAAACGgUFfN4ag4oS6KPd4XXwILthRon&amp;amp;gclid=CjwKCAjw56DBBhAkEiwAaFsG-gWjJJHmGm9P8UWourw-QNkxw5y5V-FkZftBiULc0i1Ta95GJRTaIxoCj_MQAvD_BwE" target="_blank" rel="noopener"
+&gt;자바 예외 처리의 진화: Checked Exception에서 Unchecked Exception으로&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://seungjjun.tistory.com/250" target="_blank" rel="noopener"
+&gt;[Java] Checked Exception과 Unchecked Exception&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/rolling-back.html" target="_blank" rel="noopener"
+&gt;Rolling Back a Declarative Transaction&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,397 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="feat.사용자의 password 인증을 실패했습니다"><title>psql: 시작하기</title><link rel=canonical href=https://blog.b9f1.com/p/2025-04-20-psql-getting-started/><link rel=stylesheet href=/scss/style.min.091d376ab5dee4238ab92c7f42e66ea0d97debe6d5a1f9c3e1e7121f544025d2.css><meta property='og:title' content="psql: 시작하기"><meta property='og:description' content="feat.사용자의 password 인증을 실패했습니다"><meta property='og:url' content='https://blog.b9f1.com/p/2025-04-20-psql-getting-started/'><meta property='og:site_name' content='B9F1'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='devlog'><meta property='article:tag' content='PostgreSQL'><meta property='article:tag' content='psql'><meta property='article:tag' content='DB'><meta property='article:published_time' content='2025-04-20T00:00:00+09:00'><meta property='article:modified_time' content='2025-04-20T00:00:00+09:00'><meta name=twitter:title content="psql: 시작하기"><meta name=twitter:description content="feat.사용자의 password 인증을 실패했습니다"><link rel="shortcut icon" href=/favicon.svg><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023370172872685" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-MG17SX24X0"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-MG17SX24X0")</script><script data-name=BMC-Widget data-cfasync=false src=https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js data-id=b9f1 data-description="Support me on Buy me a coffee!" data-message="👋 Glad to meet you.Buy me a coffee? 😊" data-color=#5F7FFF data-position=Right data-x_margin=18 data-y_margin=18></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_e091ceea98743e00.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🤌</span></figure><div class=site-meta><h1 class=site-name><a href=/>B9F1</a></h1><h2 class=site-description>Nine's Devlog</h2></div></header><ol class=menu-social><li><a href=https://github.com/NINE-J target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://stackoverflow.com/users/17334807/nine target=_blank title=StackOverflow rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-stackoverflow"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><path d="M8 16h8"/><path d="M8.322 12.582l7.956.836"/><path d="M8.787 9.168l7.826 1.664"/><path d="M10.096 5.764l7.608 2.472"/></svg></a></li><li><a href=mailto:rnwo47@gmail.com target=_blank title=ZMail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/toys/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Toys</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#개요>📌개요</a></li><li><a href=#내용>📌내용</a><ol><li><a href=#postgresql-설치-확인>PostgreSQL 설치 확인</a></li><li><a href=#postgresql-접속하기>PostgreSQL 접속하기</a></li><li><a href=#사용자의-password-인증을-실패했습니다>사용자의 password 인증을 실패했습니다</a></li><li><a href=#postgresql-설치>PostgreSQL 설치</a><ol><li><a href=#0welcome>0.Welcome</a></li><li><a href=#1installation-directory>1.Installation Directory</a></li><li><a href=#2select-components>2.Select Components</a></li><li><a href=#3data-directory>3.Data Directory</a></li><li><a href=#4password>4.Password</a></li><li><a href=#5port>5.Port</a></li><li><a href=#6advanced-options>6.Advanced Options</a></li><li><a href=#7pre-installation-summary>7.Pre Installation Summary</a></li><li><a href=#8ready-to-install>8.Ready to Install</a></li><li><a href=#9installing>9.Installing</a></li><li><a href=#10completing>10.Completing</a></li></ol></li><li><a href=#postgresql-삭제>PostgreSQL 삭제</a></li></ol></li><li><a href=#endnote>⚙️EndNote</a><ol><li><a href=#참고-자료>참고 자료</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/db/>DB
+</a><a href=/categories/postgresql/>PostgreSQL</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025-04-20-psql-getting-started/>psql: 시작하기</a></h2><h3 class=article-subtitle>feat.사용자의 password 인증을 실패했습니다</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-04-20T00:00:00+09:00>2025년 04월 20일</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>7 minute read</time></div></footer></div></header><section class=article-content><h2 id=개요>📌개요</h2><p>기본적으로 그냥 설치 후 환경 변수에 psql 등록돼서 버전 확인이 가능했다.
+기본 옵션으로 설치해서 DBeaver 역시 어렵지 않게 연결할 수 있었다.</p><p>근데 PostgreSQL이 동작하고 있는 서버의 IP라던가 포트를 확인하려고 하는데 오류가 있었다.</p><ul><li>Windows11, PostgreSQL 17.4 설치</li><li>SQL shell은 정상 동작</li><li>PostgreSQL 설치 후 Bash, CMD에서 <code>psql</code> 명령어 찾을 수 없음 오류</li><li>DBeaver 접속 정상</li></ul><h2 id=내용>📌내용</h2><h3 id=postgresql-설치-확인>PostgreSQL 설치 확인</h3><p>설치가 잘 됐는지 Bash, CMD 등에서 버전을 확인해본다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>psql --version
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 예상 출력</span>
+</span></span><span class=line><span class=cl>psql <span class=o>(</span>PostgreSQL<span class=o>)</span> 17.4
+</span></span></code></pre></td></tr></table></div></div><h3 id=postgresql-접속하기>PostgreSQL 접속하기</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>psql -U [username] -d [database_name] -h [hostname] -p [port_number]
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>username</code>: PostgreSQL 데이터베이스에 로그인할 사용자 이름이다. 기본적으로 &lsquo;postgres&rsquo;로 설정되어 있다.</li><li><code>database_name</code>: 접속할 데이터베이스의 이름이다. 기본값은 &lsquo;postgres&rsquo;이다.</li><li><code>hostname</code>: PostgreSQL 서버의 호스트 이름이다. 기본값은 &rsquo;localhost&rsquo;이다.</li><li><code>port_number</code>: PostgreSQL 서버의 포트 번호이다. 기본값은 &lsquo;5432&rsquo;이다.</li></ul><p>기본 옵션으로 설치한 나의 경우 아래와 같다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>psql -U postgres -d postgres -h localhost -p <span class=m>5432</span>
+</span></span><span class=line><span class=cl>postgres 사용자의 암호:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 예시 출력</span>
+</span></span><span class=line><span class=cl>psql <span class=o>(</span>17.4<span class=o>)</span>
+</span></span><span class=line><span class=cl>도움말을 보려면 <span class=s2>&#34;help&#34;</span>를 입력하십시오.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 프롬프트가 변경된다.</span>
+</span></span><span class=line><span class=cl><span class=nv>postgres</span><span class=o>=</span><span class=c1>#</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># \q | Ctrl+C 등으로 빠져나올 수 있다.</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=사용자의-password-인증을-실패했습니다>사용자의 password 인증을 실패했습니다</h3><p>명령창에서 psql 접속 후 시도하는 방법도 있지만 <a class=link href=https://wikidocs.net/215908 target=_blank rel=noopener>PostgreSQL 입문서</a>에 보면 <code>test</code> 데이터베이스에 연결하여 간단한 SQL 쿼리를 실행하는 명령어가 있다.</p><p>근데 시도하면 오류가 발생한다?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>psql -d <span class=nb>test</span> -c <span class=s2>&#34;select inet_server_addr()&#34;</span>
+</span></span><span class=line><span class=cl>&lt;USER NAME&gt; 사용자의 암호:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>psql: 오류: <span class=s2>&#34;localhost&#34;</span> <span class=o>(</span>::1<span class=o>)</span>, <span class=m>5432</span> 포트로 서버 접속 할 수 없음: 치명적오류:  사용자 <span class=s2>&#34;&lt;USER NAME&gt;&#34;</span>의 password 인증을 실패했습니다
+</span></span></code></pre></td></tr></table></div></div><p>비밀번호는 틀리지 않았고 Bash, CMD 등에서 테스트 명령만 실패한다.</p><p><code>pg_hba.conf</code> 파일의 인증 메서드를 수정하라는 정보가 많았는데 이건 보안을 바꾸는 거니까 지금 필요한 근본적인 해결책이 아니다.</p><p>postgres 접속은 가능하니까 접속해서 USER 목록을 조회해본다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=n>postgres</span><span class=o>=#</span><span class=w> </span><span class=k>SELECT</span><span class=w> </span><span class=n>usename</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>pg_user</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w> </span><span class=n>usename</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>----------
+</span></span></span><span class=line><span class=cl><span class=w> </span><span class=n>postgres</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>(</span><span class=mi>1</span><span class=err>개</span><span class=w> </span><span class=err>행</span><span class=p>)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=n>postgres</span><span class=o>=#</span><span class=w> </span><span class=k>SELECT</span><span class=w> </span><span class=n>usename</span><span class=p>,</span><span class=w> </span><span class=n>usesuper</span><span class=p>,</span><span class=w> </span><span class=n>usecreatedb</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>pg_user</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w> </span><span class=n>usename</span><span class=w>  </span><span class=o>|</span><span class=w> </span><span class=n>usesuper</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=n>usecreatedb</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>----------+----------+-------------
+</span></span></span><span class=line><span class=cl><span class=w> </span><span class=n>postgres</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=n>t</span><span class=w>        </span><span class=o>|</span><span class=w> </span><span class=n>t</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>(</span><span class=mi>1</span><span class=err>개</span><span class=w> </span><span class=err>행</span><span class=p>)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>존재하는 유저는 postgres 뿐인데 테스트 명령에 왜 엉뚱한 사용자명이 나올까?</p><p>이 명령은 명시적으로 <code>-U</code> (user)를 지정하지 않았기 때문에 현재 로그인된 OS 사용자 이름을 PostgreSQL 클라이언트가 그대로 사용하려고 한다.</p><p>확실히 존재하는 postgres 유저로 테스트 명령을 실행하기 위해 <code>-U postgres</code>를 붙여주면 명확하게 <code>postgres</code> 유저로 접속 시도하게 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>psql -U postgres -d <span class=nb>test</span> -c <span class=s2>&#34;select inet_server_addr()&#34;</span>
+</span></span><span class=line><span class=cl>postgres 사용자의 암호:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> inet_server_addr
+</span></span><span class=line><span class=cl>------------------
+</span></span><span class=line><span class=cl> ::1
+</span></span><span class=line><span class=cl><span class=o>(</span>1개 행<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>psql -U postgres -d <span class=nb>test</span> -c <span class=s2>&#34;select inet_server_port()&#34;</span>
+</span></span><span class=line><span class=cl>postgres 사용자의 암호:
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> inet_server_port
+</span></span><span class=line><span class=cl>------------------
+</span></span><span class=line><span class=cl>             <span class=m>5432</span>
+</span></span><span class=line><span class=cl><span class=o>(</span>1개 행<span class=o>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=postgresql-설치>PostgreSQL 설치</h3><p><a class=link href=https://www.postgresql.org/download/ target=_blank rel=noopener>PostgreSQL 공식 다운로드</a> Download 페이지에서 운영체제에 맞게 선택 후 다운로드</p><p>나는 지금 시점 끈따끈따한 17.4 선택.</p><h4 id=0welcome>0.Welcome</h4><p>설치 파일을 실행하면 환영해준다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설정 - PostgreSQL
+</span></span><span class=line><span class=cl>Setup - PostgreSQL
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># PostgreSQL 설치 마법사에 오신 것을 환영합니다.
+</span></span><span class=line><span class=cl>Welcome to the PostgreSQL Setup Wizard.
+</span></span></code></pre></td></tr></table></div></div><h4 id=1installation-directory>1.Installation Directory</h4><p>설치할 경로를 선택한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># PostgreSQL이 설치될 디렉토리를 지정해 주세요.
+</span></span><span class=line><span class=cl>Please specify the directory where PostgreSQL will be installed.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치 디렉토리 [경로 인풋] [경로 선택 버튼]
+</span></span><span class=line><span class=cl>Installation Directory [C:\Program Files\PostgreSQL\17] [choose path button]
+</span></span></code></pre></td></tr></table></div></div><h4 id=2select-components>2.Select Components</h4><p>설치 항목을 선택하라고 한다.</p><ul><li>PostgreSQL Server<ul><li>PostgreSQL database server</li><li>PostgreSQL 데이터베이스 서버</li></ul></li><li>pgAdmin4<ul><li>pgAdmin4는 PostgreSQL 데이터베이스와 서버를 관리하고 사용하기 위한 그래픽 인터페이스입니다.</li><li>pgAdmin4 is a graphical interface for managing and working with PostgreSQL databases and servers.</li></ul></li><li>Stack Builder<ul><li>Stack Builder는 PostgreSQL 설치를 보완하기 위해 추가 도구, 드라이버 및 애플리케이션을 다운로드하고 설치하는 데 사용할 수 있습니다.</li><li>Stack Builder may be used to download and install additional tools, drivers and applications to complement your PostgreSQL installation</li></ul></li><li>Command Line tools<ul><li>이 옵션은 libpq, ecpg, pg_basebackup, pg_dump, pg_estore, pg_bench 등과 같은 명령줄 도구와 클라이언트 라이브러리를 설치합니다. 명령줄 도구는 PostgreSQL 데이터베이스 서버 또는 pgAdmin4를 설치할 때 필요한 옵션입니다.</li><li>This option installs command line tools and client libraries such as libpq, ecpg, pg_basebackup, pg_dump, pg_restore,pg_bench and more. The command line tools are a required option when installing the PostgreSQL Database Server or pgAdmin4.</li></ul></li></ul><p>간단히 필요한 것만 선택. 귀찮으면 다 선택된 상태로 Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 구성 요소 선택
+</span></span><span class=line><span class=cl>Select Components
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치할 구성 요소를 선택합니다: 설치하지 않을 구성 요소를 지웁니다.
+</span></span><span class=line><span class=cl>Select the components you want to install: clear the components you do not want to install.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 계속할 준비가 되면 다음을 클릭합니다
+</span></span><span class=line><span class=cl>Click Next when you are ready to continue
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>- [x] PostgreSQL Server
+</span></span><span class=line><span class=cl>- [ ] pgAdmin4
+</span></span><span class=line><span class=cl>- [ ] Stack Builder
+</span></span><span class=line><span class=cl>- [x] Command Line Tools
+</span></span></code></pre></td></tr></table></div></div><h4 id=3data-directory>3.Data Directory</h4><p>Data 경로를 설정한다.
+특별히 다른 경로 지정할 필요가 없는 관계로 기본 경로 그대로 설치한다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 데이터 디렉토리
+</span></span><span class=line><span class=cl>Data Directory
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 데이터를 저장할 디렉토리를 선택해 주세요.
+</span></span><span class=line><span class=cl>Please select a directory under which to store your data.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 데이터 디렉토리 [경로 인풋] [경로 선택 버튼]
+</span></span><span class=line><span class=cl>Data Directory [C:\Program Files\PostgreSQL\17\data] [choose path button]
+</span></span></code></pre></td></tr></table></div></div><h4 id=4password>4.Password</h4><p>데이터베이스 슈퍼사용자(postgres)의 비밀번호를 설정한다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 비밀번호
+</span></span><span class=line><span class=cl>Password
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 데이터베이스 슈퍼사용자(postgres)의 비밀번호를 입력해 주세요.
+</span></span><span class=line><span class=cl>Please provide a password for the database superuser (postgres).
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 비밀번호 [비밀번호 입력 인풋]
+</span></span><span class=line><span class=cl>Password [type your password]
+</span></span><span class=line><span class=cl># 비밀번호 재입력 [비밀번호 입력 인풋]
+</span></span><span class=line><span class=cl>Retype password [type your password]
+</span></span></code></pre></td></tr></table></div></div><h4 id=5port>5.Port</h4><p>포트를 설정한다.
+특별히 변경할 필요 없어서 기본 포트로 사용. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 포트
+</span></span><span class=line><span class=cl>Port
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 서버가 수신해야 할 포트 번호를 선택해 주세요.
+</span></span><span class=line><span class=cl>Please select the port number the server should listen on.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 포트 [포트 입력 인풋]
+</span></span><span class=line><span class=cl>Port [5432]
+</span></span></code></pre></td></tr></table></div></div><h4 id=6advanced-options>6.Advanced Options</h4><p>Locale 설정 시 <code>DEFAULT</code> 값이 기본으로 설정되어 있을텐데 본인이 사용하고 있는 <strong>운영체제의 시스템 로케일</strong>을 그대로 사용하게 된다.</p><p>한국어 Windows 기준으로는 <code>Korean_Korea.949</code>로 설정되고 한국어 macOS 기준으로는 <code>ko_KR.UTF-8</code>로 설정된다.
+이는 PostgreSQL에서 한글 정렬이나 <code>LIKE</code> 검색 시 예기치 않은 동작을 유발할 수 있다.</p><p>AWS와 같은 클라우드 플랫폼을 사용해 배포를 진행하는 경우 실제 서버 운영 환경 배제할 수는 없다.
+Linux 기반의 서버, AWS RDS, Docker 컨테이너 등에서는 <code>en_US.UTF-8</code> Locale을 사용하는 점을 고려하자.</p><p>나중에 서버 배포 하고 맞출 때 인코딩 불상사를 보고 싶지 않으면 미리 맞추는 게 좋고,
+이미 만들어진 데이터베이스의 로케일은 <strong>변경할 수 없고</strong>, <strong>새 클러스터를 만들거나 데이터베이스를 새로 생성</strong>해야 한다.</p><p>잘 선택한 후 Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 고급 옵션 설정
+</span></span><span class=line><span class=cl>Advanced Options
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 새 데이터베이스 클러스터에서 사용할 지역을 선택합니다.
+</span></span><span class=line><span class=cl>Select the locale to be used by the new database cluster.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 지역 [지역 선택 드롭다운]
+</span></span><span class=line><span class=cl>Locale [en-US]
+</span></span></code></pre></td></tr></table></div></div><h4 id=7pre-installation-summary>7.Pre Installation Summary</h4><p>위 단계에서 선택한 설치 옵션의 요약 정보를 보여준다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치 전 요약
+</span></span><span class=line><span class=cl>Pre Installation Summary
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 다음 설정이 설치에 사용됩니다
+</span></span><span class=line><span class=cl>The following settings will be used for the installation
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Installation Directory: C:\Program Files\PostgreSQL\17
+</span></span><span class=line><span class=cl>Server Installation Directory: C:\Program Files\PostgreSQL\17
+</span></span><span class=line><span class=cl>Data Directory: C:\Program Files\PostgreSQL\17\data
+</span></span><span class=line><span class=cl>Database Port: 5432
+</span></span><span class=line><span class=cl>Database Superuser: postgres
+</span></span><span class=line><span class=cl>Operating System Account: NT AUTHORITY\NetworkService
+</span></span><span class=line><span class=cl>Database Service: postgresql-x64-17
+</span></span><span class=line><span class=cl>Command Line Tools Installation Directory: C:\Program Files\PostgreSQL\17
+</span></span><span class=line><span class=cl>Installation Log: C:\Users\&lt;UserName&gt;\AppData\Local\Temp\install-postgresql.log
+</span></span></code></pre></td></tr></table></div></div><h4 id=8ready-to-install>8.Ready to Install</h4><p>요약 정보를 확인하고 이상이 없는지 확인 한 번 더 해준다. Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치 준비 완료
+</span></span><span class=line><span class=cl>Ready to Install
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 이제 컴퓨터에 PostgreSQL 설치를 시작할 준비가 되었습니다.
+</span></span><span class=line><span class=cl>Setup is now ready to begin installing PostgreSQL on your computer.
+</span></span></code></pre></td></tr></table></div></div><h4 id=9installing>9.Installing</h4><p>설치 진행 바를 확인하며 기다리면 완료된다. 약 10초 내외 (성능 따라 다를 듯)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치
+</span></span><span class=line><span class=cl>Installing
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치 프로그램이 컴퓨터에 PostgreSQL을 설치하는 동안 잠시 기다려 주세요
+</span></span><span class=line><span class=cl>Please wait while Setup installs PostgreSQL on your computer
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 설치 중...
+</span></span><span class=line><span class=cl>installing...
+</span></span><span class=line><span class=cl>[설치 진행 상태바]
+</span></span></code></pre></td></tr></table></div></div><h4 id=10completing>10.Completing</h4><p>10단계에서 완료 화면을 볼 수 있다.
+만약 구성 요소 선택에서 다른 옵션을 더 체크했다면 별도의 추가 작업이 있다.
+근데 이건 설치 이후에도 추가할 수 있는 부분이니까 별도로 추가하면 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Setup]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># PostgreSQL 설치 마법사 완료
+</span></span><span class=line><span class=cl>Completing the PostgreSQL Setup Wizard
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 컴퓨터에 PostgreSQL 설치가 완료되었습니다.
+</span></span><span class=line><span class=cl>Setup has finished installing PostgreSQL on your computer.
+</span></span></code></pre></td></tr></table></div></div><h3 id=postgresql-삭제>PostgreSQL 삭제</h3><p><code>제어판 > 프로그램 및 기능</code>에서 설치한 PostgreSQL 버전 삭제를 누르면 Setup 팝업이 뜬다.
+<code>Entire application</code> 또는 <code>individual components</code> 중 선택하고 Click Next</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Uninstallation mode]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 전체 애플리케이션 또는 개별 구성 요소를 제거하시겠습니까?
+</span></span><span class=line><span class=cl>Do you want to uninstall entire application or individual components?
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 전체 애플리케이션
+</span></span><span class=line><span class=cl>- [ ] Entire application
+</span></span><span class=line><span class=cl># 전체 애플리케이션과 애플리케이션에 설치된 모든 파일을 제거합니다
+</span></span><span class=line><span class=cl>Removes entire application and all files installed by the application
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 개별 구성 요소
+</span></span><span class=line><span class=cl>- [ ] individual components
+</span></span><span class=line><span class=cl># 개별 구성 요소를 제거하고 나머지 애플리케이션은 설치된 상태로 유지합니다
+</span></span><span class=line><span class=cl>Removes individual components while leaving the rest of application installed
+</span></span></code></pre></td></tr></table></div></div><p>삭제 진행 프로그레스를 지나고 경고가 있을 수 있다.
+<code>data\log</code> 파일을 보고 있었고 등등 다른 프로그램에서 사용 중이라서 발생한 것 같다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Warning]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>The data directory (C:\\Program Files\PostgreSQL\&lt;version&gt;\data) has not been removed
+</span></span></code></pre></td></tr></table></div></div><p>그래도 삭제 완료는 된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Info]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Uninstallation completed
+</span></span></code></pre></td></tr></table></div></div><p>PostgreSQL 설치 경로 <code>C:\\Program Files\PostgreSQL</code>에서 폴더도 깔끔히 삭제해준다.
+PostgreSQL 관련 시스템 환경 변수를 등록했었다면 찾아서 삭제한다.</p><p>재부팅 끗-⭐.</p><h2 id=endnote>⚙️EndNote</h2><h3 id=참고-자료>참고 자료</h3><ul><li><a class=link href=https://wikidocs.net/book/8814 target=_blank rel=noopener>PostgreSQL을 여행하는 입문자를 위한 안내서</a></li></ul></section><footer class=article-footer><div style=margin-top:2rem;text-align:center><a href=https://www.buymeacoffee.com/b9f1 target=_blank><img src=https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png alt="Buy Me A Coffee" style=height:60px!important;width:217px!important></a></div><section class=article-tags><a href=/tags/devlog/>Devlog</a>
+<a href=/tags/postgresql/>PostgreSQL</a>
+<a href=/tags/psql/>Psql</a>
+<a href=/tags/db/>DB</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=[".main-article",".widget--toc"];e.forEach(e=>{const t=document.querySelector(e);t&&renderMathInElement(t,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/2025-06-15-db-transaction-four-principles-acid/><div class=article-details><h2 class=article-title>ACID</h2></div></a></article><article><a href=/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/><div class=article-details><h2 class=article-title>역정규화, 언제 그리고 왜 사용하는가?</h2></div></a></article><article><a href=/p/2025-06-02-db-sql-differences-between-ddl-and-dml/><div class=article-details><h2 class=article-title>DDL VS DML</h2></div></a></article><article><a href=/p/2025-06-27-wsl-using-psql/><div class=article-details><h2 class=article-title>WSL에서 PSQL 사용하기</h2></div></a></article><article><a href=/p/2025-06-15-db-what-happens-when-transaction-isolation-collapses/><div class=article-details><h2 class=article-title>트랜잭션 격리성 - Isolation</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=nine-j/nine-j.github.io data-repo-id=R_kgDOOqUgZw data-category=General data-category-id=DIC_kwDOOqUgZ84CqLyQ data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"noborder_gray")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2026 B9F1</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

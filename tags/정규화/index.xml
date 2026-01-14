@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>정규화 on B9F1</title><link>https://blog.b9f1.com/tags/%EC%A0%95%EA%B7%9C%ED%99%94/</link><description>Recent content in 정규화 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 02 Jun 2025 08:57:20 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EC%A0%95%EA%B7%9C%ED%99%94/index.xml" rel="self" type="application/rss+xml"/><item><title>역정규화, 언제 그리고 왜 사용하는가?</title><link>https://blog.b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</link><pubDate>Mon, 02 Jun 2025 08:57:20 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;데이터베이스 정규화는 이상 현상을 방지하고 데이터 일관성을 보장하기 위한 핵심 원칙이다.&lt;/p&gt;
+&lt;p&gt;그러나 실전에서는 정규화된 모델이 항상 최고의 선택은 아니다.
+자세한 내용은 다음에 다뤄보고 이번엔 &lt;strong&gt;역정규화(Denormalization)&lt;/strong&gt; 가 필요하게 되는 상황과, 이를 적용할 때의 고려사항 및 장단점을 간단한 사례와 함께 살펴본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="정규화와-현실의-간극"&gt;정규화와 현실의 간극
+&lt;/h3&gt;&lt;p&gt;정규화는 테이블 간 중복을 줄이고 무결성을 유지하기 위한 훌륭한 이론이다.
+하지만 현실에서는 다음과 같은 상황에서 정규화된 모델이 병목이 되기도 한다.&lt;/p&gt;
+&lt;h4 id="역정규화가-필요한-대표적인-상황"&gt;역정규화가 필요한 대표적인 상황
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;복잡한 조인이 빈번하게 발생하는 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 게시판 목록을 조회할 때 게시글, 작성자, 댓글 수 등 여러 테이블을 조인해야 하는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;실시간 조회 성능이 중요한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;OLTP 시스템 또는 사용자 피드, 홈화면 로딩 등 수 ms 단위 응답이 필요한 상황&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;읽기 비율이 매우 높은 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;쓰기보다 읽기가 훨씬 많고, 동일한 데이터를 반복 조회하는 경우 캐싱 효과를 극대화하기 위해 역정규화를 적용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;집계 데이터가 자주 필요한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;주문 총액, 리뷰 수, 좋아요 수 등 매번 COUNT, SUM을 하지 않고 별도로 저장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="역정규화-적용-시-고려사항"&gt;역정규화 적용 시 고려사항
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;고려 내용&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 정합성&lt;/td&gt;
+&lt;td&gt;중복된 컬럼이 여러 테이블에 있을 경우, 변경 시 일관성 유지가 어려움&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;유지보수 복잡도&lt;/td&gt;
+&lt;td&gt;역정규화된 필드는 직접 관리하거나 트리거, 애플리케이션 로직으로 동기화해야 함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;성능 이점&lt;/td&gt;
+&lt;td&gt;조회 속도와 쿼리 단순화에는 확실한 효과가 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 증가&lt;/td&gt;
+&lt;td&gt;중복 데이터로 인해 테이블 크기가 커질 수 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;→ &lt;strong&gt;결국, ‘성능’과 ‘정합성’ 사이의 균형&lt;/strong&gt;을 고려하여 설계해야 한다.&lt;/p&gt;
+&lt;h3 id="장단점-비교"&gt;장단점 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;장점&lt;/th&gt;
+&lt;th&gt;단점&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;- 조인 최소화로 인한 속도 향상 &lt;br&gt;- 쿼리 복잡도 감소 &lt;br&gt;- 집계 데이터 미리 보관 가능&lt;/td&gt;
+&lt;td&gt;- 데이터 정합성 문제 가능성 &lt;br&gt;- 유지보수 로직 증가 &lt;br&gt;- 중복 데이터로 저장 공간 낭비&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실무에서의-팁"&gt;실무에서의 팁
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정규화된 모델로 먼저 설계하고&lt;/strong&gt;, 필요한 곳에만 역정규화한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;집계용 컬럼은 write-through 방식&lt;/strong&gt;으로 관리하거나, 이벤트 기반 비동기 처리도 고려한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Redis, ElasticSearch와 같은 서브 시스템&lt;/strong&gt;으로 조회 성능을 분산시키는 것도 대안이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;“모든 데이터베이스는 처음엔 정규화로 시작하고, 결국엔 역정규화로 최적화된다.”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;정규화와 역정규화는 대립이 아닌 균형의 문제다.
+목적에 맞는 데이터 구조 설계가 진짜 실력이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;제1정규형~제3정규형 이해&lt;/li&gt;
+&lt;li&gt;기본 SQL 조인과 인덱스 작동 방식&lt;/li&gt;
+&lt;li&gt;데이터베이스 성능 튜닝 기초&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://martinfowler.com/books/refactoringDatabases.html" target="_blank" rel="noopener"
+&gt;Martin Fowler - Refactoring Databases&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;PostgreSQL Performance Tuning&lt;/li&gt;
+&lt;li&gt;CQRS (Command Query Responsibility Segregation) 아키텍처&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

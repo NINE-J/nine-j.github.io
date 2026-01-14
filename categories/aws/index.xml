@@ -1,0 +1,1018 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AWS on B9F1</title><link>https://blog.b9f1.com/categories/aws/</link><description>Recent content in AWS on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 23 Jun 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/categories/aws/index.xml" rel="self" type="application/rss+xml"/><item><title>AWS 배포 클래식</title><link>https://blog.b9f1.com/p/2025-06-23-aws-ec2-and-rds-classic-springboot-with-postgresql/</link><pubDate>Mon, 23 Jun 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-23-aws-ec2-and-rds-classic-springboot-with-postgresql/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot + PostgreSQL 앱을 AWS에 배포해 보려고 한다.
+보안에 주의해야 할 부분들을 고려하면서 진행해 보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ec2-인스턴스-생성"&gt;EC2 인스턴스 생성
+&lt;/h3&gt;&lt;p&gt;Spring Boot 실행하기 위해 EC2를 사용한다.&lt;/p&gt;
+&lt;h4 id="이름-및-태그"&gt;이름 및 태그
+&lt;/h4&gt;&lt;p&gt;원하는 서버 이름으로 설정한다.&lt;/p&gt;
+&lt;h4 id="애플리케이션-및-os-이미지amazon-machine-image"&gt;애플리케이션 및 OS 이미지(Amazon Machine Image)
+&lt;/h4&gt;&lt;p&gt;옵션이 다양해서 필요에 맞게 설정한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AMI: Amazon Linux 또는 Ubuntu
+&lt;ul&gt;
+&lt;li&gt;이번엔 Ubuntu 22.04 LTS&lt;/li&gt;
+&lt;li&gt;64비트(x86)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인스턴스 유형: &lt;code&gt;t2.micro&lt;/code&gt; FreeTier 사용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="키-페어"&gt;키 페어
+&lt;/h4&gt;&lt;p&gt;키 페어 생성:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.pem&lt;/code&gt; 파일 다운로드 (SSH 접속용)&lt;/li&gt;
+&lt;li&gt;생성 시 다운로드 되는 파일 보관&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="네트워크-설정"&gt;네트워크 설정
+&lt;/h4&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;테스트에만 사용하고 운영 시에는 특정 IP 또는 CloudFront, ALB 등으로 제한해야 한다.
+특히 사용하지 않을 땐 아예 보안 그룹에서 제거하고 필요할 때 다시 구성해서 사용하는 것이 좋다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;대부분 자동 설정이고 원격 접속을 위해 SSH 설정&lt;/p&gt;
+&lt;p&gt;SSH 트래픽 허용:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;현재 필요에 맞게 내 ip만 허용 또는 위치 무관 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;추후 보안 그룹 탭에서 변경 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스토리지-구성"&gt;스토리지 구성
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;프리 티어를 사용할 수 있는 고객은 최대 30GB의 EBS 범용(SSD)또는 마그네틱 스토리지를 사용할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;스토리지까지 설정했다면 인스턴스 생성을 클릭해서 인스턴스 생성&lt;/p&gt;
+&lt;h4 id="보안-그룹-수정"&gt;보안 그룹 수정
+&lt;/h4&gt;&lt;p&gt;AWS에서 제공하는 방화벽 인바운드, 아웃바운드 규칙이 존재한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;인바운드(Inbound): 외부에서 &lt;code&gt;EC2&lt;/code&gt;, &lt;code&gt;RDS&lt;/code&gt; 등의 내부로 접근할 때 사용되는 방화벽 규칙&lt;/li&gt;
+&lt;li&gt;아웃바운드(Outbound): &lt;code&gt;EC2&lt;/code&gt;, &lt;code&gt;RDS&lt;/code&gt; 등의 내부에서 외부로 접근할 때 사용되는 방화벽 규칙&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;EC2 &amp;gt; 네트워크 및 보안 &amp;gt; 보안 그룹&lt;/code&gt;으로 이동해서 보안 그룹 설정.
+인스턴스 생성 시 설정했던 일부 보안 그룹을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;생성 시 구성된 것 외에 필요에 맞게 보안 그룹 생성을 눌러 새로운 보안 그룹을 생성하고 구성한다.&lt;/p&gt;
+&lt;h5 id="인바운드-규칙"&gt;인바운드 규칙
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;인바운드 규칙1:
+&lt;ul&gt;
+&lt;li&gt;유형: 사용자 지정 TCP&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 8080&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: Spring Boot&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙2:
+&lt;ul&gt;
+&lt;li&gt;유형: SSH&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 22&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: SSH 연결&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙3:
+&lt;ul&gt;
+&lt;li&gt;유형: HTTP&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 80&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: HTTP 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙4:
+&lt;ul&gt;
+&lt;li&gt;유형: HTTPS&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 443&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: HTTPS 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="인스턴스에-보안-그룹-적용"&gt;인스턴스에 보안 그룹 적용
+&lt;/h4&gt;&lt;p&gt;인스턴스 &amp;gt; 작업 &amp;gt; 보안 &amp;gt; 보안 그룹 변경 화면으로 이동해서&lt;/p&gt;
+&lt;p&gt;생성했던 보안 그룹 추가 후 저장&lt;/p&gt;
+&lt;h4 id="인스턴스-연결"&gt;인스턴스 연결
+&lt;/h4&gt;&lt;p&gt;예를 들어 아래와 같은 명령으로 SSH 클라이언트에서 접속 시도할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -i &lt;span class="s2"&gt;&amp;#34;sshKey.pem&amp;#34;&lt;/span&gt; ubuntu@ec1-2-34-56-789.ap-northeast-1.compute.amazonaws.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 연결 시 서버 정보 출력 예시&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Welcome to Ubuntu 22.04.5 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux 6.8.0-1029-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Documentation: https://help.ubuntu.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Management: https://landscape.canonical.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Support: https://ubuntu.com/pro
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; System information as of Mon Jun &lt;span class="m"&gt;23&lt;/span&gt; 04:47:28 UTC &lt;span class="m"&gt;2025&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; System load: 0.08 Processes: &lt;span class="m"&gt;101&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Usage of /: 5.8% of 28.89GB Users logged in: &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Memory usage: 20% IPv4 address &lt;span class="k"&gt;for&lt;/span&gt; eth0: 172.31.39.182
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Swap usage: 0%
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Ubuntu Pro delivers the most comprehensive open &lt;span class="nb"&gt;source&lt;/span&gt; security and
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; compliance features.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; https://ubuntu.com/aws/pro
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Expanded Security Maintenance &lt;span class="k"&gt;for&lt;/span&gt; Applications is not enabled.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="m"&gt;0&lt;/span&gt; updates can be applied immediately.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Enable ESM Apps to receive additional future security updates.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;See https://ubuntu.com/esm or run: sudo pro status
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;The list of available updates is more than a week old.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;To check &lt;span class="k"&gt;for&lt;/span&gt; new updates run: sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;The programs included with the Ubuntu system are free software&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;the exact distribution terms &lt;span class="k"&gt;for&lt;/span&gt; each program are described in the
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;individual files in /usr/share/doc/*/copyright.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;applicable law.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;To run a &lt;span class="nb"&gt;command&lt;/span&gt; as administrator &lt;span class="o"&gt;(&lt;/span&gt;user &lt;span class="s2"&gt;&amp;#34;root&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;, use &lt;span class="s2"&gt;&amp;#34;sudo &amp;lt;command&amp;gt;&amp;#34;&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;See &lt;span class="s2"&gt;&amp;#34;man sudo_root&amp;#34;&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; details.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="어떻게-배포하는-게-적절할까"&gt;어떻게 배포하는 게 적절할까?
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;추천 방법&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;빠른 실험, 개인 개발, MVP&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;JAR 수동 업로드&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;팀 개발, 협업, 배포 자동화 예정&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;GitHub 클론 → 빌드 → 실행&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CI/CD (CodeDeploy, GitHub Actions 등) 준비&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;GitHub 기반&lt;/strong&gt;이 장기적으로 효율&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="rds에-postgresql-생성"&gt;RDS에 PostgreSQL 생성
+&lt;/h3&gt;&lt;p&gt;RDS &amp;gt; 데이터베이스 생성 화면에서 진행한다.&lt;/p&gt;
+&lt;h4 id="rds-생성-시-주의-사항"&gt;RDS 생성 시 주의 사항
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;엔진: PostgreSQL&lt;/li&gt;
+&lt;li&gt;인증 정보: 사용자명, 비밀번호 설정&lt;/li&gt;
+&lt;li&gt;퍼블릭 액세스: 비활성화&lt;/li&gt;
+&lt;li&gt;보안 그룹: EC2 인스턴스의 보안 그룹만 허용하도록 설정`&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="데이터베이스-생성-방식-선택"&gt;데이터베이스 생성 방식 선택
+&lt;/h4&gt;&lt;p&gt;표준 생성 또는 손쉬운 생성 선택&lt;/p&gt;
+&lt;h4 id="엔진-옵션"&gt;엔진 옵션
+&lt;/h4&gt;&lt;p&gt;엔진 유형:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Aurora(MySQL Compatible)&lt;/li&gt;
+&lt;li&gt;Aurora(PostgreSQL Compatible)&lt;/li&gt;
+&lt;li&gt;MySQL&lt;/li&gt;
+&lt;li&gt;PostgreSQL&lt;/li&gt;
+&lt;li&gt;MariaDB&lt;/li&gt;
+&lt;li&gt;Oracle&lt;/li&gt;
+&lt;li&gt;Microsoft SQL Server&lt;/li&gt;
+&lt;li&gt;IBM Db2
+엔진 버전:&lt;/li&gt;
+&lt;li&gt;다중 AZ DB 클러스터를 지원하는 버전만 표시(토글)&lt;/li&gt;
+&lt;li&gt;엔진 버전: PostgreSQL 17.4-R1&lt;/li&gt;
+&lt;li&gt;RDS 확장 지원 활성화(체크)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="템플릿"&gt;템플릿
+&lt;/h4&gt;&lt;p&gt;템플릿 선택:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;프로덕션&lt;/li&gt;
+&lt;li&gt;개발/테스트&lt;/li&gt;
+&lt;li&gt;프리 티어&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="가용성-및-내구성"&gt;가용성 및 내구성
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;사용 사례에 필요한 가용성과 내구성을 제공하는 배포 옵션을 선택하세요. AWS는 선택한 배포 옵션에 따라 일정 수준의 가동 시간을 제공하기 위해 최선을 다하고 있습니다. &lt;a class="link" href="https://aws.amazon.com/rds/sla" target="_blank" rel="noopener"
+&gt;Amazon RDS SLA(서비스 수준 계약)에 포함되지 않습니다.&lt;/a&gt; .에서 자세히 알아보세요.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;배포 옵션:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;다중 AZ DB 클러스터 배포(인스턴스 3개)&lt;/li&gt;
+&lt;li&gt;다중 AZ DB 인스턴스 배포(인스턴스 2개)&lt;/li&gt;
+&lt;li&gt;단일 AZ DB 인스턴스 배포(인스턴스 1개)
+&lt;ul&gt;
+&lt;li&gt;템플릿 프리 티어의 경우 1개만 선택 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="설정"&gt;설정
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;DB 인스턴스 식별자
+&lt;ul&gt;
+&lt;li&gt;DB 인스턴스 이름을 입력. 이름은 현재 AWS 리전에서 AWS 계정이 소유하는 모든 DB 인스턴스에 대해 고유해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자격 증명 설정
+&lt;ul&gt;
+&lt;li&gt;마스터 사용자 이름: DB 인스턴스의 마스터 사용자에 로그인 ID를 입력&lt;/li&gt;
+&lt;li&gt;자격 증명 관리: AWS Secrets Manager를 사용하거나 마스터 사용자 자격 증명을 관리할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;AWS Secrets Manager에서 관리 - _가장 뛰어난 안정성_RDS는 자동으로 암호를 생성하고 AWS Secrets Manager를 사용하여 전체 수명 주기 동안 암호를 관리한다.&lt;/li&gt;
+&lt;li&gt;자체 관리사용자가 암호를 생성하거나 RDS에서 암호를 생성하고 사용자가 관리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;암호 자동 생성(체크): Amazon RDS에서 자동으로 암호를 생성하거나 사용자가 직접 암호를 지정할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;마스터 암호, 마스터 암호 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="인스턴스-구성"&gt;인스턴스 구성
+&lt;/h4&gt;&lt;p&gt;DB 인스턴스 구성 옵션은 위에서 선택한 엔진에서 지원하는 옵션으로 제한된다.&lt;/p&gt;
+&lt;p&gt;DB 인스턴스 클래스(라디오):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;스탠다드 클래스(m 클래스 포함)&lt;/li&gt;
+&lt;li&gt;메모리 최적화 클래스(r 및 x 클래스 포함)&lt;/li&gt;
+&lt;li&gt;버스터블 클래스(t 클래스 포함)
+&lt;ul&gt;
+&lt;li&gt;db.t4g.micro&lt;/li&gt;
+&lt;li&gt;2 vCPUs, 1 GiB RAM, 네트워크: 최대 2,085Mbps&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스토리지"&gt;스토리지
+&lt;/h4&gt;&lt;p&gt;스토리지 유형:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;범용 SSD(gp2): 볼륨 크기에 따라 기준 성능 설정&lt;/li&gt;
+&lt;li&gt;범용 SSD(gp3): 스토리지와 독립적으로 성능 조정&lt;/li&gt;
+&lt;li&gt;프로비저닝된 IOPS SSD(io1): I/O 프로비저닝 유연성&lt;/li&gt;
+&lt;li&gt;프로비저닝된 IOPS SSD(io2): 지연 시간에 짧고 내구성이 뛰어나며 I/O 집약적인 스토리지&lt;/li&gt;
+&lt;li&gt;마그네틱: 최대 1,000 IOPS로 제한됨(권장되지 않음)
+할당된 스토리지&lt;/li&gt;
+&lt;li&gt;얼만큼의 용량을 할당할 것인지 입력&lt;/li&gt;
+&lt;li&gt;할당된 스토리지 값은 20GiB~6,144GiB여야 한다.&lt;/li&gt;
+&lt;li&gt;이후 필요에 따라 추가 스토리지 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="나머지-설정"&gt;나머지 설정
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;EC2 컴퓨팅 리소스에 연결, EC2 인스턴스 선택 등&lt;/li&gt;
+&lt;li&gt;데이터베이스 인증 방식 선택&lt;/li&gt;
+&lt;li&gt;모니터링 설정&lt;/li&gt;
+&lt;li&gt;추가 구성 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;필요에 맞게 구성을 설정한 후 데이터베이스 생성&lt;/p&gt;
+&lt;h3 id="ec2-연결-후-설치-및-설정"&gt;EC2 연결 후 설치 및 설정
+&lt;/h3&gt;&lt;h4 id="db-설정"&gt;DB 설정
+&lt;/h4&gt;&lt;p&gt;먼저 EC2에 접속한 상태에서 PostgreSQL 클라이언트를 설치하고, &lt;code&gt;postgres&lt;/code&gt; 사용자로 접속한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. PostgreSQL 클라이언트 설치 (Ubuntu 기준)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install postgresql-client -y
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. RDS에 접속&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;psql -h your-rds-endpoint.rds.amazonaws.com -U postgres -d postgres
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 비밀번호 입력하라고 나옴&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 비밀번호는 RDS 생성 시 설정한 `postgres` 사용자 비번&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;연결에 성공하면 앱 실행을 테스트를 위해 DB, Schema, 사용자를 생성한다.&lt;/p&gt;
+&lt;p&gt;DDL 스크립트를 작성한 sql 파일을 EC2에 배치한 뒤 psql 명령으로 테이블을 생성한다.&lt;/p&gt;
+&lt;h4 id="java-설치"&gt;Java 설치
+&lt;/h4&gt;&lt;p&gt;OpenLogic OpenJDK 17으로 프로젝트 테스트를 했지만 굳이 불필요하다면 openjdk-17-jdk로 충분하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. 패키지 업데이트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. OpenJDK 17 설치 (기본은 OpenJDK, OpenLogic은 따로 설치)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install openjdk-17-jdk -y
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 설치 후 터미널에서 설정 화면이 나타나는데 필요에 맞게 spacebar로 선택 후 enter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 3. 버전 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="빠르게-수동-테스트"&gt;빠르게 수동 테스트
+&lt;/h3&gt;&lt;p&gt;간단하고 빠른 확인을 위해 빌드 후 수동 업로드로 테스트해본다.&lt;/p&gt;
+&lt;h5 id="jar-빌드"&gt;JAR 빌드
+&lt;/h5&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;빌드 전 RDS 인스턴스를 생성하고 DB 설정을 마무리한 후 그 정보로 &lt;code&gt;application-prod.yaml&lt;/code&gt;을 구성한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;./gradlew bootJar
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 ./mvnw package&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="ec2로-전송"&gt;EC2로 전송
+&lt;/h5&gt;&lt;p&gt;ssh 원격 접속 프로토콜을 기반으로 한 SecureCopy(scp)의 약자.
+원격지에 있는 파일과 디렉터리를 보내거나 가져올 때 사용하는 파일 전송 프로토콜&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;로컬에서
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 경로 `~`는 `/home/ubuntu`를 의미한다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp -i &lt;span class="s2"&gt;&amp;#34;sshKey.pem&amp;#34;&lt;/span&gt; build/libs/app.jar ubuntu@ec1-2-34-56-789.ap-northeast-1.compute.amazonaws.com:~
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;이후 EC2 내부에서 실행하는데 실행 시 프로파일 지정
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -jar app.jar --spring.profiles.active&lt;span class="o"&gt;=&lt;/span&gt;prod
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 정상 실행 후 올라오는 주소 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# http://[퍼블릭IP]:8080&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;80 포트로 바로 실행하는 경우 1024 아래의 포트라서 ubuntu에서 권한 관련 오류를 만날 수 있다.
+Nginx를 사용해서 80 포트 접속 시 8080 포트의 사이트를 연결할 수 있도록 포트 포워딩 설정하는 방식이 안전할 수 있다. 필요에 따라 고민해보자.&lt;/p&gt;
+&lt;h3 id="보안-그룹-설정-확인"&gt;보안 그룹 설정 확인
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;리소스&lt;/th&gt;
+&lt;th&gt;포트&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;EC2&lt;/td&gt;
+&lt;td&gt;8080&lt;/td&gt;
+&lt;td&gt;외부에서 접속 가능해야 함 (브라우저 확인용)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RDS&lt;/td&gt;
+&lt;td&gt;5432&lt;/td&gt;
+&lt;td&gt;EC2 보안 그룹에서만 접근 허용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="웹-접속-테스트"&gt;웹 접속 테스트
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;http://[EC2 퍼블릭 IP]:8080/&lt;/code&gt; 또는 &lt;code&gt;http://[EC2 퍼블릭 IP]:80/&lt;/code&gt; 주소로 접속 테스트
+Spring Boot 앱이 정상 작동하면 성공!&lt;/p&gt;
+&lt;h3 id="dbeaver-클라이언트-테스트-선택"&gt;DBeaver 클라이언트 테스트 (선택)
+&lt;/h3&gt;&lt;p&gt;RDS에서 퍼블릭 접속을 허용하지 않도록 설정했기 때문에 SSH 터널링을 통해 클라이언트 연결을 시도해야 한다.&lt;/p&gt;
+&lt;p&gt;별도 설정이 필요했던 부분만 정리한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새로운 연결 생성 &amp;gt; Main 탭
+&lt;ul&gt;
+&lt;li&gt;EC2 입장에서 로컬 접속할 수 있게 설정한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SSH 탭
+&lt;ul&gt;
+&lt;li&gt;Use SSH 터널 체크&lt;/li&gt;
+&lt;li&gt;Settings 섹션
+&lt;ul&gt;
+&lt;li&gt;Host/IP: EC2 엔드포인트, Port: 22&lt;/li&gt;
+&lt;li&gt;User Name: EC2 생성 시 User&lt;/li&gt;
+&lt;li&gt;Authentication Method: Public Key&lt;/li&gt;
+&lt;li&gt;Private Key: 생성 시 발급 받은 &lt;code&gt;*.pem&lt;/code&gt; 선택&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Advanced settings 섹션
+&lt;ul&gt;
+&lt;li&gt;Remote host: RDS DB 엔드포인트, Remote Port: 5432&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="다음-단계-선택"&gt;다음 단계 (선택)
+&lt;/h3&gt;&lt;p&gt;필요한 경우 아래와 같은 설정으로 더 효율적인 운영 구조를 만들 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EC2에서 systemd로 백그라운드 실행 설정&lt;/li&gt;
+&lt;li&gt;PostgreSQL 보안 최적화&lt;/li&gt;
+&lt;li&gt;Route53 + HTTPS 연결&lt;/li&gt;
+&lt;li&gt;CloudWatch 로그 연결&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;보안성과 실용성을 모두 갖춘 Spring Boot + PostgreSQL의 AWS 수동 배포 구조를 성공적으로 구현했다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;퍼블릭 IP를 열지 않고도 EC2 내부에서 RDS를 안전하게 연결하고, 외부에서는 HTTP/Nginx로만 접근 가능한 구조를 통해 실무에서도 적용 가능한 배포 경험을 확보했다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;실습 기반의 배포 경험은 인프라 지식과 보안 개념까지 익힐 수 있는 좋은 기회였다.&lt;/li&gt;
+&lt;li&gt;Spring Boot 애플리케이션을 EC2에 안전하게 배포하고, RDS 연결 및 DB 초기 설정까지 포함한 완전한 구성 흐름을 경험했다.&lt;/li&gt;
+&lt;li&gt;추후 systemd 등록, TLS 인증서 추가, CI/CD 적용까지 이어질 수 있는 확장 가능한 구성이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS EC2, RDS의 기본 개념&lt;/li&gt;
+&lt;li&gt;SSH 키 기반 원격 접속&lt;/li&gt;
+&lt;li&gt;Spring Boot JAR 빌드 및 실행 방식&lt;/li&gt;
+&lt;li&gt;PostgreSQL 기초 쿼리 및 사용자 권한 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/ec2/" target="_blank" rel="noopener"
+&gt;Amazon EC2 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/rds/" target="_blank" rel="noopener"
+&gt;Amazon RDS 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html" target="_blank" rel="noopener"
+&gt;Spring Boot 배포 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Nginx 리버스 프록시 설정&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://dbeaver.io/" target="_blank" rel="noopener"
+&gt;DBeaver 공식 사이트&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;SSH 터널링 개념&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>IAM 사용자로 AWS 관리</title><link>https://blog.b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</link><pubDate>Sun, 22 Jun 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;AWS를 간단히 사용할 땐 Root 계정 하나로 로그인하고 필요한 것만 확인하고 참 편하긴 편하다.
+하지만 몇 번의 프로젝트를 통해 Root 계정은 절대 일상적으로 써선 안 된다는 걸 온몸으로 배웠다.&lt;/p&gt;
+&lt;p&gt;Root 계정과 IAM 사용자 권한의 차이 그리고 왜 IAM 사용자로 운영하는 게 Best Practice인지에 대해 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="root-계정은-일상적으로-사용하지-마라"&gt;Root 계정은 일상적으로 사용하지 마라
+&lt;/h3&gt;&lt;p&gt;AWS 문서에는 다음과 같이 적혀 있다.&lt;/p&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;“We strongly recommend that you don&amp;rsquo;t use the root user for your everyday tasks” &lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html" target="_blank" rel="noopener"
+&gt;docs.aws.amazon.com+8docs.aws.amazon.com+8docs.aws.amazon.com+8&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Root 계정은 결제 수단 변경, 계정 설정 수정, Support 플랜 변경 등 &lt;strong&gt;IAM으로는 불가능한 민감 작업을 수행&lt;/strong&gt;할 수 있기 때문에 AWS는 &lt;strong&gt;MFA 설정, 자동화 억제, 긴급 상황에서만 사용&lt;/strong&gt;하도록 권장한다.&lt;/p&gt;
+&lt;h3 id="iam-사용자로-운영하는-이유"&gt;IAM 사용자로 운영하는 이유
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안 강화&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;IAM 사용자는 권한을 세분화할 수 있어 최소 권한 원칙 구현 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;역할 분리&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인프라 운영, 결제 조회, 개발자 접근 등을 구분해서 관리 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;추적과 감사&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;누가 어떤 리소스를 언제 썼는지 CloudTrail로 기록 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;팀 확장 대응&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실습 → 팀 운영 → 기업 운영까지 유연하게 확장 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용/결제 보호&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실수로 비싼 리소스를 생성하는 것 방지 가능 (예: GPU EC2, RDS Multi-AZ)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="iam-사용자-권한-관리-방법"&gt;IAM 사용자 권한 관리 방법
+&lt;/h3&gt;&lt;p&gt;처음엔 복잡할 수 있지만 차근차근 순서대로 진행하면서 IAM 사용자를 분리해서 관리해보면 안정감이 느껴지고 권한에 대해 이해할 수 있게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;루트 계정으로 로그인&lt;/li&gt;
+&lt;li&gt;사용자 그룹 생성, IAM 사용자 생성 → 콘솔 접근 허용 + MFA 설정&lt;/li&gt;
+&lt;li&gt;역할에 따라 다음과 같이 그룹화하는 것을 권장. 조직에서 정하는 방식으로 진행하면 된다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;BillingViewerGroup&lt;/code&gt; - 결제 정보만 조회&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;InfraAdminGroup&lt;/code&gt; - EC2, RDS 등 자원 생성/삭제&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReadOnlyGroup&lt;/code&gt; - 전체 리소스 조회만 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;정책은 AWS에서 제공하는 관리형 정책부터 시작&lt;/li&gt;
+&lt;li&gt;필요 시 커스텀 정책 작성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="root-계정에만-있는-특수-작업"&gt;Root 계정에만 있는 특수 작업
+&lt;/h3&gt;&lt;p&gt;평소 작업엔 IAM으로 권한을 분리하여 최소 권한 원칙을 지키며 사용해야겠지만 특수한 경우는 어쩔 수 없이 Root 계정으로 로그인해야 할 것이다.&lt;/p&gt;
+&lt;p&gt;Root 계정 로그인 시 단일 인증이 아닌 멀티 인증 방식도 제공하는 것 같다.
+즉 2명 이상의 인증을 통해 로그인을 허용한다.&lt;/p&gt;
+&lt;p&gt;AWS에 따르면 Root 계정만 수행 가능한 작업은 다음과 같다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Activate IAM Access&lt;/code&gt;: IAM 사용자에게 Billing 콘솔 접근 활성화&lt;/li&gt;
+&lt;li&gt;루트 이메일 주소 및 결제 방식 변경&lt;/li&gt;
+&lt;li&gt;루트 계정 비밀번호 또는 액세스 키 재설정&lt;/li&gt;
+&lt;li&gt;AWS 계정 종료&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 작업은 Root 계정이 반드시 있어야만 할 수 있으므로 평시에는 IAM 기반 사용자/역할로 운영하고 Root는 긴급시에만 사용하는 구조가 안전하다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Root 계정은 금고 열쇠와 같다. 평소에는 꺼내지도 말아야 하며 AWS 운영은 IAM 사용자 기반으로 최소 권한 원칙을 엄수해야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;IAM 사용자 기반 운영은 번거로워 보여도 AWS에서 실수 없이 오래 살아남고 싶은 개발자라면 반드시 익숙해져야 할 &lt;strong&gt;안전장치&lt;/strong&gt;다.&lt;/p&gt;
+&lt;p&gt;AWS 문서들이 일관되게 강조하는 IAM 기반 안전 운영 방식을 실천해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="-사전-지식"&gt;### 사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS Root 계정과 IAM 사용자 구조 이해&lt;/li&gt;
+&lt;li&gt;기본적인 AWS Console UI 조작&lt;/li&gt;
+&lt;li&gt;AWS 관리형 정책 및 인라인 정책 개념&lt;/li&gt;
+&lt;li&gt;최소 권한 원칙(Least Privilege Principle)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener"
+&gt;IAM Best Practices (AWS 공식)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-example-policies.html" target="_blank" rel="noopener"
+&gt;AWS Billing 및 Cost Management 정책 예시&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/ko/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-lens-whitepapers.sort-order=desc&amp;amp;wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-guidance-whitepapers.sort-order=desc" target="_blank" rel="noopener"
+&gt;Well-Architected Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/free" target="_blank" rel="noopener"
+&gt;AWS Free Tier 안내&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS</title><link>https://blog.b9f1.com/p/2025-06-20-aws-what-is-amazon-web-services/</link><pubDate>Fri, 20 Jun 2025 16:47:07 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-20-aws-what-is-amazon-web-services/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&amp;ldquo;AWS란 무엇인가&amp;rdquo; 묻고 또 묻는 것 같은데 이해하고 넘어가는 건 개발자, 기업, 비즈니스 의사 결정자 모두에게 중요한 출발점이다.
+AWS(Amazon Web Services)의 개념, 주요 서비스 그리고 그것이 가져다주는 실질적인 가치에 대해 알아 보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="aws란"&gt;AWS란?
+&lt;/h3&gt;&lt;p&gt;AWS는 Amazon이 제공하는 클라우드 컴퓨팅 서비스 플랫폼으로 인터넷을 통해 온디맨드 방식으로 컴퓨팅 파워, 데이터베이스 스토리지, 컨텐츠 전송 등 IT 리소스를 제공하는 서비스다.&lt;/p&gt;
+&lt;p&gt;개발자는 서버를 설치하고 운영하는 번거로움 없이 애플리케이션 개발과 서비스 운영에 집중할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;온디맨드(On-demand): 수요자가 요청하는 시점에 맞춰 즉시 서비스를 제공하는 방식&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="aws의-핵심-구성-요소"&gt;AWS의 핵심 구성 요소
+&lt;/h3&gt;&lt;p&gt;AWS는 수많은 서비스를 제공하지만 대표적인 주요 구성 요소를 보면 다음과 같다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구성 요소&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;EC2&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;가상 서버 인스턴스를 생성하고 관리할 수 있는 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;S3&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;파일 저장용 객체 스토리지 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;RDS&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;관리형 관계형 데이터베이스 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;VPC&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;사용자 전용 가상 네트워크를 구성하는 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;IAM&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;사용자 및 권한 관리를 위한 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;CloudWatch&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;모니터링 및 로깅 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;CloudFormation&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인프라를 코드로 관리할 수 있게 해주는 템플릿 기반 리소스 생성 도구&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="aws의-장점"&gt;AWS의 장점
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;확장성: 서비스 수요에 따라 리소스를 유연하게 확장 또는 축소할 수 있다.&lt;/li&gt;
+&lt;li&gt;비용 효율성: 사용한 만큼만 비용을 지불하는 &lt;code&gt;pay-as-you-go&lt;/code&gt; 모델을 제공한다.&lt;/li&gt;
+&lt;li&gt;신뢰성 및 안정성: 전 세계에 걸쳐 있는 AWS 리전과 가용 영역을 통해 고가용성을 보장한다.&lt;/li&gt;
+&lt;li&gt;자동화 및 배포: CodeDeploy, Elastic Beanstalk, App Runner 등 다양한 자동 배포 서비스를 제공한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="codedeploy"&gt;CodeDeploy
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;CI/CD를 직접 구축하고 배포 전략을 세밀하게 제어하고 싶을 때 사용&lt;/li&gt;
+&lt;li&gt;EC2, ECS에 직접 배포하고 싶을 때 사용&lt;/li&gt;
+&lt;li&gt;애플리케이션 코드를 EC2, Lambda, 온프레미스 서버에 자동으로 배포해주는 서비스&lt;/li&gt;
+&lt;li&gt;배포 전략(Blue/Green, In-place)을 지원하며 배포 중 오류가 나면 자동 롤백도 가능&lt;/li&gt;
+&lt;li&gt;CI/CD 파이프라인 구성에 자주 사용됨
+&lt;ul&gt;
+&lt;li&gt;CodePipeline과 함께 쓰면 강력&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;코드 배포 자체에만 집중한 서비스
+&lt;ul&gt;
+&lt;li&gt;서버 관리 인프라는 직접&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="elastic-beanstalk"&gt;Elastic Beanstalk
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;서버는 직접 쓰고 싶지만 너무 번거로운 건 피하고 싶을 때 사용&lt;/li&gt;
+&lt;li&gt;익숙한 환경에서 빠르게 배포해보고 싶은 스타트업이나 팀에서 고려해보면 좋음&lt;/li&gt;
+&lt;li&gt;애플리케이션만 업로드하면 나머지 인프라 생성부터 배포, 스케일링까지 AWS가 자동으로 해주는 PaaS (Platform as a Service)&lt;/li&gt;
+&lt;li&gt;Java, Node.js, Python, PHP 등 다양한 플랫폼 지원&lt;/li&gt;
+&lt;li&gt;EC2, RDS, Load Balancer 등 구성 요소를 AWS가 자동으로 설정해줌&lt;/li&gt;
+&lt;li&gt;인프라는 자동화되지만 필요 시 EC2 설정 같은 부분도 커스터마이징 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="app-runner"&gt;App Runner
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;빠르게 실서비스를 만들고 싶은 스타트업, 혹은 테스트 서비스 등&lt;/li&gt;
+&lt;li&gt;인프라를 신경쓰고 싶지 않은 프론트엔드 또는 백엔드&lt;/li&gt;
+&lt;li&gt;소스 코드(GitHub) 또는 컨테이너 이미지(ECR)만 연결하면 자동으로 웹 서비스를 만들어주는 완전 관리형 서비스
+&lt;ul&gt;
+&lt;li&gt;서버? 인프라? 걱정할 필요가 없음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;서버리스 개념: EC2, Load Balancer, Auto Scaling 등은 AWS가 전부 관리&lt;/li&gt;
+&lt;li&gt;CI/CD 자동화 가능(커밋하면 자동 배포)&lt;/li&gt;
+&lt;li&gt;기본적인 웹 서비스 운영에만 집중 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="세-가지-요약-비교"&gt;세 가지 요약 비교
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;CodeDeploy&lt;/th&gt;
+&lt;th&gt;Elastic Beanstalk&lt;/th&gt;
+&lt;th&gt;App Runner&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;배포 대상&lt;/td&gt;
+&lt;td&gt;EC2, ECS, Lambda 등&lt;/td&gt;
+&lt;td&gt;EC2 기반 웹 앱&lt;/td&gt;
+&lt;td&gt;웹 애플리케이션&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인프라 관리&lt;/td&gt;
+&lt;td&gt;직접 설정&lt;/td&gt;
+&lt;td&gt;자동 설정, 필요 시 조정 가능&lt;/td&gt;
+&lt;td&gt;전부 AWS가 관리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;배포 전략&lt;/td&gt;
+&lt;td&gt;세밀한 전략 설정 가능&lt;/td&gt;
+&lt;td&gt;기본 배포&lt;/td&gt;
+&lt;td&gt;자동 CI/CD 지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;서버 접근&lt;/td&gt;
+&lt;td&gt;가능&lt;/td&gt;
+&lt;td&gt;가능&lt;/td&gt;
+&lt;td&gt;불가능 (서버리스)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;난이도&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;td&gt;중간&lt;/td&gt;
+&lt;td&gt;가장 쉬움&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;추천 대상&lt;/td&gt;
+&lt;td&gt;DevOps 팀, 대규모 운영&lt;/td&gt;
+&lt;td&gt;빠른 배포 &amp;amp; 커스터마이징&lt;/td&gt;
+&lt;td&gt;빠르게 서비스 만들어보고 싶은 개발자&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="현실적인-과금과-보안-걱정"&gt;현실적인 과금과 보안 걱정
+&lt;/h3&gt;&lt;h4 id="무료로도-충분하다"&gt;무료로도 충분하다
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;실습용이라면 &lt;code&gt;t2.micro&lt;/code&gt; 또는 &lt;code&gt;t3.micro&lt;/code&gt;, &lt;code&gt;RDS free tier&lt;/code&gt;, &lt;code&gt;S3&lt;/code&gt; 5GB 이하로만 사용해도 충분히 연습 가능&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;무료 티어(Free Tier)를 활용하면 대부분의 AWS 주요 서비스를 12개월간 또는 영구적으로 무료 사용이 가능하다.&lt;/li&gt;
+&lt;li&gt;실수로 과금될까 봐 불안하다면
+&lt;ul&gt;
+&lt;li&gt;과금 알립(AWS Budgets)을 설정해서 월 예산을 초과하면 이메일/SMS로 알림&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;개발 중인 테스트 환경은 반드시 종료(terminate) 또는 자동 중지 스케줄 설정하는 습관이 중요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="기본만-지켜도-안전하다"&gt;기본만 지켜도 안전하다
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;AWS는 기본적으로 보안 책임을 공유하는 구조 (Shared Responsibility Model)
+물리적인 데이터센터 보안은 AWS가, 계정, 데이터, 접근 제어 등은 사용자가 책임진다.
+하지만 AWS가 제공하는 도구와 정책을 잘 활용하면 훨씬 쉽게 보안을 유지할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;AWS는 세계 최고 수준의 보안 인프라를 갖추고 있다.&lt;/li&gt;
+&lt;li&gt;다만, 사용자가 기본 설정을 잘못하면 보안 이슈가 생기기 쉽다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="필수-보안-수칙-3가지"&gt;필수 보안 수칙 3가지
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;IAM Root 계정으로 로그인 금지&lt;/li&gt;
+&lt;li&gt;사용자 계정을 만들어 &lt;code&gt;MFA(이중 인증)&lt;/code&gt; 설정&lt;/li&gt;
+&lt;li&gt;퍼블릭 액세스 차단
+&lt;ul&gt;
+&lt;li&gt;S3 버킷, EC2 보안 그룹 설정 확인 (기본적으로 열려 있음)&lt;/li&gt;
+&lt;li&gt;CloudTrail, GuardDuty 활성화
+&lt;ul&gt;
+&lt;li&gt;보안 로그 기록과 이상 탐지를 자동화&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;“AWS는 단순한 서버 호스팅이 아니라, 개발자의 속도를 높이고 비즈니스의 확장을 돕는 ‘기술 기반 비즈니스 플랫폼’이다.”&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이제 클라우드는 선택이 아니라 기본이다.&lt;br&gt;
+여전히 각자의 방식이 있고, 로컬 서버나 온프레미스 환경이 필요한 곳도 존재하지만, AWS를 이해하는 것은 ‘현대적인 개발 생태계의 공통 언어’를 배우는 것과 같다.&lt;/p&gt;
+&lt;p&gt;배포 속도, 안정성, 확장성, 자동화…
+우리가 제품을 만들 때 부딪히는 거의 모든 인프라 문제를 AWS는 일정 수준 이상 해결해준다.
+결국 중요한 건 사용자에게 더 나은 경험을 더 빠르게 전달하는 것이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;기본적인 웹 서비스 구조에 대한 이해 (클라이언트–서버 구조)&lt;/li&gt;
+&lt;li&gt;HTTP, 데이터베이스, 파일 저장소 등에 대한 기초 지식&lt;/li&gt;
+&lt;li&gt;IaaS, PaaS, SaaS 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com" target="_blank" rel="noopener"
+&gt;AWS 공식 홈페이지&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/architecture/well-architected" target="_blank" rel="noopener"
+&gt;AWS Well-Architected Framework 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/free" target="_blank" rel="noopener"
+&gt;AWS 무료 티어 소개&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html" target="_blank" rel="noopener"
+&gt;AWS 과금 예측 및 관리 - Cost Explorer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/compliance/shared-responsibility-model" target="_blank" rel="noopener"
+&gt;AWS 보안 책임 모델 보기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/apprunner" target="_blank" rel="noopener"
+&gt;App Runner Developer Guide&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS 배포 기초</title><link>https://blog.b9f1.com/p/2025-06-16-aws-to-deploy-springboot-and-rdb/</link><pubDate>Mon, 16 Jun 2025 17:00:28 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-16-aws-to-deploy-springboot-and-rdb/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;AWS에 배포하려면 반드시 알아야 할 기초적인 개념과 구성 요소들을 간단히 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="aws-인프라-기초-개념"&gt;AWS 인프라 기초 개념
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;EC2&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;AWS의 가상 서버. Spring Boot 애플리케이션을 직접 배포할 수 있음.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;RDS&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;AWS에서 제공하는 관리형 관계형 데이터베이스 서비스. MySQL, PostgreSQL 등 선택 가능.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;S3&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;파일(정적 리소스, 로그 등) 저장용 버킷.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;VPC&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Virtual Private Cloud. 네트워크 설정 단위. EC2, RDS는 VPC 내에 배치됨.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;IAM&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;권한 관리. EC2, RDS에 접근 가능한 사용자/서비스 권한 설정.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Security Group&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;AWS 방화벽 설정. EC2, RDS 접근을 허용하는 IP/포트 지정.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="배포-순서별-필수-지식"&gt;배포 순서별 필수 지식
+&lt;/h3&gt;&lt;h4 id="1spring-boot-앱-배포-준비"&gt;1.Spring Boot 앱 배포 준비
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;빌드&lt;/strong&gt;: &lt;code&gt;./gradlew bootJar&lt;/code&gt; 또는 &lt;code&gt;mvn package&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;환경 분리&lt;/strong&gt;: &lt;code&gt;application.yml&lt;/code&gt; 혹은 &lt;code&gt;application-prod.yml&lt;/code&gt;로 외부 DB 설정&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;로깅/에러 처리&lt;/strong&gt;: EC2 상에서 로그를 확인할 수 있어야 함 (&lt;code&gt;/var/log&lt;/code&gt;, &lt;code&gt;nohup.out&lt;/code&gt;, etc.)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2ec2-인스턴스-생성"&gt;2.EC2 인스턴스 생성
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Amazon Linux 2&lt;/strong&gt; 또는 &lt;strong&gt;Ubuntu 22.04&lt;/strong&gt; 선택&lt;/li&gt;
+&lt;li&gt;포트 22(SSH), 8080(Spring 앱 포트) 열기&lt;/li&gt;
+&lt;li&gt;인바운드 규칙에 &lt;strong&gt;내 PC의 IP만 허용&lt;/strong&gt; (보안상 중요)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3ec2에-접속-및-배포"&gt;3.EC2에 접속 및 배포
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;scp&lt;/code&gt;로 JAR 파일 전송하거나, &lt;code&gt;git clone&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Java 설치 (&lt;code&gt;sudo yum install java-17&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;앱 실행: &lt;code&gt;java -jar your-app.jar&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;실행 확인: &lt;code&gt;curl localhost:8080&lt;/code&gt;, 또는 브라우저에서 접속&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="4rds-인스턴스-생성-및-연결"&gt;4.RDS 인스턴스 생성 및 연결
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;DB 엔진&lt;/strong&gt; 선택: PostgreSQL, MySQL 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;VPC/Subnet&lt;/strong&gt;, 보안 그룹 설정&lt;/li&gt;
+&lt;li&gt;인스턴스 생성 후 &lt;strong&gt;엔드포인트 + 포트 + 유저/비밀번호&lt;/strong&gt;를 Spring Boot &lt;code&gt;application.yml&lt;/code&gt;에 입력&lt;/li&gt;
+&lt;li&gt;DB 연결 확인: &lt;code&gt;psql&lt;/code&gt;, &lt;code&gt;mysql&lt;/code&gt; 등 CLI 도구 사용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="5배포-안정화-및-운영"&gt;5.배포 안정화 및 운영
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;EC2 재부팅 시 앱 자동 실행: &lt;code&gt;systemd&lt;/code&gt; 설정 또는 &lt;code&gt;cron&lt;/code&gt;, &lt;code&gt;nohup&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;로그 파일 분리: &lt;code&gt;logback&lt;/code&gt;, &lt;code&gt;log4j2&lt;/code&gt; 설정&lt;/li&gt;
+&lt;li&gt;AWS CloudWatch 연동하면 서버 상태 모니터링 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="반드시-체크해야-할-보안-요소"&gt;반드시 체크해야 할 보안 요소
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;보안 그룹&lt;/td&gt;
+&lt;td&gt;포트 제한 (22, 8080, 5432 등 최소화)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;DB 접근 제한&lt;/td&gt;
+&lt;td&gt;EC2의 private IP만 RDS 접근 허용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;.pem 키 관리&lt;/td&gt;
+&lt;td&gt;Git 업로드 절대 금지. 로컬에 안전하게 보관&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;환경변수 관리&lt;/td&gt;
+&lt;td&gt;DB 비밀번호는 코드에 하드코딩하지 말고 &lt;code&gt;.env&lt;/code&gt; 또는 AWS Parameter Store 사용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실무적으로-꼭-알아야-할-추가-지식"&gt;실무적으로 꼭 알아야 할 추가 지식
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;주제&lt;/th&gt;
+&lt;th&gt;이유&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Elastic IP&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;EC2 재시작 시 IP가 바뀌는 문제 방지&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Route53 + 도메인 연결&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;도메인 연결 시 설정&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;S3 + CloudFront&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;정적 리소스 캐싱/배포&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;CodeDeploy / CodePipeline&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;CI/CD 자동 배포 구성&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Parameter Store / Secrets Manager&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;민감 정보 안전하게 관리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;직접 생성해보며 확인해야 할 부분이 있지만 일단 간략한 개념부터 정리하고 알아봤다.&lt;/p&gt;
+&lt;h3 id="기초-체크리스트"&gt;기초 체크리스트
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;EC2 생성 및 SSH 접속&lt;/li&gt;
+&lt;li&gt;Spring Boot JAR 빌드 및 실행&lt;/li&gt;
+&lt;li&gt;RDS 생성 및 연결&lt;/li&gt;
+&lt;li&gt;포트 및 보안그룹 설정&lt;/li&gt;
+&lt;li&gt;로그 관리 및 서버 실행 유지&lt;/li&gt;
+&lt;li&gt;보안 설정 (환경변수, IP 제한 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;리눅스 CLI 명령어 (&lt;code&gt;scp&lt;/code&gt;, &lt;code&gt;chmod&lt;/code&gt;, &lt;code&gt;java&lt;/code&gt;, &lt;code&gt;systemctl&lt;/code&gt; 등)&lt;/li&gt;
+&lt;li&gt;Spring Boot 프로파일, 환경변수 구조&lt;/li&gt;
+&lt;li&gt;RDB 기본 설정 및 JDBC 연결 구조&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/whitepapers/overview-of-deployment-options-on-aws/" target="_blank" rel="noopener"
+&gt;Overview of Deployment Options on AWS (공식 백서)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/apprunner/latest/dg/" target="_blank" rel="noopener"
+&gt;AWS App Runner Developer Guide&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/architecture/well-architected/" target="_blank" rel="noopener"
+&gt;Well-Architected Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://spring.io/guides/gs/accessing-data-mysql/" target="_blank" rel="noopener"
+&gt;Spring Boot + RDS 가이드 (Spring 공식)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

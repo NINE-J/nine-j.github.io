@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>PARA on B9F1</title><link>https://blog.b9f1.com/tags/para/</link><description>Recent content in PARA on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 30 Dec 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/para/index.xml" rel="self" type="application/rss+xml"/><item><title>Zettelkasten x PARA</title><link>https://blog.b9f1.com/p/2025-12-30-the-zettelkasten-x-para/</link><pubDate>Tue, 30 Dec 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-12-30-the-zettelkasten-x-para/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;노트 정리를 꽤 만족스럽게 유지하고 있다고 생각했는데 저장소 관리와 배포 파이프라인을 점검하면서 Zettelkasten이라는 새로운 이론을 마주하게 됐다.&lt;/p&gt;
+&lt;p&gt;Zettelkasten이 뭐지? 메모 정리 방법? 상향식 사고? PARA도 정리법인데 어떤 차이가 있지?&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;Zettelkasten: 메모 상자 혹은 체텔카스텐/제텔카스텐은 연구와 공부를 하는 데 도움을 주는 지식 관리와 더불어 메모 작성 기법이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Spirited%20Away%20-%20Kamaji.png"
+loading="lazy"
+alt="센과 치히로의 행방불명 - 가마 할아범(보일러맨)"
+&gt;&lt;/p&gt;
+&lt;p&gt;키워드를 검색했을 때 많은 문서함이 쌓여있는 이미지를 보고 이 캐릭터가 떠오르지 않을 수 없었다. 어디에 뭐가 있는지 속속들이 알고 굉장한 속도로 원하는 것을 찾아낸다. 사실 그 보관함은 도구에 불과할 뿐 그 모든 걸 이해하고 다루는 본체가 중요하겠지만.&lt;/p&gt;
+&lt;p&gt;PARA 체계를 통해 관심사에 따라 정리하는 게 현재 내가 필요로 하는 것에 빠르게 접근할 수 있어서 만족스러웠다. 하지만 점점 노트의 양이 많아지면서 Area, Archive 영역이 점점 비대해졌다. 메모를 작성할 때 내가 어떤 생각을 하고 남겼는지 다시 찾을 수 없다면 그냥 용량 차지하는 쓰레기를 모아둔 것과 같다. 그럴 바엔 인터넷 검색으로 남들이 잘 정리해둔 글을 찾는 게 빠를 것이다.&lt;/p&gt;
+&lt;p&gt;넘치는 데이터는 통제할 수 없고 누구도 강요하지 않는다. 적어도 내 의지로 작성한 건 내 입맛대로 관리할 수 있어야 한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="쌓여가는-메모-왜-활용하지-못할까"&gt;쌓여가는 메모, 왜 활용하지 못할까?
+&lt;/h3&gt;&lt;p&gt;나의 소중한 Resource 폴더가 지식의 무덤이 되고 있는 안타까움에 주요한 사고방식부터 비교적 문제가 아닐 수도 있는 사소한 원인까지 다양하게 고민했다.&lt;/p&gt;
+&lt;p&gt;당장 해결해야 하는 원인만 중요도 순서로 정리해봤다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;지식 수집이 소화되지 않고 병목이 발생하는 Resource 포화 상태
+&lt;ul&gt;
+&lt;li&gt;계속해서 쏟아지는 지식을 그저 수집하기만 했던 기간의 Resource 영역은 너무나 정신 사나웠다. 부담이 됐고 빠르게 치워버리고 싶었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;하향식 사고
+&lt;ul&gt;
+&lt;li&gt;언제부턴가 시작하기 위해서 목표부터 정하고 그걸 해결하기 위한 계획을 세우는 것에 익숙해졌다. 그게 잘못된 건 아니지만 속도 있게 만족스러운 결과를 얻기 위한 방식에는 적절하지 않다는 생각이 들었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;내가 백링크를 제대로 활용하지 못한 것.
+&lt;ul&gt;
+&lt;li&gt;문서의 백링크는 중요하다. 옵시디언은 기본적으로 문서의 위치가 바뀌어도 링크를 유지해준다. 하지만 난 그 기능을 믿지 못해서 처음부터 백링크를 거의 사용하지 않았다.&lt;/li&gt;
+&lt;li&gt;이건 대안이 많다. 자연어 쿼리로 문서 검색, 연관 문서 Rating을 제공하는 Smart Connections 같은 플러그인도 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="관심-포화-지적-갈망"&gt;관심 포화, 지적 갈망
+&lt;/h4&gt;&lt;p&gt;지식 수집이 소화되지 않는 문제. 이거 아주 크다.
+욕심은 많아서 이것저것 담는데 그걸 소화하는가? 소화하지도 못하는 걸 다 담아서 스치듯 접하기만 한다고 내 것이 되는 게 아니다. 그저 지적 갈망일 뿐이다.&lt;/p&gt;
+&lt;p&gt;간단히 개발 관련 지식으로 예를 들어 보자.&lt;/p&gt;
+&lt;p&gt;요즘 메일 구독 서비스에서 자주 등장하는 서버 부하 테스트 포스팅을 여러 건 읽었다고 치자.&lt;/p&gt;
+&lt;p&gt;1단계. 이건 그저 읽은 거다. 접한 것이다. 포스팅이 삭제되거나 새로운 정보로 최신 기사가 덮이면 기억조차 못한다.&lt;/p&gt;
+&lt;p&gt;2단계. 그걸 읽고 AI에게 질문하여 이해까지 했다. 이건 이해만 한 것이고 오히려 더 위험하다.
+이해했다고 착각하는 순간 뇌는 리소스를 소모하면서 기억할 가치가 없다고 판단하며 다시 사용할 때까지 보류된다. 그 과정에서 잊혀진다.&lt;/p&gt;
+&lt;p&gt;3단계. 서버 부하 테스트에 필요한 세팅을 구성하고 다양한 시나리오를 적용해 한정된 환경에서 부하 테스트를 완료한 뒤 기록하는 과정을 거치고 트레이드오프와 더 현실적인 테스트 방식까지 고민해본다. 이건 내 것이다. 어떻게 뺏어갈 수 있나? 이미 내가 다 해봤는데.&lt;/p&gt;
+&lt;p&gt;뛰어난 환경에서의 경험과 재능까지 모두 놓고 1, 2단계로도 충분하다고 집요하게 따진다면 본인에게 효율적인 그 방식을 선택하기 바란다.&lt;/p&gt;
+&lt;p&gt;하지만 지금 간략한 예시로 관심 포화, 지적 갈망의 위험성은 충분히 설명된 것 같다.&lt;/p&gt;
+&lt;h4 id="하향식-사고에서-상향식-사고로-전환"&gt;하향식 사고에서 상향식 사고로 전환
+&lt;/h4&gt;&lt;p&gt;절대 하향식 사고가 잘못된 것이 아니다. 이건 사람마다 성향 차이가 있을 뿐이다.
+심지어 시간이 지남에 따라 본인의 성향이 달라질 수도 있을 것이다. 본인에게 잘 맞는 방식으로 지식 관리가 이루어진다면 더 큰 시너지를 기대할 수 있을 것이다.&lt;/p&gt;
+&lt;p&gt;현재의 나로서는 목표부터 정하고 그 구조에 맞게 하향식으로 설계하는 건 반대의 경우보다 어렵다. 두 가지 모두 장단점이 확실하고 어느 한 쪽으로 치우치기 쉽다.&lt;/p&gt;
+&lt;p&gt;예를 들어 내가 선호하는 방식이다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;우선 관심이 생기면 시작한다.&lt;/li&gt;
+&lt;li&gt;나의 한계에 부딪히며 더 나은 방식을 탐색하고 탐구한다.&lt;/li&gt;
+&lt;li&gt;지금 내 상황보다 나아진다면 만사형통이다.&lt;/li&gt;
+&lt;li&gt;목표를 계속해서 바꿀 수 있다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;반대로 누군가의 요청에 의해 또는 스스로 하향식 사고로 설계한다면 다음과 같다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;목표를 정해야 한다. 그 목표에 대한 정보를 수집해야 한다.&lt;/li&gt;
+&lt;li&gt;목표 실현 계획을 세우기 위해 정보를 수집해야 한다.&lt;/li&gt;
+&lt;li&gt;계속해서 더 나은 방식이 나를 유혹한다. 지식의 늪에 빠져 방향을 잡기 어렵다.&lt;/li&gt;
+&lt;li&gt;고민하는 동안 더 많은 해결책이 제시되고 아직 계획을 세우고 있다.&lt;/li&gt;
+&lt;li&gt;안정적인 계획 안에서 유연하게 플랜을 조정할 수 있다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이 두 가지 프로세스를 나열해 보면서 하향식 구조는 역설적이게도 이미 체계가 잡힌 전문가나, 갈피를 잡지 못하는 초보자에게만 유용한 양극단의 도구처럼 느껴졌다.&lt;/p&gt;
+&lt;p&gt;상향식은 &amp;ldquo;어?&amp;ldquo;에서 시작한다. 이게 뭐지? 왜? 좋은가? 사실 계획하지 않은 것들은 시간을 허비할 확률이 크다. 반대로 시도할 생각도 않다가 더 큰 수확이 생기기도 한다. 무계획도 계획이다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;[세컨드 브레인은 옵시디언 중에서]&lt;/p&gt;
+&lt;p&gt;삶에서 대부분의 지식 활동은 커리큘럼을 따르는 것처럼 하향식으로 이루어지지 않습니다. 반대로 우연, 창발, 귀납이 큰 부분을 차지하죠. 코끼리를 볼 수 없어도 부분 부분 더듬어 가며 코끼리의 전체 생김새를 추측하듯 우리는 세상을 상향식으로 배우고 깨닫습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;내가 중요하게 생각한 건 &amp;ldquo;나에게 무엇이 남는가?&amp;rdquo; 그게 중요하다.&lt;/p&gt;
+&lt;p&gt;개개인의 열정은 무한하다. 언제든 다시 채워지고 얼마든 땡겨 쓸 수 있다고 생각한다. 하지만 &amp;lsquo;번아웃&amp;rsquo;이란 단어 하나가 이 믿음을 무색하게 만들기도 한다.&lt;/p&gt;
+&lt;p&gt;노력 없이 얻었지만 가장 귀하며 한정적 재화인 시간과 노력으로 얻어야 하지만 무한한 열정을 잘 조율해서 본인이 아름답게 사용하도록 하자.&lt;/p&gt;
+&lt;h3 id="완벽주의와-수집벽의-충돌"&gt;완벽주의와 수집벽의 충돌
+&lt;/h3&gt;&lt;p&gt;PARA 정리의 쾌감, Zettelkasten 문득 떠오른 아이디어부터 확장하는 재미. 두 마리 토끼를 한 번에 잡지 못하는 이유는 과도한 디테일과 수집벽에 있다.&lt;/p&gt;
+&lt;p&gt;하나의 Masterpiece를 만들어서 링크로 연결하는 게 아니다. 아주 사소한 메모로 시작해서 링크가 이어지고 링크와 링크를 통해 완전해지는 것이다.&lt;/p&gt;
+&lt;p&gt;접하고, 더듬고, 상상하고, 이해하고, 실행하고, 기록하고, 체득하고, 떠올리고, 어지르며 내 것으로 만들자.&lt;/p&gt;
+&lt;p&gt;평생을 바쳐 &amp;lsquo;단 하나의 걸작&amp;rsquo;을 갈망했지만, 결국 완성된 그림이 아닌 치열했던 고뇌의 흔적이 예술로 남게 된 사례는 예술사에서 매우 비극적이기도 하지만 낭만적인 테마로 꼽힌다. 나만의 방식으로 나아가자.&lt;/p&gt;
+&lt;h3 id="이제-무엇부터-시작할까"&gt;이제 무엇부터 시작할까?
+&lt;/h3&gt;&lt;p&gt;생각보다 매우 간단하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;날것의 생각을 담는 안전한 공간 마련
+&lt;ul&gt;
+&lt;li&gt;Draft, Sandbox, Moonshot 등 내가 마음껏 어지를 수 있는 공간을 만든다.
+&lt;ul&gt;
+&lt;li&gt;Draft - 과정의 유연함: 초안, 시안 등으로 언제든 다시 수정될 수 있는 의미로 사용된다.&lt;/li&gt;
+&lt;li&gt;Sandbox - 안전한 실험: 아이들이 노는 공간인 놀이터 바닥을 의미하며 놀다가 크게 다치지 않도록 마련된 푹신한 모래 바닥을 의미한다.&lt;/li&gt;
+&lt;li&gt;Moonshot - 확장된 가능성: &amp;lsquo;달을 향해 로켓을 쏘아 올린다&amp;rsquo;는 뜻으로 단순히 조금 더 나은 개선이 아니라 거대하고 불가능해 보이는 목표에 도전하는 것&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;PARA 안에서 관리해도 되고 최상위에 생성하는 것도 좋다. 이걸 고민하는 것 자체가 이 시스템을 이해하지 못한 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&amp;lsquo;나의 언어&amp;rsquo;로 요약하여 PARA에서 관리
+&lt;ul&gt;
+&lt;li&gt;모국어와 외국어를 구분하는 게 아니라 내가 빠르게 이해할 수 있는 &amp;lsquo;나의 언어&amp;rsquo;가 중요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Data view, Smart Connections 등 나의 문서를 DB로 활용하고 메모를 손쉽게 연결하자.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;필터와 연결을 통해 끊임 없이 나의 메모가 나에게 신호를 줄 수 있도록 하자. 도서관이 아닌 생태계를 만들자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;지식 관리는 완성된 결과물을 모으는 것이 아니라 불완전한 생각들이 서로 부딪히며 성장하는 생태계를 가꾸는 과정이다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;이 메모가 나중에 나에게 어떤 가치를 줄 것인가?&amp;rdquo; 질문해 보자. 어디 내놓기도 부끄러운 생각이 모여서 계속해서 부끄러움을 유지한다면 성장하지 못한 결과고 그것대로 받아들여야 한다.&lt;/p&gt;
+&lt;p&gt;어떤 방향으로든 움직여야 잘못된 방향인 것도 알 수 있고 다시 방향을 잡을 수 있다고 생각한다.&lt;/p&gt;</description></item></channel></rss>

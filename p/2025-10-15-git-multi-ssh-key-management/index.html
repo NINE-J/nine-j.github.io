@@ -1,0 +1,254 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Git/Linux/WSL 환경별 대응"><title>Git 멀티 SSH 키 관리</title><link rel=canonical href=https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/><link rel=stylesheet href=/scss/style.min.091d376ab5dee4238ab92c7f42e66ea0d97debe6d5a1f9c3e1e7121f544025d2.css><meta property='og:title' content="Git 멀티 SSH 키 관리"><meta property='og:description' content="Git/Linux/WSL 환경별 대응"><meta property='og:url' content='https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/'><meta property='og:site_name' content='B9F1'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='devlog'><meta property='article:tag' content='SSH'><meta property='article:tag' content='SSH-Key'><meta property='article:tag' content='Git'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='멀티계정'><meta property='article:tag' content='Linux'><meta property='article:tag' content='WSL'><meta property='article:tag' content='Dev-Container'><meta property='article:tag' content='Docker'><meta property='article:tag' content='권한-설정'><meta property='article:tag' content='VersionControl'><meta property='article:tag' content='Infra'><meta property='article:tag' content='DevOps'><meta property='article:published_time' content='2025-10-15T18:30:33+09:00'><meta property='article:modified_time' content='2025-10-15T18:30:33+09:00'><meta name=twitter:title content="Git 멀티 SSH 키 관리"><meta name=twitter:description content="Git/Linux/WSL 환경별 대응"><link rel="shortcut icon" href=/favicon.svg><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023370172872685" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-MG17SX24X0"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-MG17SX24X0")</script><script data-name=BMC-Widget data-cfasync=false src=https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js data-id=b9f1 data-description="Support me on Buy me a coffee!" data-message="👋 Glad to meet you.Buy me a coffee? 😊" data-color=#5F7FFF data-position=Right data-x_margin=18 data-y_margin=18></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_e091ceea98743e00.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🤌</span></figure><div class=site-meta><h1 class=site-name><a href=/>B9F1</a></h1><h2 class=site-description>Nine's Devlog</h2></div></header><ol class=menu-social><li><a href=https://github.com/NINE-J target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://stackoverflow.com/users/17334807/nine target=_blank title=StackOverflow rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-stackoverflow"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><path d="M8 16h8"/><path d="M8.322 12.582l7.956.836"/><path d="M8.787 9.168l7.826 1.664"/><path d="M10.096 5.764l7.608 2.472"/></svg></a></li><li><a href=mailto:rnwo47@gmail.com target=_blank title=ZMail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/toys/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Toys</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#개요>📌개요</a></li><li><a href=#내용>📌내용</a><ol><li><a href=#ssh-키-구성-예시>SSH 키 구성 예시</a><ol><li><a href=#ssh-키-파일들>SSH 키 파일들</a></li><li><a href=#ssh-config-설정-sshconfig>SSH Config 설정 (<code>~/.ssh/config</code>)</a></li></ol></li><li><a href=#사용-방법>사용 방법</a><ol><li><a href=#1-기본-사용>1. 기본 사용</a></li><li><a href=#2-명시적-개인-계정-사용>2. 명시적 개인 계정 사용</a></li><li><a href=#3-회사-계정-사용>3. 회사 계정 사용</a></li></ol></li><li><a href=#새로운-계정키-추가-방법>새로운 계정/키 추가 방법</a><ol><li><a href=#1-새-ssh-키-생성>1. 새 SSH 키 생성</a></li><li><a href=#2-ssh-config에-설정-추가>2. SSH Config에 설정 추가</a></li><li><a href=#3-github에-공개-키-등록>3. GitHub에 공개 키 등록</a></li><li><a href=#4-사용>4. 사용</a></li></ol></li><li><a href=#ssh-연결-테스트>SSH 연결 테스트</a></li><li><a href=#프로젝트별-설정-확인>프로젝트별 설정 확인</a></li><li><a href=#권한-설정>권한 설정</a><ol><li><a href=#권한-설정이-필요한-환경>권한 설정이 필요한 환경</a></li><li><a href=#windows-vs-unixlinux-차이점>Windows vs Unix/Linux 차이점</a></li><li><a href=#windows에서-ssh-사용하기>Windows에서 SSH 사용하기</a></li></ol></li><li><a href=#macos-darwin>macOS: Darwin</a><ol><li><a href=#ssh가-권한을-엄격하게-요구하는-이유-unixlinux>SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)</a></li><li><a href=#올바른-권한-설정>올바른 권한 설정</a></li><li><a href=#권한-확인>권한 확인</a></li></ol></li><li><a href=#문제-해결>문제 해결</a><ol><li><a href=#권한-오류-해결>권한 오류 해결</a></li><li><a href=#ssh-키가-인식되지-않는-경우>SSH 키가 인식되지 않는 경우</a></li><li><a href=#잘못된-키-사용>잘못된 키 사용</a></li></ol></li><li><a href=#예시-프로젝트-설정>예시 프로젝트 설정</a></li><li><a href=#확장-계획>확장 계획</a></li><li><a href=#현재-구성-검증>현재 구성 검증</a></li></ol></li><li><a href=#결론>🎯결론</a></li><li><a href=#endnote>⚙️EndNote</a><ol><li><a href=#사전-지식>사전 지식</a></li><li><a href=#더-알아보기>더 알아보기</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/versioncontrol/>VersionControl</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025-10-15-git-multi-ssh-key-management/>Git 멀티 SSH 키 관리</a></h2><h3 class=article-subtitle>Git/Linux/WSL 환경별 대응</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-10-15T18:30:33+09:00>2025년 10월 15일</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><h2 id=개요>📌개요</h2><p>PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.</p><h2 id=내용>📌내용</h2><h3 id=ssh-키-구성-예시>SSH 키 구성 예시</h3><h4 id=ssh-키-파일들>SSH 키 파일들</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>~/.ssh/
+</span></span><span class=line><span class=cl>├── id_ed25519                   <span class=c1># 기본/개인 계정용 개인 키</span>
+</span></span><span class=line><span class=cl>├── id_ed25519.pub               <span class=c1># 기본/개인 계정용 공개 키</span>
+</span></span><span class=line><span class=cl>├── id_ed25519_company           <span class=c1># 회사 계정용 개인 키</span>
+</span></span><span class=line><span class=cl>├── id_ed25519_company.pub       <span class=c1># 회사 계정용 공개 키</span>
+</span></span><span class=line><span class=cl>└── config                       <span class=c1># SSH 설정 파일</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=ssh-config-설정-sshconfig>SSH Config 설정 (<code>~/.ssh/config</code>)</h4><link rel=stylesheet href=/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm+a4QTy4no=" crossorigin=anonymous><div class="admonition tip"><div class=admonition-header><svg viewBox="0 0 384 512"><path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2 5.2-7.1 10.4-14.2 15.4-21.4 19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2.0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3 5 7.2 10.2 14.3 15.4 21.4 19.8 27.1 39.7 54.4 49.2 86.2h160zM192 512c44.2.0 80-35.8 80-80v-16H112v16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112 8.8.0 16 7.2 16 16s-7.2 16-16 16c-44.2.0-80 35.8-80 80z"/></svg>
+<span>Tip</span></div><div class=admonition-content><p><code>~</code> 경로는 대부분의 OS에서 사용자 폴더를 의미한다.</p></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 기본 GitHub 설정 (개인 계정용)</span>
+</span></span><span class=line><span class=cl>Host github.com
+</span></span><span class=line><span class=cl>HostName github.com
+</span></span><span class=line><span class=cl>User git
+</span></span><span class=line><span class=cl>IdentityFile ~/.ssh/id_ed25519
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)</span>
+</span></span><span class=line><span class=cl>Host github.com-personal
+</span></span><span class=line><span class=cl>HostName github.com
+</span></span><span class=line><span class=cl>User git
+</span></span><span class=line><span class=cl>IdentityFile ~/.ssh/id_ed25519
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 회사 계정용 설정</span>
+</span></span><span class=line><span class=cl>Host github.com-company
+</span></span><span class=line><span class=cl>HostName github.com
+</span></span><span class=line><span class=cl>User git
+</span></span><span class=line><span class=cl>IdentityFile ~/.ssh/id_ed25519_company
+</span></span></code></pre></td></tr></table></div></div><h3 id=사용-방법>사용 방법</h3><h4 id=1-기본-사용>1. 기본 사용</h4><p>일반적인 GitHub URL을 그대로 사용:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone git@github.com:username/my-project.git
+</span></span><span class=line><span class=cl>git remote add origin git@github.com:username/repository-name.git
+</span></span></code></pre></td></tr></table></div></div><h4 id=2-명시적-개인-계정-사용>2. 명시적 개인 계정 사용</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone git@github.com-personal:username/repository-name.git
+</span></span><span class=line><span class=cl>git remote add origin git@github.com-personal:username/repository-name.git
+</span></span></code></pre></td></tr></table></div></div><h4 id=3-회사-계정-사용>3. 회사 계정 사용</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone git@github.com-company:CompanyOrg/repository-name.git
+</span></span><span class=line><span class=cl>git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+</span></span></code></pre></td></tr></table></div></div><h3 id=새로운-계정키-추가-방법>새로운 계정/키 추가 방법</h3><h4 id=1-새-ssh-키-생성>1. 새 SSH 키 생성</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ssh-keygen -t ed25519 -C <span class=s2>&#34;your-email@example.com&#34;</span> -f ~/.ssh/id_ed25519_newaccount
+</span></span></code></pre></td></tr></table></div></div><h4 id=2-ssh-config에-설정-추가>2. SSH Config에 설정 추가</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># ~/.ssh/config에 추가</span>
+</span></span><span class=line><span class=cl>Host github.com-newaccount
+</span></span><span class=line><span class=cl>HostName github.com
+</span></span><span class=line><span class=cl>User git
+</span></span><span class=line><span class=cl>IdentityFile ~/.ssh/id_ed25519_newaccount
+</span></span></code></pre></td></tr></table></div></div><h4 id=3-github에-공개-키-등록>3. GitHub에 공개 키 등록</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 공개 키 내용 복사</span>
+</span></span><span class=line><span class=cl>cat ~/.ssh/id_ed25519_newaccount.pub
+</span></span></code></pre></td></tr></table></div></div><p><code>GitHub Settings > SSH and GPG keys</code>에서 등록</p><h4 id=4-사용>4. 사용</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone git@github.com-newaccount:NewAccount/repository-name.git
+</span></span></code></pre></td></tr></table></div></div><h3 id=ssh-연결-테스트>SSH 연결 테스트</h3><p>각 계정별로 SSH 연결을 테스트할 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 기본 계정</span>
+</span></span><span class=line><span class=cl>ssh -T git@github.com
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 개인 계정 명시적 테스트</span>
+</span></span><span class=line><span class=cl>ssh -T git@github.com-personal
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 회사 계정</span>
+</span></span><span class=line><span class=cl>ssh -T git@github.com-company
+</span></span></code></pre></td></tr></table></div></div><p>성공시 다음과 같은 메시지가 출력된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Hi [계정명]! You&#39;ve successfully authenticated, but GitHub does not provide shell access.
+</span></span></code></pre></td></tr></table></div></div><h3 id=프로젝트별-설정-확인>프로젝트별 설정 확인</h3><p>현재 프로젝트가 어떤 SSH 키를 사용하는지 확인</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git remote -v
+</span></span><span class=line><span class=cl>git config --list <span class=p>|</span> grep remote.origin.url
+</span></span></code></pre></td></tr></table></div></div><h3 id=권한-설정>권한 설정</h3><p>SSH 파일들의 올바른 권한 설정은 <strong>Unix/Linux 기반 시스템에서 필수</strong>다.</p><h4 id=권한-설정이-필요한-환경>권한 설정이 필요한 환경</h4><ul><li>✅ <strong>Linux/Ubuntu</strong></li><li>✅ <strong>macOS</strong></li><li>✅ <strong>WSL (Windows Subsystem for Linux)</strong></li><li>✅ <strong>Docker 컨테이너</strong></li><li>✅ <strong>개발 컨테이너 (Dev Container)</strong></li><li>❌ <strong>Windows 네이티브</strong> (NTFS 권한으로 자동 관리)</li></ul><h4 id=windows-vs-unixlinux-차이점>Windows vs Unix/Linux 차이점</h4><div class=table-wrapper><table><thead><tr><th>환경</th><th>권한 시스템</th><th>SSH 권한 설정</th></tr></thead><tbody><tr><td>Windows 네이티브</td><td>NTFS ACL</td><td>불필요 (자동)</td></tr><tr><td>WSL/Linux/macOS</td><td>Unix 권한</td><td><strong>필수</strong></td></tr><tr><td>Docker/Dev Container</td><td>Unix 권한</td><td><strong>필수</strong></td></tr></tbody></table></div><h4 id=windows에서-ssh-사용하기>Windows에서 SSH 사용하기</h4><h5 id=windows-네이티브-환경>Windows 네이티브 환경</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=c># PowerShell 또는 Command Prompt에서</span>
+</span></span><span class=line><span class=cl><span class=c># SSH 키 생성</span>
+</span></span><span class=line><span class=cl><span class=nb>ssh-keygen</span> <span class=n>-t</span> <span class=n>ed25519</span> <span class=n>-C</span> <span class=s2>&#34;your-email@example.com&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c># SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장</span>
+</span></span><span class=line><span class=cl><span class=c># 권한 설정은 Windows가 자동으로 관리</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Windows 네이티브 특징:</strong></p><ul><li><code>chmod</code> 명령어 없음</li><li>NTFS 권한으로 자동 관리</li><li>SSH 클라이언트가 적절한 권한 자동 설정</li><li>수동 권한 설정 불필요</li></ul><h5 id=wsl-환경>WSL 환경</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># WSL에서는 Linux와 동일하게 권한 설정 필요</span>
+</span></span><span class=line><span class=cl>chmod <span class=m>700</span> ~/.ssh
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> ~/.ssh/config
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> ~/.ssh/id_*
+</span></span><span class=line><span class=cl>chmod <span class=m>644</span> ~/.ssh/*.pub
+</span></span></code></pre></td></tr></table></div></div><p><strong>WSL 특징:</strong></p><ul><li>Linux 파일 시스템 사용</li><li>Unix 권한 모델 적용</li><li>권한 설정 필수</li></ul><h3 id=macos-darwin>macOS: Darwin</h3><h4 id=ssh가-권한을-엄격하게-요구하는-이유-unixlinux>SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)</h4><ul><li>Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:<ol><li><strong>보안 정책</strong>: 개인 키가 다른 사용자에게 노출되는 것을 방지</li><li><strong>인증 무결성</strong>: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨</li><li><strong>파일 보호</strong>: 중요한 인증 정보의 무단 접근 차단</li></ol></li></ul><h4 id=올바른-권한-설정>올바른 권한 설정</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># SSH 디렉토리 권한 (소유자만 접근 가능)</span>
+</span></span><span class=line><span class=cl>chmod <span class=m>700</span> ~/.ssh
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># config 파일 권한 (소유자만 읽기/쓰기)</span>
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> ~/.ssh/config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 개인 키 파일들 권한 (소유자만 읽기/쓰기)</span>
+</span></span><span class=line><span class=cl>chmod <span class=m>600</span> ~/.ssh/id_*
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)</span>
+</span></span><span class=line><span class=cl>chmod <span class=m>644</span> ~/.ssh/*.pub
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 소유권 설정 (현재 사용자로 설정)</span>
+</span></span><span class=line><span class=cl>sudo chown -R <span class=nv>$USER</span>:<span class=nv>$USER</span> ~/.ssh
+</span></span></code></pre></td></tr></table></div></div><h4 id=권한-확인>권한 확인</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 현재 권한 상태 확인</span>
+</span></span><span class=line><span class=cl>ls -la ~/.ssh/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 올바른 출력 예시:</span>
+</span></span><span class=line><span class=cl><span class=c1># drwx------  (700) 소유자만 SSH 디렉토리 접근</span>
+</span></span><span class=line><span class=cl><span class=c1># -rw-------  (600) 소유자만 개인 키/config 파일 접근  </span>
+</span></span><span class=line><span class=cl><span class=c1># -rw-r--r--  (644) 공개 키는 다른 사용자도 읽기 가능</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=문제-해결>문제 해결</h3><h4 id=권한-오류-해결>권한 오류 해결</h4><p>오류 메시지</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>Bad owner or permissions on /home/node/.ssh/config
+</span></span><span class=line><span class=cl>fatal: Could not read from remote repository.
+</span></span></code></pre></td></tr></table></div></div><ul><li><strong>원인:</strong> SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨</li><li><strong>해결 단계:</strong><ol><li><strong>권한 확인</strong>:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ls -la ~/.ssh/
+</span></span></code></pre></td></tr></table></div></div></li><li><strong>권한이 <code>777</code> (rwxrwxrwx)인 경우 수정</strong>:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo chmod <span class=m>700</span> ~/.ssh
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>600</span> ~/.ssh/config
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>600</span> ~/.ssh/id_*
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>644</span> ~/.ssh/*.pub
+</span></span></code></pre></td></tr></table></div></div></li><li><strong>소유권 문제인 경우</strong>:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo chown -R <span class=nv>$USER</span>:<span class=nv>$USER</span> ~/.ssh
+</span></span></code></pre></td></tr></table></div></div></li><li><strong>권한 설정 후 테스트</strong>:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ssh -T git@github.com
+</span></span></code></pre></td></tr></table></div></div></li></ol></li></ul><h4 id=ssh-키가-인식되지-않는-경우>SSH 키가 인식되지 않는 경우</h4><p>SSH Agent에 키 추가</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>eval</span> <span class=s2>&#34;</span><span class=k>$(</span>ssh-agent -s<span class=k>)</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>ssh-add ~/.ssh/id_ed25519
+</span></span><span class=line><span class=cl>ssh-add ~/.ssh/id_ed25519_company
+</span></span></code></pre></td></tr></table></div></div><h4 id=잘못된-키-사용>잘못된 키 사용</h4><p>원격 URL 확인 및 수정</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 현재 설정 확인</span>
+</span></span><span class=line><span class=cl>git remote -v
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 원격 URL 변경</span>
+</span></span><span class=line><span class=cl>git remote set-url origin git@github.com-<span class=o>[</span>account<span class=o>]</span>:owner/repository.git
+</span></span></code></pre></td></tr></table></div></div><h3 id=예시-프로젝트-설정>예시 프로젝트 설정</h3><p><strong>my-blog</strong>: 기본 설정 사용 (<code>git@github.com:username/my-blog.git</code>)</p><ul><li>SSH 키: <code>~/.ssh/id_ed25519</code></li><li>GitHub 계정: 개인 계정</li></ul><h3 id=확장-계획>확장 계획</h3><p>향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>Host github.com-<span class=o>[</span>account-name<span class=o>]</span>
+</span></span><span class=line><span class=cl>HostName github.com
+</span></span><span class=line><span class=cl>User git
+</span></span><span class=line><span class=cl>IdentityFile ~/.ssh/id_ed25519_<span class=o>[</span>account-name<span class=o>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.</p><h3 id=현재-구성-검증>현재 구성 검증</h3><p>현재 SSH 구성이 올바르게 작동하는지 확인해본다.</p><ol><li><p><strong>권한 설정 (필수!)</strong>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 모든 권한을 한 번에 설정</span>
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>700</span> ~/.ssh
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>600</span> ~/.ssh/config ~/.ssh/id_*
+</span></span><span class=line><span class=cl>sudo chmod <span class=m>644</span> ~/.ssh/*.pub
+</span></span><span class=line><span class=cl>sudo chown -R <span class=nv>$USER</span>:<span class=nv>$USER</span> ~/.ssh
+</span></span></code></pre></td></tr></table></div></div></li><li><p><strong>SSH 연결 테스트</strong>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ssh -T git@github.com
+</span></span><span class=line><span class=cl><span class=c1># 성공시: &#34;Hi [username]! You&#39;ve successfully authenticated...&#34;</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p><strong>Git push 테스트</strong>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git push origin master
+</span></span></code></pre></td></tr></table></div></div></li></ol><p><strong>⚠️ 중요:</strong> 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+<code>Bad owner or permissions</code> 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.</p><h2 id=결론>🎯결론</h2><p>로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.</p><ul><li>새 계정 추가는 키 생성, <code>~/.ssh/config</code>에 Host 추가, 공개키 등록, <code>ssh -T</code> 테스트, 원격 URL 설정의 5단계</li><li>WSL은 <strong>리눅스 홈 경로</strong>에 <code>.ssh</code>를 두고, 필요 시 <code>includeIf</code>/<code>url.insteadOf</code>로 <strong>디렉터리별 자동 라우팅</strong>을 적용하면 실수할 일이 줄어든다.</li></ul><h2 id=endnote>⚙️EndNote</h2><h3 id=사전-지식>사전 지식</h3><ul><li><strong>SSH 키 쌍</strong>: <code>ed25519</code>가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.</li><li><strong>SSH 설정 파일</strong>: <code>~/.ssh/config</code>로 Host 단위 설정(별칭, <code>IdentityFile</code>, <code>IdentitiesOnly</code>).</li><li><strong>퍼미션 기초</strong>: <code>~/.ssh</code>(700), 개인키(600), 공개키/<code>config</code>(644~600).</li><li><strong>WSL/NTFS 차이</strong>: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. <strong>리눅스 홈</strong> 사용.</li><li><strong>ssh-agent</strong>: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → <code>IdentitiesOnly</code>로 해결.</li><li><strong>Git 원격 URL 형태</strong>: <code>git@HOST:OWNER/REPO.git</code>(SCP 구문) 또는 <code>ssh://git@HOST/OWNER/REPO.git</code>.</li><li><strong>Git 라우팅 자동화(선택)</strong>: <code>~/.gitconfig</code>의 <code>includeIf</code>(디렉터리 기준 설정), <code>url.&lt;base>.insteadOf</code>(호스트 치환).</li></ul><h3 id=더-알아보기>더 알아보기</h3><ul><li>GitHub Docs: <em>Connecting to GitHub with SSH</em>, <em>About SSH certificate authorities</em>, <em>Managing multiple accounts</em></li><li>OpenSSH Manual: <code>ssh(1)</code>, <code>ssh_config(5)</code>, <code>ssh-agent(1)</code>, <code>ssh-add(1)</code></li><li>Git Documentation: <code>git-config(1)</code>(특히 <code>includeIf</code>, <code>url.&lt;base>.insteadOf</code>), <code>git-remote(1)</code></li><li>Microsoft Docs: <em>WSL 파일 권한 & NTFS 상호작용</em> 가이드</li><li>보안 심화: <em>ed25519-sk</em>(FIDO2/보안키 기반), <code>ProxyJump</code>(점프호스트), <code>KnownHosts</code> 고급 설정</li></ul></section><footer class=article-footer><div style=margin-top:2rem;text-align:center><a href=https://www.buymeacoffee.com/b9f1 target=_blank><img src=https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png alt="Buy Me A Coffee" style=height:60px!important;width:217px!important></a></div><section class=article-tags><a href=/tags/devlog/>Devlog</a>
+<a href=/tags/ssh/>SSH</a>
+<a href=/tags/ssh-key/>SSH-Key</a>
+<a href=/tags/git/>Git</a>
+<a href=/tags/github/>GitHub</a>
+<a href=/tags/%EB%A9%80%ED%8B%B0%EA%B3%84%EC%A0%95/>멀티계정</a>
+<a href=/tags/linux/>Linux</a>
+<a href=/tags/wsl/>WSL</a>
+<a href=/tags/dev-container/>Dev-Container</a>
+<a href=/tags/docker/>Docker</a>
+<a href=/tags/%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95/>권한-설정</a>
+<a href=/tags/versioncontrol/>VersionControl</a>
+<a href=/tags/infra/>Infra</a>
+<a href=/tags/devops/>DevOps</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=[".main-article",".widget--toc"];e.forEach(e=>{const t=document.querySelector(e);t&&renderMathInElement(t,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/2025-04-03-git-tag/><div class=article-details><h2 class=article-title>Git tag</h2></div></a></article><article><a href=/p/2025-03-30-git-reset-vs-checkout/><div class=article-details><h2 class=article-title>Git Reset VS Checkout</h2></div></a></article><article><a href=/p/2025-03-30-git-stash-how-to-use/><div class=article-details><h2 class=article-title>Git Stash</h2></div></a></article><article><a href=/p/2025-03-27-git-rebase-purpose-and-alternative-features/><div class=article-details><h2 class=article-title>Git Rebase 사용 목적 및 대체 기능</h2></div></a></article><article><a href=/p/2023-12-21-try-building-a-gitea-server/><div class=article-details><h2 class=article-title>Gitea 서버 구축해보기</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=nine-j/nine-j.github.io data-repo-id=R_kgDOOqUgZw data-category=General data-category-id=DIC_kwDOOqUgZ84CqLyQ data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"noborder_gray")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2026 B9F1</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

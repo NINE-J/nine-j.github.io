@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IntelliJ on B9F1</title><link>https://blog.b9f1.com/tags/intellij/</link><description>Recent content in IntelliJ on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/intellij/index.xml" rel="self" type="application/rss+xml"/><item><title>IntelliJ IDEA에서 프로젝트 경고</title><link>https://blog.b9f1.com/p/2025-04-06-intellij-microsoft-defender-may-affect-ide/</link><pubDate>Sun, 06 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-06-intellij-microsoft-defender-may-affect-ide/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;IntelliJ IDEA에서 프로젝트를 열 때 &amp;ldquo;Microsoft Defender may affect IDE&amp;rdquo; 경고가 뜨는 건 Microsoft Devender(Windows Defender)의 실시간 보호 기능이 IDE 성능에 영향을 줄 수 있다는 의미다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;Windwos Defender의 실시간 보호 기능은 파일 시스템의 변경 사항을 실시간으로 검사하여 악성 코드나 의심스러운 활동을 탐지한다.&lt;/p&gt;
+&lt;p&gt;IntelliJ와 같은 IDE는 빌드, 인덱싱, 파일 읽기/쓰기 작업이 빈번하게 발생하기 때문에 Defender의 스캔이 성능 저하를 유발할 수 있다.&lt;/p&gt;
+&lt;p&gt;이 경고는 사용자가 이를 해결할 수 있도록 몇 가지 옵션을 제공한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406124804.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="exclude-folders"&gt;Exclude folders
+&lt;/h3&gt;&lt;p&gt;현재 열려 있는 프로젝트를 Defender가 특정 폴더를 실시간 스캔에서 제외하도록 설정한다.
+해당 폴더 내 파일을 스캔하지 않게 되어 IDE 성능이 향상될 수 있다.&lt;/p&gt;
+&lt;p&gt;예를 들어, IntelliJ는 &lt;code&gt;.idea&lt;/code&gt;(프로젝트 설정), &lt;code&gt;target&lt;/code&gt;(Maven/Gradle 빌드 결과물), 또는 소스 코드 폴더에서 빈번하게 파일을 생성하거나 수정한다.&lt;/p&gt;
+&lt;p&gt;이런 폴더를 제외하면 Defender가 불필요한 스캔을 하지 않아 성능 저하를 줄일 수 있다.&lt;/p&gt;
+&lt;h3 id="ignore-for-this-project"&gt;Ignore for this project
+&lt;/h3&gt;&lt;p&gt;해당 프로젝트에 대해 경고를 다시 표시하지 않도록 설정한다.
+단, 이 경우 Defender 설정이 변경되지는 않으며 단순히 경고 알림만 비활성화된다.
+성능 문제는 여전히 남아 있을 수 있다.&lt;/p&gt;
+&lt;h3 id="never-ask-again"&gt;Never ask again
+&lt;/h3&gt;&lt;p&gt;모든 프로젝트에 대해 이 경고를 비활성화한다.
+역시 Defender 설정 자체에는 영향을 주지 않는다.&lt;/p&gt;
+&lt;h3 id="제외하면-어디에-기록되지"&gt;제외하면 어디에 기록되지?
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Exclude folders&lt;/code&gt;를 선택하면 IntelliJ가 Windows Defender의 제외 목록에 해당 폴더를 추가한다.
+이 설정은 IntelliJ 자체에 저장되는 것이 아니라 Windows Defender의 설정에 기록된다.&lt;/p&gt;
+&lt;h4 id="windows-defender-제외-설정-위치"&gt;Windows Defender 제외 설정 위치
+&lt;/h4&gt;&lt;p&gt;Windows Defender의 제외 목록은 Windows 시스템 설정에 저장된다.
+일반적으로 이 정보는 레지스트리나 Defender의 내부 데이터베이스에 기록되며, 사용자가 직접 편집할 수 있는 특정 파일로 존재하지 않는다.&lt;/p&gt;
+&lt;p&gt;하지만 Windows Defender 설정을 통해 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;설정 &amp;gt; Windows 보안 &amp;gt; 바이러스 및 위협 방지 &amp;gt; 바이러스 및 위협 방지 설정 관리&lt;/code&gt;에서 제외 목록을 확인할 수 있고 제거할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406125851.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h4 id="intellij의-역할"&gt;IntelliJ의 역할
+&lt;/h4&gt;&lt;p&gt;IntelliJ는 사용자가 &lt;code&gt;Exclude folders&lt;/code&gt;를 선택하면 Windows Defender API를 호출하여 해당 프로젝트 폴더를 제외 목록에 추가한다고 한다.&lt;/p&gt;
+&lt;h3 id="trusted-location"&gt;Trusted Location
+&lt;/h3&gt;&lt;p&gt;작업 폴더를 모아두는 드라이브, 폴더 등이 일정하다면, IntelliJ 설정에서 신뢰할 수 있는 경로를 설정할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Settings &amp;gt; Build, Execution, Deployment &amp;gt; Trusted Locations&lt;/code&gt; 해당 메뉴에서 본인이 원하는 프로젝트들을 감싸고 있는 상위 경로를 추가 후 저장한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;간단한 테스트를 위해 만든 프로젝트를 모두 계속 등록하게 되면 어딘가에 기록이 쌓이는지 궁금해서 찾아보게 됐다.&lt;/p&gt;
+&lt;p&gt;폴더 또는 파일의 수정이 빈번하게 발생하는 프로젝트를 계속 Windows Defender가 스캔하며 성능이 저하될 수 있다는 경고다.&lt;/p&gt;
+&lt;p&gt;경고를 무시하고 진행해도 되고, 성능을 위해 Defender의 제외 목록에 등록할 수도 있다.&lt;/p&gt;
+&lt;p&gt;IntelliJ에서 프로젝트를 열 때 신뢰 관련 확인을 요구하는 게 귀찮다면 &lt;code&gt;Trusted Location&lt;/code&gt; 설정을 하는 방법이 있다.&lt;/p&gt;</description></item><item><title>IntelliJ 메모리 설정</title><link>https://blog.b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/</link><pubDate>Sun, 06 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-06-intelij-changing-the-memory-size/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;IntelliJ IDEA에서 메모리 힙 사이즈에 대해 전역 설정과 애플리케이션 별로 설정하는 방법을 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="전역-메모리-설정"&gt;전역 메모리 설정
+&lt;/h3&gt;&lt;h4 id="change-memory-settings"&gt;Change Memory Settings
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;Help &amp;gt; Change Memory Settings&lt;/code&gt; 선택 → 팝업에서 힙 사이즈 변경&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406132822.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406133006.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h4 id="edit-custom-vm-options"&gt;Edit Custom VM Options
+&lt;/h4&gt;&lt;p&gt;IDE 메뉴에서 설정하는 방법도 있지만, 직접 설정 파일을 수정하는 방법도 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Help &amp;gt; Edit Custom VM Options&lt;/code&gt; 선택,
+또는 각 설정 파일 경로를 찾아가서 수정하는 방법이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows: &lt;code&gt;%USERPROFILE%\AppData\Roaming\JetBrains\&amp;lt;IntelliJ 버전&amp;gt;\idea64.exe.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;macOS: &lt;code&gt;~/Library/Application Support/JetBrains/&amp;lt;IntelliJ 버전&amp;gt;/idea.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux: &lt;code&gt;~/.config/JetBrains/&amp;lt;IntelliJ 버전&amp;gt;/idea64.vmoptions&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406135244.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 초기 힙 사이즈(최소 메모리)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms512m
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 최대 힙 사이즈 (권장: 시스템 메모리의 1/4 ~ 1/2)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms2048m
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파일 수정 후 IntelliJ를 재시작하여 변경 사항을 적용한다.&lt;/p&gt;
+&lt;h3 id="실행-프로필-별로-메모리-설정"&gt;실행 프로필 별로 메모리 설정
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Run/Debug Configurations&lt;/code&gt;에서 &lt;code&gt;VM Options&lt;/code&gt; 설정으로 특정 프로젝트의 애플리케이션을 실행할 때 사용되는 JVM의 메모리를 설정할 수 있다.&lt;/p&gt;
+&lt;p&gt;상단 툴바에서 &lt;code&gt;Edit Configurations&lt;/code&gt; 선택, 또는 &lt;code&gt;Shift + Alt + F10&lt;/code&gt; → &lt;code&gt;Edit Configurations&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406153727.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;VM options에 메모리 설정 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;-Xms256m -Xmx1024m // 최소 256MB, 최대 1GB 할당
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406154105.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="메모리-사용량-표시"&gt;메모리 사용량 표시
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;IDE 하단 우클릭 &amp;gt; Memory Indicator&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020250406133250.png"
+loading="lazy"
+&gt;&lt;/p&gt;</description></item></channel></rss>

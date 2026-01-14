@@ -1,0 +1,2334 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Infra on B9F1</title><link>https://blog.b9f1.com/tags/infra/</link><description>Recent content in Infra on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 19 Dec 2025 03:24:06 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/infra/index.xml" rel="self" type="application/rss+xml"/><item><title>옵시디언과 블로그</title><link>https://blog.b9f1.com/p/2025-12-19-obsidian-and-blog-wrting-a-note-post-it/</link><pubDate>Fri, 19 Dec 2025 03:24:06 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-12-19-obsidian-and-blog-wrting-a-note-post-it/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;옵시디언을 사용하며 블로그는 따로 정리하거나 재작성해서 Velog, Tistory 등 개발 블로그를 업로드 했었다. 그러다 문득 학습하고 정리하면서 블로그에 배포도 되면 편하겠다 생각했다.&lt;/p&gt;
+&lt;p&gt;Quartz, Jekyll, Hugo 다양한 정적 사이트 생성기를 알아보며 선택한 기준과 배포해서 사용하다가 불편한 점을 만나 전환한 계기도 간략하게 정리한다.&lt;/p&gt;
+&lt;p&gt;거창하게 표현하자면 옵시디언을 SSoT로 삼아 플랫폼에 종속되지 않는 지속 가능한 블로그 아키텍처를 설계한다.&lt;/p&gt;
+&lt;p&gt;요약하면 낭만 쉽지 않다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="블로그-선택-기준"&gt;블로그 선택 기준
+&lt;/h3&gt;&lt;p&gt;Velog, Tistory 등 내가 작성하고 게시만 하면 되고 첨부 파일도 신경 쓸 게 없다. 간편하고 좋다.
+SSG로 블로그를 운영하다가 다시 돌아가거나 둘 다 운영하는 유저도 많은 것 같다.&lt;/p&gt;
+&lt;p&gt;나만의 블로그라는 게 좋아서 정보를 찾아보다가 가장 쉬운 건 Quartz였는데 테마가 아쉬웠다.
+적당히 쉽고 테마가 다양하고 빠르게 시작할 수 있어서 처음엔 Jekyll 블로그를 배포했다.&lt;/p&gt;
+&lt;h4 id="다루기-쉬운가"&gt;다루기 쉬운가?
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;Quartz&lt;/th&gt;
+&lt;th&gt;Jekyll&lt;/th&gt;
+&lt;th&gt;Hugo&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;타겟&lt;/td&gt;
+&lt;td&gt;옵시디언 사용자&lt;/td&gt;
+&lt;td&gt;단순 블로그 입문자&lt;/td&gt;
+&lt;td&gt;대규모 사이트/전문가&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;설치 편의성&lt;/td&gt;
+&lt;td&gt;매우 쉬움&lt;/td&gt;
+&lt;td&gt;보통(Ruby 설치 필요)&lt;/td&gt;
+&lt;td&gt;쉬움(파일 하나면 끝)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;커스텀 난이도&lt;/td&gt;
+&lt;td&gt;쉬움(JS/TS 기반)&lt;/td&gt;
+&lt;td&gt;보통(Liquid 문법)&lt;/td&gt;
+&lt;td&gt;약간 높음(Go 문법, JS 파츠 가능)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="테마가-다양한가"&gt;테마가 다양한가?
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;Jekyll
+&lt;ul&gt;
+&lt;li&gt;가장 오래되어 테마가 수천 개에 달한다. 웬만한 디자인은 이미 누군가 만들었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hugo
+&lt;ul&gt;
+&lt;li&gt;인기가 많아지면서 세련되고 현대적인 테마가 많아졌다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Quartz
+&lt;ul&gt;
+&lt;li&gt;옵시디언 퍼블리싱이라는 특수한 목적에 집중하기 때문에 일반적인 블로그 테마 종류는 적은 것 같다. 대신 소스 수정을 통한 커스텀이 쉽다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="jekyll에서-hugo로-전환한-이유"&gt;Jekyll에서 Hugo로 전환한 이유
+&lt;/h3&gt;&lt;p&gt;빌드가 너무 느리다.
+포스팅 100개도 안 되는데 빌드 시간이 5분 이상 걸리는 것 보고 위기감을 느꼈다.
+캐싱이나 빌드 최적화 방법도 다양한데 일단 이런 작업을 해주어야 할 정도로 느리다는 게 불편했다.&lt;/p&gt;
+&lt;h4 id="hugo-압도적-1위"&gt;Hugo 압도적 1위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: Go 언어(컴파일 언어)&lt;/li&gt;
+&lt;li&gt;성능: 세계에서 가장 빠른 SSG라는 슬로건을 내걸 만큼 빠르다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 문서가 1,000개일 때 빌드 시간이 수 초 내외다. 문서가 10,000개가 넘어가도 수 초 안에 빌드가 완료된다고 한다. 대규모 기술 문서 사이트에 Hugo가 가장 많이 쓰이는 이유라고 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="quartz-준수한-성능-2위"&gt;Quartz 준수한 성능 2위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: TS/Node.js(하이브리드, 컴파일/트랜스파일 + JIT 컴파일)&lt;/li&gt;
+&lt;li&gt;성능: Hugo만큼은 아니지만 상당히 빠르다. 내부적으로 캐싱 시스템이 잘 되어 있어 변경된 부분만 빠르게 업데이트한다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 수백~수천 개의 옵시디언 노트를 처리하기에 충분히 쾌적하다. 다만 복잡한 JS 플러그인을 많이 추가할 수록 조금씩 느려질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="jekyll-비교적-느림-3위"&gt;Jekyll 비교적 느림 3위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: Ruby (인터프리터 언어)&lt;/li&gt;
+&lt;li&gt;성능: 구조적인 한계로 문서 양이 많아지면 속도가 눈에 띄게 저하된다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 문서가 수천 개를 넘어가면 빌드에 몇 십 분 단위가 걸리기도 한다. 증분 빌드 기능이 있지만 다른 SSG에 비해 느리다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="전환하며-만난-문제"&gt;전환하며 만난 문제
+&lt;/h3&gt;&lt;p&gt;블로그 전환하면서 문서의 속성 값이 문제가 됐었다.
+카테고리를 작성하는데 4~5레벨 이상 허용하는 테마도 있고 그렇지 않은 것도 있다.&lt;/p&gt;
+&lt;p&gt;그냥 세분화한 카테고리가 제대로 적용만 안 되는 거면 수정 없이 사용하겠는데 빌드가 안 되거나 문서가 깨지는 등 문제가 있었다.&lt;/p&gt;
+&lt;p&gt;근데 작성된 문서가 많다면 일괄 편집 프로그램을 찾거나 직접 커스텀하게 만들어서 사용해야 할 것이다.&lt;/p&gt;
+&lt;p&gt;다행히 DataView 플러그인으로 카테고리는 따로 관리하고 있었고 문서가 엄청 많은 상태는 아니어서 속성의 카테고리를 다 제거했다.&lt;/p&gt;
+&lt;p&gt;그리고 Hugo 테마에 맞게 정리해서 일단락되었다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;DataView&lt;/code&gt; 플러그인은 DQL(Dataview Query Language, SQL과 굉장히 비슷하다), DataviewJS(JavaScript) 언어로 사용할 수 있다.
+쿼리가 익숙하든 JS가 익숙하든 편한 걸로 사용하면 될 것 같다.&lt;/p&gt;
+&lt;p&gt;직관적인 이름에 걸맞게 옵시디언에서 관리하는 문서들의 데이터를 가지고 내가 원하는 뷰를 만들 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020251219044301.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="무엇을-하고자-하는가"&gt;무엇을 하고자 하는가?
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;플랫폼에 종속되지 않는 문서 관리가 가능한지 고민하고 최대한 표준화하려고 한다.&lt;/li&gt;
+&lt;li&gt;첨부 파일을 양쪽에서 관리하는데 이건 좀 문제가 있다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PARA&lt;/code&gt; 정리법을 적용해서 잘 사용하고 있기 때문에 경로가 메인이 되면 안 된다. 관리될 수 있는 속성을 정의해야 한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="jekyll에서-hugo로-전환하면서-느낀-것"&gt;Jekyll에서 Hugo로 전환하면서 느낀 것
+&lt;/h4&gt;&lt;p&gt;Templater 플러그인을 사용해서 문서 성격에 따라 개인적으로 필요한 양식은 표준화 했지만 이런 전환점에선 수정이 불가피하다.&lt;/p&gt;
+&lt;p&gt;정착할 수 있다면 좋겠지만 언제든 맘 편히 전환할 수 있는 기반을 만들고 싶다.&lt;/p&gt;
+&lt;h4 id="첨부-파일-관리도-불편"&gt;첨부 파일 관리도 불편
+&lt;/h4&gt;&lt;h5 id="어디에-둬야-하는-거야"&gt;어디에 둬야 하는 거야?
+&lt;/h5&gt;&lt;p&gt;호스팅으로 빼서 URL을 사용하는 등 써드 파티를 적용한 사례도 많다. 무료 이미지 호스팅 사용하다가 사이트가 없어져서 이미지 다 날린 케이스도 있고 비교적 안전하게 운영되고 있는 imgur 플러그인 소개도 가끔 보인다.
+나는 가장 간편하고 안전하게 볼트 내에서 첨부 파일 폴더를 따로 관리하려고 한다.&lt;/p&gt;
+&lt;h5 id="문법은-왜-달라"&gt;문법은 왜 달라?
+&lt;/h5&gt;&lt;p&gt;왜 불편하냐면 옵시디언에서 붙여 넣거나 링크한 건 이런 위키링크 형태다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;![[location/image.png]]&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Markdown 문법이 기대하는 이미지 첨부는 이런 형태다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;![alt](location/image.png)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;사실 이건 설정에서 끌 수 있고 직접 만들어서 간단히 치환하는 방법을 사용할 수도 있다.
+&lt;code&gt;설정 &amp;gt; Options/Files and Links &amp;gt; Use[[WikiLinks]]&lt;/code&gt; 이거 비활성화 하면 기본 마크다운 형태로 삽입할 수 있다.&lt;/p&gt;
+&lt;p&gt;지금 가장 불편한 건 낭만 따라간답시고 일 벌린 다음 잘못 관리하고 있는 것이다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;옵시디언에서 신나게 이미지 넣고 작성한다.&lt;/li&gt;
+&lt;li&gt;Hugo 블로그 저장소에 문서 옮기고 이미지도 옮기고 링크 맞추고..&lt;/li&gt;
+&lt;li&gt;오탈자 없나, 깨지는 건 없나 검토하는 단계로 합리화하기.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이렇게 불편함이 많아지면 포스팅 하나 작성해볼까? 하는 데에 결심이 필요해진다. 안 된다. 개선이 필요하다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;strong&gt;PARA란?&lt;/strong&gt; (PARA method)
+디지털 자료를 관리하는 하나의 방법론이다.&lt;/p&gt;
+&lt;p&gt;하나의 경로에 고정되는 데이터가 아니라 현재 내 관심사에 따라 Project, Resources 폴더로 왔다가 Area, Archive로 갔다가 유연하게 문서가 움직인다.&lt;/p&gt;
+&lt;p&gt;PARA의 자료들은 계속해서 이동하며 장기 기억으로 가져가야 할 데이터, 데드라인을 명확히 하고자 하는 프로젝트, 우선 순위를 재조정 한다거나 계속한 상관 관계에 있다.
+한 곳으로 옮긴 이후 완료되거나 포기하면 죽는 데이터가 아니라 계속해서 돌아가는 자원이 되는 방식쯤으로 이해한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Project&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데드라인이 정해진 작업 즉, &lt;strong&gt;완료가 필요한 것들&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Area&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;데드라인이 명확하지 않은&lt;/strong&gt; 관리하는 것들의 영역&lt;/li&gt;
+&lt;li&gt;ex) 건강, 재정, 공부 등..&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Resource&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;지속적으로 관심을 가지는 주제의 자료들&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Area를 이루기 위한 것들&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Archive&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;위의 것들 중 마무리 지었거나 더이상 사용하지 않는 것들을 &lt;strong&gt;보관&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="어떻게-할-수-있는가"&gt;어떻게 할 수 있는가?
+&lt;/h3&gt;&lt;p&gt;내가 게시할 문서만 동기화하는 건 그리 복잡하지 않겠지만 외부 호스팅 의존이 필요한 이미지가 문제였다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;그냥 이미지 Base64로 박아버리면 첨부 파일 따로 안 해도 되잖아?
+&lt;ul&gt;
+&lt;li&gt;미리 보기 모드가 아닌 수정 모드에서 엄청난 스압을 만나고 문서 용량도 커진다.&lt;/li&gt;
+&lt;li&gt;확장자를 달고 링크된 이미지가 아니라서 CPU가 열일하는 모습을 볼 수 있다.&lt;/li&gt;
+&lt;li&gt;이미 이미지 압축, 스압 줄여주는 플러그인도 있다. ㅋㅋ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;이것저것 고민해보다가 나중에 또 개선해야 하는 거 너무 깊게 고민하지 않기로 했다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id="준비물"&gt;준비물
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;옵시디언 볼트
+&lt;ul&gt;
+&lt;li&gt;GitHub 저장소로 올리고 Private/Public 나눠야 할 수도 있다.&lt;/li&gt;
+&lt;li&gt;GitHub 저장소의 이미지 서빙 기능을 활용하기 위해 이미지 저장소를 따로 만들어야 할 수도 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hugo 블로그 저장소
+&lt;ul&gt;
+&lt;li&gt;GitHub Pages로 배포&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="pocproof-of-concept를-정의해보자"&gt;PoC(Proof of Concept)를 정의해보자
+&lt;/h4&gt;&lt;p&gt;이번 아키텍처의 핵심 목적은 문서를 복사하거나 이미지를 옮기는 수동 작업을 없애고 옵시디언의 PARA 체계를 유지하면서 특정 속성만으로 블로그를 배포하는 것.&lt;/p&gt;
+&lt;h5 id="검증-과제"&gt;검증 과제
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;파일 선별:
+&lt;ul&gt;
+&lt;li&gt;보관함 전체가 아닌 &lt;code&gt;publish: true&lt;/code&gt; 속성을 가진 파일만 추출 가능한가?&lt;/li&gt;
+&lt;li&gt;공개되지 않아야 하는 것들을 분리할 수 있는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;경로 동기화:
+&lt;ul&gt;
+&lt;li&gt;Git Submodule을 통해 옵시디언의 첨부 파일과 Hugo 저장소의 첨부 파일을 물리적으로 일치 시킬 수 있는가?&lt;/li&gt;
+&lt;li&gt;GitHub 저장소 자체가 호스팅 서버 역할을 하며 Hugo가 빌드 과정에서 상대 경로를 기반으로 URL을 생성하는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;문법 변환: 옵시디언 전용 문법(Callouts 등)을 Hugo가 이해하는 표준 마크다운이나 숏코드로 자동 치환 가능한가?&lt;/li&gt;
+&lt;li&gt;배포 자동화: 가벼운 명령어로 빌드 및 배포가 완료되는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="다이어그램"&gt;다이어그램
+&lt;/h4&gt;&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+%% 상단: 소스 관리 (Private)
+subgraph Source_Private
+Obs[Obsidian_Repo]
+end
+%% 중단: 공유 자원 (Public)
+subgraph Shared_Resources
+Assets[Assets_Repo]
+end
+%% 하단: 배포 엔진 (Public)
+subgraph Deployment_Public
+Hugo[Hugo_Repo]
+end
+%% 관계 설명 (서브모듈 포함 관계)
+Assets --- |Submodule| Obs
+Assets --- |Submodule| Hugo
+%% 데이터 흐름 (CI/CD)
+Obs -.-&gt; |"Filter(publish:true) &amp; Push"| Hugo
+%% 스타일링
+style Obs fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+style Assets fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+style Hugo fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant Obs as Obsidian_Repo (Private Vault)
+participant ObsAction as GitHub_Actions (Obsidian Repo)
+participant AssetRepo as Assets_Repo (Submodule / Public)
+participant HugoRepo as Hugo_Repo (Public, GitHub Pages)
+Note over Obs: 문서 작성 (Properties에 publish: true 추가)
+Obs-&gt;&gt;Obs: git push (Private Repo로)
+Obs-&gt;&gt;ObsAction: 1. Push 이벤트 트리거
+rect rgb(240, 240, 240)
+Note over ObsAction: [추출 및 변환 단계]
+ObsAction-&gt;&gt;ObsAction: 2. 보관함 스캔 (publish: true 검색)
+ObsAction-&gt;&gt;ObsAction: 3. 마크다운 변환 (WikiLink -&gt; MarkDown, 또는 설정으로 대체)
+end
+ObsAction-&gt;&gt;AssetRepo: 4. 신규 이미지 Push (Submodule 업데이트)
+ObsAction-&gt;&gt;HugoRepo: 5. 추출된 글(md) &amp; 이미지 링크 전달 (Git Push)
+Note over HugoRepo: [자동 배포 단계]
+HugoRepo-&gt;&gt;HugoRepo: 6. Hugo 빌드 프로세스 시작
+Note over HugoRepo: 7. 빌드 결과물(HTML) 생성 및 호스팅 시작
+Note over HugoRepo: https://ID.github.io 접속 가능
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="첨부-파일을-어떻게-관리해야-할까"&gt;첨부 파일을 어떻게 관리해야 할까?
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;옵시디언 볼트에서 관리 중인 Assets 폴더를 저장소로 만들어 원격에 업로드&lt;/li&gt;
+&lt;li&gt;Assets 원격 저장소를 옵시디언 볼트의 Submodule로 지정&lt;/li&gt;
+&lt;li&gt;하게 되면 git은 Submodule을 특별하게 취급기 때문에 따로 &lt;code&gt;.gitignore&lt;/code&gt; 파일에 Assets 폴더를 추가하지 않아도 된다.&lt;/li&gt;
+&lt;li&gt;이미지를 추가하는 경우 Submodule 폴더인 Assets 폴더에 추가.&lt;/li&gt;
+&lt;li&gt;옵시디언 프로그램에서 복사한 이미지 붙여 넣기의 경우 설정에 의해 지정된 경로에 이미지가 생성된다. Submodule 폴더인 Assets 폴더로 지정. 3과 동일하게 동작&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="변경-사항을-어떻게-업로드-하지"&gt;변경 사항을 어떻게 업로드 하지?
+&lt;/h4&gt;&lt;p&gt;이후 옵시디언 볼트에서 작업 후 변경 사항을 push하려면?&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Assets 저장소를 먼저 push. 명령어 만들어두면 편할 듯? 편해? 이게?
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; Assets &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;&amp;#34;update assets: {{date}}&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;&amp;#34;vault backup: {{date}}&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Assets 업데이트 된 후 옵시디언 볼트 push&lt;/li&gt;
+&lt;li&gt;옵시디언 원격 저장소의 GitHub Actions 실행된다.&lt;/li&gt;
+&lt;li&gt;GitHub Actions는 기능 수행만 하는 것이 아니라 임시 서버가 된다.&lt;/li&gt;
+&lt;li&gt;GitHub Actions 실행되는 환경 안에서
+&lt;ol&gt;
+&lt;li&gt;새롭게 포스팅 되어야 하는 문서들 필터링. 조건은 &lt;code&gt;publish: true&lt;/code&gt; 뿐인데 이미 게시된 건 어떻게 알고 새로운 것만 배포에 사용하지?
+&lt;ol&gt;
+&lt;li&gt;방식 A: 전체 덮어쓰기(가장 확실)
+&lt;ul&gt;
+&lt;li&gt;배포할 때마다 Hugo 저장소의 &lt;code&gt;content/posts&lt;/code&gt; 폴더를 비운다.&lt;/li&gt;
+&lt;li&gt;현재 Obsidian에서 &lt;code&gt;publish: true&lt;/code&gt;인 모든 파일을 다시 복사해서 넣는 방식&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;: 상태 관리가 필요 없고 Obsidian에서 &lt;code&gt;publish: false&lt;/code&gt;로 바꾼 글이 블로그에서 자동으로 사라진다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;: 파일이 아주 많아진다면 아주 미세하게 시간이 더 걸리지만, Hugo와 Git은 변경되지 않은 파일은 무시하므로 효율적&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;방식 B: 파일 비교(증분 방식)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git diff&lt;/code&gt; 명령어를 사용하여 마지막 배포 커밋 이후 변경되거나 추가된 파일만 찾기&lt;/li&gt;
+&lt;li&gt;하지만 이 방식은 Obsidian에서 글을 수정했을 때 블로그에 반영하기가 까다로워 보통 &lt;strong&gt;방식 A&lt;/strong&gt;를 권장합니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Obsidian 저장소와 Hugo 저장소를 동시에 Clone
+&lt;ol&gt;
+&lt;li&gt;필터링 스크립트 실행 (Python이나 Shell 스크립트)&lt;/li&gt;
+&lt;li&gt;찾은 파일들을 Hugo 저장소의 &lt;code&gt;content/posts&lt;/code&gt; 경로로 복사&lt;/li&gt;
+&lt;li&gt;Actions 서버가 사용자 권한을 가지고 Hugo 저장소에 원격 Push&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;이미지 관리
+&lt;ol&gt;
+&lt;li&gt;물리적 전송은 없다.&lt;/li&gt;
+&lt;li&gt;1번 단계에서 Assets를 원격에 업로드했기 때문에 Hugo 저장소는 빌드될 때 Assets Submodule의 최신 커밋을 바라보게만 설정&lt;/li&gt;
+&lt;li&gt;Hugo 저장소의 배포 Actions가 실행될 때 &lt;code&gt;git submidule update --remote&lt;/code&gt; 명령어를 수행하여 최신 이미지를 스스로 긁어오기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="첨부-파일-저장소-만들고-submodule-지정"&gt;첨부 파일 저장소 만들고 Submodule 지정
+&lt;/h3&gt;&lt;p&gt;이 저장소는 이제 옵시디언 볼트 저장소와 블로그 배포 저장소에서 서브 모듈로 활용하게 된다.&lt;/p&gt;
+&lt;h4 id="첨부-파일-저장소-업로드"&gt;첨부 파일 저장소 업로드
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;[Obsidian Vault]/[attachment location]&lt;/code&gt; 안의 소스를 잠시 백업&lt;/li&gt;
+&lt;li&gt;별도 저장소로 업로드&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="부모-저장소에서-submodule-지정"&gt;부모 저장소에서 Submodule 지정
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;Obsidian 루트 폴더에서 해당 폴더를 삭제하거나 이름을 변경&lt;/li&gt;
+&lt;li&gt;서브 모듈 등록
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git submodule add &lt;span class="o"&gt;[&lt;/span&gt;원격_저장소_URL&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;로컬에서_사용할_경로&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;등록 중 멈추는 경우 한 번에 주고 받을 수 있는 데이터의 용량 제한 때문일 수 있다. 부모 저장소에서 데이터 용량 제한을 늘린다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 버퍼 크기를 낭낭하게 500MB로 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global http.postBuffer &lt;span class="m"&gt;524288000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;그럼 로컬 앱에선 이미지가 잘 표현된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;서브 모듈에 변경이 발생하면 부모 저장소에서도 변경 사항이 있다고 표시된다.
+내용은 없지만 서브 모듈의 최신 상태를 바라보기 위한 포인터가 변경되는 거라고 한다.&lt;/p&gt;
+&lt;p&gt;서브 모듈 커밋 업로드, 부모 저장소에서 업데이트 두 번의 작업을 해야 하니 그냥 부모 저장소에선 서브 모듈의 변경을 무시하고 GitHub Actions에서 항상 서브 모듈의 최신 상태를 바라보도록 설정해야겠다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 서브모듈의 포인터 변화(커밋 변경)를 무시하도록 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config -f .gitmodules submodule.&lt;span class="s2"&gt;&amp;#34;[로컬에서_사용할_경로]&amp;#34;&lt;/span&gt;.ignore all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;명령어가 정상적으로 실행되면 &lt;code&gt;.gitmodules&lt;/code&gt; 파일에 다음과 같이 기록된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;[submodule &amp;#34;[로컬에서_사용할_경로]&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; path = [로컬에서_사용할_경로]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; url = [원격_저장소_URL]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ignore = all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;만약 지정하다가 실수하면 &lt;code&gt;.gitmodules&lt;/code&gt;, &lt;code&gt;.git/config&lt;/code&gt; 여기저기 기록이 남기 때문에 깔끔하게 지우는 절차가 중요하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;해당 경로를 제거&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.git/modules/&lt;/code&gt; 내부 보관소에서 서브 모듈 데이터 삭제&lt;/li&gt;
+&lt;li&gt;실제 폴더가 남아있다면 물리적으로 삭제&lt;/li&gt;
+&lt;li&gt;필요하다면 변경 사항 커밋&lt;/li&gt;
+&lt;li&gt;올바르게 다시 등록
+&lt;ol&gt;
+&lt;li&gt;만약 이미 존재하는 폴더라는 오류가 발생한다면 캐시를 비워야 할 수도 있다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="블로그-저장소에서-submodule-지정"&gt;블로그 저장소에서 Submodule 지정
+&lt;/h4&gt;&lt;p&gt;또 문제가 있다. 계획대로라면&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;이제 첨부 파일은 서브 모듈로 분리해서 관리&lt;/li&gt;
+&lt;li&gt;배포 시 post 경로는 새롭게 비운 뒤 업데이트&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;수동으로 낭만 있게 관리한다고 합리화하며 다음과 같은 트리로 관리하고 있던 구조를 바꿔야 한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hugo_Blog/content/post
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├─ [YEAR]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ ├─ [MONTH]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ └─ [DATE-TITLE]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ ├─ index.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ ├─ image1.[jpg|png]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ └─ image2.[jpg|png]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └─ ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├─ ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└─ README.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;일단 백업해두고 한 번 비우고 배포 돌리면 채워지겠지 뭐.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문서는 &lt;code&gt;content/post&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;정적 파일은 &lt;code&gt;static/assets/images&lt;/code&gt;, 이게 서브 모듈&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="성능이-우려되는데-일단-되는지-보자"&gt;성능이 우려되는데 일단 되는지 보자
+&lt;/h3&gt;&lt;p&gt;지금 계획은 Obsidian 커밋과 업로드 이후 GitHub Actions가 동작한다.
+다음과 같은 작업이 필요하고 $O(n)$의 복잡도를 가지게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;그나마 최적화를 위해 모든 문서의 상단만 읽고 게시 가능한지 판단&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;http&lt;/code&gt;, &lt;code&gt;https&lt;/code&gt; 등으로 시작하는 이미 외부 URL인 것을 제외한 로컬에서 등록한 이미지라고 판단되는 것들을 Hugo 구조에 맞게 치환&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;간단히 최적화 방안이 있는지만 확인&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PARA 체계를 이용하지만 대부분 Resource에서 작업하니까 여기만 스캔&lt;/li&gt;
+&lt;li&gt;Area, Archive 갔다가 문서 개정이 필요한 경우 Resource로 옮겨서 배포 후 정리&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;grep&lt;/code&gt;을 활용한 고속 필터링: 모든 파일을 열어서 내용을 확인하는 대신 파일 시스템 레벨에서 게시 가능 플래그를 포함한 파일 목록만 먼저 뽑기
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 내용에 &amp;#39;publish: true&amp;#39;가 포함된 파일 리스트만 추출&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grep -l &lt;span class="s2"&gt;&amp;#34;publish: true&amp;#34;&lt;/span&gt; *.md &amp;gt; publish_list.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sed&lt;/code&gt; 또는 &lt;code&gt;perl&lt;/code&gt; 이용한 일괄 치환: 파일을 하나씩 열어 저장하는 방식이 아니라 스트림 방식으로 메모리에서 바로 치환. 이런 식으로
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# http 또는 https로 시작하지 않는(?!http) 이미지 링크만 타겟팅&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;perl -i -pe &lt;span class="s1"&gt;&amp;#39;s/!\[\[(?!https?:\/\/)(.*?)\]\]/!\[\[\/assets\/$1\]\]/g&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;대상파일&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Git Diff를 활용한 증분 배포
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 마지막 커밋 이후 바뀐 파일만 골라내기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git diff --name-only HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이걸로 기대할 수 있는 것?
+복잡도는 $O(n)$이지만 실제 작업량$(n)$을 필터링으로 줄이고 작업 속도를 스트림 처리로 극대화&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;PARA 체계와 &lt;code&gt;grep&lt;/code&gt;의 시너지
+&lt;ul&gt;
+&lt;li&gt;전체 문서에서 Resource로 스캔 범위 제한&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;grep&lt;/code&gt;은 파일을 메모리에 다 올리지 않고 바이너리 수준에서 패턴만 훑고 지나가기 때문에 수천 개의 파일을 찾아도 거의 파일 시스템 탐색 속도와 맞먹음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;perl&lt;/code&gt; 스트림 처리로 속도 최적화
+&lt;ul&gt;
+&lt;li&gt;파일을 열고 닫는 오버헤드가 없음&lt;/li&gt;
+&lt;li&gt;한 줄씩 흐르듯 지나가며 치환하므로 텍스트 데이터 처리에 있어서는 이론적으로 최대 속도&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Git Diff 증분 배포
+&lt;ul&gt;
+&lt;li&gt;$(n)$을 전체 문서-Resource-오늘 내가 수정한 문서로 범위 제한&lt;/li&gt;
+&lt;li&gt;문서가 많아져도 오늘 3개만 작업했다면 작업량은 3개뿐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;그 다음으로 고민해볼 것&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이미지 존재 여부 체크: 치환된 이미지 파일이 실제 서브 모듈에 있는지 체크하여 누락된 이미지가 있다면 빌드 타임에 경고&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;rsync&lt;/code&gt; 활용: 파일이 변경된 경우에만 복사하므로 I/O를 한 번 더 아낄 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="obsidian-저장소에서-github-actions-작성"&gt;Obsidian 저장소에서 GitHub Actions 작성
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;publish: true&lt;/code&gt;인 파일만 골라낸다.&lt;/li&gt;
+&lt;li&gt;위키 링크를 표준 마크다운으로 바꾸고 이미지 경로를 &lt;code&gt;assets&lt;/code&gt;로 변경&lt;/li&gt;
+&lt;li&gt;가공된 파일을 Hugo 저장소로 보내기, 이후 Hugo 저장소에서 빌드 트리거&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="github-token-설정"&gt;GitHub Token 설정
+&lt;/h4&gt;&lt;p&gt;Obsidian 저장소가 Hugo 저장소에 접근하여 파일을 push해야 하므로 PAT(Personal Access Token) 필요&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;GitHub 설정 &amp;gt; Developer settings &amp;gt; Personal access tokens&lt;/code&gt;에서 생성
+&lt;ul&gt;
+&lt;li&gt;권한: repo 전체&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;생성한 토큰을 Obsidian 저장소의 &lt;code&gt;Settings &amp;gt; Secrets and variable &amp;gt; Actions&lt;/code&gt;에 등록&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="githubworkflowsdeployyml"&gt;.github/workflows/deploy.yml
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;v1.0.2까지 기록됨&lt;/p&gt;
+&lt;p&gt;현재 버전은 위키링크 변환 시 OS에서 허용하는 파일명의 특수 기호, 공백 등을 고려하지 않아 문제가 발생할 수 있음.&lt;/p&gt;
+&lt;p&gt;이후 저장소 문서로 관리 예정.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;옵시디언의 위키링크와 로컬 이미지 경로를 AST 기반 Node 변환 스크립트로 표준 마크다운 및 형식으로 변환하도록 구현&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;deploy.yml&lt;/code&gt;에서 기존 Perl 치환을 제거하고 해당 스크립트 호출로 교체&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;트리거 및 타겟팅 제어
+&lt;ul&gt;
+&lt;li&gt;특정 경로 감시: &lt;code&gt;02.Resource/**&lt;/code&gt; 폴더 내의 변경 사항이 발생할 때만 배포가 실행되도록 제한하여 불필요한 빌드를 방지한다.&lt;/li&gt;
+&lt;li&gt;멀티 저장소 체크아웃: 옵시디언 저장소뿐만 아니라 배포 대상인 Hugo 저장소를 동시에 관리한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;파일 스캐닝 (awk 활용)
+&lt;ul&gt;
+&lt;li&gt;조건부 배포 필터링: 모든 파일을 배포하는 것이 아니라, 파일 상단 15줄 이내에 publish: true 또는 false 설정이 있는 파일만 추출한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;경로 확장성: 주석 처리를 통해 03.Area, 04.Archive 등 다른 PARA 폴더로의 확장 가능성&lt;/li&gt;
+&lt;li&gt;마크다운 변환 (Perl 정규식 활용)
+&lt;ul&gt;
+&lt;li&gt;코드 블록 보호: 변환 시 코드 블록(&amp;hellip;) 내부나 인라인 코드는 건드리지 않도록 스킵 로직 적용&lt;/li&gt;
+&lt;li&gt;링크 체계 자동 보정: 옵시디언 전용 위키링크를 표준 마크다운 이미지 링크로 변환&lt;/li&gt;
+&lt;li&gt;모든 로컬 이미지 경로를 Hugo 기준으로 자동 보정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Front Matter 동적 변환: publish 상태값에 따라 Hugo가 인식하는 draft 필드(true/false)를 자동으로 삽입하여 배포 상태를 동기화&lt;/li&gt;
+&lt;li&gt;동기화 및 업서트 (UPSERT)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;rsync&lt;/code&gt; 체크섬 비교: 단순히 파일을 덮어쓰는 것이 아니라, &lt;code&gt;--checksum&lt;/code&gt; 옵션을 통해 실제 내용의 변경이 있는 파일만 선별적으로 업데이트&lt;/li&gt;
+&lt;li&gt;임시 스테이징: &lt;code&gt;temp_posts&lt;/code&gt; 폴더에서 모든 변환 작업을 마친 후 최종본만 대상 저장소에 동기화하여 안정성 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자동 커밋 및 배포 최적화
+&lt;ul&gt;
+&lt;li&gt;변경 감지: &lt;code&gt;git diff --cached --quiet&lt;/code&gt; 명령을 사용하여 실제로 변경된 내용이 있을 때만 커밋을 생성&lt;/li&gt;
+&lt;li&gt;이력 추적: 커밋 메시지에 배포 시각을 포함하여 버전 관리를 용이하게 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt; 10
+&lt;/span&gt;&lt;span class="lnt"&gt; 11
+&lt;/span&gt;&lt;span class="lnt"&gt; 12
+&lt;/span&gt;&lt;span class="lnt"&gt; 13
+&lt;/span&gt;&lt;span class="lnt"&gt; 14
+&lt;/span&gt;&lt;span class="lnt"&gt; 15
+&lt;/span&gt;&lt;span class="lnt"&gt; 16
+&lt;/span&gt;&lt;span class="lnt"&gt; 17
+&lt;/span&gt;&lt;span class="lnt"&gt; 18
+&lt;/span&gt;&lt;span class="lnt"&gt; 19
+&lt;/span&gt;&lt;span class="lnt"&gt; 20
+&lt;/span&gt;&lt;span class="lnt"&gt; 21
+&lt;/span&gt;&lt;span class="lnt"&gt; 22
+&lt;/span&gt;&lt;span class="lnt"&gt; 23
+&lt;/span&gt;&lt;span class="lnt"&gt; 24
+&lt;/span&gt;&lt;span class="lnt"&gt; 25
+&lt;/span&gt;&lt;span class="lnt"&gt; 26
+&lt;/span&gt;&lt;span class="lnt"&gt; 27
+&lt;/span&gt;&lt;span class="lnt"&gt; 28
+&lt;/span&gt;&lt;span class="lnt"&gt; 29
+&lt;/span&gt;&lt;span class="lnt"&gt; 30
+&lt;/span&gt;&lt;span class="lnt"&gt; 31
+&lt;/span&gt;&lt;span class="lnt"&gt; 32
+&lt;/span&gt;&lt;span class="lnt"&gt; 33
+&lt;/span&gt;&lt;span class="lnt"&gt; 34
+&lt;/span&gt;&lt;span class="lnt"&gt; 35
+&lt;/span&gt;&lt;span class="lnt"&gt; 36
+&lt;/span&gt;&lt;span class="lnt"&gt; 37
+&lt;/span&gt;&lt;span class="lnt"&gt; 38
+&lt;/span&gt;&lt;span class="lnt"&gt; 39
+&lt;/span&gt;&lt;span class="lnt"&gt; 40
+&lt;/span&gt;&lt;span class="lnt"&gt; 41
+&lt;/span&gt;&lt;span class="lnt"&gt; 42
+&lt;/span&gt;&lt;span class="lnt"&gt; 43
+&lt;/span&gt;&lt;span class="lnt"&gt; 44
+&lt;/span&gt;&lt;span class="lnt"&gt; 45
+&lt;/span&gt;&lt;span class="lnt"&gt; 46
+&lt;/span&gt;&lt;span class="lnt"&gt; 47
+&lt;/span&gt;&lt;span class="lnt"&gt; 48
+&lt;/span&gt;&lt;span class="lnt"&gt; 49
+&lt;/span&gt;&lt;span class="lnt"&gt; 50
+&lt;/span&gt;&lt;span class="lnt"&gt; 51
+&lt;/span&gt;&lt;span class="lnt"&gt; 52
+&lt;/span&gt;&lt;span class="lnt"&gt; 53
+&lt;/span&gt;&lt;span class="lnt"&gt; 54
+&lt;/span&gt;&lt;span class="lnt"&gt; 55
+&lt;/span&gt;&lt;span class="lnt"&gt; 56
+&lt;/span&gt;&lt;span class="lnt"&gt; 57
+&lt;/span&gt;&lt;span class="lnt"&gt; 58
+&lt;/span&gt;&lt;span class="lnt"&gt; 59
+&lt;/span&gt;&lt;span class="lnt"&gt; 60
+&lt;/span&gt;&lt;span class="lnt"&gt; 61
+&lt;/span&gt;&lt;span class="lnt"&gt; 62
+&lt;/span&gt;&lt;span class="lnt"&gt; 63
+&lt;/span&gt;&lt;span class="lnt"&gt; 64
+&lt;/span&gt;&lt;span class="lnt"&gt; 65
+&lt;/span&gt;&lt;span class="lnt"&gt; 66
+&lt;/span&gt;&lt;span class="lnt"&gt; 67
+&lt;/span&gt;&lt;span class="lnt"&gt; 68
+&lt;/span&gt;&lt;span class="lnt"&gt; 69
+&lt;/span&gt;&lt;span class="lnt"&gt; 70
+&lt;/span&gt;&lt;span class="lnt"&gt; 71
+&lt;/span&gt;&lt;span class="lnt"&gt; 72
+&lt;/span&gt;&lt;span class="lnt"&gt; 73
+&lt;/span&gt;&lt;span class="lnt"&gt; 74
+&lt;/span&gt;&lt;span class="lnt"&gt; 75
+&lt;/span&gt;&lt;span class="lnt"&gt; 76
+&lt;/span&gt;&lt;span class="lnt"&gt; 77
+&lt;/span&gt;&lt;span class="lnt"&gt; 78
+&lt;/span&gt;&lt;span class="lnt"&gt; 79
+&lt;/span&gt;&lt;span class="lnt"&gt; 80
+&lt;/span&gt;&lt;span class="lnt"&gt; 81
+&lt;/span&gt;&lt;span class="lnt"&gt; 82
+&lt;/span&gt;&lt;span class="lnt"&gt; 83
+&lt;/span&gt;&lt;span class="lnt"&gt; 84
+&lt;/span&gt;&lt;span class="lnt"&gt; 85
+&lt;/span&gt;&lt;span class="lnt"&gt; 86
+&lt;/span&gt;&lt;span class="lnt"&gt; 87
+&lt;/span&gt;&lt;span class="lnt"&gt; 88
+&lt;/span&gt;&lt;span class="lnt"&gt; 89
+&lt;/span&gt;&lt;span class="lnt"&gt; 90
+&lt;/span&gt;&lt;span class="lnt"&gt; 91
+&lt;/span&gt;&lt;span class="lnt"&gt; 92
+&lt;/span&gt;&lt;span class="lnt"&gt; 93
+&lt;/span&gt;&lt;span class="lnt"&gt; 94
+&lt;/span&gt;&lt;span class="lnt"&gt; 95
+&lt;/span&gt;&lt;span class="lnt"&gt; 96
+&lt;/span&gt;&lt;span class="lnt"&gt; 97
+&lt;/span&gt;&lt;span class="lnt"&gt; 98
+&lt;/span&gt;&lt;span class="lnt"&gt; 99
+&lt;/span&gt;&lt;span class="lnt"&gt;100
+&lt;/span&gt;&lt;span class="lnt"&gt;101
+&lt;/span&gt;&lt;span class="lnt"&gt;102
+&lt;/span&gt;&lt;span class="lnt"&gt;103
+&lt;/span&gt;&lt;span class="lnt"&gt;104
+&lt;/span&gt;&lt;span class="lnt"&gt;105
+&lt;/span&gt;&lt;span class="lnt"&gt;106
+&lt;/span&gt;&lt;span class="lnt"&gt;107
+&lt;/span&gt;&lt;span class="lnt"&gt;108
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deploy Posts to Hugo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;push&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;branches&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;main &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 브랜치명&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;paths&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# PARA 체계 중 배포 대상이 포함된 폴더만 감시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s1"&gt;&amp;#39;02.Resource/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;#     - &amp;#39;03.Area/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;#     - &amp;#39;04.Archive/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;jobs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;deploy&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;runs-on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ubuntu-latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;steps&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Checkout Obsidian Vault&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@v4&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;fetch-depth&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 증분 배포(diff)를 위해 전체 이력 가져오기&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Set up Hugo Repo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@v4&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;repository&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="l"&gt;계정]/[Hugo_저장소_이름]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;token&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;${{ secrets.HUGO_DEPLOY_TOKEN }}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;hugo-dest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Hugo 저장소를 임시 폴더에 체크아웃&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Filter and Transform Posts&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 1. 폴더를 비우지 않고, 변환 작업을 위한 임시 스테이징 폴더 생성
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; mkdir -p temp_posts
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; mkdir -p hugo-dest/content/post/ # 대상 폴더가 없을 경우 대비
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 2. 하위 폴더 탐색 및 awk 실행
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # shopt -s globstar: ** 패턴 사용을 위한 셸 옵션 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; shopt -s globstar
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; PUBLISH_FILES=$(awk &amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; FNR &amp;lt;= 15 &amp;amp;&amp;amp; /publish: (true|false)/ { print FILENAME; nextfile }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; FNR &amp;gt; 15 { nextfile }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 스캔 범위 02.Resource로 제한할 때 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; &amp;#39; 02.Resource/**/*.md || true)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 스캔 범위 일시적으로 늘릴 때 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; #&amp;#39; 02.Resource/**/*.md 03.Area/**/*.md 04.Archive/**/*.md || true)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; if [ -z &amp;#34;$PUBLISH_FILES&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; echo &amp;#34;배포 대상 파일이 없습니다.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; exit 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 3. 파일 복사 및 변환 대상을 temp_posts로 지정
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 공백이 포함된 파일명을 안전하게 처리하기 위해 IFS 설정
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; SAVEIFS=$IFS
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; IFS=$&amp;#39;\n&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; for file in $PUBLISH_FILES; do
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 파일명만 추출
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; filename=$(basename &amp;#34;$file&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # hugo-dest가 아닌 임시 폴더(temp_posts)에 먼저 복사
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; dest=&amp;#34;temp_posts/$filename&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 복사 (파일 경로에 따옴표 필수)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 4. Perl 통합 치환 (코드 블록 보호 및 경로 보정)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 동적 백틱 개수 대응: 시작한 백틱 개수만큼 닫는 백틱이 나올 때까지 스킵
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 인라인 코드 보호: 한 줄 내의 백틱 영역 스킵
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 위키링크 변환 `![[]]` -&amp;gt; `![]()` 및 표준링크 프리픽스 보정을 한 번의 스캔으로 처리
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -0777 -pe &amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; s/
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; (?:^|\n)(`{3,})[\s\S]*?\n\1(?:\n|$) (*SKIP)(*F) |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; `[^`\n]+` (*SKIP)(*F) |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; (?:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; !\[\[(?!https?:\/\/)(.*?)\]\] |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; !\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; )
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; /
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; $2 ? &amp;#34;![](\/assets\/images\/$2)&amp;#34; : &amp;#34;!\[$3\](\/assets\/images\/$4)&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; /gex&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # [추가] publish: false 발견 시 바로 다음 줄에 draft: true 삽입, Hugo에서 제공하는 front matter 활용
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # s/찾을패턴/대체패턴/g 활용
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^(publish:\s*false)/$1\ndraft: true/g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^(publish:\s*true)/$1\ndraft: false/g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^image:\s*$/# image: /g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; done
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 5. rsync를 이용한 UPSERT (변경 상태 비교 및 동기화)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # --checksum: 파일 내용이 실제로 변했는지 체크
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; rsync -av --checksum temp_posts/ hugo-dest/content/post/
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # IFS 복구
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; IFS=$SAVEIFS&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Push to Hugo Repo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; cd hugo-dest
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git config user.name &amp;#34;github-actions[bot]&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git config user.email &amp;#34;github-actions[bot]@users.noreply.github.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git add .
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 변경사항이 있을 때만 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; if ! git diff --cached --quiet; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git commit -m &amp;#34;Update posts from Obsidian (at $(date +&amp;#39;%Y-%m-%d %H:%M:%S&amp;#39;))&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; echo &amp;#34;변경 사항이 없어 배포를 진행하지 않습니다.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; fi&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;마크다운 표준에서는 코드 블록 내부에 &lt;code&gt;```&lt;/code&gt;이 들어갈 경우 외부 감싸개는 그보다 많은 백틱 4개(&lt;code&gt;````&lt;/code&gt;)를 사용하도록 권장한다.&lt;/p&gt;
+&lt;p&gt;만약 코드 내부에 백틱 4개가 들어있다면 외부는 5개로 감싸야 하며, 이 개수에는 제한이 없다.
+반드시 바깥쪽이 안쪽보다 최소 1개는 더 많아야 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="파일-탐색-방식-기술-비교"&gt;파일 탐색 방식 기술 비교
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;방식&lt;/th&gt;
+&lt;th&gt;기술적 명칭&lt;/th&gt;
+&lt;th&gt;특징 (비유)&lt;/th&gt;
+&lt;th&gt;효율성&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;grep&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;고속 전수 조사&lt;/td&gt;
+&lt;td&gt;책을 아주 빨리 넘기며 단어를 찾지만, &lt;strong&gt;결국 끝까지 다 읽음&lt;/strong&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;중간&lt;/strong&gt; (단순하지만 낭비 있음)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;find + head&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;개별 정밀 조사&lt;/td&gt;
+&lt;td&gt;책 한 권을 꺼내 &lt;strong&gt;앞부분만 보고 다시 꽂기를 반복&lt;/strong&gt;. (책을 꺼내고 넣는 동작이 너무 많음)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;낮음&lt;/strong&gt; (오버헤드 큼)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;awk&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;조건부 조기 종료 스캔&lt;/td&gt;
+&lt;td&gt;책을 펼쳐 &lt;strong&gt;앞부분에 단어가 없으면 즉시 다음 책으로 넘어감&lt;/strong&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;최상&lt;/strong&gt; (가장 지능적임)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="이미지가-왜-자꾸-안-나와"&gt;이미지가 왜 자꾸 안 나와?
+&lt;/h3&gt;&lt;p&gt;Obsidian 저장소, Hugo 저장소에서 Asssets 저장소를 서브 모듈로 등록했다.
+로컬 앱에선 이미지가 잘 보인다. 근데 Hugo 빌드 및 배포하면 포스팅에 이미지가 안 나온다?&lt;/p&gt;
+&lt;p&gt;Hugo는 내부적으로 루트에 assets 폴더가 있고 static 폴더는 정적 리소스로 빌드에 포함된다.
+assets 하위 img 폴더는 사이트 UI에 사용되는 것 같은데 static 폴더에 등록해둔 서브 모듈의 소스는 왜 배포된 포스팅에 제대로 노출이 안 되지?&lt;/p&gt;
+&lt;p&gt;GitHub 저장소의 소스를 다른 곳에 서빙하기 위한 권한 문제인가?
+프리픽스가 잘못됐나? 그냥 루트의 assets 폴더에 배치해야 하나?
+근데 static 폴더가 정적 리소스로 사용하기 위해 설계된 구조인데 왜지?&lt;/p&gt;
+&lt;p&gt;Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 빌드할 때 포함되지 않았던 것. 빌드할 때 submodule에 대한 정의가 없어서 그냥 빈 폴더처럼 다루고 있었던 것이었다. 경로는 내가 계획한 게 맞았고 Actions 실행되는 동안 내부적으로 그 소스에 접근해서 빌드를 생성할 수 있게 설정이 필요했다.&lt;/p&gt;
+&lt;p&gt;올바르게 구성하고 이미지 확인까지 한 후 기존의 포스팅을 다시 점검하는 시간을 가지게 됐다.&lt;/p&gt;
+&lt;h3 id="properties-관리"&gt;Properties 관리
+&lt;/h3&gt;&lt;p&gt;문서 상단 Properties를 표준화해서 관리한다면 이후에 다른 모듈로 변경할 때 상당히 간편한 전환을 기대할 수 있겠다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;publish&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;draft&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;title&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;문서 제목&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;description&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;문서 설명&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;author&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;작성자&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;date&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;작성일시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;categories&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;Level1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;Level2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;tag1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;tag2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;Status&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ToDo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="상태-유지형-업데이트-개선-방향"&gt;상태 유지형 업데이트 개선 방향
+&lt;/h3&gt;&lt;p&gt;현재는 문서량이 적으므로 전수 조사 후 전체 복사 방식이 가장 에러가 없고 관리하기 편하다.&lt;/p&gt;
+&lt;p&gt;지금처럼 모두 지우고 새로 복사하는 것이 아니라 &lt;strong&gt;파일의 변경 상태를 비교&lt;/strong&gt;하여 필요한 동작만 수행하는 방식으로 개선해보자.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# AS-IS: 전체 삭제 후 복사&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 1. 일단 다 지움 (이 때문에 Git 히스토리가 매번 끊김)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;rm -rf hugo-dest/content/post/*&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;mkdir -p hugo-dest/content/post/&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 2. 파일마다 바로 Hugo 저장소로 복사&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;for file in $PUBLISH_FILES; do&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;dest=&amp;#34;hugo-dest/content/post/$filename&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 여기서 치환을 수행 (치환 중 실패하면 Hugo 저장소 파일이 오염됨)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;done&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# TO-BE: 임시 폴더 작업 후 rsync 동기화&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 1. 기존 파일을 지우지 않고 임시 작업장 생성&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;mkdir -p temp_posts&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 2. 임시 폴더에서 안전하게 모든 변환 완료&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;for file in $PUBLISH_FILES; do&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;dest=&amp;#34;temp_posts/$filename&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Perl 치환 수행 (성공한 결과물만 임시 폴더에 쌓임)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;done&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 3. rsync로 실제 바뀐 파일만 골라서 Hugo 저장소에 &amp;#39;동기화&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;rsync -av --checksum temp_posts/ hugo-dest/content/post/&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;신규 게시, 업데이트하고 싶은 건 &lt;code&gt;Resource&lt;/code&gt;로 가져온다&amp;quot;는 단 하나의 원칙만 지키면 된다.
+&lt;strong&gt;Obsidian은 UPSERT에 집중하고 Hugo는 게시 상태를 판단한다.&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;수정(Update):&lt;/strong&gt; &lt;code&gt;Resource&lt;/code&gt;에서 내용을 고치고 배포하면 Hugo에 이미 있는 같은 이름의 파일을 덮어쓴다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;누적(Accumulate):&lt;/strong&gt; &lt;code&gt;Resource&lt;/code&gt;에서 작업이 끝나 &lt;code&gt;Area&lt;/code&gt;로 옮겨버려도 다음 배포 시 &lt;code&gt;Resource&lt;/code&gt;만 스캔하므로 Hugo에 이미 들어가 있는 파일은 건드리지 않고 그대로 유지된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;a class="link" href="https://gohugo.io/content-management/front-matter/" target="_blank" rel="noopener"
+&gt;Hugo - Front matter&lt;/a&gt;
+문서 상단 속성의 &lt;code&gt;publish&lt;/code&gt; 값으로 게시 상태를 판단하려고 했는데 Hugo에서 기본적으로 &lt;code&gt;draft&lt;/code&gt; 값으로 게시 상태를 다룰 수 있어서 이걸 활용한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;옵시디언 데이터를 SSoT로 삼아 GitHub Actions 환경에서 입맛에 맞게 소스를 가공한 뒤 원하는 배포 툴을 이용해 빌드 및 배포하며 GitHub 저장소를 활용해서 첨부 파일을 서빙하는 구조를 완성했다.&lt;/p&gt;
+&lt;p&gt;각 저장소가 어떤 책임을 가지는지, GitHub Actions에서 어떤 처리를 해주면 처리가 간편해지는지 고민해볼 수 있어서 좋았다.&lt;/p&gt;
+&lt;p&gt;호스팅 쓰자. 🙂&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Static Site Generator (SSG)&lt;/strong&gt;: 정적 사이트 생성기. 마크다운 같은 텍스트 파일을 빌드 시점에 정적 HTML로 변환해주는 도구로 Hugo, Jekyll, Quartz 등이 대표적이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git Submodule&lt;/strong&gt;: 하나의 Git 저장소 안에 다른 Git 저장소를 하위 폴더로 포함하는 기능이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Actions (CI/CD)&lt;/strong&gt;: 코드가 Push될 때 특정 작업을 자동으로 수행하는 도구다. 여기서는 문서 필터링, 문법 치환, 파일 전송의 자동화 엔진 역할을 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Regular Expression (Regex)&lt;/strong&gt;: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(&lt;code&gt;![[]]&lt;/code&gt;)를 마크다운 링크(&lt;code&gt;![]()&lt;/code&gt;)로 변환하는 등에 핵심적으로 사용된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;PARA Method&lt;/strong&gt;: 디지털 정보를 관리하는 4단계 체계(Project, Area, Resource, Archive)로, 효율적인 노트 관리를 돕는 프레임워크. &lt;a class="link" href="https://fortelabs.com/blog/para/" target="_blank" rel="noopener"
+&gt;Tiago Forte의 공식 웹사이트&lt;/a&gt;에서 더 상세한 내용을 볼 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hugo Documentation&lt;/strong&gt;: 세계에서 가장 빠른 SSG인 Hugo의 공식 문서. &lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
+&gt;gohugo.io&lt;/a&gt;에서 다양한 테마와 빌드 옵션을 확인할 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Fine-grained PAT&lt;/strong&gt;: 기존 Classic 토큰보다 보안이 강화된 세분화된 접근 토큰 설정 방법이다. 특정 저장소에만 읽기/쓰기 권한을 부여하는 방법 등 권한 관련 학습하면 좋다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Perl One-liner&lt;/strong&gt;: 스크립트 파일 없이 터미널에서 즉시 실행하는 Perl 명령어 활용법이다. 대용량 파일의 스트림 기반 텍스트 처리에 강력한 성능을 발휘한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Incremental Builds&lt;/strong&gt;: 모든 파일을 다시 빌드하지 않고 변경된 파일만 처리하는 방식이다. &lt;code&gt;git diff&lt;/code&gt; 활용 전략을 확장하여 빌드 시간을 더 단축하는 방법을 탐구해 볼 수 있다.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS ElastiCache Redis 배포</title><link>https://blog.b9f1.com/p/2025-10-16-deploy-aws-elasticache-redis/</link><pubDate>Thu, 16 Oct 2025 17:17:14 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-10-16-deploy-aws-elasticache-redis/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;현재 프로젝트에서는 PostgreSQL(RDS), Kafka(Confluent Cloud)와 함께 Redis를 세션/캐시용으로 운영해야 하는 상황이다.&lt;/p&gt;
+&lt;p&gt;Redis를 로컬에서 &lt;code&gt;docker-compose&lt;/code&gt;로 테스트는 했지만 운영 환경에서의 연결 구조와 설정 원리를 명확히 이해하고자 한다.&lt;/p&gt;
+&lt;p&gt;현재 계획은 ECS Fargate 기반 분산 환경이며 Redis를 어떻게 배포하고 연결하는지 간단히 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="redis는-기본-구성만으로-동작한다"&gt;Redis는 기본 구성만으로 동작한다
+&lt;/h3&gt;&lt;p&gt;Redis는 HTTP 기반이 아닌 TCP 기반의 Key-Value 서버다.
+HTTP처럼 경로 개념이 없고 단순히 정의된 포트(기본 6379)로 열려 있는 소켓을 통해 명령을 주고 받는다.&lt;/p&gt;
+&lt;p&gt;즉, Redis는 복잡한 인증이나 핸드셰이크 없이도 클라이언트가 IP와 포트를 알고 있으면 바로 접근 가능한 구조다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis는 &lt;code&gt;host:port&lt;/code&gt; 기반의 TCP 프로토콜만 있으면 동작한다.&lt;/li&gt;
+&lt;li&gt;별도의 서비스 레이어가 없으므로 설정의 핵심은 어디로 붙을 것인가.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="spring-boot에서-redis-연결-구조"&gt;Spring Boot에서 Redis 연결 구조
+&lt;/h3&gt;&lt;p&gt;Spring Boot는 &lt;code&gt;spring-boot-starter-data-redis&lt;/code&gt; 의존성만 추가하면 간단하게 &lt;code&gt;LettuceConnectionFactory&lt;/code&gt;, &lt;code&gt;RedisTemplate&lt;/code&gt;, &lt;code&gt;CacheManager&lt;/code&gt; 등을 등록한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;host&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;redis-cluster.xxxxxx.apn2.cache.amazonaws.com&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;port&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6379&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;별도의 Bean을 등록하지 않아도 Spring Boot는 이를 감지해 자동 연결한다.
+설정을 생략하면 기본값(&lt;code&gt;localhost:6379&lt;/code&gt;)으로 시도한다.&lt;/p&gt;
+&lt;h3 id="elastic-redis-배포-개요"&gt;Elastic Redis 배포 개요
+&lt;/h3&gt;&lt;p&gt;AWS에서는 ElastiCache Redis OSS를 사용하면 서버 설치 없이 관리형 Redis 클러스터를 사용할 수 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구성 요소&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Primary Node&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;쓰기 담당 Redis 노드&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Replica Node&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;읽기 전용 복제본 (선택사항)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Cluster&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;여러 샤드로 데이터를 분산 저장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Endpoint&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;연결용 주소 (&lt;code&gt;.cache.amazonaws.com&lt;/code&gt;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="ecs-fargate-연결-구조"&gt;ECS Fargate 연결 구조
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;보안 그룹 규칙&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Inbound: 6379 허용 (ECS -&amp;gt; Redis)&lt;/li&gt;
+&lt;li&gt;Outbound: ECS에서 Redis SG(Security Group)로 접근 허용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;VPC&lt;/strong&gt;: 같은 VPC 또는 피어링된 네트워크에 존재해야 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="로컬-docker와-운영-redis의-관계"&gt;로컬 Docker와 운영 Redis의 관계
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;로컬 환경&lt;/th&gt;
+&lt;th&gt;운영 환경&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;호스트&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;localhost:6379&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;Elasticache Endpoint&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;목적&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;개발 및 단위 테스트&lt;/td&gt;
+&lt;td&gt;실제 서비스 운영&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;공유 여부&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;완전히 분리&lt;/td&gt;
+&lt;td&gt;완전히 분리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;차이점&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단일 인스턴스&lt;/td&gt;
+&lt;td&gt;멀티 AZ, 클러스터링, 모니터링 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;즉, 코드상으로는 동일한 RedisTemplate을 사용하지만 환경 변수(&lt;code&gt;SPRING_DATA_REDIS_HOST&lt;/code&gt;, &lt;code&gt;SPRING_DATA_REDIS_PORT&lt;/code&gt;)만 달라진다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;호스트와 포트를 맞추어&lt;/strong&gt; TCP 레벨에서 연결만 되면 Redis는 별도 복잡한 설정 없이 바로 동작한다.&lt;/p&gt;
+&lt;h3 id="운영-시-고려사항"&gt;운영 시 고려사항
+&lt;/h3&gt;&lt;p&gt;운영 환경에서는 다음 항목들을 통해 &lt;strong&gt;보안과 안정성을 강화&lt;/strong&gt;할 수 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안 그룹 제한&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Redis 포트(6379)는 오직 ECS 서비스의 보안 그룹에서만 접근 가능하도록 설정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;VPC 내부 통신&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;퍼블릭 액세스를 비활성화하고, VPC 내부 트래픽으로만 접근을 제한한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;암호화 옵션&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Elasticache 생성 시 ‘전송 중 암호화(Encryption in-transit)’ 및 ‘저장 시 암호화(Encryption at-rest)’를 활성화한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Redis AUTH (선택)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;OSS 기본은 인증 미지원이지만, 필요 시 Redis Enterprise 또는 프록시 계층을 통해 비밀번호 인증을 구성할 수 있다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;세션 공유 설정&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Spring Boot 세션 스토어를 Redis로 변경 (&lt;code&gt;spring.session.store-type=redis&lt;/code&gt;).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;TTL 관리&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;캐시 만료시간을 반드시 설정 (&lt;code&gt;Duration.ofMinutes(...)&lt;/code&gt; 등).&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;모니터링&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;CloudWatch, Redis SlowLog, CloudWatch Metrics 등을 활용해 지표와 성능을 추적한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;Redis는 기본적으로 포트만 맞으면 동작하지만,&lt;br&gt;
+운영 환경에서는 &lt;strong&gt;보안 그룹, VPC, 암호화 옵션&lt;/strong&gt;을 통해 최소한의 방어선을 만들 수 있다.&lt;/p&gt;
+&lt;p&gt;Spring Boot에서는 host와 port만 지정하면 자동으로 연결되고 Elasticache Redis는 이를 VPC 내부에서 안전하게 관리해준다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS ECS / VPC / Security Group 개념&lt;/li&gt;
+&lt;li&gt;Redis Key-Value 구조 및 기본 명령&lt;/li&gt;
+&lt;li&gt;Spring Boot 자동 설정 (&lt;code&gt;spring-boot-starter-data-redis&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/ko/elasticache/redis/" target="_blank" rel="noopener"
+&gt;Redis OSS 호환 Amazon ElastiCache&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-data/redis/reference/" target="_blank" rel="noopener"
+&gt;Spring Data Redis Reference&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://redis.io/docs/latest/develop/reference/protocol-spec/" target="_blank" rel="noopener"
+&gt;Redis serialization protocol specification&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-peering.html" target="_blank" rel="noopener"
+&gt;VPC 피어링을 사용하여 VPC 연결&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://devoong2.tistory.com/entry/Kafka-%EC%99%80-Redis-%EC%9D%98-PubSub-%EB%B9%84%EA%B5%90" target="_blank" rel="noopener"
+&gt;Kafka 와 Redis 의 Pub/Sub 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Kafka vs Confluent</title><link>https://blog.b9f1.com/p/2025-10-16-kafka-vs-confluent-open-source-and-managed-data-streaming-infrastructure/</link><pubDate>Thu, 16 Oct 2025 14:48:14 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-10-16-kafka-vs-confluent-open-source-and-managed-data-streaming-infrastructure/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;이벤트 기반 아키텍처에서 Kafka는 시스템 간 메시지 정합성을 유지하는 핵심 역할을 한다. 그런데 이 Kafka를 어떻게 배포할 것인지 선택해야 한다.&lt;/p&gt;
+&lt;p&gt;직접 서버에 구축할 수도 있고 AWS MSK 같은 클라우드 관리형 서비스를 쓸 수도 있고 Confluent Cloud처럼 Kafka 전문 업체의 완전 관리형 서비스를 이용할 수도 있다.&lt;/p&gt;
+&lt;p&gt;각 배포 방식의 특징과 장단점을 비교하여 프로젝트에 맞는 Kafka 인프라 선택 기준을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="kafka-배포-방법"&gt;Kafka 배포 방법
+&lt;/h3&gt;&lt;p&gt;Kafka를 배포하는 방법은 크게 세 가지로 나눌 수 있다.&lt;/p&gt;
+&lt;h4 id="1-자체-배포"&gt;1. 자체 배포
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;직접 서버에 Kafka 설치 및 운영&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;배포 환경&lt;/strong&gt;: 온프레미스 서버, AWS EC2, Azure VM, GCP Compute Engine 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;설치 방법&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;바이너리 다운로드 후 수동 설치&lt;/li&gt;
+&lt;li&gt;Docker/Kubernetes를 통한 컨테이너 배포&lt;/li&gt;
+&lt;li&gt;Ansible, Terraform 등 IaC 도구 활용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;구성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;Kafka 브로커 클러스터 (보통 3대 이상)&lt;/li&gt;
+&lt;li&gt;메타데이터 관리 (Kafka 4.x는 KRaft 자체 관리)&lt;/li&gt;
+&lt;li&gt;모니터링 스택 (Prometheus, Grafana 등)&lt;/li&gt;
+&lt;li&gt;Kafka Connect, Schema Registry 등 별도 구축&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;완전한 제어권: 모든 설정과 튜닝 가능&lt;/li&gt;
+&lt;li&gt;비용 최적화: 대규모 트래픽에서 인프라 비용 절감&lt;/li&gt;
+&lt;li&gt;데이터 주권: 온프레미스나 특정 리전에 데이터 보관&lt;/li&gt;
+&lt;li&gt;커스터마이징: 특수한 요구사항 반영 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;높은 운영 부담: 2-3명의 전담 인력 필요&lt;/li&gt;
+&lt;li&gt;전문성 요구: Kafka 내부 구조 이해 필수&lt;/li&gt;
+&lt;li&gt;장애 대응: 24/7 온콜 체계 구축 필요&lt;/li&gt;
+&lt;li&gt;초기 구축 시간: 안정화까지 수주~수개월 소요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-클라우드-관리형-서비스"&gt;2. 클라우드 관리형 서비스
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;클라우드 제공자의 Kafka 관리 서비스 이용&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AWS MSK (Managed Streaming for Kafka)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;AWS가 Kafka 클러스터 및 인프라 관리&lt;/li&gt;
+&lt;li&gt;VPC 내부에서 프라이빗 연결&lt;/li&gt;
+&lt;li&gt;CloudWatch 통합 모니터링&lt;/li&gt;
+&lt;li&gt;자동 패치 및 버전 업그레이드&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Azure Event Hubs for Kafka&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka 프로토콜 호환 이벤트 스트리밍 서비스&lt;/li&gt;
+&lt;li&gt;Azure 네이티브 통합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Google Cloud Managed Kafka (Preview)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;GCP에서 관리하는 Kafka 서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;인프라 관리 자동화: 서버 관리, 패치 불필요&lt;/li&gt;
+&lt;li&gt;클라우드 생태계 통합: Lambda, S3, IAM 등 쉽게 연결&lt;/li&gt;
+&lt;li&gt;빠른 프로비저닝: 클릭 몇 번으로 클러스터 생성&lt;/li&gt;
+&lt;li&gt;자체 배포보다 낮은 운영 부담&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;제한된 제어권: 일부 고급 설정 불가&lt;/li&gt;
+&lt;li&gt;Kafka 지식 여전히 필요: 토픽, 파티션, 컨슈머 그룹 관리는 직접&lt;/li&gt;
+&lt;li&gt;추가 도구 별도 구축: Kafka Connect, Schema Registry 등&lt;/li&gt;
+&lt;li&gt;비용: 자체 배포보다 비쌈 (편의성 프리미엄)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-완전-관리형-서비스"&gt;3. 완전 관리형 서비스
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Kafka 전문 업체의 SaaS형 서비스&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Confluent Cloud&lt;/strong&gt;: Kafka 창시자들이 만든 엔터프라이즈 플랫폼&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Aiven for Apache Kafka&lt;/strong&gt;: 멀티 클라우드 지원&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Instaclustr&lt;/strong&gt;: 관리형 Kafka 서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Confluent Cloud 중심 설명&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;제공하는 것&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka 클러스터 완전 관리 (인프라부터 운영까지)&lt;/li&gt;
+&lt;li&gt;120+ 사전 구축 커넥터 (DB, SaaS, 클라우드)&lt;/li&gt;
+&lt;li&gt;Schema Registry 관리형 제공&lt;/li&gt;
+&lt;li&gt;ksqlDB 및 Apache Flink 통합 (스트림 처리)&lt;/li&gt;
+&lt;li&gt;Stream Catalog (데이터 계보 추적)&lt;/li&gt;
+&lt;li&gt;고급 보안 및 컴플라이언스 (SOC 2, HIPAA 등)&lt;/li&gt;
+&lt;li&gt;24/7 전문가 지원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;제로 운영 부담: 인프라 걱정 없이 바로 사용&lt;/li&gt;
+&lt;li&gt;개발 생산성 극대화: 커넥터, 스키마 관리 등 즉시 활용&lt;/li&gt;
+&lt;li&gt;자동 스케일링: 트래픽 변화에 자동 대응&lt;/li&gt;
+&lt;li&gt;멀티 클라우드/리전: 글로벌 서비스 쉽게 구축&lt;/li&gt;
+&lt;li&gt;빠른 실험: PoC부터 프로덕션까지 빠르게 전환&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;비용: 소규모에서는 경제적이나 대규모에서는 비쌈&lt;/li&gt;
+&lt;li&gt;벤더 락인: Confluent 고유 기능 사용 시 이전 어려움&lt;/li&gt;
+&lt;li&gt;제어권 제한: 내부 설정 접근 불가&lt;/li&gt;
+&lt;li&gt;데이터 외부 전송: 온프레미스 전용 환경에서는 사용 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="배포-방식별-비교-매트릭스"&gt;배포 방식별 비교 매트릭스
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;비교 항목&lt;/th&gt;
+&lt;th&gt;자체 배포&lt;/th&gt;
+&lt;th&gt;클라우드 관리형 (AWS MSK)&lt;/th&gt;
+&lt;th&gt;완전 관리형 (Confluent Cloud)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;높음 (전담 팀 필요)&lt;/td&gt;
+&lt;td&gt;중간 (Kafka 지식 필요)&lt;/td&gt;
+&lt;td&gt;낮음 (제로 운영)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;초기 구축 시간&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수주~수개월&lt;/td&gt;
+&lt;td&gt;수일~1주&lt;/td&gt;
+&lt;td&gt;수분~수시간&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;전문 인력 필요&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;필수 (2-3명)&lt;/td&gt;
+&lt;td&gt;필요 (1명)&lt;/td&gt;
+&lt;td&gt;선택 (개발자만)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Kafka 지식 요구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;깊은 이해 필수&lt;/td&gt;
+&lt;td&gt;중급 수준&lt;/td&gt;
+&lt;td&gt;기본 개념만&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용 (소규모)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;높음 (인력+인프라)&lt;/td&gt;
+&lt;td&gt;중간&lt;/td&gt;
+&lt;td&gt;낮음~중간&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용 (대규모)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;낮음 (최적화 시)&lt;/td&gt;
+&lt;td&gt;중간&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수동 계획 필요&lt;/td&gt;
+&lt;td&gt;반자동&lt;/td&gt;
+&lt;td&gt;완전 자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안/컴플라이언스&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;직접 구현&lt;/td&gt;
+&lt;td&gt;기본 제공&lt;/td&gt;
+&lt;td&gt;엔터프라이즈급&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;커넥터/도구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;직접 구축&lt;/td&gt;
+&lt;td&gt;직접 구축&lt;/td&gt;
+&lt;td&gt;120+ 즉시 사용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;글로벌 복제&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;수동 구성&lt;/td&gt;
+&lt;td&gt;복잡함&lt;/td&gt;
+&lt;td&gt;클릭 몇 번&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;적합한 규모&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;월 10TB+&lt;/td&gt;
+&lt;td&gt;중소 규모&lt;/td&gt;
+&lt;td&gt;스타트업~중견&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실전-선택-가이드"&gt;실전 선택 가이드
+&lt;/h3&gt;&lt;h4 id="자체-배포를-선택해야-할-때"&gt;자체 배포를 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;대규모 트래픽&lt;/strong&gt;: 월 10TB 이상의 안정적인 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;온프레미스 필수&lt;/strong&gt;: 데이터 외부 반출이 불가능한 환경&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특수 커스터마이징&lt;/strong&gt;: Kafka 내부 동작을 깊이 제어해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장기적 비용 최적화&lt;/strong&gt;: 인프라 비용을 최소화해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이미 운영 중&lt;/strong&gt;: Kafka 운영 경험과 전담 팀이 있는 경우&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (AWS 기준, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EC2 브로커 3대 (t3.medium): 월 약 25만원&lt;/li&gt;
+&lt;li&gt;EBS 스토리지 500GB: 월 약 5만원&lt;/li&gt;
+&lt;li&gt;네트워크 비용: 변동&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 월 500만원+ (DevOps 엔지니어 1명)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 530만원+ (인프라만 30만원)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="클라우드-관리형aws-msk을-선택해야-할-때"&gt;클라우드 관리형(AWS MSK)을 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;AWS 중심 아키텍처&lt;/strong&gt;: Lambda, S3 등과 긴밀한 통합 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;중간 규모&lt;/strong&gt;: 월 1TB~10TB 정도의 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;운영 부담 경감&lt;/strong&gt;: 인프라 관리는 자동화하고 싶지만 Kafka는 직접 관리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;클라우드 벤더 선호&lt;/strong&gt;: AWS 생태계 내에서 모든 것을 해결&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 요구사항&lt;/strong&gt;: AWS IAM, VPC와의 통합 필요&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (AWS MSK, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kafka.t3.small 3대: 월 약 $150 (약 20만원)&lt;/li&gt;
+&lt;li&gt;스토리지: 별도 과금&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 월 300만원+ (Kafka 지식 보유 개발자)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 320만원+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="완전-관리형confluent-cloud을-선택해야-할-때"&gt;완전 관리형(Confluent Cloud)을 선택해야 할 때
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;빠른 MVP 검증&lt;/strong&gt;: 이벤트 스트리밍 아키텍처를 신속하게 실험&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전담 인력 부족&lt;/strong&gt;: Kafka 전문가 채용이 어렵거나 비용 부담&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소규모 스타트업&lt;/strong&gt;: 월 100GB~1TB 정도의 트래픽&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;글로벌 서비스&lt;/strong&gt;: 멀티 리전 복제가 필요한 경우&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;개발 집중&lt;/strong&gt;: 인프라 걱정 없이 비즈니스 로직에 집중&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;규제 산업&lt;/strong&gt;: SOC 2, HIPAA 등 컴플라이언스 인증 필요&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;비용 예시 (Confluent Cloud, 2025년 10월)&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;USD 1달러 = 약 1,419원 기준&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Basic 클러스터: 월 $730 (약 100만원)&lt;/li&gt;
+&lt;li&gt;스토리지 50GB: 월 $5 (약 7천원)&lt;/li&gt;
+&lt;li&gt;네트워크 100GB: 월 $9 (약 1만원)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인력 비용&lt;/strong&gt;: 0원 (일반 개발자만 있으면 됨)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;총 비용&lt;/strong&gt;: 월 101만원 (소규모)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프리 크레딧&lt;/strong&gt;: $400 제공 (약 55만원 상당)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="하이브리드-전략-단계적-접근"&gt;하이브리드 전략: 단계적 접근
+&lt;/h3&gt;&lt;p&gt;많은 기업이 채택하는 현실적인 전략:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Phase 1: 초기 단계 (Confluent Cloud)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PoC 및 MVP 빠르게 검증&lt;/li&gt;
+&lt;li&gt;초기 서비스 런칭 (월 트래픽 ~1TB)&lt;/li&gt;
+&lt;li&gt;팀 규모: 개발자 2-3명&lt;/li&gt;
+&lt;li&gt;비용: 월 100~200만원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Phase 2: 성장 단계 (계속 Confluent 또는 MSK 검토)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;트래픽 증가 (월 1TB~10TB)&lt;/li&gt;
+&lt;li&gt;비용 분석 시작&lt;/li&gt;
+&lt;li&gt;Kafka 전문 인력 1명 채용 고려&lt;/li&gt;
+&lt;li&gt;비용: 월 200~500만원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Phase 3: 성숙 단계 (자체 배포 전환 검토)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;대규모 트래픽 (월 10TB+)&lt;/li&gt;
+&lt;li&gt;전담 인프라 팀 구성&lt;/li&gt;
+&lt;li&gt;자체 배포로 전환하여 TCO 60% 절감&lt;/li&gt;
+&lt;li&gt;비용: 월 500~1,000만원 (하지만 트래픽은 10배+)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;병행 사용 예시&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;핵심 서비스: 자체 배포 (안정성, 비용 최적화)&lt;/li&gt;
+&lt;li&gt;실험적 프로젝트: Confluent Cloud (빠른 실험)&lt;/li&gt;
+&lt;li&gt;글로벌 리전: Confluent Cloud (멀티 리전 자동 복제)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;세 가지 배포 방식은 각각 명확한 장단점이 있으며 정답은 조직의 상황에 달려 있다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;자체 배포&lt;/strong&gt; 는 대규모 트래픽과 전문 인력이 있을 때 최적의 선택이다.
+완전한 제어권과 비용 최적화를 얻지만 운영 복잡도와 인력 투자가 크다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;클라우드 관리형(AWS MSK)&lt;/strong&gt; 은 AWS 생태계를 쓰면서 운영 부담을 줄이고 싶을 때 중간 지점이다. 인프라는 자동화되지만 Kafka 지식은 여전히 필요하다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;완전 관리형(Confluent Cloud)&lt;/strong&gt; 은 빠른 실행과 제로 운영 부담이 필요할 때 최선이다.
+소규모에서는 인력 비용 고려 시 가장 경제적이지만 대규모에서는 비용이 높아질 수 있다.&lt;/p&gt;
+&lt;p&gt;Kafka 인프라를 관리하는 데 시간을 쓸 것인지 아니면 고객 가치를 만드는 데 집중할 것인지 스스로 질문해보자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;필수 개념&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Apache Kafka 기본&lt;/strong&gt;: Topic, Partition, Producer, Consumer, Broker&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이벤트 기반 아키텍처&lt;/strong&gt;: 비동기 메시징, 이벤트 소싱&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;클라우드 서비스 모델&lt;/strong&gt;: IaaS, PaaS, SaaS 차이&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;알아두면 좋은 개념&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;분산 시스템&lt;/strong&gt;: 복제, 파티셔닝, 합의 알고리즘&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DevOps&lt;/strong&gt;: CI/CD, 모니터링, IaC (Infrastructure as Code)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kafka 생태계&lt;/strong&gt;: Kafka Connect, Kafka Streams, Schema Registry&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;공식 문서&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kafka.apache.org/documentation/" target="_blank" rel="noopener"
+&gt;Apache Kafka Documentation&lt;/a&gt; - 오픈소스 공식 문서&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.confluent.io/" target="_blank" rel="noopener"
+&gt;Confluent Documentation&lt;/a&gt; - Confluent Platform 문서&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/msk/" target="_blank" rel="noopener"
+&gt;AWS MSK Documentation&lt;/a&gt; - AWS 관리형 Kafka&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.confluent.io/ko-kr/apache-kafka-vs-confluent/" target="_blank" rel="noopener"
+&gt;CONFLUENT의 어필 - Confluent와 Apache Kafka® 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;핵심 개념 심화&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Connect&lt;/strong&gt;: 외부 시스템(DB, SaaS)과 데이터 파이프라인 구축&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Schema Registry&lt;/strong&gt;: Avro/Protobuf 스키마 버전 관리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kafka Streams&lt;/strong&gt;: 자바 기반 스트림 처리 라이브러리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ksqlDB&lt;/strong&gt;: SQL로 스트림 처리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Apache Flink&lt;/strong&gt;: 대규모 상태 기반 복잡한 스트림 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;AWS 연동 가이드&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html" target="_blank" rel="noopener"
+&gt;AWS Lambda + Kafka 연동&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.confluent.io/cloud/current/networking/peering/aws-peering.html" target="_blank" rel="noopener"
+&gt;VPC 피어링으로 Confluent Cloud 연결&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.confluent.io/aws-msk-alternative/" target="_blank" rel="noopener"
+&gt;MSK vs Confluent Cloud 비교&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Git 멀티 SSH 키 관리</title><link>https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</link><pubDate>Wed, 15 Oct 2025 18:30:33 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ssh-키-구성-예시"&gt;SSH 키 구성 예시
+&lt;/h3&gt;&lt;h4 id="ssh-키-파일들"&gt;SSH 키 파일들
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519 &lt;span class="c1"&gt;# 기본/개인 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519.pub &lt;span class="c1"&gt;# 기본/개인 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company &lt;span class="c1"&gt;# 회사 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company.pub &lt;span class="c1"&gt;# 회사 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── config &lt;span class="c1"&gt;# SSH 설정 파일&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="ssh-config-설정-sshconfig"&gt;SSH Config 설정 (&lt;code&gt;~/.ssh/config&lt;/code&gt;)
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 경로는 대부분의 OS에서 사용자 폴더를 의미한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 GitHub 설정 (개인 계정용)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정용 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="사용-방법"&gt;사용 방법
+&lt;/h3&gt;&lt;h4 id="1-기본-사용"&gt;1. 기본 사용
+&lt;/h4&gt;&lt;p&gt;일반적인 GitHub URL을 그대로 사용:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com:username/my-project.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-명시적-개인-계정-사용"&gt;2. 명시적 개인 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-회사-계정-사용"&gt;3. 회사 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="새로운-계정키-추가-방법"&gt;새로운 계정/키 추가 방법
+&lt;/h3&gt;&lt;h4 id="1-새-ssh-키-생성"&gt;1. 새 SSH 키 생성
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-keygen -t ed25519 -C &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt; -f ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-ssh-config에-설정-추가"&gt;2. SSH Config에 설정 추가
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# ~/.ssh/config에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-github에-공개-키-등록"&gt;3. GitHub에 공개 키 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 내용 복사&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cat ~/.ssh/id_ed25519_newaccount.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub Settings &amp;gt; SSH and GPG keys&lt;/code&gt;에서 등록&lt;/p&gt;
+&lt;h4 id="4-사용"&gt;4. 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-newaccount:NewAccount/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ssh-연결-테스트"&gt;SSH 연결 테스트
+&lt;/h3&gt;&lt;p&gt;각 계정별로 SSH 연결을 테스트할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 테스트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;성공시 다음과 같은 메시지가 출력된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hi [계정명]! You&amp;#39;ve successfully authenticated, but GitHub does not provide shell access.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="프로젝트별-설정-확인"&gt;프로젝트별 설정 확인
+&lt;/h3&gt;&lt;p&gt;현재 프로젝트가 어떤 SSH 키를 사용하는지 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --list &lt;span class="p"&gt;|&lt;/span&gt; grep remote.origin.url
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="권한-설정"&gt;권한 설정
+&lt;/h3&gt;&lt;p&gt;SSH 파일들의 올바른 권한 설정은 &lt;strong&gt;Unix/Linux 기반 시스템에서 필수&lt;/strong&gt;다.&lt;/p&gt;
+&lt;h4 id="권한-설정이-필요한-환경"&gt;권한 설정이 필요한 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;✅ &lt;strong&gt;Linux/Ubuntu&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;macOS&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;WSL (Windows Subsystem for Linux)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;Docker 컨테이너&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;개발 컨테이너 (Dev Container)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;❌ &lt;strong&gt;Windows 네이티브&lt;/strong&gt; (NTFS 권한으로 자동 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="windows-vs-unixlinux-차이점"&gt;Windows vs Unix/Linux 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;환경&lt;/th&gt;
+&lt;th&gt;권한 시스템&lt;/th&gt;
+&lt;th&gt;SSH 권한 설정&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Windows 네이티브&lt;/td&gt;
+&lt;td&gt;NTFS ACL&lt;/td&gt;
+&lt;td&gt;불필요 (자동)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WSL/Linux/macOS&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker/Dev Container&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="windows에서-ssh-사용하기"&gt;Windows에서 SSH 사용하기
+&lt;/h4&gt;&lt;h5 id="windows-네이티브-환경"&gt;Windows 네이티브 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# PowerShell 또는 Command Prompt에서&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;ssh-keygen&lt;/span&gt; &lt;span class="n"&gt;-t&lt;/span&gt; &lt;span class="n"&gt;ed25519&lt;/span&gt; &lt;span class="n"&gt;-C&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 권한 설정은 Windows가 자동으로 관리&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Windows 네이티브 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;chmod&lt;/code&gt; 명령어 없음&lt;/li&gt;
+&lt;li&gt;NTFS 권한으로 자동 관리&lt;/li&gt;
+&lt;li&gt;SSH 클라이언트가 적절한 권한 자동 설정&lt;/li&gt;
+&lt;li&gt;수동 권한 설정 불필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="wsl-환경"&gt;WSL 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# WSL에서는 Linux와 동일하게 권한 설정 필요&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;WSL 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux 파일 시스템 사용&lt;/li&gt;
+&lt;li&gt;Unix 권한 모델 적용&lt;/li&gt;
+&lt;li&gt;권한 설정 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="macos-darwin"&gt;macOS: Darwin
+&lt;/h3&gt;&lt;h4 id="ssh가-권한을-엄격하게-요구하는-이유-unixlinux"&gt;SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;보안 정책&lt;/strong&gt;: 개인 키가 다른 사용자에게 노출되는 것을 방지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증 무결성&lt;/strong&gt;: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 보호&lt;/strong&gt;: 중요한 인증 정보의 무단 접근 차단&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="올바른-권한-설정"&gt;올바른 권한 설정
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# SSH 디렉토리 권한 (소유자만 접근 가능)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# config 파일 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 키 파일들 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 소유권 설정 (현재 사용자로 설정)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="권한-확인"&gt;권한 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 권한 상태 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 올바른 출력 예시:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# drwx------ (700) 소유자만 SSH 디렉토리 접근&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw------- (600) 소유자만 개인 키/config 파일 접근 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw-r--r-- (644) 공개 키는 다른 사용자도 읽기 가능&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="문제-해결"&gt;문제 해결
+&lt;/h3&gt;&lt;h4 id="권한-오류-해결"&gt;권한 오류 해결
+&lt;/h4&gt;&lt;p&gt;오류 메시지&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Bad owner or permissions on /home/node/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;원인:&lt;/strong&gt; SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 단계:&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;권한 확인&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한이 &lt;code&gt;777&lt;/code&gt; (rwxrwxrwx)인 경우 수정&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소유권 문제인 경우&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한 설정 후 테스트&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="ssh-키가-인식되지-않는-경우"&gt;SSH 키가 인식되지 않는 경우
+&lt;/h4&gt;&lt;p&gt;SSH Agent에 키 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="잘못된-키-사용"&gt;잘못된 키 사용
+&lt;/h4&gt;&lt;p&gt;원격 URL 확인 및 수정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 설정 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 URL 변경&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-url origin git@github.com-&lt;span class="o"&gt;[&lt;/span&gt;account&lt;span class="o"&gt;]&lt;/span&gt;:owner/repository.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="예시-프로젝트-설정"&gt;예시 프로젝트 설정
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;my-blog&lt;/strong&gt;: 기본 설정 사용 (&lt;code&gt;git@github.com:username/my-blog.git&lt;/code&gt;)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH 키: &lt;code&gt;~/.ssh/id_ed25519&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GitHub 계정: 개인 계정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="확장-계획"&gt;확장 계획
+&lt;/h3&gt;&lt;p&gt;향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="현재-구성-검증"&gt;현재 구성 검증
+&lt;/h3&gt;&lt;p&gt;현재 SSH 구성이 올바르게 작동하는지 확인해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;권한 설정 (필수!)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 모든 권한을 한 번에 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SSH 연결 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 성공시: &amp;#34;Hi [username]! You&amp;#39;ve successfully authenticated...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Git push 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;⚠️ 중요:&lt;/strong&gt; 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+&lt;code&gt;Bad owner or permissions&lt;/code&gt; 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새 계정 추가는 키 생성, &lt;code&gt;~/.ssh/config&lt;/code&gt;에 Host 추가, 공개키 등록, &lt;code&gt;ssh -T&lt;/code&gt; 테스트, 원격 URL 설정의 5단계&lt;/li&gt;
+&lt;li&gt;WSL은 &lt;strong&gt;리눅스 홈 경로&lt;/strong&gt;에 &lt;code&gt;.ssh&lt;/code&gt;를 두고, 필요 시 &lt;code&gt;includeIf&lt;/code&gt;/&lt;code&gt;url.insteadOf&lt;/code&gt;로 &lt;strong&gt;디렉터리별 자동 라우팅&lt;/strong&gt;을 적용하면 실수할 일이 줄어든다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SSH 키 쌍&lt;/strong&gt;: &lt;code&gt;ed25519&lt;/code&gt;가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH 설정 파일&lt;/strong&gt;: &lt;code&gt;~/.ssh/config&lt;/code&gt;로 Host 단위 설정(별칭, &lt;code&gt;IdentityFile&lt;/code&gt;, &lt;code&gt;IdentitiesOnly&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퍼미션 기초&lt;/strong&gt;: &lt;code&gt;~/.ssh&lt;/code&gt;(700), 개인키(600), 공개키/&lt;code&gt;config&lt;/code&gt;(644~600).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSL/NTFS 차이&lt;/strong&gt;: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. &lt;strong&gt;리눅스 홈&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → &lt;code&gt;IdentitiesOnly&lt;/code&gt;로 해결.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 원격 URL 형태&lt;/strong&gt;: &lt;code&gt;git@HOST:OWNER/REPO.git&lt;/code&gt;(SCP 구문) 또는 &lt;code&gt;ssh://git@HOST/OWNER/REPO.git&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 라우팅 자동화(선택)&lt;/strong&gt;: &lt;code&gt;~/.gitconfig&lt;/code&gt;의 &lt;code&gt;includeIf&lt;/code&gt;(디렉터리 기준 설정), &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;(호스트 치환).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GitHub Docs: &lt;em&gt;Connecting to GitHub with SSH&lt;/em&gt;, &lt;em&gt;About SSH certificate authorities&lt;/em&gt;, &lt;em&gt;Managing multiple accounts&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;OpenSSH Manual: &lt;code&gt;ssh(1)&lt;/code&gt;, &lt;code&gt;ssh_config(5)&lt;/code&gt;, &lt;code&gt;ssh-agent(1)&lt;/code&gt;, &lt;code&gt;ssh-add(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git Documentation: &lt;code&gt;git-config(1)&lt;/code&gt;(특히 &lt;code&gt;includeIf&lt;/code&gt;, &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;), &lt;code&gt;git-remote(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft Docs: &lt;em&gt;WSL 파일 권한 &amp;amp; NTFS 상호작용&lt;/em&gt; 가이드&lt;/li&gt;
+&lt;li&gt;보안 심화: &lt;em&gt;ed25519-sk&lt;/em&gt;(FIDO2/보안키 기반), &lt;code&gt;ProxyJump&lt;/code&gt;(점프호스트), &lt;code&gt;KnownHosts&lt;/code&gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS RDS vs EC2 직접 설치</title><link>https://blog.b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</link><pubDate>Sun, 03 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;초기 프로젝트를 구축하거나 서비스를 운영하는 과정에서 &lt;strong&gt;데이터베이스를 어디에 설치할지&lt;/strong&gt;는 중요한 결정 중 하나다.&lt;/p&gt;
+&lt;p&gt;특히 AWS 환경에서는 &lt;code&gt;RDS&lt;/code&gt;를 사용할지, &lt;code&gt;EC2&lt;/code&gt;에 직접 설치할지를 두고 많은 고민을 하게 된다.&lt;/p&gt;
+&lt;p&gt;실제 운영 관점에서 &lt;strong&gt;RDS의 주요 이점과 EC2 직접 설치 방식과의 차이점&lt;/strong&gt;을 정리하고 &lt;code&gt;RDS&lt;/code&gt;가 적합하지 않은 상황까지 함께 다뤄보려 한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="rds를-사용할-때의-주요-이점"&gt;RDS를 사용할 때의 주요 이점
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;자동화된 관리&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;백업, 보안 패치, 장애 복구까지 AWS가 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Multi-AZ 구성 가능&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;자동 장애 조치(Failover) 지원으로 고가용성 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자동 백업 및 시점 복구(PITR)&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;데이터 복구를 쉽게 수행 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 강화&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;IAM 인증, KMS 암호화, 보안 그룹 등 보안 기능 내장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;모니터링 및 알림&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;CloudWatch 연동으로 실시간 DB 상태 확인 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;스케일링 유연성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;수직 확장과 읽기 전용 복제(Replica) 지원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="ec2에-직접-설치와-비교"&gt;EC2에 직접 설치와 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;EC2 직접 설치&lt;/th&gt;
+&lt;th&gt;RDS&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;설치 편의성&lt;/td&gt;
+&lt;td&gt;수동&lt;/td&gt;
+&lt;td&gt;자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;패치 및 유지보수&lt;/td&gt;
+&lt;td&gt;직접 관리&lt;/td&gt;
+&lt;td&gt;AWS 자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;확장성&lt;/td&gt;
+&lt;td&gt;어렵고 시간 소요&lt;/td&gt;
+&lt;td&gt;빠르고 간편&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;장애 조치&lt;/td&gt;
+&lt;td&gt;복잡한 구성 필요&lt;/td&gt;
+&lt;td&gt;자동 장애 복구 지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보안 설정&lt;/td&gt;
+&lt;td&gt;수동 구성&lt;/td&gt;
+&lt;td&gt;IAM, KMS 등 통합 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;백업/복구&lt;/td&gt;
+&lt;td&gt;직접 스크립트 작성&lt;/td&gt;
+&lt;td&gt;자동 백업 및 PITR 지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;직접 설치는 최대한의 유연성과 커스터마이징이 가능하다는 장점이 있지만, &lt;strong&gt;보안과 가용성을 직접 관리해야 한다는 부담&lt;/strong&gt;이 있다.&lt;/p&gt;
+&lt;p&gt;특히 운영 경험이 적거나 인프라 리소스가 부족한 팀에게는 &lt;code&gt;RDS&lt;/code&gt;가 훨씬 더 효율적이다.&lt;/p&gt;
+&lt;h3 id="rds가-적합하지-않은-케이스"&gt;RDS가 적합하지 않은 케이스
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;복잡한 확장 플러그인이 필요한 경우&lt;/strong&gt; (예: PostgreSQL의 일부 확장 모듈 미지원)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DB 튜닝을 위해 커널 파라미터까지 조정해야 하는 경우&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;최소비용으로 간헐적 사용을 원할 때&lt;/strong&gt; (EC2+Docker가 유리)&lt;/li&gt;
+&lt;li&gt;사내망 또는 외부 연결이 자유로운 구조를 구성하고자 할 때&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;복잡한 운영을 줄이고 안정성을 확보하고 싶다면, AWS RDS는 최고의 선택이 될 수 있다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;하지만 반대로, &lt;strong&gt;비용 최적화·유연성·특수 환경을 원한다면 EC2 직접 설치가 유리할 수 있다.&lt;/strong&gt;
+결국 핵심은 &lt;strong&gt;“어떤 서비스를 어떻게 운영할 것인가?”&lt;/strong&gt; 에 달려 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS 서비스 (EC2, RDS, VPC, IAM, KMS)&lt;/li&gt;
+&lt;li&gt;리눅스 서버와 DB 설치 경험&lt;/li&gt;
+&lt;li&gt;PostgreSQL 또는 MySQL과 같은 관계형 DB 운영 경험&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/rds/" target="_blank" rel="noopener"
+&gt;Amazon RDS 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/contrib.html" target="_blank" rel="noopener"
+&gt;PostgreSQL 확장 기능 목록&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html" target="_blank" rel="noopener"
+&gt;AWS Well-Architected Framework: Operational Excellence Pillar&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>컨테이너 오케스트레이션</title><link>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</link><pubDate>Wed, 25 Jun 2025 22:17:57 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Docker는 컨테이너 단위의 애플리케이션 패키징과 실행이 뛰어나지만 실제 운영 환경에서는 수십, 수백 개의 컨테이너를 배포하고 유지해야 하는 복잡한 상황이 발생한다.&lt;/p&gt;
+&lt;p&gt;이 문제를 해결하기 위해 등장한 개념이 컨테이너 오케스트레이션(Container Orchestration)이다.&lt;/p&gt;
+&lt;p&gt;오케스트레이션의 핵심 개념과 필요성, Docker 단독 환경의 한계, Kubernetes를 중심으로 오케스트레이터가 해결하는 세 가지 주요 문제를 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-오케스트레이션이란"&gt;컨테이너 오케스트레이션이란?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;오케스트라(orchestra)에서 유래&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;오케스트라: 수십 개의 악기가 각자 연주하지만 지휘자가 이를 정해진 순서와 규칙에 따라 통제하여 하나의 음악으로 만들어낸다.&lt;/li&gt;
+&lt;li&gt;개발 시스템: 수많은 컨테이너, 서비스, 배포, 트래픽, 설정이 따로따로 존재하지만 오케스트레이터가 이를 자동으로 조율하여 하나의 애플리케이션처럼 작동하도록 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;컨테이너 오케스트레이션은 다음과 같은 작업을 자동화한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨테이너의 배포 및 종료&lt;/li&gt;
+&lt;li&gt;헬스 체크 및 실패 시 자동 복구&lt;/li&gt;
+&lt;li&gt;트래픽에 따라 컨테이너 자동 확장/축소&lt;/li&gt;
+&lt;li&gt;로드 밸런싱, 서비스 디스커버리&lt;/li&gt;
+&lt;li&gt;YAML을 활용한 선언적 구성(Declarative Configuration)을 통한 인프라 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;단일 컨테이너 환경에서는 수작업이나 스크립트로 관리가 가능하지만 수십 개 이상의 컨테이너를 운영하는 클러스터 환경에서는 비효율과 오류를 피하기 어렵다.&lt;/p&gt;
+&lt;h3 id="docker-단독-사용-환경의-한계"&gt;Docker 단독 사용 환경의 한계
+&lt;/h3&gt;&lt;p&gt;Docker는 다음과 같은 측면에서 한계가 존재한다.&lt;/p&gt;
+&lt;h4 id="수동-스케일링"&gt;수동 스케일링
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 명령어로 컨테이너 개수를 수동 조정&lt;/li&gt;
+&lt;li&gt;실시간 트래픽 변화에 대응 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="제한된-복구-기능"&gt;제한된 복구 기능
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--restart&lt;/code&gt; 자동 재시작은 가능하지만, 헬스 체크 기반 복구, 다중 노드 상태 관리는 불가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="서비스-수준-추상화-부족"&gt;서비스 수준 추상화 부족
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Docker Compose로 일부 기능(네트워크, 볼륨, 환경변수)은 구성 가능&lt;/li&gt;
+&lt;li&gt;하지만 로드밸런싱, 트래픽 분산, 서비스 디스커버리 등은 부족하거나 수동 구성 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="오케스트레이션이-해결하는-주요-문제-3가지"&gt;오케스트레이션이 해결하는 주요 문제 3가지
+&lt;/h3&gt;&lt;h4 id="자동-확장---auto-scaling"&gt;자동 확장 - Auto Scaling
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 트래픽 급증 시 컨테이너 수를 사람이 조정해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;Horizontal Pod Autoscaler&lt;/code&gt;를 통해 리소스(CPU, 메모리) 사용량 기준으로 Pod 수를 자동 조절&lt;/li&gt;
+&lt;li&gt;예시: CPU 사용률이 80% 이상일 때 3개에서 10개로 자동 확장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자가-복구---self-healing"&gt;자가 복구 - Self-Healing
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 컨테이너가 비정상 종료될 경우 사람이 직접 조치해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;livenessProbe&lt;/code&gt;, &lt;code&gt;readinessProbe&lt;/code&gt;를 통해 주기적으로 상태를 체크하고 실패한 컨테이너는 자동 재시작 또는 교체
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;livenessProbe&lt;/code&gt;: &amp;ldquo;얘가 아직 살아 있나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;자동 재시작&lt;/li&gt;
+&lt;li&gt;컨테이너가 비정상 상태일 경우 자동으로 재시작해줌&lt;/li&gt;
+&lt;li&gt;예: 무한 루프에 빠졌거나 내부적으로는 죽었는데 프로세스는 살아 있는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readinessProbe&lt;/code&gt;: &amp;ldquo;얘가 트래픽 받을 준비가 됐나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;장애 확산 방지&lt;/li&gt;
+&lt;li&gt;준비되지 않은 컨테이너는 Service에 등록되지 않음&lt;/li&gt;
+&lt;li&gt;앱이 시작은 됐지만 DB 연결이 아직 안 됐다면 트래픽 받지 않도록 막아줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="선언적-인프라---declarative-infrastructure"&gt;선언적 인프라 - Declarative Infrastructure
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 수동 명령어는 현재 상태를 명확히 알기 어렵고 일관성 유지가 어려움&lt;/li&gt;
+&lt;li&gt;해결: k8s에서는 YAML 파일에 &amp;ldquo;이 시스템은 이래야 한다&amp;quot;고 선언하면 클러스터가 이를 자동으로 유지
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 선언 예시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;apiVersion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;apps/v1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deployment&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;replicas&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;template&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;containers&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker-compose-vs-kubernetes-비교"&gt;Docker Compose vs Kubernetes 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;Docker Compose&lt;/th&gt;
+&lt;th&gt;Kubernetes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;스케일링&lt;/td&gt;
+&lt;td&gt;수동 조정 (&lt;code&gt;--scale&lt;/code&gt;)&lt;/td&gt;
+&lt;td&gt;HPA 기반 자동 확장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;복구&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--restart&lt;/code&gt;로 기본 재시작&lt;/td&gt;
+&lt;td&gt;상태 기반 자가 복구&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;디스커버리&lt;/td&gt;
+&lt;td&gt;내부 DNS 미지원 (v2 기준)&lt;/td&gt;
+&lt;td&gt;서비스명 기반 자동 디스커버리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;낮음&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;운영 복잡도&lt;/td&gt;
+&lt;td&gt;낮음 (로컬)&lt;/td&gt;
+&lt;td&gt;높지만 강력함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="오케스트레이터-선택-기준"&gt;오케스트레이터 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;오케스트레이터&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;th&gt;적합한 상황&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Kubernetes&lt;/td&gt;
+&lt;td&gt;CNCF 주도, 생태계 광범위&lt;/td&gt;
+&lt;td&gt;MSA 기반 대규모 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker Swarm&lt;/td&gt;
+&lt;td&gt;Docker와 연동 용이, 간결함&lt;/td&gt;
+&lt;td&gt;중소 규모 단일 클러스터&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AWS ECS / Fargate&lt;/td&gt;
+&lt;td&gt;서버리스, 비용 최적화&lt;/td&gt;
+&lt;td&gt;AWS 중심의 배포 전략&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너 오케스트레이션은 현대적인 서비스 운영을 위한 기본이자 필수 인프라 기술이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;학습과 실험엔 Docker만으로 충분하지만 실전에서는 운영 자동화, 복구, 확장성, 일관된 인프라 구성이 가능한 오케스트레이터가 반드시 필요하다.&lt;/p&gt;
+&lt;p&gt;특히 Kubernetes는 클라우드 네이티브 환경의 표준으로 자리 잡았다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Docker의 기본 사용법&lt;/li&gt;
+&lt;li&gt;컨테이너 개념 (이미지, 레지스트리, 실행 등)&lt;/li&gt;
+&lt;li&gt;YAML 파일의 구조 이해&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/ko/docs/home/" target="_blank" rel="noopener"
+&gt;Kubernetes 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" target="_blank" rel="noopener"
+&gt;Kubernetes Horizontal Pod Autoscaler&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://landscape.cncf.io/" target="_blank" rel="noopener"
+&gt;CNCF Landscape&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

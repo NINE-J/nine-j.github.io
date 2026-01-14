@@ -1,0 +1,509 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="유용한 터미널 설정을 알아보자"><title>나만의 리눅스 터미널 설정</title><link rel=canonical href=https://blog.b9f1.com/p/2025-02-15-set-up-my-own-linux-terminal/><link rel=stylesheet href=/scss/style.min.091d376ab5dee4238ab92c7f42e66ea0d97debe6d5a1f9c3e1e7121f544025d2.css><meta property='og:title' content="나만의 리눅스 터미널 설정"><meta property='og:description' content="유용한 터미널 설정을 알아보자"><meta property='og:url' content='https://blog.b9f1.com/p/2025-02-15-set-up-my-own-linux-terminal/'><meta property='og:site_name' content='B9F1'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='devlog'><meta property='article:tag' content='linux'><meta property='article:tag' content='terminal'><meta property='article:tag' content='리눅스'><meta property='article:tag' content='터미널'><meta property='article:published_time' content='2025-02-15T10:00:00+09:00'><meta property='article:modified_time' content='2025-02-15T10:00:00+09:00'><meta name=twitter:title content="나만의 리눅스 터미널 설정"><meta name=twitter:description content="유용한 터미널 설정을 알아보자"><link rel="shortcut icon" href=/favicon.svg><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023370172872685" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-MG17SX24X0"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-MG17SX24X0")</script><script data-name=BMC-Widget data-cfasync=false src=https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js data-id=b9f1 data-description="Support me on Buy me a coffee!" data-message="👋 Glad to meet you.Buy me a coffee? 😊" data-color=#5F7FFF data-position=Right data-x_margin=18 data-y_margin=18></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_e091ceea98743e00.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🤌</span></figure><div class=site-meta><h1 class=site-name><a href=/>B9F1</a></h1><h2 class=site-description>Nine's Devlog</h2></div></header><ol class=menu-social><li><a href=https://github.com/NINE-J target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://stackoverflow.com/users/17334807/nine target=_blank title=StackOverflow rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-stackoverflow"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><path d="M8 16h8"/><path d="M8.322 12.582l7.956.836"/><path d="M8.787 9.168l7.826 1.664"/><path d="M10.096 5.764l7.608 2.472"/></svg></a></li><li><a href=mailto:rnwo47@gmail.com target=_blank title=ZMail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/toys/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Toys</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#개요>📌개요</a></li><li><a href=#내용>📌내용</a><ol><li><a href=#사전-준비>사전 준비</a></li><li><a href=#oh-my-zsh>oh-my-zsh</a><ol><li><a href=#설치>설치</a></li><li><a href=#설정>설정</a></li></ol></li><li><a href=#tmux>Tmux</a><ol><li><a href=#tmux-command>Tmux Command</a></li><li><a href=#tmux-shortcuts>Tmux Shortcuts</a></li><li><a href=#tmux-plugin-manager>Tmux Plugin Manager</a></li><li><a href=#tmux-resurrect>Tmux Resurrect</a></li><li><a href=#vi-키-맵핑>vi 키 맵핑</a></li></ol></li></ol></li><li><a href=#선택사항>📌선택사항</a><ol><li><a href=#windows-terminal-설치>Windows Terminal 설치</a></li><li><a href=#wsl-설치>WSL 설치</a></li><li><a href=#wsl-삭제>WSL 삭제</a><ol><li><a href=#1설치-상태-확인>1.설치 상태 확인</a></li><li><a href=#2등록-해제>2.등록 해제</a></li><li><a href=#3ubuntu-제거>3.Ubuntu 제거</a></li><li><a href=#4선택-사항>4.선택 사항</a></li></ol></li><li><a href=#powerlevel10k>Powerlevel10k</a><ol><li><a href=#p10kzsh><code>~/.p10k.zsh</code></a></li></ol></li></ol></li><li><a href=#endnote>⚙️EndNote</a><ol><li><a href=#wsl>WSL</a><ol><li><a href=#git-자격증명-관련>Git 자격증명 관련</a></li><li><a href=#git-status>git status</a></li></ol></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/wsl/>WSL
+</a><a href=/categories/terminal/>Terminal</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025-02-15-set-up-my-own-linux-terminal/>나만의 리눅스 터미널 설정</a></h2><h3 class=article-subtitle>유용한 터미널 설정을 알아보자</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-02-15T10:00:00+09:00>2025년 02월 15일</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>10 minute read</time></div></footer></div></header><section class=article-content><h2 id=개요>📌개요</h2><p>나만의 리눅스 터미널을 설정한다.</p><h2 id=내용>📌내용</h2><h3 id=사전-준비>사전 준비</h3><p><code>WSL</code>, <code>Windows Terminal</code> 설치 등은 제외하고 Linux 환경에서 정리 시작
+설치에 필요한 <code>wget</code>, <code>curl</code>, <code>git</code>을 설치한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt-get update
+</span></span><span class=line><span class=cl>sudo apt install wget curl git
+</span></span></code></pre></td></tr></table></div></div><p><code>zsh</code>를 설치한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt install zsh
+</span></span></code></pre></td></tr></table></div></div><p>현재 유저의 기본 쉘을 변경한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>chsh -s <span class=k>$(</span>which zsh<span class=k>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>설정을 확인한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>echo</span> <span class=nv>$SHELL</span>
+</span></span><span class=line><span class=cl><span class=c1># /usr/bin/zsh</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=oh-my-zsh>oh-my-zsh</h3><h4 id=설치>설치</h4><p><a class=link href=https://ohmyz.sh/#install target=_blank rel=noopener>oh-my-zsh 설치</a></p><h5 id=install-oh-my-zsh-via-curl>Install oh-my-zsh via curl</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sh -c <span class=s2>&#34;</span><span class=k>$(</span>curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh<span class=k>)</span><span class=s2>&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=install-oh-my-zsh-via-wget>Install oh-my-zsh via wget</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sh -c <span class=s2>&#34;</span><span class=k>$(</span>wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -<span class=k>)</span><span class=s2>&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=설정>설정</h4><p>폰트는 <code>fonts-powerline​</code>등 <code>agnoster</code> 테마를 정상적으로 사용할 수 있는 폰트로 사용한다.</p><h5 id=테마-설정>테마 설정</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># vim 에디터로 .zshrc 열기</span>
+</span></span><span class=line><span class=cl>vim ~/.zshrc
+</span></span><span class=line><span class=cl><span class=c1># .zshrc 중 ZSH_THEME 부분</span>
+</span></span><span class=line><span class=cl><span class=nv>ZSH_THEME</span><span class=o>=</span><span class=s2>&#34;agnoster&#34;</span>
+</span></span><span class=line><span class=cl><span class=c1># 수정 후 저장</span>
+</span></span><span class=line><span class=cl><span class=c1># 이후 적용</span>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><h5 id=플러그인-사용-설정>플러그인 사용 설정</h5><p>아래 설치한 플러그인을 사용하기 위해선 <code>.zshrc</code> 파일에 설정해야 한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># vim 에디터로 .zshrc 열기</span>
+</span></span><span class=line><span class=cl>vim ~/.zshrc
+</span></span><span class=line><span class=cl><span class=c1># .zshrc 중 plugins 부분</span>
+</span></span><span class=line><span class=cl><span class=nv>plugins</span><span class=o>=(</span>  
+</span></span><span class=line><span class=cl>	...
+</span></span><span class=line><span class=cl>	zsh-syntax-highlighting
+</span></span><span class=line><span class=cl>	zsh-autosuggestions
+</span></span><span class=line><span class=cl>	fzf
+</span></span><span class=line><span class=cl>	...  
+</span></span><span class=line><span class=cl><span class=o>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 수정 후 저장</span>
+</span></span><span class=line><span class=cl><span class=c1># 이후 적용</span>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><h5 id=zsh-syntax-highlighting>zsh-syntax-highlighting</h5><p>명령어 문법에 따른 강조 표시하는 플러그인</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone https://github.com/zsh-users/zsh-syntax-highlighting.git <span class=si>${</span><span class=nv>ZSH_CUSTOM</span><span class=k>:-</span><span class=p>~/.oh-my-zsh/custom</span><span class=si>}</span>/plugins/zsh-syntax-highlighting
+</span></span></code></pre></td></tr></table></div></div><h5 id=zsh-autosuggestions>zsh-autosuggestions</h5><p>명령어에 대한 자동완성을 돕는 플러그인
+이전 사용했던 명령어 또는 사용할 수 있는 명령어 등을 제안해준다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone https://github.com/zsh-users/zsh-autosuggestions <span class=si>${</span><span class=nv>ZSH_CUSTOM</span><span class=k>:-</span><span class=p>~/.oh-my-zsh/custom</span><span class=si>}</span>/plugins/zsh-autosuggestions
+</span></span></code></pre></td></tr></table></div></div><h5 id=fzf-fuzzy-finder->fzf (Fuzzy Finder )</h5><p>파일 찾기, 명령어 히스토리 등 터미널을 강력하게 사용할 수 있다.</p><p><a class=link href=https://github.com/junegunn/fzf target=_blank rel=noopener>fzf 자세히 보기</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone --depth <span class=m>1</span> https://github.com/junegunn/fzf.git ~/.fzf
+</span></span><span class=line><span class=cl>~/.fzf/install​
+</span></span><span class=line><span class=cl><span class=c1># Do you want to enable fuzzy auto-completion? ([y]/n) y</span>
+</span></span><span class=line><span class=cl><span class=c1># Do you want to enable key bindings? ([y]/n) y</span>
+</span></span><span class=line><span class=cl><span class=c1># Do you want to update your shell configuration files? ([y]/n) y</span>
+</span></span><span class=line><span class=cl><span class=c1># Update /home/nine/.bashrc:</span>
+</span></span><span class=line><span class=cl><span class=c1>#   - [ -f ~/.fzf.bash ] &amp;&amp; source ~/.fzf.bash</span>
+</span></span><span class=line><span class=cl><span class=c1>#     + Added</span>
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl><span class=c1># Update /home/nine/.zshrc:</span>
+</span></span><span class=line><span class=cl><span class=c1>#   - [ -f ~/.fzf.zsh ] &amp;&amp; source ~/.fzf.zsh</span>
+</span></span><span class=line><span class=cl><span class=c1>#     + Added</span>
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl><span class=c1># Finished. Restart your shell or reload config file.</span>
+</span></span><span class=line><span class=cl><span class=c1>#    source ~/.bashrc  # bash</span>
+</span></span><span class=line><span class=cl><span class=c1>#    source ~/.zshrc   # zsh</span>
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl><span class=c1># Use uninstall script to remove fzf.</span>
+</span></span><span class=line><span class=cl><span class=c1># </span>
+</span></span><span class=line><span class=cl><span class=c1># For more information, see: https://github.com/junegunn/fzf</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=커스텀-설정>커스텀 설정</h5><ul><li>사용자명 + 랜덤 이모지 설정</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># vim 에디터로 .zshrc 열기</span>
+</span></span><span class=line><span class=cl>vim ~/.zshrc
+</span></span><span class=line><span class=cl><span class=c1># .zshrc 최하단에 추가</span>
+</span></span><span class=line><span class=cl>prompt_context<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Custom (Random emoji)</span>
+</span></span><span class=line><span class=cl>  <span class=nv>emojis</span><span class=o>=(</span><span class=s2>&#34;🦋&#34;</span> <span class=s2>&#34;🌈&#34;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>  <span class=nv>RAND_EMOJI_N</span><span class=o>=</span><span class=k>$((</span> <span class=nv>$RANDOM</span> <span class=o>%</span> <span class=si>${#</span><span class=nv>emojis</span><span class=p>[@]</span><span class=si>}</span> <span class=o>+</span> <span class=m>1</span><span class=k>))</span>
+</span></span><span class=line><span class=cl>  prompt_segment black default <span class=s2>&#34;Name </span><span class=si>${</span><span class=nv>emojis</span><span class=p>[</span><span class=nv>$RAND_EMOJI_N</span><span class=p>]</span><span class=si>}</span><span class=s2> &#34;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=c1># 수정 후 저장</span>
+</span></span><span class=line><span class=cl><span class=c1># 이후 적용</span>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><ul><li>새로운 줄에서 명령어 시작<ul><li>경로가 길거나 명령어가 길거나 뭐, 가끔 테마가 깨지는 경우를 대비해 깔끔하게 새로운 라인에서 명령어를 입력할 수 있게 변경</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 테마의 환경 파일 열기</span>
+</span></span><span class=line><span class=cl>vim ~/.oh-my-zsh/themes/agnoster.zsh-theme
+</span></span><span class=line><span class=cl><span class=c1># build_prompt 부분을 찾아서 prompt_hg와 prompt_end 사이에 prompt_newline을 추가</span>
+</span></span><span class=line><span class=cl>build_prompt<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>	<span class=nv>RETVAL</span><span class=o>=</span><span class=nv>$?</span>
+</span></span><span class=line><span class=cl>	prompt_status
+</span></span><span class=line><span class=cl>	prompt_virtualenv
+</span></span><span class=line><span class=cl>	prompt_aws
+</span></span><span class=line><span class=cl>	prompt_context
+</span></span><span class=line><span class=cl>	prompt_dir
+</span></span><span class=line><span class=cl>	prompt_git
+</span></span><span class=line><span class=cl>	prompt_bzr
+</span></span><span class=line><span class=cl>	prompt_hg
+</span></span><span class=line><span class=cl>	prompt_newline <span class=c1># 이 위치에 추가한다.</span>
+</span></span><span class=line><span class=cl>	prompt_end
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=c1># 아래 내용을 추가한다.</span>
+</span></span><span class=line><span class=cl>prompt_newline<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=o>[[</span> -n <span class=nv>$CURRENT_BG</span> <span class=o>]]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> -n <span class=s2>&#34;%{%k%F{</span><span class=nv>$CURRENT_BG</span><span class=s2>}%}</span><span class=nv>$SEGMENT_SEPARATOR</span><span class=s2>
+</span></span></span><span class=line><span class=cl><span class=s2>%{%k%F{blue}%}</span><span class=nv>$SEGMENT_SEPARATOR</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>else</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> -n <span class=s2>&#34;%{%k%}&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> -n <span class=s2>&#34;%{%f%}&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=nv>CURRENT_BG</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=c1># 수정 후 저장</span>
+</span></span><span class=line><span class=cl><span class=c1># 이후 적용</span>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><h3 id=tmux>Tmux</h3><p>터미널 세션을 만들 수 있고 터미널 분할이 가능하다.
+세션을 바꿔가며 터미널을 확인할 수 있다.</p><p><code>tmux</code> 명령으로 실행할 때마다 새로운 세션이 생성된다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># tmux 설치</span>
+</span></span><span class=line><span class=cl>sudo apt-get install tmux
+</span></span><span class=line><span class=cl><span class=c1># 이후 tmux 실행</span>
+</span></span><span class=line><span class=cl>tmux
+</span></span></code></pre></td></tr></table></div></div><p>이후 <code>tmux</code>의 설정(<code>.tmux.conf</code>)은 세션을 재시작하거나 명령어로 적용할 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># prefix + b, :</span>
+</span></span><span class=line><span class=cl><span class=c1># 명령 모드에서</span>
+</span></span><span class=line><span class=cl>source-file ~/.tmux.conf
+</span></span></code></pre></td></tr></table></div></div><h4 id=tmux-command>Tmux Command</h4><div class=table-wrapper><table><thead><tr><th>명령어</th><th>설명</th></tr></thead><tbody><tr><td><code>tmux</code></td><td>새 tmux 세션 시작</td></tr><tr><td><code>tmux ls</code> 또는 <code>tmux list-sessions</code></td><td>실행 중인 tmux 세션 목록 보기</td></tr><tr><td><code>tmux attach-session -t {세션명}</code></td><td>특정 세션에 접근 (세션명에 따라)</td></tr><tr><td><code>tmux attach</code> 또는 <code>tmux a</code></td><td>마지막으로 사용한 tmux 세션에 접근</td></tr><tr><td><code>tmux new -s {세션명}</code></td><td>새로운 tmux 세션을 특정 이름으로 시작</td></tr><tr><td><code>tmux kill-session -t {세션명}</code></td><td>특정 세션 종료 (세션명에 따라)</td></tr><tr><td><code>tmux kill-server</code></td><td>모든 tmux 세션 종료 (서버 종료)</td></tr><tr><td><code>Ctrl + b, d</code></td><td>현재 tmux 세션에서 detach (세션 분리)</td></tr><tr><td><code>Ctrl + b, s</code></td><td>세션 목록 보기 (세션 선택 후 attach 가능)</td></tr><tr><td><code>Ctrl + b, $</code></td><td>현재 세션의 이름 변경 (rename session)</td></tr></tbody></table></div><h4 id=tmux-shortcuts>Tmux Shortcuts</h4><ul><li>Meta 키 <code>M</code> - 일반적으로 <code>Alt</code> 키로 매핑된다. 즉, <code>M-1</code>은 <code>Alt + 1</code> 과 동일하다.</li><li><code>DC</code>는 <code>delete</code> 키를 의미한다.</li></ul><div class=table-wrapper><table><thead><tr><th>단축키</th><th>설명</th></tr></thead><tbody><tr><td><code>C-b C-b</code></td><td>Prefix 키 자체를 입력 (즉, <code>C-b</code>를 두 번 입력)</td></tr><tr><td><code>Prefix C-o</code></td><td>창을 순환 이동 (Rotate through panes)</td></tr><tr><td><code>Prefix C-z</code></td><td>현재 클라이언트 일시 정지 (Suspend the current client)</td></tr><tr><td><code>Prefix Space</code></td><td>다음 레이아웃 선택 (Select next layout)</td></tr><tr><td><code>Prefix !</code></td><td>현재 패널을 새로운 창으로 이동 (Break pane to a new window)</td></tr><tr><td><code>Prefix "</code></td><td>창을 수직으로 분할 (Split window vertically)</td></tr><tr><td><code>Prefix #</code></td><td>모든 붙여넣기 버퍼 목록 표시 (List all paste buffers)</td></tr><tr><td><code>Prefix $</code></td><td>현재 세션 이름 변경 (Rename current session)</td></tr><tr><td><code>Prefix %</code></td><td>창을 수평으로 분할 (Split window horizontally)</td></tr><tr><td><code>Prefix &</code></td><td>현재 창 종료 (Kill current window)</td></tr><tr><td><code>Prefix '</code></td><td>창 번호 입력 후 이동 (Prompt for window index to select)</td></tr><tr><td><code>Prefix (</code></td><td>이전 클라이언트로 전환 (Switch to previous client)</td></tr><tr><td><code>Prefix )</code></td><td>다음 클라이언트로 전환 (Switch to next client)</td></tr><tr><td><code>Prefix ,</code></td><td>현재 창 이름 변경 (Rename current window)</td></tr><tr><td><code>Prefix -</code></td><td>가장 최근 붙여넣기 버퍼 삭제 (Delete the most recent paste buffer)</td></tr><tr><td><code>Prefix .</code></td><td>현재 창 이동 (Move the current window)</td></tr><tr><td><code>Prefix /</code></td><td>키 바인딩 설명 표시 (Describe key binding)</td></tr><tr><td><code>Prefix 0~9</code></td><td>특정 번호의 창 선택 (Select window 0~9)</td></tr><tr><td><code>Prefix :</code></td><td>명령어 입력 프롬프트 (Prompt for a command)</td></tr><tr><td><code>Prefix ;</code></td><td>이전 활성 패널로 이동 (Move to the previously active pane)</td></tr><tr><td><code>Prefix =</code></td><td>붙여넣기 버퍼 선택 (Choose a paste buffer from a list)</td></tr><tr><td><code>Prefix ?</code></td><td>키 바인딩 목록 표시 (List key bindings)</td></tr><tr><td><code>Prefix C</code></td><td>옵션 사용자 지정 (Customize options)</td></tr><tr><td><code>Prefix D</code></td><td>클라이언트 분리 선택 (Choose and detach a client from a list)</td></tr><tr><td><code>Prefix E</code></td><td>패널 크기를 균등하게 조정 (Spread panes out evenly)</td></tr><tr><td><code>Prefix L</code></td><td>마지막 클라이언트로 전환 (Switch to the last client)</td></tr><tr><td><code>Prefix M</code></td><td>선택된 패널 마크 해제 (Clear the marked pane)</td></tr><tr><td><code>Prefix [</code></td><td>복사 모드 진입 (Enter copy mode) -> spacebar 선택, enter 복사 (키가 동작하지 않는 경우 vi 키맵핑 필요할 수 있음)</td></tr><tr><td><code>Prefix ]</code></td><td>최근 붙여넣기 버퍼 붙여넣기 (Paste the most recent paste buffer)</td></tr><tr><td><code>Prefix c</code></td><td>새 창 생성 (Create a new window)</td></tr><tr><td><code>Prefix d</code></td><td>현재 클라이언트 분리 (Detach the current client)</td></tr><tr><td><code>Prefix f</code></td><td>패널 검색 (Search for a pane)</td></tr><tr><td><code>Prefix i</code></td><td>창 정보 표시 (Display window information)</td></tr><tr><td><code>Prefix l</code></td><td>이전 창으로 이동 (Select the previously current window)</td></tr><tr><td><code>Prefix m</code></td><td>현재 패널 마크/마크 해제 (Toggle the marked pane)</td></tr><tr><td><code>Prefix n</code></td><td>다음 창 선택 (Select the next window)</td></tr><tr><td><code>Prefix o</code></td><td>다음 패널 선택 (Select the next pane)</td></tr><tr><td><code>Prefix p</code></td><td>이전 창 선택 (Select the previous window)</td></tr><tr><td><code>Prefix q</code></td><td>패널 번호 표시 (Display pane numbers)</td></tr><tr><td><code>Prefix r</code></td><td>현재 클라이언트 다시 그리기 (Redraw the current client)</td></tr><tr><td><code>Prefix s</code></td><td>세션 목록에서 선택 (Choose a session from a list)</td></tr><tr><td><code>Prefix t</code></td><td>시계 표시 (Show a clock)</td></tr><tr><td><code>Prefix w</code></td><td>창 목록에서 선택 (Choose a window from a list)</td></tr><tr><td><code>Prefix x</code></td><td>활성 패널 종료 (Kill the active pane)</td></tr><tr><td><code>Prefix z</code></td><td>패널 확대/축소 (Zoom the active pane)</td></tr><tr><td><code>Prefix {</code></td><td>현재 패널을 위쪽 패널과 교환 (Swap the active pane with the pane above)</td></tr><tr><td><code>Prefix }</code></td><td>현재 패널을 아래쪽 패널과 교환 (Swap the active pane with the pane below)</td></tr><tr><td><code>Prefix ~</code></td><td>메시지 기록 보기 (Show messages)</td></tr><tr><td><code>Prefix DC</code> (<code>DC</code> = <code>delete</code>)</td><td>창의 보이는 부분을 커서가 따라가도록 리셋 (Reset visible part of the window follows the cursor)</td></tr><tr><td><code>Prefix PPage</code></td><td>복사 모드에서 위로 스크롤 (Enter copy mode and scroll up)</td></tr><tr><td><code>Prefix ↑ / ↓ / ← / →</code></td><td>패널 간 이동 (Select pane up/down/left/right)</td></tr><tr><td><code>Prefix M-1 ~ M-5</code> (<code>M</code> = <code>Alt</code>)</td><td>레이아웃 설정 (Set even-horizontal, even-vertical, main-horizontal, main-vertical, tiled layout)</td></tr><tr><td><code>Prefix M-n / M-p</code></td><td>경고가 있는 창으로 이동 (Select next/previous window with an alert)</td></tr><tr><td><code>Prefix M-o</code></td><td>패널을 반대 방향으로 순환 (Rotate through the panes in reverse)</td></tr><tr><td><code>Prefix M-↑ / M-↓ / M-← / M-→</code></td><td>패널 크기 조정 (Resize pane up/down/left/right by 5)</td></tr><tr><td><code>Prefix C-↑ / C-↓ / C-← / C-→</code></td><td>패널 크기 조정 (Resize pane up/down/left/right)</td></tr><tr><td><code>Prefix S-↑ / S-↓ / S-← / S-→</code></td><td>창의 보이는 부분을 이동 (Move the visible part of the window up/down/left/right)</td></tr></tbody></table></div><h4 id=tmux-plugin-manager>Tmux Plugin Manager</h4><p>Tmux Plugin Manager (<code>TPM</code>) 설치</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 열거나 생성한다.</span>
+</span></span><span class=line><span class=cl>vim ~/.tmux.conf
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 아래 내용을 입력 후 저장</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># TPM 설정</span>
+</span></span><span class=line><span class=cl><span class=nb>set</span> -g @plugin <span class=s1>&#39;tmux-plugins/tpm&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1># tmux에서 마우스 스크롤 활성화</span>
+</span></span><span class=line><span class=cl><span class=nb>set</span> -g mouse on
+</span></span><span class=line><span class=cl><span class=c1># TPM을 초기화하는 설정</span>
+</span></span><span class=line><span class=cl>run <span class=s1>&#39;~/.tmux/plugins/tpm/tpm&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>TPM</code>이 설정되었으면 <code>tmux</code>에서 다음 명령을 입력하여 플러그인을 설치할 수 있다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># tmux에서 새로운 세션을 시작하고 (또는 기존 세션에서)</span>
+</span></span><span class=line><span class=cl>prefix + I
+</span></span></code></pre></td></tr></table></div></div><h4 id=tmux-resurrect>Tmux Resurrect</h4><p><a class=link href=https://github.com/tmux-plugins/tmux-resurrect target=_blank rel=noopener>Tmux Resurrect 자세히 보기</a></p><p>시스템 리부팅 시 작업하던 Tmux 세션이 날아가는데,
+세션을 저장하고 불러올 수 있게 해준다.</p><h5 id=플러그인-설정-및-설치>플러그인 설정 및 설치</h5><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 생성하거나 수정</span>
+</span></span><span class=line><span class=cl>vim ~/.tmux.conf
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 아래 내용을 run &#39;~/.tmux/plugins/tpm/tpm&#39; 명령 위에 추가 후 저장</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># tmux-resurrect 플러그인 추가</span>
+</span></span><span class=line><span class=cl><span class=nb>set</span> -g @plugin <span class=s1>&#39;tmux-plugins/tmux-resurrect&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 만약 TPM 설치도 정상, .tmux.conf 설정도 정상일 때 결과</span>
+</span></span><span class=line><span class=cl><span class=c1># [0/0]Installing &#34;tmux-resurrect&#34;</span>
+</span></span><span class=line><span class=cl><span class=c1># &#34;tmux-resurrect&#34; download success</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># TMUX environment reloaded.</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=c1># Done, press ESCAPE to continue.</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=key-bindings>Key bindings</h5><ul><li><code>prefix + Ctrl-s</code> - save</li><li><code>prefix + Ctrl-r</code> - restore</li></ul><h4 id=vi-키-맵핑>vi 키 맵핑</h4><p>tmux는 기본적으로 vi 키로 동작하지만 정상적으로 키 입력이 안 되는 경우가 발생할 수 있다.
+그럴 땐 직접 vi 키 맵핑으로 동작할 수 있게 설정에 추가하고 적용한다.</p><p>문서 하단에 추가하고 설정 적용 커맨드 실행한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 사용자의 홈 디렉토리에 `.tmux.conf` 파일을 생성하거나 수정</span>
+</span></span><span class=line><span class=cl>vim ~/.tmux.conf
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># vi 키 바인딩</span>
+</span></span><span class=line><span class=cl><span class=c1># 복사모드 Termux에서 실행 중인 tmux 세션에서 스페이스바와 Enter 키를 사용하여 해당 줄을 복사</span>
+</span></span><span class=line><span class=cl>set-window-option -g mode-keys vi
+</span></span></code></pre></td></tr></table></div></div><h2 id=선택사항>📌선택사항</h2><h3 id=windows-terminal-설치>Windows Terminal 설치</h3><p><code>MicroSoft Store</code>에서 <code>Windows Terminal</code>을 설치한다.
+터미널의 설정에서 기본 프로필, 폰트, 컬러 등을 설정한다.</p><h3 id=wsl-설치>WSL 설치</h3><p>명령어로 설치 가능하지만, 더 자세한 자료 확인이 필요하다면
+<a class=link href=https://learn.microsoft.com/ko-kr/windows/wsl/install target=_blank rel=noopener>WSL을 사용하여 Windows에 Linux를 설치하는 방법</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>wsl --install
+</span></span></code></pre></td></tr></table></div></div><h3 id=wsl-삭제>WSL 삭제</h3><h4 id=1설치-상태-확인>1.설치 상태 확인</h4><p><code>WSL</code>에서 설치된 <code>Linux</code> 배포판 목록과 해당 배포판의 상태를 확인한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>wsl -l -v
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#    NAME              STATE           VERSION</span>
+</span></span><span class=line><span class=cl><span class=c1>#  * Ubuntu            Stopped         2</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=2등록-해제>2.등록 해제</h4><p><code>NAME</code>으로 등록 해제한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>wsl --unregister Ubuntu
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 등록 취소 중입니다.</span>
+</span></span><span class=line><span class=cl><span class=c1># 작업을 완료했습니다.</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=3ubuntu-제거>3.Ubuntu 제거</h4><p><code>Windows</code>의 시작 메뉴에서 <code>ubuntu</code>를 찾아 제거한다.</p><h4 id=4선택-사항>4.선택 사항</h4><p>필요하다면 아래 절차도 진행한다.
+버전이 바뀌면서 다를 수 있으니 케이스에 맞지 않다면 넘어간다.</p><ul><li><code>앱 > 설치된 앱</code>에서 <code>Windows Subsystem for Linux</code>, <code>Linux용 Windows 하위 시스템</code> 삭제</li><li><code>Win + R</code> 눌러 실행을 열고, <code>optionalfeatures</code>를 입력해서 <code>Windows 기능 창</code>을 연다.<ul><li><code>Linux용 Windows 하위 시스템</code>을 체크 해제하고 재부팅</li></ul></li><li>WSL의 파일은 기본적으로 <code>C:\Users\{사용자 이름}\AppData\Local\Packages</code> 폴더에 저장된다.<ul><li>이 폴더에서 해당 배포판 관련 폴더를 찾아 삭제할 수 있다.</li></ul></li></ul><h3 id=powerlevel10k>Powerlevel10k</h3><link rel=stylesheet href=/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm+a4QTy4no=" crossorigin=anonymous><div class="admonition tip"><div class=admonition-header><svg viewBox="0 0 384 512"><path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2 5.2-7.1 10.4-14.2 15.4-21.4 19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2.0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3 5 7.2 10.2 14.3 15.4 21.4 19.8 27.1 39.7 54.4 49.2 86.2h160zM192 512c44.2.0 80-35.8 80-80v-16H112v16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112 8.8.0 16 7.2 16 16s-7.2 16-16 16c-44.2.0-80 35.8-80 80z"/></svg>
+<span>powerlevel10k repository</span></div><div class=admonition-content><p><a class=link href=https://github.com/romkatv/powerlevel10k#oh-my-zsh target=_blank rel=noopener>GitHub-powerlevel10k</a>
+<a class=link href=https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k target=_blank rel=noopener>심볼 표현을 위한 meslo font</a></p></div></div><p>저장소를 클론 받는다.
+폰트도 미리 설치하면 편하다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git clone --depth<span class=o>=</span><span class=m>1</span> https://github.com/romkatv/powerlevel10k.git <span class=si>${</span><span class=nv>ZSH_CUSTOM</span><span class=k>:-</span><span class=nv>$HOME</span><span class=p>/.oh-my-zsh/custom</span><span class=si>}</span>/themes/powerlevel10k
+</span></span></code></pre></td></tr></table></div></div><p><code>.zshrc</code>를 열어서 테마를 변경한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim ~/.zshrc
+</span></span><span class=line><span class=cl><span class=c1># ZSH_THEME 찾아서 변경</span>
+</span></span><span class=line><span class=cl><span class=nv>ZSH_THEME</span><span class=o>=</span><span class=s2>&#34;powerlevel10k/powerlevel10k&#34;</span>
+</span></span><span class=line><span class=cl><span class=c1># 변경된 .zshrc 적용</span>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><p>변경된 <code>.zshrc</code> 적용 후 아래와 같이 출력 되면 성공</p><ul><li>UTF-8 텍스트 확인<ul><li><code>ASCII</code> 문자로 충분했지만 대부분의 오픈 소스들은 거의 최소 <code>UTF-8</code>를 쓰고 있기 때문에 사용하는 폰트가 해당 텍스트를 지원하고 있는지 확인하는 것</li></ul></li><li>PUA(Private Use Area)에 해당하는 글자가 보이는지 확인<ul><li>PUA는 이름 그대로 사용자 정의 영역이고 <code>UTF-8</code>, <code>UTF-16</code>에서 사용자 개인이 직접 특수 문자를 정의해서 쓸 수 있는 구간.(<code>U+E000 ~ U+F8FF</code>, <code>U+F0000 ~ U+10FFFF</code>)</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>This is Powerlevel10k configuration wizard. You are seeing it because you haven<span class=err>&#39;</span>t
+</span></span><span class=line><span class=cl>      defined any Powerlevel10k configuration options. It will ask you a few questions and
+</span></span><span class=line><span class=cl>                                     configure your prompt.
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>                        Does this look like a diamond <span class=o>(</span>rotated square<span class=o>)</span>?
+</span></span><span class=line><span class=cl>                          reference: https://graphemica.com/%E2%97%86
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>                                         ---&gt;    &lt;---
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=o>(</span>y<span class=o>)</span>  Yes.
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=o>(</span>n<span class=o>)</span>  No.
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=o>(</span>q<span class=o>)</span>  Quit and <span class=k>do</span> nothing.
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    Choice <span class=o>[</span>ynq<span class=o>]</span>:
+</span></span></code></pre></td></tr></table></div></div><p>이후 여러가지 설정을 묻는데 취향에 맞게 설정 후 <code>recommended</code> 옵션으로 마무리한다.
+기존에 적용했던 랜덤 임티와 이름 표현도 수정이 필요하다.</p><ul><li>테마 재설정<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>p10k configure
+</span></span></code></pre></td></tr></table></div></div></li></ul><h4 id=p10kzsh><code>~/.p10k.zsh</code></h4><ul><li>랜덤 이모지 적용</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>  <span class=c1># The list of segments shown on the left. Fill it with the most important segments.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_LEFT_PROMPT_ELEMENTS</span><span class=o>=(</span>
+</span></span><span class=line><span class=cl>    <span class=c1># =========================[ Line #1 ]=========================</span>
+</span></span><span class=line><span class=cl>    <span class=c1># os_icon               # os identifier</span>
+</span></span><span class=line><span class=cl>    custom_emoji            <span class=c1># custom emoji</span>
+</span></span><span class=line><span class=cl>    dir                     <span class=c1># current directory</span>
+</span></span><span class=line><span class=cl>    vcs                     <span class=c1># git status</span>
+</span></span><span class=line><span class=cl>    <span class=c1># =========================[ Line #2 ]=========================</span>
+</span></span><span class=line><span class=cl>    newline                 <span class=c1># \n</span>
+</span></span><span class=line><span class=cl>    <span class=c1># prompt_char           # prompt symbol</span>
+</span></span><span class=line><span class=cl>  <span class=o>)</span>
+</span></span><span class=line><span class=cl>  <span class=c1># custom emoji env</span>
+</span></span><span class=line><span class=cl>  <span class=nv>POWERLEVEL9K_CUSTOM_EMOJI</span><span class=o>=</span><span class=s2>&#34;my_random_emoji&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=nv>POWERLEVEL9K_CUSTOM_EMOJI_BACKGROUND</span><span class=o>=</span><span class=m>0</span>   <span class=c1># 배경</span>
+</span></span><span class=line><span class=cl>  <span class=c1># custom emoji function</span>
+</span></span><span class=line><span class=cl>  <span class=k>function</span> my_random_emoji<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>local</span> <span class=nv>emojis</span><span class=o>=(</span><span class=s2>&#34;🤌&#34;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;</span><span class=si>${</span><span class=nv>emojis</span><span class=p>[RANDOM % </span><span class=si>${#</span><span class=nv>emojis</span><span class=p>[@]</span><span class=si>}</span><span class=p> + 1]</span><span class=si>}</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=o>}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>경로 축약 표현<ul><li>취향에 맞게 적절히 조정</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>  <span class=c1># If directory is too long, shorten some of its segments to the shortest possible unique</span>
+</span></span><span class=line><span class=cl>  <span class=c1># prefix. The shortened directory can be tab-completed to the original.</span>
+</span></span><span class=line><span class=cl>  <span class=c1># typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_SHORTEN_STRATEGY</span><span class=o>=</span>truncate
+</span></span><span class=line><span class=cl>  <span class=c1># Replace removed segment suffixes with this symbol.</span>
+</span></span><span class=line><span class=cl>  <span class=c1># typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_SHORTEN_DELIMITER</span><span class=o>=</span>...
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1># If set to &#34;first&#34; (&#34;last&#34;), remove everything before the first (last) subdirectory that contains</span>
+</span></span><span class=line><span class=cl>  <span class=c1># files matching $POWERLEVEL9K_SHORTEN_FOLDER_MARKER. For example, when the current directory is</span>
+</span></span><span class=line><span class=cl>  <span class=c1># /foo/bar/git_repo/nested_git_repo/baz, prompt will display git_repo/nested_git_repo/baz (first)</span>
+</span></span><span class=line><span class=cl>  <span class=c1># or nested_git_repo/baz (last). This assumes that git_repo and nested_git_repo contain markers</span>
+</span></span><span class=line><span class=cl>  <span class=c1># and other directories don&#39;t.</span>
+</span></span><span class=line><span class=cl>  <span class=c1>#</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Optionally, &#34;first&#34; and &#34;last&#34; can be followed by &#34;:&lt;offset&gt;&#34; where &lt;offset&gt; is an integer.</span>
+</span></span><span class=line><span class=cl>  <span class=c1># This moves the truncation point to the right (positive offset) or to the left (negative offset)</span>
+</span></span><span class=line><span class=cl>  <span class=c1># relative to the marker. Plain &#34;first&#34; and &#34;last&#34; are equivalent to &#34;first:0&#34; and &#34;last:0&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=c1># respectively.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER</span><span class=o>=</span><span class=nb>false</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Don&#39;t shorten this many last directory segments. They are anchors.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_SHORTEN_DIR_LENGTH</span><span class=o>=</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Shorten directory if it&#39;s longer than this even if there is space for it. The value can</span>
+</span></span><span class=line><span class=cl>  <span class=c1># be either absolute (e.g., &#39;80&#39;) or a percentage of terminal width (e.g, &#39;50%&#39;). If empty,</span>
+</span></span><span class=line><span class=cl>  <span class=c1># directory will be shortened only when prompt doesn&#39;t fit or when other parameters demand it</span>
+</span></span><span class=line><span class=cl>  <span class=c1># (see POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS and POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT below).</span>
+</span></span><span class=line><span class=cl>  <span class=c1># If set to `0`, directory will always be shortened to its minimum length.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_DIR_MAX_LENGTH</span><span class=o>=</span><span class=m>80</span>
+</span></span><span class=line><span class=cl>  <span class=c1># When `dir` segment is on the last prompt line, try to shorten it enough to leave at least this</span>
+</span></span><span class=line><span class=cl>  <span class=c1># many columns for typing commands.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS</span><span class=o>=</span><span class=m>40</span>
+</span></span><span class=line><span class=cl>  <span class=c1># When `dir` segment is on the last prompt line, try to shorten it enough to leave at least</span>
+</span></span><span class=line><span class=cl>  <span class=c1># COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT</span><span class=o>=</span><span class=m>50</span>
+</span></span><span class=line><span class=cl>  <span class=c1># If set to true, embed a hyperlink into the directory. Useful for quickly</span>
+</span></span><span class=line><span class=cl>  <span class=c1># opening a directory in the file manager simply by clicking the link.</span>
+</span></span><span class=line><span class=cl>  <span class=c1># Can also be handy when the directory is shortened, as it allows you to see</span>
+</span></span><span class=line><span class=cl>  <span class=c1># the full directory that was used in previous commands.</span>
+</span></span><span class=line><span class=cl>  <span class=nb>typeset</span> -g <span class=nv>POWERLEVEL9K_DIR_HYPERLINK</span><span class=o>=</span><span class=nb>false</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=endnote>⚙️EndNote</h2><h3 id=wsl>WSL</h3><p>Windows Sub-system for Linux, 윈도우의 하위 시스템으로 리눅스 사용</p><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span>Info</span></div><div class=admonition-content><p>개발자는 Windows 컴퓨터에서 동시에 Windows와 Linux의 기능에 액세스할 수 있습니다. WSL(Linux용 Windows 하위 시스템)을 사용하면 개발자가 Linux 배포판(예: Ubuntu, OpenSUSE, Kali, Debian, Arch Linux)을 설치하고 기존 가상 머신 또는 이중 부팅 설정의 오버헤드 없이 Windows에서 직접 Linux 애플리케이션, 유틸리티 및 Bash 명령줄 도구를 사용할 수 있습니다.</p></div></div><h4 id=git-자격증명-관련>Git 자격증명 관련</h4><p>WSL을 사용할 때 <code>git</code> 명령어 사용 시 username, password를 요구하는 경우가 있다.
+온전한 <code>linux</code>가 아니라서 별도 라이브러리를 사용해야 할 수도 있다.
+일단, 간단한 방법으로는 <code>windows</code>의 자격증명을 사용하게끔 설정하는 방법이다.
+<code>git</code>이 설치되어 있어야 한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git config --global credential.helper <span class=s2>&#34;/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=git-status>git status</h4><p>WSL을 사용할 때 <code>git status</code> 확인 시 다른 프로필의 터미널로 확인할 때와 다른 경우가 있다.</p><ol><li>CRLF(Line Ending) 차이</li><li>Git이 파일 권한(Executable Bit)을 다르게 인식<ol><li>WSL에서는 파일의 실행 권한(<code>chmod +x</code>)이 적용되지만, Windows에서는 실행 권한 개념이 없기 때문에 파일이 변경된 것처럼 인식될 수 있다.</li></ol></li><li>저장소를 클론 받은 주체에 따라 접근 권한에 대한 오류가 발생할 수도 있다.</li></ol><p>따라서 모든 케이스를 해결할 필요는 없고 적절한 조치를 취하면 된다.
+해결 가능한 요약 정보만 정리한다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 줄바꿈 문제</span>
+</span></span><span class=line><span class=cl>git config --global core.autocrlf <span class=nb>false</span>
+</span></span><span class=line><span class=cl><span class=c1># 파일 권한 변경 감지 방지</span>
+</span></span><span class=line><span class=cl>git config --global core.fileMode <span class=nb>false</span>
+</span></span><span class=line><span class=cl><span class=c1># 대소문자 문제 방지</span>
+</span></span><span class=line><span class=cl>git config --global core.ignoreCase <span class=nb>false</span>
+</span></span><span class=line><span class=cl><span class=c1># 심볼릭 링크 문제 해결</span>
+</span></span><span class=line><span class=cl>git config --global core.symlinks <span class=nb>true</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><div style=margin-top:2rem;text-align:center><a href=https://www.buymeacoffee.com/b9f1 target=_blank><img src=https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png alt="Buy Me A Coffee" style=height:60px!important;width:217px!important></a></div><section class=article-tags><a href=/tags/devlog/>Devlog</a>
+<a href=/tags/linux/>Linux</a>
+<a href=/tags/terminal/>Terminal</a>
+<a href=/tags/%EB%A6%AC%EB%88%85%EC%8A%A4/>리눅스</a>
+<a href=/tags/%ED%84%B0%EB%AF%B8%EB%84%90/>터미널</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=[".main-article",".widget--toc"];e.forEach(e=>{const t=document.querySelector(e);t&&renderMathInElement(t,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/2025-06-27-wsl-using-aws-cli/><div class=article-details><h2 class=article-title>WSL에서 AWS-CLI 사용하기</h2></div></a></article><article><a href=/p/2025-06-27-wsl-using-psql/><div class=article-details><h2 class=article-title>WSL에서 PSQL 사용하기</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=nine-j/nine-j.github.io data-repo-id=R_kgDOOqUgZw data-category=General data-category-id=DIC_kwDOOqUgZ84CqLyQ data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"noborder_gray")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2026 B9F1</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

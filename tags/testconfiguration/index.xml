@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TestConfiguration on B9F1</title><link>https://blog.b9f1.com/tags/testconfiguration/</link><description>Recent content in TestConfiguration on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 13 Sep 2025 21:03:30 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/testconfiguration/index.xml" rel="self" type="application/rss+xml"/><item><title>설정 어노테이션 비교</title><link>https://blog.b9f1.com/p/2025-09-13-configuration-vs-testconfiguration/</link><pubDate>Sat, 13 Sep 2025 21:03:30 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-09-13-configuration-vs-testconfiguration/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot에서 애플리케이션 설정을 구성할 때 자주 쓰이는 &lt;code&gt;@Configuration&lt;/code&gt;과 테스트 환경에서 활용되는 &lt;code&gt;@TestConfiguration&lt;/code&gt;은 비슷해 보이지만 동작 방식과 적용 범위가 다르다.&lt;/p&gt;
+&lt;p&gt;두 어노테이션의 &lt;strong&gt;자동 등록 여부, 프로필 영향, 스캔 시점&lt;/strong&gt;을 기준으로 비교해보고 어떤 상황에서 적절히 선택해야 하는지 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="1-자동-등록-여부"&gt;1. 자동 등록 여부
+&lt;/h3&gt;&lt;h4 id="configuration"&gt;@Configuration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@Component&lt;/code&gt; 계열 어노테이션처럼 Spring의 &lt;strong&gt;컴포넌트 스캔 대상&lt;/strong&gt;에 포함된다.&lt;/li&gt;
+&lt;li&gt;별도의 import 없이도 &lt;code&gt;ApplicationContext&lt;/code&gt; 초기화 시 자동으로 등록된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="testconfiguration"&gt;@TestConfiguration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;자동 스캔 제외&lt;/strong&gt; 대상이다.&lt;/li&gt;
+&lt;li&gt;테스트 컨텍스트에선 기본적으로 로드되지 않으며, 다음과 같은 경우에만 적용된다:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;테스트 클래스 내부 static class&lt;/strong&gt; 로 선언했을 때&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Import&lt;/code&gt; 등을 통해 명시적으로 가져왔을 때&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-프로필profile-영향"&gt;2. 프로필(Profile) 영향
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;두 어노테이션 모두 &lt;code&gt;@Profile&lt;/code&gt;을 함께 사용하면 활성화된 profile에 따라 적용 여부가 결정된다.&lt;/li&gt;
+&lt;li&gt;하지만 &lt;code&gt;@TestConfiguration&lt;/code&gt;은 기본적으로 스캔되지 않기 때문에, &lt;strong&gt;import되거나 테스트 내부에 선언된 경우에만 프로필 조건이 평가&lt;/strong&gt;된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-적용-시점--스캔"&gt;3. 적용 시점 / 스캔
+&lt;/h3&gt;&lt;h4 id="configuration-1"&gt;@Configuration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;애플리케이션 실행 시 Spring Context 초기화 과정에서 &lt;strong&gt;컴포넌트 스캔, Bean 정의 등록&lt;/strong&gt; 순서로 처리된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="testconfiguration-1"&gt;@TestConfiguration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;테스트 실행 시 컨텍스트에 주입된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Import&lt;/code&gt;된 경우에는 일반 컴포넌트보다 &lt;strong&gt;먼저 적용&lt;/strong&gt;되며 이후 테스트 컨텍스트에 필요한 빈들을 우선적으로 교체하거나 오버라이드할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-사용-목적"&gt;4. 사용 목적
+&lt;/h3&gt;&lt;h4 id="configuration-2"&gt;@Configuration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;프로덕션 및 애플리케이션 전역 설정을 관리한다.&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;DataSource&lt;/code&gt;, &lt;code&gt;Service Bean&lt;/code&gt;, &lt;code&gt;MessageConverter&lt;/code&gt; 설정 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="testconfiguration-2"&gt;@TestConfiguration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;테스트 전용 설정을 분리하기 위한 용도로 사용한다.&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;MockBean&lt;/code&gt;, &lt;code&gt;Stub&lt;/code&gt;, &lt;code&gt;Testcontainers 초기화&lt;/code&gt;, 테스트용 Repository 대체 설정 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@Configuration&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;애플리케이션 전역&lt;/strong&gt; 설정&lt;/li&gt;
+&lt;li&gt;컴포넌트 스캔 대상&lt;/li&gt;
+&lt;li&gt;프로덕션/테스트 어디든 포함될 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@TestConfiguration&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;테스트 전용&lt;/strong&gt; 설정&lt;/li&gt;
+&lt;li&gt;자동 스캔 제외 (명시적 import 또는 static inner class로 사용)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;운영 환경에서는 로딩되지 않음&lt;/strong&gt;. &amp;ldquo;운영 코드와 테스트 설정의 경계&amp;quot;를 안전하게 보장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring IoC Container (Bean 관리 메커니즘)&lt;/li&gt;
+&lt;li&gt;Spring Boot TestContext Framework&lt;/li&gt;
+&lt;li&gt;Profile 기반 환경 분리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html" target="_blank" rel="noopener"
+&gt;Spring Framework @Configuration 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestConfiguration.html" target="_blank" rel="noopener"
+&gt;Spring Boot @TestConfiguration 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;테스트 설정 패턴: &lt;code&gt;@MockitoBean&lt;/code&gt;, &lt;code&gt;@Import&lt;/code&gt;, &lt;code&gt;@ActiveProfiles&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

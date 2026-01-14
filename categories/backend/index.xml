@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Backend on B9F1</title><link>https://blog.b9f1.com/categories/backend/</link><description>Recent content in Backend on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 04 Jan 2026 14:54:18 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/categories/backend/index.xml" rel="self" type="application/rss+xml"/><item><title>당신은 5년 차인가요, 1년 차 5번인가요?</title><link>https://blog.b9f1.com/p/2026-01-04-my-5-years-of-java-experience-collapsed-in-a-60-minute-interview/</link><pubDate>Sun, 04 Jan 2026 14:54:18 +0900</pubDate><guid>https://blog.b9f1.com/p/2026-01-04-my-5-years-of-java-experience-collapsed-in-a-60-minute-interview/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;메일함에서 Medium Daily Digest를 확인하다가 발목이 잡혔다.
+공감할 수 있는 내용이고 자신의 태도에 대해 고민해 볼 수 있는 좋은 글이라고 생각한다.&lt;/p&gt;
+&lt;p&gt;이 글에서 &amp;lsquo;우리&amp;rsquo;, &amp;lsquo;자신&amp;rsquo;이라는 키워드가 자주 등장할 텐데 만약 본인은 포함되지 않는다고 생각한다면 빠르게 뒤로 가기, 탭 닫기를 통해 시간을 아끼길 바란다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;나의 5년 자바 경력이 60분 면접 만에 무너졌다 - My 5 Years of Java Experience Collapsed in a 60-Minute Interview&amp;quot;는 자극적인 제목보다 더 충격적이었던 건, 그 안의 질문들에 선뜻 답하지 못하는 나의 모습이었다.&lt;/p&gt;
+&lt;p&gt;우리는 모두가 자신의 문제를 해결하기 위해 바쁘게 생산적인 일을 한다. 매일 스프린트를 쳐내고, 라이브러리를 가져다 쓰고, 비즈니스 로직을 구현한다. 하지만 &amp;lsquo;어떻게(How)&amp;rsquo; 돌아가게 만드는 것에 익숙해진 나머지, &amp;lsquo;왜(Why)&amp;rsquo; 그렇게 설계되었는지에 대해서는 추상화라는 장막 뒤로 숨겨두곤 한다.&lt;/p&gt;
+&lt;p&gt;이 포스팅은 원작자가 겪은 뼈아픈 면접 기록을 통해, 우리가 놓치고 있었던 &amp;lsquo;백엔드 개발자의 기술적 깊이&amp;rsquo;란 무엇인지, 그리고 &amp;lsquo;연차&amp;rsquo;를 &amp;lsquo;실력&amp;rsquo;으로 치환하기 위해 어떤 태도가 필요한지 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="어느-5년-차-개발자의-뼈아픈-고백"&gt;어느 5년 차 개발자의 뼈아픈 고백
+&lt;/h3&gt;&lt;p&gt;원문: &lt;a class="link" href="https://blog.stackademic.com/my-5-years-of-java-experience-collapsed-in-a-60-minute-interview-34d8657eba66" target="_blank" rel="noopener"
+&gt;My 5 Years of Java Experience Collapsed in a 60-Minute Interview&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;간단한 것부터 시작하죠.&amp;rdquo; 면접관의 이 한마디가 비수가 되어 돌아오기까지는 그리 오랜 시간이 걸리지 않았습니다. 5년 동안 자바를 다뤄왔고 수많은 마이크로서비스를 배포했으며 운영 환경의 복잡한 버그들을 잡아왔던 한 개발자의 자신감은 60분 만에 산산조각이 났습니다.&lt;/p&gt;
+&lt;p&gt;최근 해외 개발 관련 글에서 공감을 얻고 있는 My 5 Years of Java Experience Collapsed in a 60-Minute Interview라는 글의 이야기다. 이 글은 단순한 면접 탈락 수기가 아니다. 우리가 &amp;lsquo;경험&amp;rsquo;이라고 부르는 시간이 얼마나 허망하게 쌓여있을 수 있는지에 대한 자기반성이자 동시에 우리 모두에게 던지는 경고장이다.&lt;/p&gt;
+&lt;p&gt;나 역시 이 글을 읽으며 묘한 서늘함을 느꼈다. &amp;ldquo;내가 저 자리에 있었다면 과연 면접관의 꼬리 질문을 견뎌낼 수 있었을까?&amp;ldquo;라는 질문에 선뜻 &amp;ldquo;예쓰&amp;quot;라고 답할 수 없었기 때문이다. 우리는 과연 경력이라는 이름 뒤에 숨어 성장을 멈춘 것은 아닐까?&lt;/p&gt;
+&lt;h3 id="왜-우리는-경험을-실력이라-착각하는가"&gt;왜 우리는 경험을 실력이라 착각하는가?
+&lt;/h3&gt;&lt;p&gt;원작자는 5년의 경력을 가졌음에도 &lt;code&gt;Arrays.asList()&lt;/code&gt;로 생성한 리스트에 요소를 추가할 때 왜 에러가 나는지, 왜 공유 자원에 대한 동시성 이슈를 해결할 때 &lt;code&gt;AtomaticInteger&lt;/code&gt;가 대안이 될 수 있는지 명확히 설명하지 못했다. 왜 이런 일이 벌어질까?&lt;/p&gt;
+&lt;h4 id="1-숙련도와-전문성의-괴리-사용과-이해는-다르다"&gt;1. 숙련도와 전문성의 괴리: 사용과 이해는 다르다.
+&lt;/h4&gt;&lt;p&gt;우리는 도구에 익숙해지는 것을 실력이라 착각하곤 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;숙련도(How): 특정 라이브러리의 API를 호출하고 늘 쓰던 패턴으로 서비스를 구축하는 능력.&lt;/li&gt;
+&lt;li&gt;전문성(Why): 그 도구가 내부적으로 어떻게 동작하며, 왜 다른 대안이 아닌 이 기술을 선택했는지 논리적으로 증명하는 능력. 시니어에게 요구되는 것은 전자가 아니라 후자다. 하지만 많은 이들이 프레임워크가 제공하는 편리함(추상화)에 안주하며 내부 원리를 궁금해하지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-업무의-반복성-1년-차-5번-반복의-함정"&gt;2. 업무의 반복성: 1년 차 5번 반복의 함정
+&lt;/h4&gt;&lt;p&gt;원작자는 뼈아픈 통찰을 남겼다. &amp;ldquo;나는 5년 동안 코딩해 왔지만, 5년 동안 배우지는 않았다&amp;quot;라는 것이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;매일 비슷한 비즈니스 로직을 짜고, 기존 템플릿을 복사해 새 서비스를 만들며 바쁘게 보낸 시간은 우리를 익숙한 개발자로 만들 뿐이다.&lt;/li&gt;
+&lt;li&gt;새로운 기술적 난제에 부딪히고 이를 해결하기 위해 깊게 파고드는 경험이 없다면, 그것은 5년의 경력이 아니라 1년의 경험을 5번 반복한 것에 불과하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;우리는 수평적으로 경험을 확장하는 데 급급해 정작 한 분야의 뿌리를 깊게 내리는 수직적 성장을 소홀히 해왔을지도 모른다.&lt;/p&gt;
+&lt;h3 id="백엔드-개발자에게-요구되는-진짜-깊이란"&gt;백엔드 개발자에게 요구되는 진짜 깊이란?
+&lt;/h3&gt;&lt;p&gt;원작자가 마주했던 질문들은 결코 지엽적인 말장난이 아니었다. 이는 백엔드 개발자가 매일 다루는 도구의 한계점과 동작 원리를 얼마나 깊게 인지하고 있는지를 묻는 본질적인 질문들이었다.&lt;/p&gt;
+&lt;h4 id="1-자바-기본기-arraysaslist와-추상화의-함정"&gt;1. 자바 기본기: &lt;code&gt;Arrays.asList()&lt;/code&gt;와 추상화의 함정
+&lt;/h4&gt;&lt;p&gt;단순히 &amp;ldquo;에러가 난다&amp;quot;를 아는 것과 그 이유가 &lt;code&gt;ArrayList&lt;/code&gt;라는 이름 뒤에 숨겨진 구현의 차이 떄문임을 아는 것은 다르다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Arrays.asList()&lt;/code&gt;는 우리가 흔히 쓰는 &lt;code&gt;java.util.ArrayList&lt;/code&gt;가 아니라, 내부 클래스인 &lt;code&gt;Arrays$ArrayList&lt;/code&gt;를 반환한다. 이는 &amp;lsquo;고정 크기&amp;rsquo; 배열을 래핑한 것에 불과하기 때문에 &lt;code&gt;add()&lt;/code&gt; 호출 시 예외를 던지는 것이다.&lt;/p&gt;
+&lt;p&gt;우리가 사용하는 인터페이스(&lt;code&gt;List&lt;/code&gt;) 뒤에 어떤 구체적인 구현체가 숨어 있는지 확인하는 습관이 없다면, 런타임에 예상치 못한 사이드 이펙트를 마주하게 된다.&lt;/p&gt;
+&lt;h4 id="2-concurrency-동시성-이슈를-해결하는-논리적-근거"&gt;2. Concurrency: 동시성 이슈를 해결하는 논리적 근거
+&lt;/h4&gt;&lt;p&gt;공유 자원 문제에 단순히 &lt;code&gt;synchronized&lt;/code&gt;를 붙이는 것은 가장 쉬운 해결책일 수 있지만, 성능 최적화 관점에서는 최악일 수 있다. 면접관이 던진 &lt;code&gt;AtomaticInteger&lt;/code&gt;라는 대안은 Lock-based(비관적 락)와 CAS(Compare-And-Swap, 낙관적 락)의 차이를 이해하고 있는지 묻는 것이다.&lt;/p&gt;
+&lt;p&gt;실무에서 발생하는 데드락이나 성능 저하 문제는 대개 이런 원리에 대한 무지에서 시작된다. &amp;ldquo;돌아가니까 됐다&amp;quot;는 시니어의 답변이 될 수 없다.&lt;/p&gt;
+&lt;h4 id="3-시스템-설계-trade-off의-예술"&gt;3. 시스템 설계: Trade-off의 예술
+&lt;/h4&gt;&lt;p&gt;레이트 리미터 설계 예시에서 중요한 건 &amp;lsquo;정답&amp;rsquo;이 아니다. 왜 고정 윈도우가 아닌 슬라이딩 윈도우를 택했는지, 토큰 버킷 방식이 트래픽 버스트를 어떻게 처리하는지 설명할 수 있어야 한다.&lt;/p&gt;
+&lt;p&gt;모든 기술 선택에는 비용이 따른다. 시니어는 성능, 복잡도, 유지보수성 사이에서 최적의 균형점을 찾는 &amp;lsquo;의사결정권자&amp;rsquo;여야 한다.&lt;/p&gt;
+&lt;h3 id="얕은-지식을-온전히-내-것으로-만드는-전략"&gt;얕은 지식을 온전히 내 것으로 만드는 전략
+&lt;/h3&gt;&lt;p&gt;사실 이건 엉덩이 붙이고 앉아서 사투를 벌이며 체화하는 것 말고 왕도가 있을까 싶다. 자신에게 맞는 효율적인 방법을 찾아 시간을 아낄 수 있다면 더할 나위 없이 좋은 가치가 된다. 하지만 효율을 핑계로 깊이 파고드는 고통을 회피하고 있는 것은 아닌지 스스로 경계해야 한다.&lt;/p&gt;
+&lt;p&gt;파편화된 지식을 경험으로 연결하기 위해 내가 실천하고 있는, 그리고 원작자가 제안한 &amp;lsquo;리셋&amp;rsquo; 전략이다.&lt;/p&gt;
+&lt;h4 id="1-소스-코드-여행go-to-declaration"&gt;1. 소스 코드 여행(Go to Declaration)
+&lt;/h4&gt;&lt;p&gt;IDE에서 라이브러리 메서드를 사용할 때 &lt;code&gt;Ctrl+Click&lt;/code&gt;을 누르는 습관을 들여야 한다. 내가 호출한 메서드가 내부적으로 어떤 객체를 생성하고 어떤 예외를 던지는지 직접 눈으로 확인하는 과정이 쌓여 기술적 깊이가 된다.&lt;/p&gt;
+&lt;h4 id="2-문서화와-언어화"&gt;2. 문서화와 언어화
+&lt;/h4&gt;&lt;p&gt;머릿속으로 안다고 생각하는 것과 그것을 타인에게 설명하는 것은 천지 차이다. 학습한 내용을 블로그에 정리하거나 동료에게 공유해보자. 논리의 빈틈은 설명하려 할 때 비로소 드러난다.&lt;/p&gt;
+&lt;h4 id="pocproof-of-concept-중심-학습"&gt;PoC(Proof of Concept) 중심 학습
+&lt;/h4&gt;&lt;p&gt;이론으로만 배운 개념은 금방 휘발된다. &lt;code&gt;AtomaticInteger&lt;/code&gt;가 정말 &lt;code&gt;synchronized&lt;/code&gt;보다 빠른지, 1000개의 스레드를 돌려 직접 벤치마크 코드를 작성해 보아라. 직접 현상을 재현하고 데이터를 눈으로 확인한 지식은 결코 무너지지 않는다.&lt;/p&gt;
+&lt;h3 id="연차의-무게를-감당하는-개발자가-되기-위해"&gt;연차의 무게를 감당하는 개발자가 되기 위해
+&lt;/h3&gt;&lt;p&gt;원작자는 마지막에 이렇게 말한다. &amp;ldquo;당신의 경험은 그것을 깊이 있게 설명할 수 있을 떄만 의미가 있다.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;5년, 10년이라는 숫자가 주는 안락함에 속지 말자. 오늘 내가 작성한 코드 한 줄의 &amp;lsquo;이유&amp;rsquo;를 설명하지 못한다면 우리는 그저 거대한 프레임워크의 부품으로 머물 뿐이다. 연차에 어울리는 무게감은 내가 아는 기술의 뿌리에서 나온다. 내일의 우리는 오늘보다 조금 더 깊은 개발자이기를 바란다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;경력은 단순히 시간이 흐른 결과가 아니라 그 시간 동안 쌓아 올린 논리적 근거의 총합이다.
+효율을 핑계로 깊이 파고드는 고통을 회피하고 있는 것은 아닌지 스스로 경계해야 한다.&lt;/p&gt;</description></item><item><title>MSA Outbox 패턴</title><link>https://blog.b9f1.com/p/2025-10-10-outbox-patterns-for-data-consistency-and-event-reliability-in-msa/</link><pubDate>Fri, 10 Oct 2025 19:41:23 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-10-10-outbox-patterns-for-data-consistency-and-event-reliability-in-msa/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;MSA에서 각 서비스는 독립적인 데이터베이스와 메시지 브로커를 사용하며 이를 통해 비동기 이벤트를 교환한다.&lt;/p&gt;
+&lt;p&gt;하지만 이 구조는 하나의 트랜잭션 내에서 데이터 저장과 이벤트 발행이 분리되기 때문에 데이터 일관성과 메시지 신뢰성을 보장하기 어렵다.&lt;/p&gt;
+&lt;p&gt;예를 들어 결제 서비스가 결제 정보를 DB에 저장한 후 kafka에 결제 완료 이벤트를 발행한다고 하자. 만약 DB 저장은 성공했지만 kafka 발행이 실패한다면?
+결제는 되었는데 알림 서비스나 배송 서비스는 이를 모르게 된다.&lt;/p&gt;
+&lt;p&gt;이런 문제를 해결하기 위한 안전한 전략이 바로 Outbox 패턴이다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;Outbox는 보낼 편지함이라는 뜻이며 &lt;code&gt;Transactional Outbox Pattern&lt;/code&gt;으로 조회했을 때 다양한 정보가 있었다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="문제-상황"&gt;문제 상황
+&lt;/h3&gt;&lt;p&gt;MSA 환경에서 다음과 같은 불일치가 자주 발생한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DB에는 반영되었지만 이벤트 발행 실패&lt;/li&gt;
+&lt;li&gt;이벤트는 발행되었지만 데이터 저장 실패&lt;/li&gt;
+&lt;li&gt;중복 발행 및 순서 불일치&lt;/li&gt;
+&lt;li&gt;서비스 간 재시도 로직으로 인한 중복 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이는 &lt;strong&gt;DB 트랜잭션과 메시지 발행이 원자적(atomic)&lt;/strong&gt; 으로 묶여있지 않기 때문에 발생한다.&lt;/p&gt;
+&lt;h3 id="기존-접근의-한계"&gt;기존 접근의 한계
+&lt;/h3&gt;&lt;h4 id="2pctwo-phase-commit"&gt;2PC(Two-Phase Commit)
+&lt;/h4&gt;&lt;p&gt;DB와 메시지 브로커가 XA 트랜잭션을 지원해야 하며, 락 경합과 네트워크 오버헤드로 인해 확장성 측면에서 부적합하다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;XS 트랜잭션&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;표준화된 분산 트랜잭션 구현 XA(eXtended Architecture)는 2PC(2 phase commit)을 통한 분산 트랜잭션 처리를 위해 X-Open에서 명시한 표준이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="application-level-retry"&gt;Application-Level Retry
+&lt;/h4&gt;&lt;p&gt;애플리케이션에서 발행 실패 시 재시도를 구현할 수 있지만 네트워크 장애나 장애 복구 시점에 따라 &lt;strong&gt;중복 이벤트&lt;/strong&gt; 또는 &lt;strong&gt;순서 역전&lt;/strong&gt;이 발생할 수 있다.&lt;/p&gt;
+&lt;h3 id="outbox-패턴으로-해결할-수-있는-것"&gt;Outbox 패턴으로 해결할 수 있는 것
+&lt;/h3&gt;&lt;p&gt;Outbox 패턴은 &lt;strong&gt;비즈니스 데이터와 이벤트를 동일 트랜잭션 내에서 처리하고&lt;/strong&gt; 이후 별도의 &lt;strong&gt;Message Relay 프로세스&lt;/strong&gt;가 메시지 브로커(Kafka, RabbitMQ 등)에 발행하는 구조다.&lt;/p&gt;
+&lt;p&gt;이 방식은 트랜잭션 일관성과 메시지 신뢰성을 모두 확보한다.&lt;/p&gt;
+&lt;h4 id="처리-흐름-요약"&gt;처리 흐름 요약
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;비즈니스 트랜잭션 수행&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ORDER&lt;/code&gt; 테이블에 INSERT / UPDATE / DELETE 수행&lt;/li&gt;
+&lt;li&gt;같은 트랜잭션 내에서 &lt;code&gt;OUTBOX&lt;/code&gt; 테이블에 이벤트 메시지(페이로드) 저장&lt;/li&gt;
+&lt;li&gt;두 테이블은 &lt;strong&gt;하나의 트랜잭션 단위&lt;/strong&gt;로 커밋됨, 원자성(Atomicity) 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메시지 릴레이(Message Relay)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;트랜잭션이 커밋된 후, 별도 프로세스가 &lt;code&gt;OUTBOX&lt;/code&gt; 테이블을 주기적으로 읽음&lt;/li&gt;
+&lt;li&gt;발행되지 않은 이벤트(&lt;code&gt;status = NEW&lt;/code&gt;)를 찾아 메시지 브로커에 Publish&lt;/li&gt;
+&lt;li&gt;발행 성공 시 &lt;code&gt;status = PUBLISHED&lt;/code&gt;로 갱신&lt;/li&gt;
+&lt;li&gt;실패 시 재시도 로직 또는 DLQ(Dead Letter Queue)로 이동&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메시지 브로커&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Kafka, RabbitMQ, AWS SNS/SQS 등으로 메시지 전달&lt;/li&gt;
+&lt;li&gt;구독 서비스들이 해당 이벤트를 비동기적으로 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart LR
+A[Order Service] --&gt;|INSERT/UPDATE/DELETE| B[(ORDER table)]
+A --&gt;|INSERT event| C[(OUTBOX table)]
+subgraph Database
+B
+C
+end
+C --&gt;|Read Outbox| D[Message Relay]
+D --&gt;|Publish Event| E[Message Broker]
+classDef highlight fill:#f4f4f4,stroke:#666,stroke-width:1px;
+class B,C highlight
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="구성-요소"&gt;구성 요소
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Sender (Order Service):&lt;/strong&gt; 비즈니스 로직 수행 및 Outbox에 이벤트 기록&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Database:&lt;/strong&gt; 비즈니스 데이터(&lt;code&gt;ORDER&lt;/code&gt;)와 이벤트 로그(&lt;code&gt;OUTBOX&lt;/code&gt;)를 함께 저장&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Outbox:&lt;/strong&gt; 발행 대기 중인 이벤트를 저장하는 테이블 또는 컬렉션&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Relay:&lt;/strong&gt; Outbox 테이블에서 이벤트를 읽어 메시지 브로커로 발행&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Message Broker:&lt;/strong&gt; 이벤트를 다른 서비스에 전달 (Kafka, RabbitMQ 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="주요-장점"&gt;주요 장점
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;트랜잭션 일관성 보장&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;DB 저장과 이벤트 기록이 하나의 트랜잭션으로 처리됨&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;재처리 가능&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Outbox 테이블을 기준으로 실패한 이벤트를 재전송 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;멱등성(idempotency)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;이벤트 발행 시 &lt;code&gt;event_id&lt;/code&gt;로 중복 처리 방지&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Kafka Connect / Debezium 등을 통해 Change Data Capture(CDC) 기반으로 확장 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="outbox--cdcchange-data-capture"&gt;Outbox + CDC(Change Data Capture)
+&lt;/h3&gt;&lt;p&gt;단순 폴링 기반은 부하가 크기 때문에 &lt;strong&gt;Debezium + Kafka Connect&lt;/strong&gt; 조합을 사용하기도 한다.
+DB 트랜잭션 로그를 구독하여 outbox 테이블의 변경 사항만 캡처해 이벤트를 발행하므로 효율적이다.&lt;/p&gt;
+&lt;h3 id="유사-패턴과-비교"&gt;유사 패턴과 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;패턴&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;한계&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Saga 패턴&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;여러 서비스 트랜잭션을 보상 트랜잭션으로 관리&lt;/td&gt;
+&lt;td&gt;복잡한 보상 로직, 순차적 지연&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Event Sourcing&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;상태를 이벤트 스트림으로 저장&lt;/td&gt;
+&lt;td&gt;이벤트 재생 비용, 복잡한 쿼리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Outbox 패턴&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;이벤트를 별도 테이블에 기록 후 발행&lt;/td&gt;
+&lt;td&gt;Outbox 테이블 관리 필요&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="적용-시-고려사항"&gt;적용 시 고려사항
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Outbox 테이블은 주기적으로 정리(cleanup) 필요&lt;/li&gt;
+&lt;li&gt;이벤트 발행 실패 시 재시도 정책 및 DLQ(Dead Letter Queue) 구성&lt;/li&gt;
+&lt;li&gt;발행 순서 보장을 위한 파티셔닝 키 설계 (&lt;code&gt;aggregate_id&lt;/code&gt; 기반)&lt;/li&gt;
+&lt;li&gt;Kafka 등 메시지 브로커의 전달 보증 설정 (&lt;code&gt;at-least-once&lt;/code&gt; vs &lt;code&gt;exactly-once&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;발행 중복 대비를 위한 멱등 처리 전략 (&lt;code&gt;unique event_id&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="outbox-패턴-적용-관련-트러블슈팅"&gt;Outbox 패턴 적용 관련 트러블슈팅
+&lt;/h3&gt;&lt;p&gt;날씨 정보로 사용자의 OOTD를 추천하는 서비스(피드 공유, DM 등 SNS 기능 포함)
+날씨 도메인을 담당하는 팀원의 PR을 리뷰하다가 특이한 상황을 만났다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;배치 잡을 실행하며 특별한 날씨 변화가 감지되면 알림을 생성하는 케이스&lt;/li&gt;
+&lt;li&gt;해당 테스트는 다른 테스트의 DB와 충돌이 없도록 독립된 인메모리 DB로 실행.&lt;/li&gt;
+&lt;li&gt;로컬 테스트 코드에서 실행 시 성공 또는 무한 루프로 인한 실패. 성공 보장이 안 됨.&lt;/li&gt;
+&lt;li&gt;특이하게 CI 이력엔 성공 케이스만 있음.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="로직-점검"&gt;로직 점검
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;outboxes&lt;/code&gt;가 비었을 때만 &lt;code&gt;FINISHED&lt;/code&gt;, 기본은 &lt;code&gt;CONTINUABLE&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;모든 이벤트를 발송하기 위함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;수신 대상이 없어도 &lt;code&gt;SENDING&lt;/code&gt; 상태로 저장하는 결함 발견
+&lt;ul&gt;
+&lt;li&gt;수신 대상이 없어서 &lt;code&gt;outbox&lt;/code&gt;가 처리되지 않고 계속 남아있으며 &lt;code&gt;CONTINUABLE&lt;/code&gt; 무한 루프&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;하지만 간헐적인 성공과 CI에서만 성공하는 건 설명되지 않음.&lt;/p&gt;
+&lt;h4 id="성공-조건과-실패-조건-점검"&gt;성공 조건과 실패 조건 점검
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;왜 로컬에선 무한 루프로 실패하는 케이스가 있고 CI에선 정상 동작하지?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;성공의 조건
+&lt;ul&gt;
+&lt;li&gt;배치 실행 시점에 &lt;code&gt;PENDING&lt;/code&gt; &lt;code&gt;outbox&lt;/code&gt;가 비어있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;실패의 조건
+&lt;ul&gt;
+&lt;li&gt;배치 시작 후, &lt;code&gt;PENDING&lt;/code&gt; &lt;code&gt;outbox&lt;/code&gt; 조회 쿼리와 수신 대상 조회 쿼리가 반복&lt;/li&gt;
+&lt;li&gt;수신 대상이 0명인 경우: &lt;code&gt;SENDING&lt;/code&gt;으로 바꾸지 않음, 여전히 &lt;code&gt;PENDING&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Step이 종료되지 않고 같은 쿼리를 계속 내며 무한 반복&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;질문이 잘못됐다..! 로컬과 CI로 구분해서 볼 게 아니라 로직 점검에서 확인했던 &lt;code&gt;outbox&lt;/code&gt;의 생성 여부를 봤어야 했다. &amp;ldquo;outboxes가 비었을 때만 &lt;code&gt;FINISHED&lt;/code&gt;&amp;rdquo; 였으니까..&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;즉, 특별한 날씨 변화가 있는가? 였다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;날씨 조회에 대한 것도 Mocking 하거나 수신 대상을 보장하는 등 다양한 방법이 있었을텐데 정답이 없다 보니 발생했던 문제 같다.&lt;/p&gt;
+&lt;p&gt;특이하게 CI에 성공 이력만 있던 것도 마침 그때는 특별한 날씨 변화가 없던 것&amp;hellip;&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;Outbox 패턴은 &lt;strong&gt;MSA 환경에서 데이터 일관성과 이벤트 신뢰성을 확보하는 현실적인 대안&lt;/strong&gt;이 될 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;트랜잭션 ACID 속성&lt;/li&gt;
+&lt;li&gt;메시지 브로커의 전달 보증 (&lt;code&gt;at-least-once&lt;/code&gt;, &lt;code&gt;exactly-once&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Saga, 2PC, Event Sourcing 패턴&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://ssonzm.tistory.com/148" target="_blank" rel="noopener"
+&gt;분산 트랜잭션과 XA 트랜잭션에 대해&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://devocean.sk.com/blog/techBoardDetail.do?ID=165445&amp;amp;boardType=techBlog" target="_blank" rel="noopener"
+&gt;[MSA 패턴] SAGA, Transactional Outbox 패턴 활용하기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://microservices.io/patterns/data/transactional-outbox.html#:~:text=The%20solution%20is%20for%20the,messages%20to%20the%20message%20broker" target="_blank" rel="noopener"
+&gt;Pattern: Transactional outbox&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="추가-정리"&gt;추가 정리
+&lt;/h3&gt;&lt;h4 id="단일-인스턴스monolithic-환경"&gt;단일 인스턴스(Monolithic) 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;하나의 DB, 하나의 트랜잭션에서 모든 로직이 처리된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2PC(2-Phase Commit)&lt;/strong&gt; 같은 표준 트랜잭션 메커니즘으로 DB 저장과 이벤트 처리(예: 메시지 큐 발행)를 하나의 논리적 단위로 묶을 수 있다.&lt;/li&gt;
+&lt;li&gt;따라서 &lt;strong&gt;원자성(Atomicity)&lt;/strong&gt; 과 &lt;strong&gt;일관성(Consistency)&lt;/strong&gt; 이 보장된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="확장-시-한계-락-경쟁--처리-병목"&gt;확장 시 한계 (락 경쟁 &amp;amp; 처리 병목)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;트래픽 증가 → DB Connection Pool 경쟁 → 락 경합(lock contention) 증가&lt;/li&gt;
+&lt;li&gt;대규모 트랜잭션으로 인해 응답 지연 발생&lt;/li&gt;
+&lt;li&gt;DB가 &lt;strong&gt;트랜잭션 코디네이터&lt;/strong&gt; 역할까지 하므로 병목이 심화된다.&lt;/li&gt;
+&lt;li&gt;이 시점에서 &lt;strong&gt;단일 DB 트랜잭션 구조는 확장성의 한계&lt;/strong&gt;에 부딪힌다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="분산-환경-msa-도입"&gt;분산 환경(= MSA 도입)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;각 서비스가 &lt;strong&gt;독립된 DB&lt;/strong&gt;를 가지게 되고 서비스 간에는 &lt;strong&gt;비동기 메시지 큐(Kafka, RabbitMQ, SNS/SQS)&lt;/strong&gt; 로 이벤트를 전달한다.&lt;/li&gt;
+&lt;li&gt;이로 인해 처리 속도는 비약적으로 향상된다. (주요 비즈니스 로직만 빠르게 커밋, 나머지는 비동기로 후처리)&lt;/li&gt;
+&lt;li&gt;하지만 &lt;strong&gt;데이터 일관성 문제&lt;/strong&gt;가 새롭게 등장한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="새로운-문제-원자성-붕괴"&gt;새로운 문제: 원자성 붕괴
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;비즈니스 트랜잭션(DB 커밋)과 이벤트 발행(Message Send)이 &lt;strong&gt;서로 다른 시스템&lt;/strong&gt;에서 발생&lt;/li&gt;
+&lt;li&gt;두 작업 중 하나라도 실패하면 데이터 불일치 발생&lt;/li&gt;
+&lt;li&gt;메시지 순서가 바뀌거나 중복 이벤트가 발생할 수도 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="outbox-패턴의-해결-방식"&gt;Outbox 패턴의 해결 방식
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;서비스 로직 트랜잭션 안에서 &lt;strong&gt;비즈니스 데이터 + 이벤트 로그(Outbox)를 함께 커밋&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이로써 “이벤트 기록”까지는 &lt;strong&gt;원자성 보장&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이후 별도 프로세스(Message Relay)가 Outbox 테이블을 읽어 메시지 브로커(Kafka 등)에 발행&lt;/li&gt;
+&lt;li&gt;발행이 성공하면 상태를 &lt;code&gt;PUBLISHED&lt;/code&gt;로 변경 실패하면 재시도 또는 DLQ(Dead Letter Queue)로 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+autonumber
+participant Service as Order Service
+participant DB as Database
+participant Relay as Message Relay
+participant Kafka as Kafka Broker
+rect rgb(240, 248, 255)
+Note over Service,DB: [서비스 트랜잭션 - 동기 처리]
+Service-&gt;&gt;DB: INSERT INTO orders (...)
+Service-&gt;&gt;DB: INSERT INTO outbox_event (...)
+DB--&gt;&gt;Service: COMMIT (단일 트랜잭션으로 원자성 확보)
+end
+rect rgb(250, 250, 250)
+Note over Relay,Kafka: [비동기 메시지 릴레이 - Outbox Poller]
+Relay-&gt;&gt;DB: SELECT * FROM outbox_event WHERE status = 'NEW'
+Relay-&gt;&gt;Kafka: Publish Event to Kafka
+Kafka--&gt;&gt;Relay: ACK
+Relay-&gt;&gt;DB: UPDATE outbox_event SET status = 'PUBLISHED'
+end
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="결과적으로"&gt;결과적으로
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;기존 구조&lt;/th&gt;
+&lt;th&gt;Outbox 적용 후&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;원자성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;DB ↔ MQ 분리되어 깨짐&lt;/td&gt;
+&lt;td&gt;동일 트랜잭션 내 Outbox 기록으로 보장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;확장성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단일 DB 락 병목&lt;/td&gt;
+&lt;td&gt;분산 환경 + 비동기 처리로 개선&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;신뢰성&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;발행 실패 시 유실 가능&lt;/td&gt;
+&lt;td&gt;Outbox 재시도 / CDC로 회복 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;단순&lt;/td&gt;
+&lt;td&gt;Outbox 테이블 관리 필요(운영비 증가)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</description></item><item><title>로컬 캐시 vs 분산 캐시</title><link>https://blog.b9f1.com/p/2025-08-30-local-cache-vs-distributed-cache/</link><pubDate>Sat, 30 Aug 2025 13:25:20 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-30-local-cache-vs-distributed-cache/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;애플리케이션의 성능 최적화에서 &lt;strong&gt;캐시(Cache)&lt;/strong&gt; 는 빠질 수 없는 핵심 요소다.&lt;/p&gt;
+&lt;p&gt;캐시는 데이터를 반복적으로 계산하거나 DB에서 가져오지 않고, &lt;strong&gt;빠른 접근이 가능한 저장소&lt;/strong&gt;에 보관해 재사용함으로써 응답 속도를 개선한다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 &lt;strong&gt;로컬 캐시(Local Cache)&lt;/strong&gt; 와 &lt;strong&gt;분산 캐시(Distributed Cache)&lt;/strong&gt; 의 개념적 차이를 살펴보고, 각각의 장단점, 그리고 실무에서 어떤 기준으로 선택해야 하는지 다룬다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="1-로컬-캐시local-cache"&gt;1. 로컬 캐시(Local Cache)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 애플리케이션 프로세스 내부 메모리에 데이터를 저장하는 캐시.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: Spring Boot에서 &lt;code&gt;@Cacheable&lt;/code&gt;과 함께 사용하는 &lt;code&gt;ConcurrentHashMap&lt;/code&gt;, Guava Cache, Caffeine 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="장점"&gt;장점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;DB나 네트워크를 거치지 않고 &lt;strong&gt;메모리 접근 속도&lt;/strong&gt;로 응답 → 극한의 성능.&lt;/li&gt;
+&lt;li&gt;설치나 운영이 간단하며, 외부 시스템 의존도가 없음.&lt;/li&gt;
+&lt;li&gt;트래픽이 적거나 단일 서버 애플리케이션에 적합.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단점"&gt;단점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;확장성 부족&lt;/strong&gt;: 서버가 여러 대라면 각 인스턴스마다 캐시를 따로 관리해야 함 → 데이터 불일치(Inconsistency).&lt;/li&gt;
+&lt;li&gt;서버 재시작 시 캐시 데이터 손실.&lt;/li&gt;
+&lt;li&gt;캐시 메모리 크기가 서버 메모리에 직접 의존.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-분산-캐시distributed-cache"&gt;2. 분산 캐시(Distributed Cache)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 네트워크를 통해 여러 애플리케이션 인스턴스가 공유하는 외부 캐시 서버.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: Redis, Memcached, Hazelcast, AWS ElastiCache.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="장점-1"&gt;장점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;여러 서버 간 &lt;strong&gt;캐시 일관성 보장&lt;/strong&gt; (모든 노드가 같은 캐시 데이터 참조).&lt;/li&gt;
+&lt;li&gt;서버 재시작에도 데이터 유지 가능(특히 Redis 같은 Persistent Cache).&lt;/li&gt;
+&lt;li&gt;대규모 트래픽 처리와 수평 확장에 적합.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단점-1"&gt;단점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;네트워크를 거치므로 로컬 캐시보다 접근 속도는 느림.&lt;/li&gt;
+&lt;li&gt;별도의 인프라 운영이 필요하며, 설정 및 비용 부담이 있음.&lt;/li&gt;
+&lt;li&gt;네트워크 장애 시 캐시 미스(cache miss) 폭발 가능성.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-실무에서의-선택-기준"&gt;3. 실무에서의 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;기준&lt;/th&gt;
+&lt;th&gt;로컬 캐시 적합&lt;/th&gt;
+&lt;th&gt;분산 캐시 적합&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;트래픽 규모&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;소규모, 단일 서버&lt;/td&gt;
+&lt;td&gt;대규모, 다중 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;일관성 요구&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;데이터 변동이 적거나 중요하지 않은 경우&lt;/td&gt;
+&lt;td&gt;강한 일관성이 필요한 경우&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;운영 복잡도&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;간단한 아키텍처 추구&lt;/td&gt;
+&lt;td&gt;별도 인프라 운영 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;성능&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;마이크로초 단위 응답&lt;/td&gt;
+&lt;td&gt;밀리초 단위 응답 (네트워크 오버헤드)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;장애 복원력&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;서버 재시작 시 캐시 유실&lt;/td&gt;
+&lt;td&gt;영속성 옵션을 통해 데이터 유지 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;보통 &lt;strong&gt;초기 단계&lt;/strong&gt;에서는 로컬 캐시(Caffeine 등)로 간단히 시작하고, 트래픽이 증가해 서버를 여러 대 띄우는 순간 &lt;strong&gt;분산 캐시(Redis)&lt;/strong&gt; 로 전환하는 전략이 가장 합리적이다.&lt;/p&gt;
+&lt;p&gt;실제로 Spring에서도 &lt;code&gt;@Cacheable&lt;/code&gt; 같은 어노테이션은 캐시 추상화를 제공해 &lt;strong&gt;로컬 ↔ 분산 캐시 전환이 용이&lt;/strong&gt;하도록 설계되어 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;지금 운영하는 서비스는 “속도&amp;quot;가 중요한가, “규모와 일관성”**이 중요한가?&lt;/p&gt;
+&lt;p&gt;이 질문에 대한 답이 로컬 vs 분산 캐시 선택의 시작점이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;프로젝트 초반에는 로컬 캐시로 충분하다. 그러나 &lt;strong&gt;트래픽 증가·수평 확장·데이터 일관성 요구&lt;/strong&gt;가 생기는 순간 분산 캐시로 전환해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;캐시의 기본 동작 원리 (Cache Hit / Cache Miss)&lt;/li&gt;
+&lt;li&gt;Spring Cache 추상화 (&lt;code&gt;@Cacheable&lt;/code&gt;, &lt;code&gt;@CachePut&lt;/code&gt;, &lt;code&gt;@CacheEvict&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Redis, Memcached 같은 인메모리 DB의 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/integration/cache.html" target="_blank" rel="noopener"
+&gt;Spring Framework Docs - Caching Abstraction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://redis.io/docs/" target="_blank" rel="noopener"
+&gt;Redis 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://github.com/ben-manes/caffeine" target="_blank" rel="noopener"
+&gt;Caffeine Cache GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;PostgreSQL의 캐시 활용 및 쿼리 최적화&lt;/li&gt;
+&lt;li&gt;AWS ElastiCache&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Race condition 뿌리부터 잡기</title><link>https://blog.b9f1.com/p/2025-08-16-from-the-basics-of-race-condition/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-16-from-the-basics-of-race-condition/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;트래픽이 두 배가 되는 순간, 가장 먼저 터지는 건 &lt;strong&gt;성능&lt;/strong&gt;이 아니라 &lt;strong&gt;정합성&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;멀티스레드 환경의 대표적 복병 &lt;strong&gt;경쟁 상태(Race Condition)&lt;/strong&gt; 는 재현도 어렵고 한 번 새면 데이터 신뢰도가 무너진다.&lt;/p&gt;
+&lt;p&gt;운영 환경에서 빈번하게 마주치는 &lt;strong&gt;경쟁 상태의 원인&lt;/strong&gt;, &lt;strong&gt;재현 패턴&lt;/strong&gt;, &lt;strong&gt;해결 전략의 우선순위&lt;/strong&gt;를 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="경쟁-상태란-무엇인가"&gt;경쟁 상태란 무엇인가?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;정의&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;여러 스레드가 &lt;strong&gt;공유 상태(shared state)&lt;/strong&gt; 를 동시에 읽고/쓰기 하며 실행 타이밍에 따라 결과가 달라지는 상황.&lt;br&gt;
+핵심 원인 축: &lt;strong&gt;AVR&lt;/strong&gt; - Atomicity(원자성), Visibility(가시성), Reordering(재배치).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Atomicity&lt;/strong&gt;: &lt;code&gt;x = x + 1&lt;/code&gt; 같은 RMW(Read–Modify–Write) 연산이 중간에 끼어들기로 깨지면서 lost update 발생&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Visibility&lt;/strong&gt;: 한 스레드의 쓰기가 다른 스레드에 늦게 보여 stale value(오래된 값) 관측, 잘못된 분기
+&lt;ul&gt;
+&lt;li&gt;stale value: 다른 스레드가 최신 값을 썼음에도 불구하고, 캐시/레지스터 등 중간 계층에 남아있던 &lt;strong&gt;이전 값&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이 때문에 &lt;strong&gt;중복 및 누락&lt;/strong&gt;뿐 아니라 &lt;code&gt;if (value==0)&lt;/code&gt; 같은 &lt;strong&gt;조건 분기 오류&lt;/strong&gt;가 발생&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Reordering&lt;/strong&gt;: CPU out-of-order 실행이나 JIT 최적화로 happens-before 순서가 무너짐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="위험-신호와-재현-패턴"&gt;위험 신호와 재현 패턴
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;증상&lt;/strong&gt;: 카운터 불일치, 중복/누락, “가끔” 실패하는 테스트, 운영 환경에서만 나타나는 버그(Heisenbug)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;패턴&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;if(없으면 저장)&lt;/code&gt; 후 put (TOCTOU)&lt;/li&gt;
+&lt;li&gt;캐시 초기화 동시 접근&lt;/li&gt;
+&lt;li&gt;통계 카운터 증가&lt;/li&gt;
+&lt;li&gt;잘못된 Lazy init&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Heisenbug&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;하이젠버그는 프로그래밍에서 테스트를 수행할 때 발생되는 버그의 형태 중의 하나로서 문제를 발견하고 수정하기 위한 디버깅을 수행하려고 하면 문제점이 사라지는 형태의 버그를 말한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;TOCTOU (Time Of Check to Time Of Use)&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;검사 시점과 사용 시점 사이의 틈새에서 다른 스레드가 상태를 바꿔 &lt;strong&gt;예상치 못한 버그 및 보안 취약점&lt;/strong&gt;을 유발하는 &lt;strong&gt;클래식 경쟁 조건 유형&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="최소-예제로-보는-버그"&gt;최소 예제로 보는 버그
+&lt;/h3&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;원자적이지 않은 연산&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;value++&lt;/code&gt; 는 단일 연산처럼 보이지만, JVM 바이트코드 레벨에서는 &lt;code&gt;getfield&lt;/code&gt; → &lt;code&gt;iconst_1&lt;/code&gt; → &lt;code&gt;iadd&lt;/code&gt; → &lt;code&gt;putfield&lt;/code&gt; 로 분해된다.
+중간에 다른 스레드가 끼어들어 lost update 발생. &lt;code&gt;volatile&lt;/code&gt;은 가시성만 보장해도 원자성은 보장 못 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BrokenCounter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;inc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 경쟁 상태&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="바이트코드-관점필드-증가"&gt;바이트코드 관점(필드 증가)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;getfield value&lt;/code&gt; → &lt;code&gt;iconst_1&lt;/code&gt; → &lt;code&gt;iadd&lt;/code&gt; → &lt;code&gt;putfield value&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;단일 연산이 아니라 여러 명령어로 분해됨 → 원자성 깨짐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="interleaving-예-두-스레드"&gt;Interleaving 예 (두 스레드)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;두 번 증가 의도 → 최종 값 1 (한 번만 반영)&lt;/li&gt;
+&lt;li&gt;DB의 &lt;strong&gt;Lost Update anomaly&lt;/strong&gt;와 동일한 문제&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="가시성까지-얽히면-더-위험"&gt;가시성까지 얽히면 더 위험
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;A 스레드가 &lt;code&gt;1&lt;/code&gt; 저장해도, B 스레드는 캐시 coherence 지연으로 여전히 &lt;code&gt;0&lt;/code&gt;(stale value) 관측&lt;/li&gt;
+&lt;li&gt;결과:
+&lt;ol&gt;
+&lt;li&gt;카운터 중복·누락&lt;/li&gt;
+&lt;li&gt;조건 분기 오류 (예: &lt;code&gt;if (get()==0) init()&lt;/code&gt;이 중복 실행)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="왜-volatile로-해결되지-않나"&gt;왜 &lt;code&gt;volatile&lt;/code&gt;로 해결되지 않나?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;volatile&lt;/code&gt;은 가시성(Visibility)과 재배치(Reordering) 방지 일부를 보장한다.&lt;/li&gt;
+&lt;li&gt;하지만 &lt;code&gt;value++&lt;/code&gt; 같은 RMW 원자성은 보장 못 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;volatile&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;inc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 여전히 lost update 가능&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="해결-전략-락보다-설계가-먼저"&gt;해결 전략: 락보다 설계가 먼저
+&lt;/h3&gt;&lt;h4 id="상태-자체를-줄여라"&gt;상태 자체를 줄여라
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;불변 객체(Immutable), Copy-on-Write, 메시지 패싱/Actor 모델, 이벤트 루프&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스레드-컨파인먼트"&gt;스레드 컨파인먼트
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ThreadLocal&lt;/code&gt;, 키 파티셔닝(같은 키는 동일 워커로)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="원자-연산--동시-컬렉션-juc"&gt;원자 연산 &amp;amp; 동시 컬렉션 (J.U.C)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;AtomicInteger.incrementAndGet()&lt;/code&gt; (CAS 기반)
+&lt;ul&gt;
+&lt;li&gt;CAS(Compare-And-Swap)는 &lt;strong&gt;재시도 루프(spin)&lt;/strong&gt; 구조로 동작한다. 즉, 경쟁이 심하면 충돌이 잦아지고 성능이 급격히 저하될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;고경합 환경엔 &lt;code&gt;LongAdder&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;내부적으로 셀(Cell) 배열에 분산 저장하여 스레드 충돌을 줄인다.&lt;/li&gt;
+&lt;li&gt;주기적 집계를 통해 최종 값을 계산 → CAS 충돌 병목이 적음.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ConcurrentHashMap.computeIfAbsent/merge&lt;/code&gt;로 TOCTOU 제거&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;CAS와 성능&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;CAS는 실패 시 루프를 돌며 재시도하는 &lt;strong&gt;spin 기반 알고리즘&lt;/strong&gt;이다.
+경쟁이 적을 땐 락보다 빠르지만, 경쟁이 많으면 계속 충돌 → 재시도로 인해 오히려 락보다 느려질 수 있다.
+이 때문에 고경합 상황에서는 &lt;code&gt;LongAdder&lt;/code&gt; 같은 분산 구조가 더 유리하다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="동기화-synchronization"&gt;동기화 (Synchronization)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;synchronized&lt;/code&gt; (간단, 확실)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReentrantLock&lt;/code&gt; (tryLock, 타임아웃 지원)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReadWriteLock&lt;/code&gt;, &lt;code&gt;StampedLock&lt;/code&gt; (낙관적 읽기 성능 개선)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;StampedLock&lt;/code&gt;의 &lt;strong&gt;낙관적 읽기&lt;/strong&gt;는 실제 읽은 값이 도중에 다른 쓰기에 의해 깨지지 않았는지 &lt;code&gt;validate(stamp)&lt;/code&gt; 호출로 반드시 검증해야 안전하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;StampedLock의 validate()&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;long stamp = lock.tryOptimisticRead();&lt;/code&gt; → 값 읽기 → &lt;code&gt;if (!lock.validate(stamp)) { ...재시도... }&lt;/code&gt;
+낙관적 읽기는 무조건 성공하는 게 아니라, 읽은 후에 검증(validate)을 반드시 거쳐야 한다. 검증이 실패하면 일반적인 읽기 락을 다시 걸어야 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="가시성-보장--안전한-게시"&gt;가시성 보장 &amp;amp; 안전한 게시
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;volatile&lt;/code&gt; 플래그, &lt;code&gt;final&lt;/code&gt; 필드&lt;/li&gt;
+&lt;li&gt;Safe Publication (동기화 통해 객체를 게시)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단일-실행--멱등idempotency"&gt;단일 실행 &amp;amp; 멱등(Idempotency)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;멱등 설계, fencing token(순서 보장 토큰)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="실전-시나리오별-추천-레시피"&gt;실전 시나리오별 추천 레시피
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;시나리오&lt;/th&gt;
+&lt;th&gt;증상&lt;/th&gt;
+&lt;th&gt;해법&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;동시 카운팅/지표&lt;/td&gt;
+&lt;td&gt;증발(Lost update)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;LongAdder&lt;/code&gt; → 주기적 집계&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Lazy 초기화&lt;/td&gt;
+&lt;td&gt;중복 생성&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;computeIfAbsent&lt;/code&gt;, 초기화 전용 락&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;캐시 프리로드&lt;/td&gt;
+&lt;td&gt;중복 로드&lt;/td&gt;
+&lt;td&gt;키 파티셔닝 + 단일 워커&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;읽기 99%&lt;/td&gt;
+&lt;td&gt;락 경합&lt;/td&gt;
+&lt;td&gt;Copy-on-Write, &lt;code&gt;StampedLock&lt;/code&gt; 낙관 읽기&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;고가 연산 임계구역&lt;/td&gt;
+&lt;td&gt;응답 지연&lt;/td&gt;
+&lt;td&gt;임계구역 축소, 분해락(키별 락)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;키 충돌 업데이트&lt;/td&gt;
+&lt;td&gt;중복·경합&lt;/td&gt;
+&lt;td&gt;키별 락/Striped Lock, &lt;code&gt;merge&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="성능-vs-정확성-트레이드오프"&gt;성능 vs 정확성 트레이드오프
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;정확성 고정&lt;/strong&gt;: &lt;code&gt;synchronized&lt;/code&gt;/ConcurrentHashMap으로 정합성 우선 확보&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;핫스팟 튜닝&lt;/strong&gt;: 임계구역 축소, 자료구조 교체&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;마지막에&lt;/strong&gt;: 락-프리/낙관적 기법 적용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="테스트검증-전략"&gt;테스트·검증 전략
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;jcstress&lt;/strong&gt; (OpenJDK 동시성 경계 테스트 프레임워크)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;확률 테스트&lt;/strong&gt; (스레드 수·코어 수·JVM 옵션 다양화)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;페일패스트 계측&lt;/strong&gt; (불가능 상태 assert)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장시간 soak test&lt;/strong&gt; (운영 유사 환경)&lt;/li&gt;
+&lt;li&gt;이런 버그는 &lt;strong&gt;Heisenbug&lt;/strong&gt; 특성이 강함 → 반드시 장기간·다양 환경에서 검증 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;공유 상태를 최소화하라.&lt;/strong&gt;
+남는 공유 상태는 반드시 &lt;strong&gt;J.U.C(java.util.concurrent)&lt;/strong&gt; 와 &lt;strong&gt;명시적 동기화&lt;/strong&gt;로 보호하라.
+먼저 정합성을 보장하고, 이후 성능을 최적화하는 순서가 바람직하다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java Memory Model(JMM), happens-before&lt;/li&gt;
+&lt;li&gt;monitor/synchronized, CAS(compare-and-swap)&lt;/li&gt;
+&lt;li&gt;J.U.C(java.util.concurrent): 원자 클래스, 동시 컬렉션&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java Concurrency in Practice (Brian Goetz)&lt;/li&gt;
+&lt;li&gt;Effective Java 동시성 아이템&lt;/li&gt;
+&lt;li&gt;OpenJDK &lt;strong&gt;jcstress&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Oracle Concurrency 튜토리얼&lt;/li&gt;
+&lt;li&gt;Martin Kleppmann: Idempotency / Exactly-once&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>컨텍스트 안전 전파</title><link>https://blog.b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-16-addressing-contextual-information-such-as-mdc-and-securitycontext-in-asynchronous-environments/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;멀티스레드와 비동기 환경에서 흔히 사용하는 &lt;strong&gt;MDC(Logback Mapped Diagnostic Context)&lt;/strong&gt; 나 &lt;strong&gt;SecurityContext&lt;/strong&gt; 는 내부적으로 &lt;code&gt;ThreadLocal&lt;/code&gt; 기반으로 동작한다.&lt;/p&gt;
+&lt;p&gt;문제는 요청을 처리하는 스레드가 바뀌는 순간(예: &lt;code&gt;@Async&lt;/code&gt;, &lt;code&gt;Executor&lt;/code&gt;, &lt;code&gt;CompletableFuture&lt;/code&gt;, Reactor 등) 이 컨텍스트 정보가 사라지거나 누락되기 쉽다는 것이다.&lt;/p&gt;
+&lt;p&gt;따라서 &lt;strong&gt;로그 추적성과 보안 인증 상태를 잃지 않고 스레드를 건너뛰어 전파하는 방법&lt;/strong&gt;이 필요하다.
+서블릿 기반(Spring MVC + @Async/Executor/CompletableFuture)과 리액티브 기반(Reactor/WebFlux)에서 각각 컨텍스트를 안전하게 전달하는 실전 패턴을 살펴본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="왜-사라지나-threadlocal의-본질"&gt;왜 사라지나? &lt;code&gt;ThreadLocal&lt;/code&gt;의 본질
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MDC(Logback MDC)&lt;/strong&gt;, &lt;strong&gt;SecurityContextHolder&lt;/strong&gt;는 기본적으로 &lt;code&gt;ThreadLocal&lt;/code&gt; 기반이다.&lt;/li&gt;
+&lt;li&gt;작업이 &lt;strong&gt;다른 스레드&lt;/strong&gt;(스레드풀, ForkJoin)에서 실행되면 값이 비어 있거나 &lt;strong&gt;이전 요청의 쓰레기 값&lt;/strong&gt;이 남을 수 있다(스레드 재사용).&lt;/li&gt;
+&lt;li&gt;해결 핵심: &lt;strong&gt;(캡처) → (전파) → (정리)&lt;/strong&gt; 의 생명주기를 명시한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="서블릿동기비동기-스택-6가지-정석-패턴"&gt;서블릿(동기/비동기) 스택: 6가지 정석 패턴
+&lt;/h3&gt;&lt;h4 id="a-runnablecallable-래핑핵심-원리"&gt;A. &lt;code&gt;Runnable/Callable&lt;/code&gt; 래핑(핵심 원리)
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MdcPropagatingRunnable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;implements&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Runnable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;final&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Runnable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;final&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Map&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;captured&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MdcPropagatingRunnable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Runnable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;delegate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;captured&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getCopyOfContextMap&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;run&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Map&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;old&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getCopyOfContextMap&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;captured&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setContextMap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;captured&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;run&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;finally&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;old&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setContextMap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;old&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;clear&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;캡처 → set → 실행 → 복원/clear&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SecurityContext&lt;/code&gt;도 동일 원리로 적용 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="b-taskdecorator로-전역-적용asyncthreadpooltaskexecutor"&gt;B. &lt;code&gt;TaskDecorator&lt;/code&gt;로 전역 적용(@Async/ThreadPoolTaskExecutor)
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;TaskDecorator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;mdcTaskDecorator&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Runnable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MdcPropagatingRunnable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;Executor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;taskExecutor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TaskDecorator&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;decorator&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ThreadPoolTaskExecutor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ex&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ThreadPoolTaskExecutor&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ex&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setTaskDecorator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;decorator&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ex&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;initialize&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ex&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;장점: &lt;code&gt;@Async&lt;/code&gt;, &lt;code&gt;CompletableFuture&lt;/code&gt;, 커스텀 &lt;code&gt;Executor&lt;/code&gt; 모두 &lt;strong&gt;자동 전파&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="c-spring-security-전파-전용-유틸"&gt;C. Spring Security 전파 전용 유틸
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;Executor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Executors&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;newFixedThreadPool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;8&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;Executor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;secExecutor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DelegatingSecurityContextExecutor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;delegate&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;secExecutor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cm"&gt;/* SecurityContext 보존됨 */&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;DelegatingSecurityContext*&lt;/code&gt;&lt;/strong&gt; 계열(Executor, ExecutorService, Runnable, Callable)을 사용하면 &lt;strong&gt;인증 컨텍스트만&lt;/strong&gt; 확실히 전달된다.&lt;/li&gt;
+&lt;li&gt;MDC도 필요하면 B 패턴과 &lt;strong&gt;조합&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="d-securitycontextholder-전략-옵션"&gt;D. &lt;code&gt;SecurityContextHolder&lt;/code&gt; 전략 옵션
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;SecurityContextHolder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setStrategyName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SecurityContextHolder&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;MODE_INHERITABLETHREADLOCAL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;자식 스레드&lt;/strong&gt;에 한해 상속.&lt;/li&gt;
+&lt;li&gt;한계: &lt;strong&gt;스레드풀 재사용&lt;/strong&gt;과는 맞지 않는다(“새로 만든 자식 스레드”만 상속).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="e-completablefuture에서의-주의"&gt;E. &lt;code&gt;CompletableFuture&lt;/code&gt;에서의 주의
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getCopyOfContextMap&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;CompletableFuture&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;supplyAsync&lt;/span&gt;&lt;span class="p"&gt;(()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setContextMap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;doWork&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;finally&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;clear&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;},&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;taskExecutor&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;기본 공급자는 &lt;strong&gt;ForkJoinPool&lt;/strong&gt; → 문맥 유실. 항상 &lt;strong&gt;전파 가능한 Executor&lt;/strong&gt;와 &lt;strong&gt;명시적 set/clear&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="f-작업-종료-시-정리clean-up-는-의무"&gt;F. 작업 종료 시 &lt;strong&gt;정리(clean-up)&lt;/strong&gt; 는 의무
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;실패, 취소 케이스까지 &lt;strong&gt;finally에서 clear/복원&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;그렇지 않으면 &lt;strong&gt;컨텍스트 누수&lt;/strong&gt;로 다른 요청 로그가 오염된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="리액티브reactorwebflux-스택-컨텍스트는-데이터다"&gt;리액티브(Reactor/WebFlux) 스택: 컨텍스트는 데이터다
+&lt;/h3&gt;&lt;h4 id="a-securitycontext-리액티브-전용-api-사용"&gt;A. SecurityContext 리액티브 전용 API 사용
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;인증은 &lt;code&gt;ReactiveSecurityContextHolder&lt;/code&gt;를 통해 Reactor &lt;strong&gt;Context&lt;/strong&gt;에 저장/조회.&lt;/li&gt;
+&lt;li&gt;예) WebFilter에서 &lt;code&gt;contextWrite&lt;/code&gt;로 주입, 다운스트림에서 자동 사용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="b-mdc-reactor-context-mdc-브리징"&gt;B. MDC Reactor Context, MDC 브리징
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// 컨텍스트 키 정의&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;record&lt;/span&gt; &lt;span class="nc"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;traceId&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;final&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;KEY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;TRACE&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// 컨텍스트 주입&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;Mono&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;deferContextual&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ctxView&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ctxView&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;KEY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Mono&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;fromRunnable&lt;/span&gt;&lt;span class="p"&gt;(()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;trace={}&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;traceId&lt;/span&gt;&lt;span class="p"&gt;()));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;contextWrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;put&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;KEY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;abc-123&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// 공통 브리징 연산자(예시)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;static&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Function&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Publisher&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Publisher&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;mdc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;pub&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Flux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;from&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pub&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="na"&gt;doOnEach&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isOnNext&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isOnError&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isOnComplete&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getContextView&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;traceId&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getOrDefault&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;KEY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TraceCtx&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;-&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="na"&gt;traceId&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ignored&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MDC&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;putCloseable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;traceId&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;traceId&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// MDC는 이 시점 로깅에만 반영됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getType&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SignalType&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;ON_NEXT&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;processing...&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;핵심: Reactor 로그는 &lt;strong&gt;시그널 순간에만&lt;/strong&gt; MDC에 넣고 즉시 닫는다(&lt;code&gt;MDC.putCloseable&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;장점: 스레드 hops가 잦아도 &lt;strong&gt;오염, 누수 없음&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;리액터 체인 가장 바깥에서 &lt;code&gt;transform(mdc())&lt;/code&gt;로 한 번만 적용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="무엇을-언제-사용하는-게-좋을까"&gt;무엇을 언제 사용하는 게 좋을까
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;권장 패턴&lt;/th&gt;
+&lt;th&gt;비고&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Spring MVC + &lt;code&gt;@Async&lt;/code&gt;/&lt;code&gt;Executor&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;TaskDecorator(B)&lt;/strong&gt; + 필요 시 &lt;strong&gt;DelegatingSecurityContext(C)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;전역 일관성, 적용 쉬움&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;단발 커스텀 스케줄러/쓰레드&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;Runnable/Callable 래핑(A)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;최소 오버헤드&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;CompletableFuture&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;전파 가능한 Executor&lt;/strong&gt; + &lt;strong&gt;명시적 set/clear(E)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;ForkJoinPool 지양&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;자식 스레드만 생성&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;INHERITABLETHREADLOCAL(D)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;풀 재사용 환경에 부적합&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WebFlux/Reactor&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;ReactiveSecurityContextHolder&lt;/strong&gt; + &lt;strong&gt;MDC 브리징(B 리액티브판)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;ThreadLocal 직접 접근 금지&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="체크리스트"&gt;체크리스트
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;캡처 시점&lt;/strong&gt;은 요청 입구(필터/인터셉터/웹필터)에서.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전파 책임&lt;/strong&gt;은 스케줄링/실행 시점(Executor/연산자)에서.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정리&lt;/strong&gt;는 항상 &lt;code&gt;finally&lt;/code&gt; 또는 &lt;code&gt;try-with-resources(MDC.putCloseable)&lt;/code&gt;로.&lt;/li&gt;
+&lt;li&gt;풀 크기, 큐 적재량을 조정해 &lt;strong&gt;컨텍스트 스와핑 비용&lt;/strong&gt;을 최소화.&lt;/li&gt;
+&lt;li&gt;성능 민감 구간에선 &lt;strong&gt;필드형 추적 ID&lt;/strong&gt;(메서드 파라미터로 전달)도 고려 — 오버헤드와 가독성의 트레이드오프.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="캡처-전파-정리-시각화"&gt;캡처, 전파, 정리 시각화
+&lt;/h3&gt;&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant IN as Request Inbound
+participant CAP as Capture
+participant EXEC as Executor
+participant RUN as Task
+IN-&gt;&gt;CAP: traceId, auth 캡처
+CAP-&gt;&gt;EXEC: Runnable/Callable 래핑
+EXEC-&gt;&gt;RUN: set(MDC, SecurityContext)
+RUN--&gt;&gt;EXEC: finally { clear()/restore() }
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;비동기의 본질은 &lt;strong&gt;스레드 이동&lt;/strong&gt;이고, 해법의 본질은 &lt;strong&gt;캡처-전파-정리의 규율&lt;/strong&gt;이다.
+이 원칙만 지키면 &lt;code&gt;MDC&lt;/code&gt;와 &lt;code&gt;SecurityContext&lt;/code&gt;는 어느 실행 모델에서도 흔들리지 않는다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;ThreadLocal과 스레드풀 재사용 모델&lt;/li&gt;
+&lt;li&gt;Logback MDC 기본 사용법 (&lt;code&gt;MDC.put&lt;/code&gt;, &lt;code&gt;MDC.clear&lt;/code&gt;, &lt;code&gt;MDC.putCloseable&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Spring Security: &lt;code&gt;SecurityContextHolder&lt;/code&gt;, &lt;code&gt;Authentication&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Reactor의 &lt;code&gt;Context&lt;/code&gt;와 신호(시그널) 기반 훅&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring Security: &lt;code&gt;DelegatingSecurityContextExecutor&lt;/code&gt;, &lt;code&gt;DelegatingSecurityContextCallable/Runnable&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Spring Framework: &lt;code&gt;TaskDecorator&lt;/code&gt;, &lt;code&gt;ThreadPoolTaskExecutor&lt;/code&gt;, &lt;code&gt;@Async&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Reactor: &lt;code&gt;Context&lt;/code&gt;, &lt;code&gt;contextWrite&lt;/code&gt;, &lt;code&gt;doOnEach&lt;/code&gt;, &lt;code&gt;SignalType&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;로깅: 분산 트레이싱(TraceId/SpanId)와 MDC 연동, &lt;code&gt;MDC.putCloseable&lt;/code&gt; 활용 패턴&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>JWT 구조를 구체적으로 알아보자</title><link>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</link><pubDate>Tue, 05 Aug 2025 01:58:05 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;최근 백엔드 인증/인가 시스템을 설계하거나 OAuth 2.0 기반의 로그인 시스템을 구축할 때 가장 많이 등장하는 키워드 중 하나가 &lt;code&gt;JWT(JSON Web Token)&lt;/code&gt;이다.&lt;/p&gt;
+&lt;p&gt;JWT의 &lt;strong&gt;3단계 구조&lt;/strong&gt;를 정확히 이해하고, 각 구성 요소가 왜 존재하는지, 어떤 역할을 하는지 예제를 통해 상세히 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;JWT는 기본적으로 &lt;strong&gt;세 부분으로 구성된 문자열&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Header&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Payload&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Signature&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각각의 의미를 뜯어보자.&lt;/p&gt;
+&lt;h3 id="1-header-헤더"&gt;1. Header (헤더)
+&lt;/h3&gt;&lt;p&gt;이 부분은 &lt;strong&gt;토큰을 어떻게 검증할 것인지에 대한 메타 정보&lt;/strong&gt;를 제공한다.
+Base64Url로 인코딩되어 토큰의 첫 번째 파트를 구성한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;alg&lt;/code&gt;(algorithm): 토큰 서명을 생성하기 위한 알고리즘을 명시. 보통 &lt;code&gt;HS256&lt;/code&gt; 또는 &lt;code&gt;RS256&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;typ&lt;/code&gt;(type): 토큰의 타입을 나타냄. JWT를 사용하는 경우 &lt;code&gt;&amp;quot;JWT&amp;quot;&lt;/code&gt;로 고정.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-payload-페이로드"&gt;2. Payload (페이로드)
+&lt;/h3&gt;&lt;p&gt;이 페이로드는 &lt;strong&gt;서명되어 있지만 암호화되어 있진 않다.&lt;/strong&gt; 즉, &lt;strong&gt;누구나 내용을 볼 수 있다.&lt;/strong&gt;&lt;br&gt;
+따라서 민감 정보(password, 주민번호 등)는 절대 포함시키면 안 된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;user1234&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;John Doe&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;iat&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691432621&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691436221&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;(subject): 주체 식별자 (ex. 사용자 ID).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;iat&lt;/code&gt;(issued at): 발급 시간 (Unix timestamp).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;exp&lt;/code&gt;(expiration): 만료 시간.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;role&lt;/code&gt;, &lt;code&gt;email&lt;/code&gt; 등 커스텀 클레임: 인증 또는 인가에 필요한 사용자 속성 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-signature-서명"&gt;3. Signature (서명)
+&lt;/h3&gt;&lt;p&gt;서버는 이 서명을 사용하여 토큰이 &lt;strong&gt;위조되지 않았음을 검증&lt;/strong&gt;할 수 있다.&lt;br&gt;
+서명이 다르면 페이로드가 조작된 것이다. 유효하지 않은 토큰으로 처리된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;HMACSHA256&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;.&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;payload&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;secret&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;앞서 인코딩한 Header와 Payload를 &lt;code&gt;.&lt;/code&gt;으로 연결한 후,&lt;/li&gt;
+&lt;li&gt;비밀 키(&lt;code&gt;secret&lt;/code&gt;)를 이용해 알고리즘(&lt;code&gt;HS256&lt;/code&gt; 등)으로 서명한 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt-예시"&gt;JWT 예시
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJzdWIiOiIxMjM0NTYiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDAwMDAwMDB9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각 부분을 디코딩하면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Header&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Payload&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;123456&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1700000000&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Signature&lt;/strong&gt;: 서버에서 secret key로만 확인 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt의-주요-보안-고려사항"&gt;JWT의 주요 보안 고려사항
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서명만 존재하고, 페이로드는 암호화되지 않는다.&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;민감 정보는 넣지 말 것.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;만료 시간(&lt;code&gt;exp&lt;/code&gt;)을 꼭 설정&lt;/strong&gt;하자.
+&lt;ul&gt;
+&lt;li&gt;토큰 탈취 시 무한히 사용할 수 없도록 하기 위해.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;서버는 반드시 Signature를 검증&lt;/strong&gt;해야 한다.
+&lt;ul&gt;
+&lt;li&gt;서명 검증을 하지 않으면 누구나 Payload만 바꿔도 토큰이 유효해진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;JWT는 “신뢰할 수 있는 정보를 클라이언트에 안전하게 전달하기 위한 구조화된 문자열”이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;Header&lt;/code&gt;는 토큰의 형식과 알고리즘, &lt;code&gt;Payload&lt;/code&gt;는 전달하고자 하는 정보, &lt;code&gt;Signature&lt;/code&gt;는 위조 여부를 판별하는 핵심 키이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Base64 인코딩/디코딩&lt;/li&gt;
+&lt;li&gt;대칭/비대칭 키 개념 (HMAC vs RSA)&lt;/li&gt;
+&lt;li&gt;HTTP 인증 방식 (Bearer Token)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://jwt.io/" target="_blank" rel="noopener"
+&gt;jwt.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html" target="_blank" rel="noopener"
+&gt;Spring Security에서 JWT 사용하기 공식 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;OAuth 2.0과 JWT의 관계&lt;/li&gt;
+&lt;li&gt;JWT vs Session 기반 인증 비교 포스팅&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>OAuth 2.0 핵심 구조 이해하기</title><link>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 인증 인프라를 설계하며 OAuth 2.0이 표준처럼 자리 잡았다는 사실을 체감하고 있다.&lt;/p&gt;
+&lt;p&gt;특히 소셜 로그인이나 외부 리소스 접근 권한 위임 기능을 구현하면서 “Authorization Code Grant” 방식의 구조와 흐름을 완벽히 이해하는 것이 중요하다고 판단해 이 글을 작성하게 되었다.&lt;/p&gt;
+&lt;p&gt;이번 포스팅에서는 OAuth 2.0의 주요 컴포넌트와 함께 Authorization Code Grant가 어떤 흐름으로 동작하는지 실전 중심으로 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="oauth-20의-주요-컴포넌트"&gt;OAuth 2.0의 주요 컴포넌트
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;컴포넌트&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Owner&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스(정보)의 실제 소유자. 보통 사용자(User)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Client&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스 접근을 요청하는 애플리케이션 (ex. 우리가 개발하는 웹앱)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Authorization Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인증을 담당하며, Access Token을 발급하는 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;보호된 리소스를 제공하는 API 서버 (Authorization Server와 분리될 수도 있음)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="authorization-code-grant-흐름"&gt;Authorization Code Grant 흐름
+&lt;/h3&gt;&lt;p&gt;이 방식은 &lt;strong&gt;보안성과 유연성&lt;/strong&gt;을 모두 만족하는 방식으로, 웹 앱에서 가장 많이 사용된다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant User
+participant Client (웹앱)
+participant AuthorizationServer
+participant ResourceServer
+User-&gt;&gt;Client: 로그인 요청
+Client-&gt;&gt;AuthorizationServer: 인증 요청 (사용자 브라우저를 리디렉션)
+AuthorizationServer-&gt;&gt;User: 로그인 + 권한 요청
+User-&gt;&gt;AuthorizationServer: 로그인 &amp; 승인
+AuthorizationServer-&gt;&gt;Client: Authorization Code 전달 (리디렉션 URI)
+Client-&gt;&gt;AuthorizationServer: Authorization Code + Client Secret로 Access Token 요청
+AuthorizationServer-&gt;&gt;Client: Access Token + (선택) Refresh Token 전달
+Client-&gt;&gt;ResourceServer: Access Token으로 리소스 요청
+ResourceServer-&gt;&gt;Client: 리소스 응답
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="흐름-요약"&gt;흐름 요약
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;인증 요청:&lt;/strong&gt; Client가 Authorization Server에 인증 요청 URL로 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;사용자 승인:&lt;/strong&gt; 사용자는 로그인 후 권한 승인.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;코드 수신:&lt;/strong&gt; Authorization Server는 Redirect URI에 &lt;code&gt;Authorization Code&lt;/code&gt;를 포함하여 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 요청:&lt;/strong&gt; Client는 받은 코드를 Authorization Server에 전송하며, Access Token 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 수신:&lt;/strong&gt; Authorization Server는 Access Token을 응답.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API 요청:&lt;/strong&gt; Client는 받은 Access Token을 사용해 Resource Server에 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 수신:&lt;/strong&gt; 유효한 토큰이면 리소스를 응답.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="refresh-token은-왜-필요할까"&gt;Refresh Token은 왜 필요할까?
+&lt;/h4&gt;&lt;p&gt;Access Token은 일반적으로 &lt;strong&gt;짧은 유효시간(예: 1시간)&lt;/strong&gt; 을 가진다.
+이때 Refresh Token이 있으면 재로그인 없이 새로운 Access Token을 발급 받을 수 있어 UX 개선에 큰 역할을 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;OAuth 2.0의 핵심은 &lt;strong&gt;책임 분리와 위임&lt;/strong&gt;이며, Authorization Code Grant는 가장 안전하고 실전적인 인증 흐름이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 프로토콜의 기본 흐름&lt;/li&gt;
+&lt;li&gt;RESTful API의 인증/인가 개념&lt;/li&gt;
+&lt;li&gt;HTTPS 통신 방식&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener"
+&gt;RFC 6749: The OAuth 2.0 Authorization Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html" target="_blank" rel="noopener"
+&gt;Spring Security OAuth2 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/" target="_blank" rel="noopener"
+&gt;JWT.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;키워드: &lt;code&gt;PKCE&lt;/code&gt;, &lt;code&gt;Client Credentials&lt;/code&gt;, &lt;code&gt;Implicit Grant&lt;/code&gt;, &lt;code&gt;OpenID Connect&lt;/code&gt;, &lt;code&gt;Refresh Token Rotation&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>세션 vs 토큰 인증 차이</title><link>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 개발자가 꼭 이해하고 있어야 할 인증의 두 축, &lt;strong&gt;세션 기반 인증&lt;/strong&gt;과 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;의 구조적 차이점과 각각의 &lt;strong&gt;보안상 고려사항&lt;/strong&gt;에 대해 다뤄보자.&lt;/p&gt;
+&lt;p&gt;특히 REST API 설계, OAuth2 도입, JWT 사용 시 맞닥뜨리는 여러 결정 포인트에서 어떤 방식을 왜 선택해야 하는지, 실전 관점에서 짚어본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="세션-기반-인증-session-based-authentication"&gt;세션 기반 인증 (Session-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 사용자 정보를 저장한 &lt;strong&gt;세션 ID&lt;/strong&gt;를 생성하고, 클라이언트에 &lt;strong&gt;쿠키로 전달&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 모든 요청에는 쿠키가 자동으로 첨부되어 세션 ID를 통해 인증 정보를 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;서버가 세션 상태를 &lt;strong&gt;직접 저장&lt;/strong&gt; (메모리, Redis 등)&lt;/li&gt;
+&lt;li&gt;브라우저 친화적 (자동 쿠키 처리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CSRF 공격&lt;/strong&gt;에 취약: 쿠키가 자동 전송되기 때문&lt;/li&gt;
+&lt;li&gt;세션 탈취(Session Hijacking) 대비 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SameSite, Secure, HttpOnly&lt;/strong&gt; 쿠키 옵션 사용 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;브라우저 기반의 전통적인 웹 서비스&lt;/li&gt;
+&lt;li&gt;내부망 또는 통제된 환경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="토큰-기반-인증-token-based-authentication"&gt;토큰 기반 인증 (Token-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 &lt;strong&gt;JWT(JSON Web Token)&lt;/strong&gt; 또는 커스텀 토큰을 발급하고, 클라이언트는 이를 &lt;strong&gt;로컬 저장소에 저장&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 요청 시 Authorization 헤더를 통해 &lt;strong&gt;직접 첨부&lt;/strong&gt;해서 인증한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서버 무상태(stateless)&lt;/strong&gt; 인증 방식 (세션 저장 불필요)&lt;/li&gt;
+&lt;li&gt;클라이언트/서버 분리된 구조에 유리&lt;/li&gt;
+&lt;li&gt;JWT는 &lt;strong&gt;자체적으로 서명되어 위변조 검증&lt;/strong&gt; 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;XSS에 취약&lt;/strong&gt;: 토큰을 로컬스토리지에 저장 시 노출 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 탈취 → 장기 권한 노출&lt;/strong&gt; 우려&lt;/li&gt;
+&lt;li&gt;만료시간, Refresh Token 전략, &lt;strong&gt;Token Rotation&lt;/strong&gt; 도입 필요&lt;/li&gt;
+&lt;li&gt;HTTPS 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;모바일 앱, SPA(Single Page App)&lt;/li&gt;
+&lt;li&gt;분산 시스템, 마이크로서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="주요-차이-정리"&gt;주요 차이 정리
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;세션 기반 인증&lt;/th&gt;
+&lt;th&gt;토큰 기반 인증&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;서버 상태&lt;/td&gt;
+&lt;td&gt;상태 유지 (Stateful)&lt;/td&gt;
+&lt;td&gt;상태 없음 (Stateless)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;저장소&lt;/td&gt;
+&lt;td&gt;서버 메모리/DB/Redis&lt;/td&gt;
+&lt;td&gt;클라이언트 로컬 저장소&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인증 전달&lt;/td&gt;
+&lt;td&gt;쿠키 (자동 전송)&lt;/td&gt;
+&lt;td&gt;HTTP Header (직접 전송)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;취약점&lt;/td&gt;
+&lt;td&gt;CSRF, 세션 탈취&lt;/td&gt;
+&lt;td&gt;XSS, 토큰 탈취&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 사례&lt;/td&gt;
+&lt;td&gt;웹 사이트&lt;/td&gt;
+&lt;td&gt;모바일, API 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;인증 방식은 서비스 구조와 위협 모델에 따라 선택하자. 만능은 없다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;클라이언트가 브라우저 중심이고 보안 제어가 가능한 경우엔 &lt;strong&gt;세션 기반 인증&lt;/strong&gt;이, REST API나 모바일 중심이라면 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;이 적절하다.&lt;/p&gt;
+&lt;p&gt;단, 어떤 방식을 쓰든 보안은 추가 설정과 방어 로직 없이는 무너질 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 쿠키/헤더&lt;/li&gt;
+&lt;li&gt;JWT 구조 (Header.Payload.Signature)&lt;/li&gt;
+&lt;li&gt;CSRF, XSS 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" target="_blank" rel="noopener"
+&gt;OWASP 인증 관련 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/introduction" target="_blank" rel="noopener"
+&gt;JWT 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://oauth.net/2/" target="_blank" rel="noopener"
+&gt;OAuth 2.0 개념 정리 및 흐름&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,1301 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DevOps on B9F1</title><link>https://blog.b9f1.com/tags/devops/</link><description>Recent content in DevOps on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 15 Oct 2025 18:30:33 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/devops/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 멀티 SSH 키 관리</title><link>https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</link><pubDate>Wed, 15 Oct 2025 18:30:33 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-10-15-git-multi-ssh-key-management/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ssh-키-구성-예시"&gt;SSH 키 구성 예시
+&lt;/h3&gt;&lt;h4 id="ssh-키-파일들"&gt;SSH 키 파일들
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519 &lt;span class="c1"&gt;# 기본/개인 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519.pub &lt;span class="c1"&gt;# 기본/개인 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company &lt;span class="c1"&gt;# 회사 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company.pub &lt;span class="c1"&gt;# 회사 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── config &lt;span class="c1"&gt;# SSH 설정 파일&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="ssh-config-설정-sshconfig"&gt;SSH Config 설정 (&lt;code&gt;~/.ssh/config&lt;/code&gt;)
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 경로는 대부분의 OS에서 사용자 폴더를 의미한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 GitHub 설정 (개인 계정용)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정용 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="사용-방법"&gt;사용 방법
+&lt;/h3&gt;&lt;h4 id="1-기본-사용"&gt;1. 기본 사용
+&lt;/h4&gt;&lt;p&gt;일반적인 GitHub URL을 그대로 사용:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com:username/my-project.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-명시적-개인-계정-사용"&gt;2. 명시적 개인 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-회사-계정-사용"&gt;3. 회사 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="새로운-계정키-추가-방법"&gt;새로운 계정/키 추가 방법
+&lt;/h3&gt;&lt;h4 id="1-새-ssh-키-생성"&gt;1. 새 SSH 키 생성
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-keygen -t ed25519 -C &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt; -f ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-ssh-config에-설정-추가"&gt;2. SSH Config에 설정 추가
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# ~/.ssh/config에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-github에-공개-키-등록"&gt;3. GitHub에 공개 키 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 내용 복사&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cat ~/.ssh/id_ed25519_newaccount.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub Settings &amp;gt; SSH and GPG keys&lt;/code&gt;에서 등록&lt;/p&gt;
+&lt;h4 id="4-사용"&gt;4. 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-newaccount:NewAccount/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ssh-연결-테스트"&gt;SSH 연결 테스트
+&lt;/h3&gt;&lt;p&gt;각 계정별로 SSH 연결을 테스트할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 테스트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;성공시 다음과 같은 메시지가 출력된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hi [계정명]! You&amp;#39;ve successfully authenticated, but GitHub does not provide shell access.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="프로젝트별-설정-확인"&gt;프로젝트별 설정 확인
+&lt;/h3&gt;&lt;p&gt;현재 프로젝트가 어떤 SSH 키를 사용하는지 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --list &lt;span class="p"&gt;|&lt;/span&gt; grep remote.origin.url
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="권한-설정"&gt;권한 설정
+&lt;/h3&gt;&lt;p&gt;SSH 파일들의 올바른 권한 설정은 &lt;strong&gt;Unix/Linux 기반 시스템에서 필수&lt;/strong&gt;다.&lt;/p&gt;
+&lt;h4 id="권한-설정이-필요한-환경"&gt;권한 설정이 필요한 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;✅ &lt;strong&gt;Linux/Ubuntu&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;macOS&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;WSL (Windows Subsystem for Linux)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;Docker 컨테이너&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;개발 컨테이너 (Dev Container)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;❌ &lt;strong&gt;Windows 네이티브&lt;/strong&gt; (NTFS 권한으로 자동 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="windows-vs-unixlinux-차이점"&gt;Windows vs Unix/Linux 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;환경&lt;/th&gt;
+&lt;th&gt;권한 시스템&lt;/th&gt;
+&lt;th&gt;SSH 권한 설정&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Windows 네이티브&lt;/td&gt;
+&lt;td&gt;NTFS ACL&lt;/td&gt;
+&lt;td&gt;불필요 (자동)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WSL/Linux/macOS&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker/Dev Container&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="windows에서-ssh-사용하기"&gt;Windows에서 SSH 사용하기
+&lt;/h4&gt;&lt;h5 id="windows-네이티브-환경"&gt;Windows 네이티브 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# PowerShell 또는 Command Prompt에서&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;ssh-keygen&lt;/span&gt; &lt;span class="n"&gt;-t&lt;/span&gt; &lt;span class="n"&gt;ed25519&lt;/span&gt; &lt;span class="n"&gt;-C&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 권한 설정은 Windows가 자동으로 관리&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Windows 네이티브 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;chmod&lt;/code&gt; 명령어 없음&lt;/li&gt;
+&lt;li&gt;NTFS 권한으로 자동 관리&lt;/li&gt;
+&lt;li&gt;SSH 클라이언트가 적절한 권한 자동 설정&lt;/li&gt;
+&lt;li&gt;수동 권한 설정 불필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="wsl-환경"&gt;WSL 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# WSL에서는 Linux와 동일하게 권한 설정 필요&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;WSL 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux 파일 시스템 사용&lt;/li&gt;
+&lt;li&gt;Unix 권한 모델 적용&lt;/li&gt;
+&lt;li&gt;권한 설정 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="macos-darwin"&gt;macOS: Darwin
+&lt;/h3&gt;&lt;h4 id="ssh가-권한을-엄격하게-요구하는-이유-unixlinux"&gt;SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;보안 정책&lt;/strong&gt;: 개인 키가 다른 사용자에게 노출되는 것을 방지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증 무결성&lt;/strong&gt;: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 보호&lt;/strong&gt;: 중요한 인증 정보의 무단 접근 차단&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="올바른-권한-설정"&gt;올바른 권한 설정
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# SSH 디렉토리 권한 (소유자만 접근 가능)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# config 파일 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 키 파일들 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 소유권 설정 (현재 사용자로 설정)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="권한-확인"&gt;권한 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 권한 상태 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 올바른 출력 예시:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# drwx------ (700) 소유자만 SSH 디렉토리 접근&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw------- (600) 소유자만 개인 키/config 파일 접근 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw-r--r-- (644) 공개 키는 다른 사용자도 읽기 가능&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="문제-해결"&gt;문제 해결
+&lt;/h3&gt;&lt;h4 id="권한-오류-해결"&gt;권한 오류 해결
+&lt;/h4&gt;&lt;p&gt;오류 메시지&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Bad owner or permissions on /home/node/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;원인:&lt;/strong&gt; SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 단계:&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;권한 확인&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한이 &lt;code&gt;777&lt;/code&gt; (rwxrwxrwx)인 경우 수정&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소유권 문제인 경우&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한 설정 후 테스트&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="ssh-키가-인식되지-않는-경우"&gt;SSH 키가 인식되지 않는 경우
+&lt;/h4&gt;&lt;p&gt;SSH Agent에 키 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="잘못된-키-사용"&gt;잘못된 키 사용
+&lt;/h4&gt;&lt;p&gt;원격 URL 확인 및 수정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 설정 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 URL 변경&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-url origin git@github.com-&lt;span class="o"&gt;[&lt;/span&gt;account&lt;span class="o"&gt;]&lt;/span&gt;:owner/repository.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="예시-프로젝트-설정"&gt;예시 프로젝트 설정
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;my-blog&lt;/strong&gt;: 기본 설정 사용 (&lt;code&gt;git@github.com:username/my-blog.git&lt;/code&gt;)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH 키: &lt;code&gt;~/.ssh/id_ed25519&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GitHub 계정: 개인 계정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="확장-계획"&gt;확장 계획
+&lt;/h3&gt;&lt;p&gt;향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="현재-구성-검증"&gt;현재 구성 검증
+&lt;/h3&gt;&lt;p&gt;현재 SSH 구성이 올바르게 작동하는지 확인해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;권한 설정 (필수!)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 모든 권한을 한 번에 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SSH 연결 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 성공시: &amp;#34;Hi [username]! You&amp;#39;ve successfully authenticated...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Git push 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;⚠️ 중요:&lt;/strong&gt; 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+&lt;code&gt;Bad owner or permissions&lt;/code&gt; 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새 계정 추가는 키 생성, &lt;code&gt;~/.ssh/config&lt;/code&gt;에 Host 추가, 공개키 등록, &lt;code&gt;ssh -T&lt;/code&gt; 테스트, 원격 URL 설정의 5단계&lt;/li&gt;
+&lt;li&gt;WSL은 &lt;strong&gt;리눅스 홈 경로&lt;/strong&gt;에 &lt;code&gt;.ssh&lt;/code&gt;를 두고, 필요 시 &lt;code&gt;includeIf&lt;/code&gt;/&lt;code&gt;url.insteadOf&lt;/code&gt;로 &lt;strong&gt;디렉터리별 자동 라우팅&lt;/strong&gt;을 적용하면 실수할 일이 줄어든다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SSH 키 쌍&lt;/strong&gt;: &lt;code&gt;ed25519&lt;/code&gt;가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH 설정 파일&lt;/strong&gt;: &lt;code&gt;~/.ssh/config&lt;/code&gt;로 Host 단위 설정(별칭, &lt;code&gt;IdentityFile&lt;/code&gt;, &lt;code&gt;IdentitiesOnly&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퍼미션 기초&lt;/strong&gt;: &lt;code&gt;~/.ssh&lt;/code&gt;(700), 개인키(600), 공개키/&lt;code&gt;config&lt;/code&gt;(644~600).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSL/NTFS 차이&lt;/strong&gt;: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. &lt;strong&gt;리눅스 홈&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → &lt;code&gt;IdentitiesOnly&lt;/code&gt;로 해결.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 원격 URL 형태&lt;/strong&gt;: &lt;code&gt;git@HOST:OWNER/REPO.git&lt;/code&gt;(SCP 구문) 또는 &lt;code&gt;ssh://git@HOST/OWNER/REPO.git&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 라우팅 자동화(선택)&lt;/strong&gt;: &lt;code&gt;~/.gitconfig&lt;/code&gt;의 &lt;code&gt;includeIf&lt;/code&gt;(디렉터리 기준 설정), &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;(호스트 치환).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GitHub Docs: &lt;em&gt;Connecting to GitHub with SSH&lt;/em&gt;, &lt;em&gt;About SSH certificate authorities&lt;/em&gt;, &lt;em&gt;Managing multiple accounts&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;OpenSSH Manual: &lt;code&gt;ssh(1)&lt;/code&gt;, &lt;code&gt;ssh_config(5)&lt;/code&gt;, &lt;code&gt;ssh-agent(1)&lt;/code&gt;, &lt;code&gt;ssh-add(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git Documentation: &lt;code&gt;git-config(1)&lt;/code&gt;(특히 &lt;code&gt;includeIf&lt;/code&gt;, &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;), &lt;code&gt;git-remote(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft Docs: &lt;em&gt;WSL 파일 권한 &amp;amp; NTFS 상호작용&lt;/em&gt; 가이드&lt;/li&gt;
+&lt;li&gt;보안 심화: &lt;em&gt;ed25519-sk&lt;/em&gt;(FIDO2/보안키 기반), &lt;code&gt;ProxyJump&lt;/code&gt;(점프호스트), &lt;code&gt;KnownHosts&lt;/code&gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS RDS vs EC2 직접 설치</title><link>https://blog.b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</link><pubDate>Sun, 03 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-03-differences-between-using-aws-rds-and-installing-db-directly-into-ec2/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;초기 프로젝트를 구축하거나 서비스를 운영하는 과정에서 &lt;strong&gt;데이터베이스를 어디에 설치할지&lt;/strong&gt;는 중요한 결정 중 하나다.&lt;/p&gt;
+&lt;p&gt;특히 AWS 환경에서는 &lt;code&gt;RDS&lt;/code&gt;를 사용할지, &lt;code&gt;EC2&lt;/code&gt;에 직접 설치할지를 두고 많은 고민을 하게 된다.&lt;/p&gt;
+&lt;p&gt;실제 운영 관점에서 &lt;strong&gt;RDS의 주요 이점과 EC2 직접 설치 방식과의 차이점&lt;/strong&gt;을 정리하고 &lt;code&gt;RDS&lt;/code&gt;가 적합하지 않은 상황까지 함께 다뤄보려 한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="rds를-사용할-때의-주요-이점"&gt;RDS를 사용할 때의 주요 이점
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;자동화된 관리&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;백업, 보안 패치, 장애 복구까지 AWS가 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Multi-AZ 구성 가능&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;자동 장애 조치(Failover) 지원으로 고가용성 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자동 백업 및 시점 복구(PITR)&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;데이터 복구를 쉽게 수행 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 강화&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;IAM 인증, KMS 암호화, 보안 그룹 등 보안 기능 내장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;모니터링 및 알림&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;CloudWatch 연동으로 실시간 DB 상태 확인 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;스케일링 유연성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;수직 확장과 읽기 전용 복제(Replica) 지원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="ec2에-직접-설치와-비교"&gt;EC2에 직접 설치와 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;EC2 직접 설치&lt;/th&gt;
+&lt;th&gt;RDS&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;설치 편의성&lt;/td&gt;
+&lt;td&gt;수동&lt;/td&gt;
+&lt;td&gt;자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;패치 및 유지보수&lt;/td&gt;
+&lt;td&gt;직접 관리&lt;/td&gt;
+&lt;td&gt;AWS 자동&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;확장성&lt;/td&gt;
+&lt;td&gt;어렵고 시간 소요&lt;/td&gt;
+&lt;td&gt;빠르고 간편&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;장애 조치&lt;/td&gt;
+&lt;td&gt;복잡한 구성 필요&lt;/td&gt;
+&lt;td&gt;자동 장애 복구 지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보안 설정&lt;/td&gt;
+&lt;td&gt;수동 구성&lt;/td&gt;
+&lt;td&gt;IAM, KMS 등 통합 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;백업/복구&lt;/td&gt;
+&lt;td&gt;직접 스크립트 작성&lt;/td&gt;
+&lt;td&gt;자동 백업 및 PITR 지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;직접 설치는 최대한의 유연성과 커스터마이징이 가능하다는 장점이 있지만, &lt;strong&gt;보안과 가용성을 직접 관리해야 한다는 부담&lt;/strong&gt;이 있다.&lt;/p&gt;
+&lt;p&gt;특히 운영 경험이 적거나 인프라 리소스가 부족한 팀에게는 &lt;code&gt;RDS&lt;/code&gt;가 훨씬 더 효율적이다.&lt;/p&gt;
+&lt;h3 id="rds가-적합하지-않은-케이스"&gt;RDS가 적합하지 않은 케이스
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;복잡한 확장 플러그인이 필요한 경우&lt;/strong&gt; (예: PostgreSQL의 일부 확장 모듈 미지원)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DB 튜닝을 위해 커널 파라미터까지 조정해야 하는 경우&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;최소비용으로 간헐적 사용을 원할 때&lt;/strong&gt; (EC2+Docker가 유리)&lt;/li&gt;
+&lt;li&gt;사내망 또는 외부 연결이 자유로운 구조를 구성하고자 할 때&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;복잡한 운영을 줄이고 안정성을 확보하고 싶다면, AWS RDS는 최고의 선택이 될 수 있다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;하지만 반대로, &lt;strong&gt;비용 최적화·유연성·특수 환경을 원한다면 EC2 직접 설치가 유리할 수 있다.&lt;/strong&gt;
+결국 핵심은 &lt;strong&gt;“어떤 서비스를 어떻게 운영할 것인가?”&lt;/strong&gt; 에 달려 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS 서비스 (EC2, RDS, VPC, IAM, KMS)&lt;/li&gt;
+&lt;li&gt;리눅스 서버와 DB 설치 경험&lt;/li&gt;
+&lt;li&gt;PostgreSQL 또는 MySQL과 같은 관계형 DB 운영 경험&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/rds/" target="_blank" rel="noopener"
+&gt;Amazon RDS 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/contrib.html" target="_blank" rel="noopener"
+&gt;PostgreSQL 확장 기능 목록&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html" target="_blank" rel="noopener"
+&gt;AWS Well-Architected Framework: Operational Excellence Pillar&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>컨테이너 오케스트레이션</title><link>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</link><pubDate>Wed, 25 Jun 2025 22:17:57 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Docker는 컨테이너 단위의 애플리케이션 패키징과 실행이 뛰어나지만 실제 운영 환경에서는 수십, 수백 개의 컨테이너를 배포하고 유지해야 하는 복잡한 상황이 발생한다.&lt;/p&gt;
+&lt;p&gt;이 문제를 해결하기 위해 등장한 개념이 컨테이너 오케스트레이션(Container Orchestration)이다.&lt;/p&gt;
+&lt;p&gt;오케스트레이션의 핵심 개념과 필요성, Docker 단독 환경의 한계, Kubernetes를 중심으로 오케스트레이터가 해결하는 세 가지 주요 문제를 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-오케스트레이션이란"&gt;컨테이너 오케스트레이션이란?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;오케스트라(orchestra)에서 유래&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;오케스트라: 수십 개의 악기가 각자 연주하지만 지휘자가 이를 정해진 순서와 규칙에 따라 통제하여 하나의 음악으로 만들어낸다.&lt;/li&gt;
+&lt;li&gt;개발 시스템: 수많은 컨테이너, 서비스, 배포, 트래픽, 설정이 따로따로 존재하지만 오케스트레이터가 이를 자동으로 조율하여 하나의 애플리케이션처럼 작동하도록 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;컨테이너 오케스트레이션은 다음과 같은 작업을 자동화한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨테이너의 배포 및 종료&lt;/li&gt;
+&lt;li&gt;헬스 체크 및 실패 시 자동 복구&lt;/li&gt;
+&lt;li&gt;트래픽에 따라 컨테이너 자동 확장/축소&lt;/li&gt;
+&lt;li&gt;로드 밸런싱, 서비스 디스커버리&lt;/li&gt;
+&lt;li&gt;YAML을 활용한 선언적 구성(Declarative Configuration)을 통한 인프라 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;단일 컨테이너 환경에서는 수작업이나 스크립트로 관리가 가능하지만 수십 개 이상의 컨테이너를 운영하는 클러스터 환경에서는 비효율과 오류를 피하기 어렵다.&lt;/p&gt;
+&lt;h3 id="docker-단독-사용-환경의-한계"&gt;Docker 단독 사용 환경의 한계
+&lt;/h3&gt;&lt;p&gt;Docker는 다음과 같은 측면에서 한계가 존재한다.&lt;/p&gt;
+&lt;h4 id="수동-스케일링"&gt;수동 스케일링
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 명령어로 컨테이너 개수를 수동 조정&lt;/li&gt;
+&lt;li&gt;실시간 트래픽 변화에 대응 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="제한된-복구-기능"&gt;제한된 복구 기능
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--restart&lt;/code&gt; 자동 재시작은 가능하지만, 헬스 체크 기반 복구, 다중 노드 상태 관리는 불가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="서비스-수준-추상화-부족"&gt;서비스 수준 추상화 부족
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Docker Compose로 일부 기능(네트워크, 볼륨, 환경변수)은 구성 가능&lt;/li&gt;
+&lt;li&gt;하지만 로드밸런싱, 트래픽 분산, 서비스 디스커버리 등은 부족하거나 수동 구성 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="오케스트레이션이-해결하는-주요-문제-3가지"&gt;오케스트레이션이 해결하는 주요 문제 3가지
+&lt;/h3&gt;&lt;h4 id="자동-확장---auto-scaling"&gt;자동 확장 - Auto Scaling
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 트래픽 급증 시 컨테이너 수를 사람이 조정해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;Horizontal Pod Autoscaler&lt;/code&gt;를 통해 리소스(CPU, 메모리) 사용량 기준으로 Pod 수를 자동 조절&lt;/li&gt;
+&lt;li&gt;예시: CPU 사용률이 80% 이상일 때 3개에서 10개로 자동 확장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자가-복구---self-healing"&gt;자가 복구 - Self-Healing
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 컨테이너가 비정상 종료될 경우 사람이 직접 조치해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;livenessProbe&lt;/code&gt;, &lt;code&gt;readinessProbe&lt;/code&gt;를 통해 주기적으로 상태를 체크하고 실패한 컨테이너는 자동 재시작 또는 교체
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;livenessProbe&lt;/code&gt;: &amp;ldquo;얘가 아직 살아 있나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;자동 재시작&lt;/li&gt;
+&lt;li&gt;컨테이너가 비정상 상태일 경우 자동으로 재시작해줌&lt;/li&gt;
+&lt;li&gt;예: 무한 루프에 빠졌거나 내부적으로는 죽었는데 프로세스는 살아 있는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readinessProbe&lt;/code&gt;: &amp;ldquo;얘가 트래픽 받을 준비가 됐나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;장애 확산 방지&lt;/li&gt;
+&lt;li&gt;준비되지 않은 컨테이너는 Service에 등록되지 않음&lt;/li&gt;
+&lt;li&gt;앱이 시작은 됐지만 DB 연결이 아직 안 됐다면 트래픽 받지 않도록 막아줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="선언적-인프라---declarative-infrastructure"&gt;선언적 인프라 - Declarative Infrastructure
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 수동 명령어는 현재 상태를 명확히 알기 어렵고 일관성 유지가 어려움&lt;/li&gt;
+&lt;li&gt;해결: k8s에서는 YAML 파일에 &amp;ldquo;이 시스템은 이래야 한다&amp;quot;고 선언하면 클러스터가 이를 자동으로 유지
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 선언 예시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;apiVersion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;apps/v1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deployment&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;replicas&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;template&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;containers&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker-compose-vs-kubernetes-비교"&gt;Docker Compose vs Kubernetes 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;Docker Compose&lt;/th&gt;
+&lt;th&gt;Kubernetes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;스케일링&lt;/td&gt;
+&lt;td&gt;수동 조정 (&lt;code&gt;--scale&lt;/code&gt;)&lt;/td&gt;
+&lt;td&gt;HPA 기반 자동 확장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;복구&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--restart&lt;/code&gt;로 기본 재시작&lt;/td&gt;
+&lt;td&gt;상태 기반 자가 복구&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;디스커버리&lt;/td&gt;
+&lt;td&gt;내부 DNS 미지원 (v2 기준)&lt;/td&gt;
+&lt;td&gt;서비스명 기반 자동 디스커버리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;낮음&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;운영 복잡도&lt;/td&gt;
+&lt;td&gt;낮음 (로컬)&lt;/td&gt;
+&lt;td&gt;높지만 강력함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="오케스트레이터-선택-기준"&gt;오케스트레이터 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;오케스트레이터&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;th&gt;적합한 상황&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Kubernetes&lt;/td&gt;
+&lt;td&gt;CNCF 주도, 생태계 광범위&lt;/td&gt;
+&lt;td&gt;MSA 기반 대규모 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker Swarm&lt;/td&gt;
+&lt;td&gt;Docker와 연동 용이, 간결함&lt;/td&gt;
+&lt;td&gt;중소 규모 단일 클러스터&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AWS ECS / Fargate&lt;/td&gt;
+&lt;td&gt;서버리스, 비용 최적화&lt;/td&gt;
+&lt;td&gt;AWS 중심의 배포 전략&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너 오케스트레이션은 현대적인 서비스 운영을 위한 기본이자 필수 인프라 기술이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;학습과 실험엔 Docker만으로 충분하지만 실전에서는 운영 자동화, 복구, 확장성, 일관된 인프라 구성이 가능한 오케스트레이터가 반드시 필요하다.&lt;/p&gt;
+&lt;p&gt;특히 Kubernetes는 클라우드 네이티브 환경의 표준으로 자리 잡았다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Docker의 기본 사용법&lt;/li&gt;
+&lt;li&gt;컨테이너 개념 (이미지, 레지스트리, 실행 등)&lt;/li&gt;
+&lt;li&gt;YAML 파일의 구조 이해&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/ko/docs/home/" target="_blank" rel="noopener"
+&gt;Kubernetes 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" target="_blank" rel="noopener"
+&gt;Kubernetes Horizontal Pod Autoscaler&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://landscape.cncf.io/" target="_blank" rel="noopener"
+&gt;CNCF Landscape&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>봄 모니터링 지표</title><link>https://blog.b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</link><pubDate>Tue, 17 Jun 2025 18:49:24 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-17-springboot-metrics-monitoring-with-prometheus-and-grafana/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot 프로젝트에서 Prometheus, Grafana를 연동해 시간의 흐름에 따라 변동되는 메트릭(Metrics) 데이터를 시각화해보자.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image01.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="사전-준비"&gt;사전 준비
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot 프로젝트
+&lt;ul&gt;
+&lt;li&gt;spring-boot-actuator&lt;/li&gt;
+&lt;li&gt;micrometer-registry-prometheus&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Docker 또는 Docker Desktop&lt;/li&gt;
+&lt;li&gt;docker-compose.yml&lt;/li&gt;
+&lt;li&gt;prometheus.yml&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="buildgradle"&gt;build.gradle
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-groovy" data-lang="groovy"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;dependencies&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;implementation&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;io.micrometer:micrometer-registry-prometheus&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="c1"&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="applicationyaml"&gt;application.yaml
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;management&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;endpoints&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;web&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;exposure&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;include&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;export&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;enabled&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-composeyml"&gt;docker-compose.yml
+&lt;/h4&gt;&lt;p&gt;Docker 서비스 실행 자동화 설정
+여러 Docker 컨테이너(Prometheus, Grafana 등)를 한 번에 실행/종료/관리하기 위한 설정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;prometheus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prom/prometheus:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Prometheus 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;prometheus &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정, 내부 DNS로도 사용돤다. ex)http://prometheus:9090&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;./prometheus.yml:/etc/prometheus/prometheus.yml &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 로컬 설정 파일을 컨테이너에 마운트&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;9090:9090&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 9090 → 컨테이너의 9090 (Prometheus 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 아래 정의한 사용자 정의 네트워크에 연결&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;grafana&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana/grafana:latest &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Grafana 공식 이미지&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;grafana &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 컨테이너 이름 지정&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;3000:3000&amp;#34;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 호스트의 3000 → 컨테이너의 3000 (Grafana 웹 UI)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;monitoring &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 같은 네트워크에 있어야 prometheus:9090 접근 가능&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 사용자 정의 네트워크 정의 (서로 통신 가능하게 함)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 네트워크 이름만 지정하면 default 설정으로 생성됨&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;왜 &lt;code&gt;networks.monitoring&lt;/code&gt;은 비어있는가?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이건 사용자 정의 브리지 네트워크를 선언하는 부분이고 따로 옵션(예 &lt;code&gt;driver&lt;/code&gt;)을 주지 않으면 Docoker가 기본값으로 설정된 브리지 네트워크를 생성한다.&lt;/li&gt;
+&lt;li&gt;명시적으로 정의도 가능하지만 대부분의 경우 생략해도 무방하다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;monitoring&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;driver&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;bridge&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="실행-명령어"&gt;실행 명령어
+&lt;/h5&gt;&lt;p&gt;Docker Desktop이 설치되어 있어야 &lt;code&gt;docker-compose&lt;/code&gt; 명령 사용 가능&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up &lt;span class="c1"&gt;# 실행&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down &lt;span class="c1"&gt;# 종료&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="prometheusyml"&gt;prometheus.yml
+&lt;/h4&gt;&lt;p&gt;Prometheus 수집 대상 설정 파일
+Prometheus가 어떤 서버나 앱의 메트릭을 수집할지 설정하는 파일&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;host.docker.internal&lt;/code&gt;은 Docker 컨테이너가 로컬 호스트의 Spring Boot 앱에 접근하기 위한 주소다. (Mac/Windows 한정. Linux는 다르다)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yml" data-lang="yml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;global&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;5s &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 모든 타겟을 5초마다 스크랩(메트릭 수집)함 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;scrape_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;job_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;spring-app&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 수집 작업 이름 (Prometheus UI에서 구분용) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;metrics_path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/actuator/prometheus&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 메트릭이 노출되는 경로 (Spring Boot 기준) &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;scrape_interval&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;3s&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 3초 마다 metrics_path의 경로에 접근하여 메트릭 데이터를 수집 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;static_configs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;targets&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;host.docker.internal:8080&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 타겟 주소 (로컬 Spring Boot 앱)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="실행"&gt;실행
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;docker-compose.yml&lt;/code&gt; 파일이 있는 경로로 이동해서 &lt;code&gt;docker-compose up&lt;/code&gt; 명령을 실행하면 Docker에 알맞게 Volume, Images, Container 생성되며 빌드된다.&lt;/p&gt;
+&lt;p&gt;정상적으로 아래 출력을 확인했다면 &lt;code&gt;localhost:9090&lt;/code&gt;에 접속하면 Prometheus UI를 확인할 수 있다.&lt;/p&gt;
+&lt;h4 id="변경-발생-시-사용할-명령어"&gt;변경 발생 시 사용할 명령어
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose down
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up --build
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker restart prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="docker-compose-up-명령-시-출력-예시"&gt;&lt;code&gt;docker-compose up&lt;/code&gt; 명령 시 출력 예시
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;span class="lnt"&gt;43
+&lt;/span&gt;&lt;span class="lnt"&gt;44
+&lt;/span&gt;&lt;span class="lnt"&gt;45
+&lt;/span&gt;&lt;span class="lnt"&gt;46
+&lt;/span&gt;&lt;span class="lnt"&gt;47
+&lt;/span&gt;&lt;span class="lnt"&gt;48
+&lt;/span&gt;&lt;span class="lnt"&gt;49
+&lt;/span&gt;&lt;span class="lnt"&gt;50
+&lt;/span&gt;&lt;span class="lnt"&gt;51
+&lt;/span&gt;&lt;span class="lnt"&gt;52
+&lt;/span&gt;&lt;span class="lnt"&gt;53
+&lt;/span&gt;&lt;span class="lnt"&gt;54
+&lt;/span&gt;&lt;span class="lnt"&gt;55
+&lt;/span&gt;&lt;span class="lnt"&gt;56
+&lt;/span&gt;&lt;span class="lnt"&gt;57
+&lt;/span&gt;&lt;span class="lnt"&gt;58
+&lt;/span&gt;&lt;span class="lnt"&gt;59
+&lt;/span&gt;&lt;span class="lnt"&gt;60
+&lt;/span&gt;&lt;span class="lnt"&gt;61
+&lt;/span&gt;&lt;span class="lnt"&gt;62
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 22/22
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ grafana Pulled 12.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f18232174bc9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.6s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 055b9255fa03 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f61a19743345 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ b176d7edde70 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e60d9caeb0b8 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ e032d0a5e409 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c49e0ee60bfb Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 7.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 384497dbce3b Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 9.4s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ c53a11b7c6fc Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 8af57d8c9f49 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.2s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ prometheus Pulled 8.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7df673c7455d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 6ac0e4adf315 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 408012a7b118 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1ccde423731d Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 1617e25568b2 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.7s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 7221d93db8a9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 2.0s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 9fa9226be034 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 1.3s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ bf70c5107ab5 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.8s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ f3b09c502777 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 4.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ 44986281b8b9 Pull &lt;span class="nb"&gt;complete&lt;/span&gt; 0.9s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt; Running 3/3
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Network resources_monitoring Created 0.1s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container prometheus Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ✔ Container grafana Created 0.5s
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Attaching to grafana, prometheus
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:674 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;No time or size retention was set so using the default time retention&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;15d
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:725 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Prometheus Server&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;mode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;server &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(version=3.4.1, branch=HEAD, revision=aea6503d9bbaad6c5faff3ecf6f1025213356c92)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.321Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:730 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;operational information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;build_context&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(go=go1.24.3, platform=linux/amd64, user=root@16f976c24db1, date=20250531-10:44:38, tags=netgo,builtinassets,stringlabels)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;host_details&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(Linux 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 999bf7192f26 )&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fd_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=1048576, hard=1048576)&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;vm_limits&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;(soft=unlimited, hard=unlimited)&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.322Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:806 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Leaving GOMAXPROCS=12: CPU quota undefined&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;automaxprocs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web.go:656 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Start listening for connections&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0.0.0.0:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.324Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1266 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting TSDB ...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:347 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Listening on&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.327Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tls_config.go:350 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TLS is disabled.&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;web &lt;span class="nv"&gt;http2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;false&lt;/span&gt; &lt;span class="nv"&gt;address&lt;/span&gt;&lt;span class="o"&gt;=[&lt;/span&gt;::&lt;span class="o"&gt;]&lt;/span&gt;:9090
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:657 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying on-disk memory mappable chunks if any&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:744 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;On-disk memory mappable chunks replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:752 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Replaying WAL, this may take a while&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:825 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL segment loaded&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;segment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;maxSegment&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="nv"&gt;duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;156.935µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.329Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;head.go:862 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;WAL replay completed&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tsdb &lt;span class="nv"&gt;checkpoint_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;28.265µs &lt;span class="nv"&gt;wal_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;187.212µs &lt;span class="nv"&gt;wbl_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;133ns &lt;span class="nv"&gt;chunk_snapshot_load_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0s &lt;span class="nv"&gt;mmap_chunk_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;972ns &lt;span class="nv"&gt;total_replay_duration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;249.607µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1287 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;filesystem information&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;fs_type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;EXT4_SUPER_MAGIC
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1290 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;TSDB started&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.330Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1475 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Loading configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1514 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;updated GOGC&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;old&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="nv"&gt;new&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;75&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1524 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Completed loading of configuration file&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;db_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;820ns &lt;span class="nv"&gt;remote_storage&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;800ns &lt;span class="nv"&gt;web_handler&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;248ns &lt;span class="nv"&gt;query_engine&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;572ns &lt;span class="nv"&gt;scrape&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;325.871µs &lt;span class="nv"&gt;scrape_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;23.08µs &lt;span class="nv"&gt;notify&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;68.448µs &lt;span class="nv"&gt;notify_sd&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;7.122µs &lt;span class="nv"&gt;rules&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1.01µs &lt;span class="nv"&gt;tracing&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2.927µs &lt;span class="nv"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/prometheus/prometheus.yml &lt;span class="nv"&gt;totalDuration&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;641.79µs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;main.go:1251 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Server is ready to receive web requests.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;prometheus &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.331Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;INFO &lt;span class="nv"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;manager.go:175 &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting rule manager...&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;component&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;rule manager&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.580946399Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Starting Grafana&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;version&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;12.0.1+security-01 &lt;span class="nv"&gt;commit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ff20b06681749873999bb0a8e365f24fddaee33f &lt;span class="nv"&gt;branch&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;HEAD &lt;span class="nv"&gt;compiled&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19Z
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581187455Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/share/grafana/conf/defaults.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581202298Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config loaded from&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;file&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/grafana/grafana.ini
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581205854Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.data=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581208666Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.logs=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581212098Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.plugins=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581215368Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.paths.provisioning=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.5812188Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from command line&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;arg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;default.log.mode=console&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581222384Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_DATA=/var/lib/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.58122533Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_LOGS=/var/log/grafana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581228361Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PLUGINS=/var/lib/grafana/plugins&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grafana &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="nv"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;settings &lt;span class="nv"&gt;t&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;2025-06-17T12:40:19.581230583Z &lt;span class="nv"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;info &lt;span class="nv"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;Config overridden from Environment variable&amp;#34;&lt;/span&gt; &lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;GF_PATHS_PROVISIONING=/etc/grafana/provisioning&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="prometheus-ui"&gt;Prometheus UI
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;http://localhost:9090&lt;/code&gt;으로 접속했다면 &lt;code&gt;Status &amp;gt; Targets&lt;/code&gt;의 타겟 상태가 UP 상태로 잘 올라와 있는지 확인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="grafana-ui"&gt;Grafana UI
+&lt;/h3&gt;&lt;p&gt;설정해둔 주소 &lt;code&gt;localhost:3000&lt;/code&gt; 접속 후 별다른 설정을 하지 않았다면 기본 로그인 정보인 (id: admin, pw: admin)으로 로그인한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image03.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;DATA SOURCES Add your first data source 클릭 이동&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image04.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;Prometheus 클릭&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image05.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;설정했던 &lt;code&gt;http://prometheus:9090&lt;/code&gt; 입력 후 저장&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image06.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="4"&gt;
+&lt;li&gt;주의할 것은 &lt;code&gt;localhost&lt;/code&gt; 아니고 &lt;code&gt;docker-compose.yml&lt;/code&gt;에서 설정한 컨테이너 이름이자 내부 DNS를 &lt;code&gt;prometheus&lt;/code&gt;로 사용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image07.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="5"&gt;
+&lt;li&gt;대시보드 생성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image08.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;ol start="6"&gt;
+&lt;li&gt;대시보드 추가 과정&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image09.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image10.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image11.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image12.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image13.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h4 id="yml-yaml"&gt;yml? yaml?
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;yaml&lt;/code&gt; 확장자로 했을 때 Prometheus Status 잘 올라오지 않았고 별다른 설정 문제가 아니라면 기본적으로 찾게되는 확장자가 &lt;code&gt;yml&lt;/code&gt;인가 싶어 변경했더니 잘 올라왔다.&lt;/p&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Gemini&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;YAML과 YML은 ==파일 확장자만 다를 뿐, 본질적으로 같은 것을 가리킵니다==. YAML은 &amp;ldquo;YAML Ain&amp;rsquo;t Markup Language&amp;quot;의 약자로, 사람이 읽기 쉬운 데이터 직렬화 언어입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Yaml Ain&amp;rsquo;t Markup Language 또는 Yet Another Markup Language&lt;/p&gt;
+&lt;p&gt;.html 대신 .htm으로도 사용된 것과 같이 옛날 옛날 한 옛날 Windows에서 Extensions는 파일 확장자가 3자로 제한되는 특성이 있었기 때문이라고 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;시스템의 가시성과 안정성을 높이기 위한 가장 빠르고 효과적인 방법은 Prometheus와 Grafana를 Docker로 연동해 메트릭을 시각화하는 것이다.&lt;/p&gt;
+&lt;p&gt;이 방식은 별도 설치 없이 빠르게 시작할 수 있으며 Spring Boot의 Actuator와 Micrometer를 활용하면 애플리케이션의 상태와 예외 흐름까지도 실시간으로 모니터링할 수 있다.&lt;/p&gt;
+&lt;p&gt;운영 환경 이전에 개발 및 테스트 단계부터 시각화 환경을 구축해두는 것이 예외 대응력과 시스템 품질을 높이는 핵심 전략이 된다.&lt;/p&gt;</description></item><item><title>Docker 시작하기: 기초 개념과 필수 지식 정리</title><link>https://blog.b9f1.com/p/2025-01-27-getting-started-with-docker/</link><pubDate>Mon, 27 Jan 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-01-27-getting-started-with-docker/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;란 무엇이고 왜 사용하는지 정리한다.&lt;/p&gt;
+&lt;h2 id="docker란"&gt;📌Docker란?
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 애플리케이션을 컨테이너라는 독립된 환경에서 실행할 수 있게 해주는 플랫폼이다.
+&lt;code&gt;Docker&lt;/code&gt;를 이해하기 위해 필요한 기본 개념들과 지식에 대해 알아본다.&lt;/p&gt;
+&lt;h2 id="왜-사용하지"&gt;📌왜 사용하지?
+&lt;/h2&gt;&lt;h3 id="1-일관된-환경-제공"&gt;1. 일관된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 컨테이너를 통해 애플리케이션과 그 종속성들을 포함하는 독립된 환경을 제공한다.
+이를 통해 개발, 테스트, 배포 환경에서 일관된 실행 환경을 보장할 수 있다.
+이는 &amp;ldquo;내 컴에선 잘 되네요. (Works on my machine)&amp;rdquo; 문제를 해결하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="2-효율적인-리소스-사용"&gt;2. 효율적인 리소스 사용
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 컨테이너는 가상 머신보다 가볍고 빠르다.
+컨테이너는 호스트 운영 체제의 커널을 공유하면서 실행되기 때문에, 리소스 오버헤드가 적고 빠른 성능을 제공한다.&lt;/p&gt;
+&lt;h3 id="3-빠른-배포와-스케일링"&gt;3. 빠른 배포와 스케일링
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 사용하면 애플리케이션의 배포와 스케일링이 용이하다.
+이미지를 통해 컨테이너를 빠르게 생성하고 실행할 수 있으며, 필요한 경우 컨테이너를 쉽게 확장할 수 있다.&lt;/p&gt;
+&lt;h3 id="4-이식성"&gt;4. 이식성
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 어디서나 일관된 환경을 제공하기 때문에, 애플리케이션을 다양한 플랫폼에서 쉽게 실행할 수 있다.
+이는 로컬 개발 환경, 테스트 서버, 클라우드 환경 등에서 동일하게 동작한다.&lt;/p&gt;
+&lt;h3 id="5-버전-관리와-롤백"&gt;5. 버전 관리와 롤백
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 버전 관리가 가능하며, 특정 버전으로 롤백할 수 있다.
+이는 애플리케이션의 안정성과 일관성을 유지하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="6-분리된-환경-제공"&gt;6. 분리된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 각 애플리케이션을 분리된 컨테이너에서 실행하기 때문에, 서로 간섭 없이 독립적으로 실행할 수 있다.
+이는 보안성과 안정성을 높이는 데 기여한다.&lt;/p&gt;
+&lt;h3 id="7-devops와-cicd-통합"&gt;7. DevOps와 CI/CD 통합
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 &lt;code&gt;DevOps&lt;/code&gt;와 &lt;code&gt;CI/CD&lt;/code&gt; 파이프라인과 쉽게 통합할 수 있다.
+이를 통해 자동화된 빌드, 테스트, 배포 프로세스를 구현할 수 있다.&lt;/p&gt;
+&lt;h2 id="docker를-이해하기-위한-기본-지식"&gt;📌Docker를 이해하기 위한 기본 지식
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 이해하고 사용하기 위해 다음과 같은 기본 지식이 필요하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;리눅스 명령어와 기초 운영 체제 지식&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 주로 리눅스 환경에서 사용되므로 리눅스 명령어와 파일 시스템 구조에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;가상화 개념&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 가상화 기술의 한 형태이므로, 전통적인 가상 머신과 비교하여 컨테이너의 장점과 차이점을 이해하는 것이 도움이 된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워킹 기초&lt;/strong&gt;: 컨테이너 간의 통신과 네트워킹 설정을 이해하기 위해 기본적인 네트워킹 개념이 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;버전 관리 시스템&lt;/strong&gt;: &lt;code&gt;Dockerfile&lt;/code&gt;과 이미지를 버전 관리하는 데 도움이 되므로 &lt;code&gt;Git&lt;/code&gt;과 같은 버전 관리 시스템에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="docker의핵심-개념"&gt;📌Docker의 핵심 개념
+&lt;/h2&gt;&lt;h3 id="1-containers-컨테이너"&gt;1. Containers (컨테이너)
+&lt;/h3&gt;&lt;p&gt;컨테이너는 애플리케이션과 그 종속성들을 포함하는 경량의 독립 실행 환경이다.&lt;/p&gt;
+&lt;p&gt;컨테이너는 동일한 호스트 운영 체제 커널을 공유하면서도 서로 격리되어 실행된다.
+이를 통해 애플리케이션이 어디서나 일관되게 실행될 수 있다.&lt;/p&gt;
+&lt;h3 id="2-images-이미지"&gt;2. Images (이미지)
+&lt;/h3&gt;&lt;p&gt;이미지는 &lt;code&gt;Docker&lt;/code&gt; 컨테이너를 생성하기 위한 읽기 전용 템플릿이다.&lt;/p&gt;
+&lt;p&gt;이미지는 여러 개의 레이어로 구성되며, 각 레이어는 기존 이미지에서 변경된 내용을 포함한다.
+이미지는 재사용 가능하며, &lt;code&gt;Docker Hub&lt;/code&gt;와 같은 레지스트리에 저장하고 배포할 수 있다.&lt;/p&gt;
+&lt;h3 id="3-volumes-볼륨"&gt;3. Volumes (볼륨)
+&lt;/h3&gt;&lt;p&gt;볼륨은 컨테이너와 호스트 간의 데이터를 지속적으로 저장하고 공유하기 위한 메커니즘이다.&lt;/p&gt;
+&lt;p&gt;컨테이너가 삭제되더라도 볼륨에 저장된 데이터는 유지된다.
+볼륨은 컨테이너 간에 데이터를 공유할 때도 유용하하다.&lt;/p&gt;
+&lt;h3 id="4-builds-빌드"&gt;4. Builds (빌드)
+&lt;/h3&gt;&lt;p&gt;빌드는 &lt;code&gt;Dockerfile&lt;/code&gt;을 사용하여 이미지를 생성하는 과정이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Dockerfile&lt;/code&gt;은 애플리케이션 환경을 설정하는 명령어들의 스크립트다.
+&lt;code&gt;docker build&lt;/code&gt; 명령어를 사용하여 &lt;code&gt;Dockerfile&lt;/code&gt;을 기반으로 이미지를 생성할 수 있다.&lt;/p&gt;</description></item></channel></rss>

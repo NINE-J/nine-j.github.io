@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>버전관리 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%B2%84%EC%A0%84%EA%B4%80%EB%A6%AC/</link><description>Recent content in 버전관리 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 21 Dec 2023 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%B2%84%EC%A0%84%EA%B4%80%EB%A6%AC/index.xml" rel="self" type="application/rss+xml"/><item><title>Gitea 서버 구축해보기</title><link>https://blog.b9f1.com/p/2023-12-21-try-building-a-gitea-server/</link><pubDate>Thu, 21 Dec 2023 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2023-12-21-try-building-a-gitea-server/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;깃 서버를 구축해서 같은 네트워크 망의 다른 PC에서 프로젝트 클론해보자.&lt;/p&gt;
+&lt;h2 id="gitea란"&gt;📌Gitea란?
+&lt;/h2&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;code&gt;Gitea&lt;/code&gt;는 &lt;code&gt;Git&lt;/code&gt; 저장소를 관리하기 위한 오픈 소스 분산 버전 관리 시스템이다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub&lt;/code&gt;와 유사한 기능을 제공하며, 자체 호스팅이 가능하여 사용자가 자신의 서버에 설치하고 운영할 수 있다.
+&lt;code&gt;Gitea&lt;/code&gt;는 경량화된 애플리케이션으로, 개인 프로젝트나 소규모 팀에서 사용하기에 적합하다.
+주요 기능으로는 코드 리뷰, 이슈 트래킹, 지속적 통합(CI) 등을 제공하며 그 외에도 유용한 기능을 많이 제공한다.&lt;/p&gt;
+&lt;h2 id="설치-및-구동"&gt;📌설치 및 구동
+&lt;/h2&gt;&lt;p&gt;아래 깃헙 저장소에 접속하여 윈도우 설치 파일을 다운로드 받는다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://github.com/go-gitea/gitea/releases" target="_blank" rel="noopener"
+&gt;https://github.com/go-gitea/gitea/releases&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;gitea-1.21.2-gogit-windows-4.0-amd64.exe&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;필요한 버전으로 받는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;다운로드 받은 파일을 관리자 권한으로 실행하면 아래와 같은 명령창이 확인된다.
+기본 포트 3000으로 접속할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020231221151334.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;접속하면 &lt;code&gt;Github&lt;/code&gt; UI와 비슷한 화면에서 형상 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="데이터베이스-설정"&gt;데이터베이스 설정
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Gitea requires MySQL, PostgreSQL, MSSQL, SQLite3 or TiDB (MySQL protocol).&lt;/li&gt;
+&lt;li&gt;사용할 DB를 연결할 수도 있고, 기본적으로 별도의 DB와 연결하지 않아도 자체 SQLite와 함께 사용할 수 있다.&lt;/li&gt;
+&lt;li&gt;ID: giteaadmin, PW: giteaadmin, e-mail: &lt;a class="link" href="mailto:jgjo@kors.co.kr" &gt;jgjo@kors.co.kr&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="각종-설정"&gt;각종 설정
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;관리자 생성, 사용자 권한 등 설정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;These configuration options will be written into: D:\gitea_config\custom\conf\app.ini&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="uninstall"&gt;Uninstall
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;삭제는 bat, sh 등 삭제 관련 소스를 찾을 수 있다.&lt;/li&gt;
+&lt;li&gt;일단 gitea 설치 시 설정했던 경로들의 gitea 관련 폴더를 삭제하면 다시 설치할 수 있다.&lt;/li&gt;
+&lt;li&gt;또한 &lt;code&gt;gitea-1.21.2-gogit-windows-4.0-amd64.exe&lt;/code&gt;를 실행한 위치에 &lt;code&gt;data&lt;/code&gt;, &lt;code&gt;custom&lt;/code&gt; 폴더가 생성된 걸 확인할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="보안-설정"&gt;📌보안 설정
+&lt;/h2&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;무엇보다 앞서 DNS가 필요하다. 외부 도메인 없이 내부 IP만으로 사용할 수가 없다. 유효하지 않은 인증서라고&amp;hellip;&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;gitea 문서: &lt;a class="link" href="https://docs.gitea.com/next/administration/https-setup" target="_blank" rel="noopener"
+&gt;https://docs.gitea.com/next/administration/https-setup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;https 보안 설정을 위해 필요한 인증 파일을 발급해야 한다.
+&lt;ul&gt;
+&lt;li&gt;cert.pem&lt;/li&gt;
+&lt;li&gt;key.pem&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-ini" data-lang="ini"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;[server]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;ROOT_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;https://000.000.000.000:3000/ #http &amp;gt;&amp;gt;&amp;gt; https 수정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;PROTOCOL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;https #추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;CERT_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;custom/https/cert.pem #추가, 경로는 자유&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="na"&gt;KEY_FILE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;custom/https/key.pem #추가, 경로는 자유&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="openssl-설치"&gt;OpenSSL 설치
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;다운로드&lt;/strong&gt;: OpenSSL 공식 웹사이트에서 Windows용 설치 파일을 다운로드한다. &lt;a class="link" href="https://slproweb.com/products/Win32OpenSSL.html" target="_blank" rel="noopener"
+&gt;https://slproweb.com/products/Win32OpenSSL.html&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;설치&lt;/strong&gt;: 다운로드한 설치 파일을 실행하여 OpenSSL을 설치한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="openssl-명령어-사용"&gt;OpenSSL 명령어 사용
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;명령 프롬프트 열기&lt;/strong&gt;: OpenSSL을 설치한 후, 명령 프롬프트(Windows의 cmd)를 연다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;버전 확인&lt;/strong&gt;: OpenSSL이 정상적으로 설치되었는지 버전을 확인한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;openssl version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;RSA 키 생성&lt;/strong&gt;: 개인 키를 생성한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;openssl genrsa -out key.pem &lt;span class="m"&gt;2048&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이 명령은 2048 비트 길이의 RSA 개인 키를 생성하고 &lt;code&gt;key.pem&lt;/code&gt; 파일에 저장한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;자체 서명된 인증서 생성&lt;/strong&gt;: 개인 키를 사용하여 자체 서명된 인증서를 생성한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;openssl req -new -x509 -key key.pem -out cert.pem -days &lt;span class="m"&gt;3650&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이 명령은 10년(3650일) 동안 유효한 자체 서명된 인증서를 생성하고 &lt;code&gt;cert.pem&lt;/code&gt; 파일에 저장한다.
+입력하라는 대로 입력해도 멈추는 경우가 있는데 입력 후에 &lt;code&gt;.&lt;/code&gt;을 입력해서 넘기거나 구글링하거나 빈 칸으로 넘어가보자.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;인증서 정보 입력&lt;/strong&gt;: 명령을 실행하면 추가 정보를 입력해야 할 수 있다. 실제 운영에서는 이 정보가 중요하며 신뢰할 수 있는 인증서를 위해 정확하고 유효한 정보를 제공해야 한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;파일 확인&lt;/strong&gt;: 생성된 &lt;code&gt;key.pem&lt;/code&gt;과 &lt;code&gt;cert.pem&lt;/code&gt; 파일을 확인하여 사용한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이제 생성된 &lt;code&gt;key.pem&lt;/code&gt;과 &lt;code&gt;cert.pem&lt;/code&gt; 파일을 필요한 곳에서 사용할 수 있다.&lt;/p&gt;
+&lt;p&gt;자체 서명된 인증서를 사용하는 경우, 클라이언트에서는 브라우저에 예외로 등록해야만 경고 없이 접속할 수 있다.
+그러나 실제 제품에서는 신뢰할 수 있는 인증 기관으로부터 유효한 인증서를 구입하는 것이 좋다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;외부에 소스를 업로드 하길 원치 않지만, 자체적으로 버전 관리가 필요한 상황이었다.
+내부에서 저장소를 공유하고 버전 관리를 할 수 있게 됐다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;사용자 관리, 저장소 인증 관리 등은 포럼에서 확인하는 것이 좋을 것 같다.&lt;/li&gt;
+&lt;li&gt;Gitea Forum: &lt;a class="link" href="https://forum.gitea.com/" target="_blank" rel="noopener"
+&gt;https://forum.gitea.com/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;네트워크 연결 상태 때문인지 한 번씩 push에서 인증 오류 뜰 때가 있는데 다시 시도하면 정상적으로 된다.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>SVN을 사용해보자.</title><link>https://blog.b9f1.com/p/2022-04-12-try-using-svn/</link><pubDate>Tue, 12 Apr 2022 10:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2022-04-12-try-using-svn/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;이번 근무지에선 SVN을 사용한다.
+SVN은 다양한 버전이 있고 사용하는 OS에 맞는 것을 선택할 수 있다.&lt;/p&gt;
+&lt;h2 id="설치"&gt;📌설치
+&lt;/h2&gt;&lt;p&gt;우선 사용 중인 &lt;code&gt;VISUALSVN SERVER&lt;/code&gt;로 작성하겠다.
+사이트에서 설치 파일을 받아 설치한다.&lt;/p&gt;
+&lt;h3 id="설치-과정"&gt;설치 과정
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;라이선스 동의&lt;/li&gt;
+&lt;li&gt;서버와 관리자 또는 관리자만, command line tools 환경 변수 등록 등 옵션 선택&lt;/li&gt;
+&lt;li&gt;설치 경로, 저장소 경로, 서버 포트, 백업 경로 등을 설정&lt;/li&gt;
+&lt;li&gt;색인 설정&lt;/li&gt;
+&lt;li&gt;Subversion 또는 Windows 인증 방식 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="저장소-생성"&gt;📌저장소 생성
+&lt;/h2&gt;&lt;h3 id="1repository-type"&gt;1.Repository Type
+&lt;/h3&gt;&lt;h4 id="fsfs-fast-secure-file-system"&gt;FSFS (Fast Secure File System)
+&lt;/h4&gt;&lt;p&gt;표준 Subversion Repository로 기본적으로 사용하는 저장소&lt;/p&gt;
+&lt;h4 id="vdfs-visutalsvn-distributed-file-system"&gt;VDFS (VisutalSVN Distributed File System)
+&lt;/h4&gt;&lt;p&gt;분산 파일 시스템과 유사한 형태를 지니며 특징은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Master / Slave 형태의 아키텍처로 구성&lt;/li&gt;
+&lt;li&gt;Commit할 경우 Master Server로 적용된 후 Slave Server로 자동 복제 됨&lt;/li&gt;
+&lt;li&gt;Slave Server로도 Commit 가능하며, 이 경우에 동이에 Master Server로도 자동 Commit 됨&lt;/li&gt;
+&lt;/ul&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;strong&gt;Distributed VDFS는 FSFS repository와 기능적으론 동일&lt;/strong&gt;하다. 그렇기 때문에 &lt;strong&gt;서버 구성을 어떻게 할 것인가&lt;/strong&gt;에 따라 FSFS / VDFS를 선택하면 된다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="2repository-structure"&gt;2.Repository Structure
+&lt;/h3&gt;&lt;p&gt;Repository Type을 선택한 후에는 Repository Structure를 선택해야 한다.&lt;/p&gt;
+&lt;p&gt;이 두가지의 차이는 간단하다.
+하나의 Repository에 하나의 프로젝트를 관리하는지 아니면 여러 개의 프로젝트를 관리하는지에 따라 선택하면 된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Empty repository&lt;/strong&gt; : Standard Project로, 한 개의 Repository에 &lt;strong&gt;여러 Project를 관리&lt;/strong&gt;할 수 있는 구조로 Repository를 생성한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Single-Project Repository&lt;/strong&gt; : 한 개의 Repository에 &lt;strong&gt;하나의 Proeject를 관리&lt;/strong&gt;할 수 있는 구조로 Repository를 생성한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3respository-access-permissions"&gt;3.Respository Access Permissions
+&lt;/h3&gt;&lt;p&gt;마지막으로 권한 설정이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Nobody has access&lt;/strong&gt; : 아무나 접근 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;All Subversion users have Read/Write access&lt;/strong&gt; : SVN에 등록된 User들 접근 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Customize Permissions&lt;/strong&gt; : 커스터마이징에 따라 접근 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="checkout"&gt;📌Checkout
+&lt;/h2&gt;&lt;p&gt;SVN은 Git과 동작 방식이 다르다.
+그래서 checkout 이후에 생기는 outgoing이 찝찝해서 알아봄.&lt;/p&gt;
+&lt;h3 id="checkout만-했는데-outgoing이요"&gt;Checkout만 했는데 Outgoing이요?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;SVN에서는 Checkout 작업 자체가 로컬에 원격 저장소의 파일과 디렉토리를 가져오는 작업이다.&lt;/li&gt;
+&lt;li&gt;따라서 Checkout 이후에는 로컬 작업 디렉토리에 원격 저장소의 상태가 복제되어 추적된다. 이로 인해 변경된 사항이나 새로 생성된 파일 등이 발생할 수 있다.&lt;/li&gt;
+&lt;li&gt;따라서 새로운 Checkout은 변경된 내용이 있는 것처럼 Outgoing으로 표시될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;예를 들어 &lt;code&gt;TEST&lt;/code&gt;라는 원격 저장소를 받았는데 자동으로 메이븐 업데이트며 유효성 검사며 빌드며.. 진행하면서 생기는 변경 사항들을 svn ignore 처리했는데도 &lt;code&gt;TEST&lt;/code&gt;라는 폴더에 변경사항이 있다고 outgoing이 표시될 수 있다.&lt;/li&gt;
+&lt;li&gt;이를 checkout 했다는 의미로 커밋을 하던, 무시하고 작업한 이후에 작업 내용과 함께 커밋을 하던 본인이나 팀의 방식대로 사용하는 것이 찝찝함을 없앨 수 있는 하나의 방법 같다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="svn과-git은-다르다"&gt;SVN과 Git은 다르다.
+&lt;/h3&gt;&lt;p&gt;SVN에서는 Checkout 후에 변경 사항이 있는 것처럼 Outgoing이 표시될 수 있다.
+이는 SVN이 원격 저장소와 로컬 사이의 상태를 비교하기 때문이다.
+하지만 이렇게 표시되더라도 변경 사항이 없는 것이라면 이를 무시하거나 커밋하지 않고 무시할 수 있다.&lt;/p&gt;
+&lt;p&gt;Git의 경우에는 Clone 작업을 통해 저장소를 가져오더라도 파일의 추적이나 변경 사항이 바로 일어나지 않는다.
+이는 Git의 동작 방식과 SVN의 동작 방식이 다르기 때문이다.
+Git에서는 로컬에 있는 작업 디렉토리에서 명시적으로 &lt;code&gt;git add&lt;/code&gt; 명령어를 사용하여 추적하거나 변경 사항을 스테이징해야 한다.&lt;/p&gt;
+&lt;p&gt;간단히 말하자면, SVN의 Checkout은 원격 저장소의 상태를 로컬에 복제하는 작업이다.
+이로 인해 변경 사항이 있는 것처럼 Outgoing으로 표시될 수 있다.
+그러나 변경 사항이 없다면 이를 무시하거나 커밋하지 않고 무시할 수 있다.
+Git과 SVN는 다르게 동작하므로, Git의 Clone과 SVN의 Checkout은 이러한 점에서 차이가 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;필요한 SVN을 설치해서 저장소와 사용자 인증을 생성하고 URL을 공유할 수 있는 형태로 만든다.&lt;/p&gt;
+&lt;p&gt;공유 받은 URL을 사용해 형상 관리를 한다. 끝.&lt;/p&gt;</description></item></channel></rss>

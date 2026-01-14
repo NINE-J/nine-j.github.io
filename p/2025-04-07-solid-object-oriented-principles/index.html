@@ -1,0 +1,470 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="더 유연한 소프트웨어를 위한 설계 지침"><title>SOLID 원칙: 객체지향의 5가지 원칙</title><link rel=canonical href=https://blog.b9f1.com/p/2025-04-07-solid-object-oriented-principles/><link rel=stylesheet href=/scss/style.min.091d376ab5dee4238ab92c7f42e66ea0d97debe6d5a1f9c3e1e7121f544025d2.css><meta property='og:title' content="SOLID 원칙: 객체지향의 5가지 원칙"><meta property='og:description' content="더 유연한 소프트웨어를 위한 설계 지침"><meta property='og:url' content='https://blog.b9f1.com/p/2025-04-07-solid-object-oriented-principles/'><meta property='og:site_name' content='B9F1'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='devlog'><meta property='article:tag' content='SOLID'><meta property='article:tag' content='설계'><meta property='article:published_time' content='2025-04-07T00:00:00+09:00'><meta property='article:modified_time' content='2025-04-07T00:00:00+09:00'><meta name=twitter:title content="SOLID 원칙: 객체지향의 5가지 원칙"><meta name=twitter:description content="더 유연한 소프트웨어를 위한 설계 지침"><link rel="shortcut icon" href=/favicon.svg><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7023370172872685" crossorigin=anonymous></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-MG17SX24X0"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-MG17SX24X0")</script><script data-name=BMC-Widget data-cfasync=false src=https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js data-id=b9f1 data-description="Support me on Buy me a coffee!" data-message="👋 Glad to meet you.Buy me a coffee? 😊" data-color=#5F7FFF data-position=Right data-x_margin=18 data-y_margin=18></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_e091ceea98743e00.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🤌</span></figure><div class=site-meta><h1 class=site-name><a href=/>B9F1</a></h1><h2 class=site-description>Nine's Devlog</h2></div></header><ol class=menu-social><li><a href=https://github.com/NINE-J target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://stackoverflow.com/users/17334807/nine target=_blank title=StackOverflow rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-stackoverflow"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><path d="M8 16h8"/><path d="M8.322 12.582l7.956.836"/><path d="M8.787 9.168l7.826 1.664"/><path d="M10.096 5.764l7.608 2.472"/></svg></a></li><li><a href=mailto:rnwo47@gmail.com target=_blank title=ZMail rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/toys/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Toys</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#개요>📌개요</a></li><li><a href=#내용>📌내용</a><ol><li><a href=#srp-single-responsibility-principle---단일-책임-원칙>SRP (Single Responsibility Principle) - 단일 책임 원칙</a><ol><li><a href=#잘못된-예>잘못된 예</a></li><li><a href=#올바른-예>올바른 예</a></li></ol></li><li><a href=#ocp-openclosed-principle---개방폐쇄-원칙>OCP (Open/Closed Principle) - 개방/폐쇄 원칙</a><ol><li><a href=#잘못된-예-1>잘못된 예</a></li><li><a href=#올바른-예-1>올바른 예</a></li></ol></li><li><a href=#lspliskov-subtitution-principle---리스코프-치환-원칙>LSP(Liskov Subtitution Principle) - 리스코프 치환 원칙</a><ol><li><a href=#잘못된-예-2>잘못된 예</a></li><li><a href=#올바른-예-2>올바른 예</a></li></ol></li><li><a href=#isp-interface-segregation-principle---인터페이스-분리-원칙>ISP (Interface Segregation Principle) - 인터페이스 분리 원칙</a><ol><li><a href=#잘못된-예-3>잘못된 예</a></li><li><a href=#올바른-예-3>올바른 예</a></li></ol></li><li><a href=#dip-dependency-inversion-principle---의존관계-역전-원칙>DIP (Dependency Inversion Principle) - 의존관계 역전 원칙</a><ol><li><a href=#잘못된-예-4>잘못된 예</a></li><li><a href=#올바른-예-4>올바른 예</a></li></ol></li></ol></li><li><a href=#결론>🎯결론</a><ol><li><a href=#srp-단일-책임-원칙>SRP (단일 책임 원칙)</a></li><li><a href=#ocp-개방폐쇄-원칙>OCP (개방/폐쇄 원칙)</a></li><li><a href=#lsp-리스코프-치환-원칙>LSP (리스코프 치환 원칙)</a></li><li><a href=#isp-인터페이스-분리-원칙>ISP (인터페이스 분리 원칙)</a></li><li><a href=#dip-의존-역전-원칙>DIP (의존 역전 원칙)</a></li><li><a href=#핵심-질문-정리>핵심 질문 정리</a></li></ol></li><li><a href=#endnote>⚙️EndNote</a><ol><li><a href=#사전-지식>사전 지식</a></li><li><a href=#더-알면-좋은-것들>더 알면 좋은 것들?</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%EC%84%A4%EA%B3%84/>설계</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/2025-04-07-solid-object-oriented-principles/>SOLID 원칙: 객체지향의 5가지 원칙</a></h2><h3 class=article-subtitle>더 유연한 소프트웨어를 위한 설계 지침</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2025-04-07T00:00:00+09:00>2025년 04월 07일</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>10 minute read</time></div></footer></div></header><section class=article-content><h2 id=개요>📌개요</h2><link rel=stylesheet href=/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm+a4QTy4no=" crossorigin=anonymous><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span>한 언어에만 국한되는 내용이 아닌 객체지향 프로그래밍의 핵심 설계 방식이다.</span></div></div><p>SOLID 원칙은 2000년대 초반 로버트 C. 마틴(Robert C. Martin) - &lsquo;엉클 밥(Uncle Bob)&rsquo; 미국의 소프트웨어 공학자가 정리했지만, 그 기원은 1980년대 후반부터 시작된 객체 지향 설계 연구에 뿌리를 두고 있다.</p><ul><li>SOLID 원칙이 핵심 원칙이라 불리는 이유?<ul><li>변경 비용 감소: 기능 추가/수정 시 영향 범위 최소화</li><li>시스템 수명 연장: 유지보수성 향상으로 기술 부채 감소</li><li>팀 협업 효율화: 코드 가독성과 예측 가능성 증가</li></ul></li></ul><p>각 원칙에 대한 정의와 그 의미를 알아보고 간단한 Java 코드로 예시시를 확인해본다.</p><h2 id=내용>📌내용</h2><h3 id=srp-single-responsibility-principle---단일-책임-원칙>SRP (Single Responsibility Principle) - 단일 책임 원칙</h3><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span><strong>정의</strong>: 한 클래스는 하나의 책임만 가져야 한다.</span></div></div><p>클래스를 변경하는 이유는 단 하나여야 한다는 원칙으로, 여러 책임이 있는 클래스는 변경이 필요할 때마다 영향을 받을 가능성이 높다.</p><p>하나의 책임을 갖는다는 건 변경의 이유도 하나를 갖는다는 의미가 된다.</p><h4 id=잘못된-예>잘못된 예</h4><ul><li><code>User</code> 클래스가 두 가지 책임(사용자 정보 관리 + 데이터베이스 작업)을 동시에 가진다.</li><li>만약 데이터베이스 로직이 변경되면 <code>User</code> 클래스도 수정해야 한다.</li><li>사용자 정보의 필드 변경 시에도 <code>User</code> 클래스를 수정해야 하므로 변경의 이유가 두 가지가 된다.</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>class</span> <span class=nc>User</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>private</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>private</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>email</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=c1>// 사용자 정보 관련 책임</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=nf>getName</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=k>return</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>setName</span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>name</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>name</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=c1>// 데이터베이스 관련 책임 (SRP 위반)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>saveUserToDatabase</span><span class=p>(</span><span class=n>User</span><span class=w> </span><span class=n>user</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* ... */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=n>User</span><span class=w> </span><span class=nf>getUserFromDatabase</span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>userId</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* ... */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=올바른-예>올바른 예</h4><ul><li><code>User</code> 클래스는 사용자 정보 관리만 담당한다.</li><li><code>UserRepository</code> 클래스는 데이터베이스 작업만 담당한다.</li><li>데이터베이스 로직이 변경되어도 <code>User</code> 클래스는 영향을 받지 않으며 반대의 경우도 마찬가지다.</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>class</span> <span class=nc>User</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>private</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>private</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=n>email</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=n>String</span><span class=w> </span><span class=nf>getName</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=k>return</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>setName</span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>name</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=k>this</span><span class=p>.</span><span class=na>name</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>name</span><span class=p>;</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>UserRepository</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>saveUserToDatabase</span><span class=p>(</span><span class=n>User</span><span class=w> </span><span class=n>user</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* ... */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=n>User</span><span class=w> </span><span class=nf>getUserFromDatabase</span><span class=p>(</span><span class=n>String</span><span class=w> </span><span class=n>userId</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* ... */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=ocp-openclosed-principle---개방폐쇄-원칙>OCP (Open/Closed Principle) - 개방/폐쇄 원칙</h3><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span><strong>정의</strong>: 소프트웨어 개체는 확장에는 열려 있어야 하고, 수정에는 닫혀 있어야 한다.</span></div></div><p>기존 코드를 변경하지 않고도 시스템의 기능을 확장할 수 있어야 하며, 이는 추상화와 다형성을 통해 구현된다.</p><h4 id=잘못된-예-1>잘못된 예</h4><ul><li>수정에 닫혀 있지 않음<ul><li>새로운 도형(예: 삼각형)이 추가될 때마다 <code>AreaCalcurator</code> 클래스의 <code>calculateArea()</code> 메서드를 계속 수정해야 한다.</li><li>확장 시 <code>if-else</code> 블럭을 추가해야 되는 안티패턴은 유지보수성이 떨어지고, 기존 코드의 안정성이 위협 받는다.</li></ul></li><li>확장에 열려 있지 않음<ul><li>새로운 기능을 추가하려면 기존 클래스의 로직을 직접 변경해야 한다.</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>class</span> <span class=nc>AreaCalculator</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=nf>calculateArea</span><span class=p>(</span><span class=n>Object</span><span class=w> </span><span class=n>shape</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>if</span><span class=p>(</span><span class=n>shape</span><span class=w> </span><span class=k>instanceof</span><span class=w> </span><span class=n>Circle</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>			</span><span class=n>Circle</span><span class=w> </span><span class=n>circle</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>Circle</span><span class=p>)</span><span class=w> </span><span class=n>shape</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>			</span><span class=k>return</span><span class=w> </span><span class=n>Math</span><span class=p>.</span><span class=na>PI</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>circle</span><span class=p>.</span><span class=na>radius</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>circle</span><span class=p>.</span><span class=na>radius</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>shape</span><span class=w> </span><span class=k>instanceof</span><span class=w> </span><span class=n>Rectangle</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>			</span><span class=n>Rectangle</span><span class=w> </span><span class=n>rect</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=n>Rectangle</span><span class=p>)</span><span class=w> </span><span class=n>shape</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>			</span><span class=k>return</span><span class=w> </span><span class=n>rect</span><span class=p>.</span><span class=na>width</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>rect</span><span class=p>.</span><span class=na>height</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>IllegalArgumentException</span><span class=p>(</span><span class=s>&#34;Unknown shape&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=올바른-예-1>올바른 예</h4><ul><li>추상화 도입<ul><li>모든 도형이 <code>calculateArea()</code> 메서드를 구현하도록 강제한다.</li><li>새로운 도형이 추가되어도 <code>AreaCalculator</code>는 변경되지 않는다.</li></ul></li><li>다형성 활용<ul><li><code>AreaCalculator</code>는 구체적인 도형 클래스를 알 필요 없이 인터페이스에 의존한다.</li><li>도형의 종류가 늘어나도 <code>calculateArea()</code> 메서드는 한 번만 구현하면 된다.</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Shape</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>double</span><span class=w> </span><span class=nf>calculateArea</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Circle</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Shape</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=n>radius</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=nf>calculateArea</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>return</span><span class=w> </span><span class=n>Math</span><span class=p>.</span><span class=na>PI</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>radius</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>radius</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Rectangle</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Shape</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=n>width</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=n>height</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=nf>calculateArea</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>return</span><span class=w> </span><span class=n>width</span><span class=w> </span><span class=o>*</span><span class=w> </span><span class=n>height</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>AreaCalculator</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>double</span><span class=w> </span><span class=nf>calculateArea</span><span class=p>(</span><span class=n>Shape</span><span class=w> </span><span class=n>shape</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>		</span><span class=k>return</span><span class=w> </span><span class=n>shape</span><span class=p>.</span><span class=na>calculateArea</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=lspliskov-subtitution-principle---리스코프-치환-원칙>LSP(Liskov Subtitution Principle) - 리스코프 치환 원칙</h3><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span><strong>정의</strong>: 프로그램의 객체는 프로그램의 정확성을 깨뜨리지 않으면서 하위 타입의 인스턴스로 바꿀 수 있어야 한다.</span></div></div><p>부모 클래스가 사용되는 모든 곳에서 자식 클래스를 안전하게 사용할 수 있어야 하며 이때 프로그램의 정확성이 깨지지 않아야 한다.</p><p>즉, 클라이언트가 상위 타입에 기대하는 동작을 하위 타입에서도 동일하게 제공해야 한다.</p><ul><li><p>계약적 설계 개념:</p><ul><li><strong>사전 조건</strong>: 메서드 실행 전 만족해야 하는 조건</li><li><strong>사후 조건</strong>: 메서드 실행 후 보장되는 조건</li><li><strong>불변 조건</strong>: 객체 생명주기 동안 유지되는 조건</li></ul></li><li><p>LSP의 3가지 핵심 조건:</p><ol><li><strong>메서드 시그니처 호환성</strong>: 하위 클래스는 상위 클래스의 모든 메서드를 동일한 시그니처로 구현해야 한다.</li><li><strong>사전 조건 약화</strong>: 하위 클래스의 메서드 사전 조건(입력 제약)은 상위 클래스보다 강하지 않아야 한다.</li><li><strong>사후 조건 강화</strong>: 하위 클래스의 메서드 사후 조건(출력 보장)은 상위 클래스보다 약하지 않아야 한다.</li></ol></li></ul><h4 id=잘못된-예-2>잘못된 예</h4><ul><li>계약 위반:<ul><li><code>Bird</code>의 <code>fly()</code>는 &ldquo;날 수 있다"는 행동을 보장하지만,</li><li><code>Penguin</code>은 이를 부정하며 예외를 던진다.</li></ul></li><li>클라이언트 충격:<ul><li><code>watchFlight()</code>은 모든 <code>Bird</code>가 날 것이라 기대하지만,</li><li>펭귄 전달 시 시스템이 비정상 종료된다.</li></ul></li><li>일상적 직관과 충돌:<ul><li>생물학적으로 펭귄은 새이지만,</li><li>프로그래밍에서는 상속 관계가 적합하지 않다.</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 부모 클래스: 새</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Bird</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>fly</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;날개짓 하며 날아간덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;먹이를 먹는덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// 자식 클래스: 펭귄 (LSP 위반)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Penguin</span><span class=w> </span><span class=kd>extends</span><span class=w> </span><span class=n>Bird</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nd>@Override</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>fly</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>throw</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>UnsupportedOperationException</span><span class=p>(</span><span class=s>&#34;펭귄은 날 수 없덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// 클라이언트 코드</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>BirdWatcher</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>watchFlight</span><span class=p>(</span><span class=n>Bird</span><span class=w> </span><span class=n>bird</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>bird</span><span class=p>.</span><span class=na>fly</span><span class=p>();</span><span class=w>  </span><span class=c1>// 펭귄 전달 시 예외 발생</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kd>static</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>main</span><span class=p>(</span><span class=n>String</span><span class=o>[]</span><span class=w> </span><span class=n>args</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>Bird</span><span class=w> </span><span class=n>bird</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>new</span><span class=w> </span><span class=n>Penguin</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>new</span><span class=w> </span><span class=n>BirdWatcher</span><span class=p>().</span><span class=na>watchFlight</span><span class=p>(</span><span class=n>bird</span><span class=p>);</span><span class=w>  </span><span class=c1>// 런타임 예외!</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=올바른-예-2>올바른 예</h4><ul><li>생물학적 분류 != 프로그래밍적 상속</li><li><strong>&ldquo;is-a&rdquo; 관계가 아닌 경우 상속 금지</strong></li><li>상속 대신 확장 포인트 제공</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Bird</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Flyable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>void</span><span class=w> </span><span class=nf>fly</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Sparrow</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Bird</span><span class=p>,</span><span class=w> </span><span class=n>Flyable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>fly</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	    </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;날개짓 하며 날아간덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	    </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;먹이를 먹는덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Penguin</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Bird</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	    </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;먹이를 먹는덩&#34;</span><span class=p>);</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// fly() 메서드 없음</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// 클라이언트 코드</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>BirdWatcher</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 날 수 있는 새만 처리</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>watchFlight</span><span class=p>(</span><span class=n>FlyingBird</span><span class=w> </span><span class=n>bird</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>bird</span><span class=p>.</span><span class=na>fly</span><span class=p>();</span><span class=w>  </span><span class=c1>// 펭귄은 컴파일 타임에 전달 불가</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 모든 새 처리</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>watchFeeding</span><span class=p>(</span><span class=n>Bird</span><span class=w> </span><span class=n>bird</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=n>bird</span><span class=p>.</span><span class=na>eat</span><span class=p>();</span><span class=w>  </span><span class=c1>// 펭귄도 안전하게 호출</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=isp-interface-segregation-principle---인터페이스-분리-원칙>ISP (Interface Segregation Principle) - 인터페이스 분리 원칙</h3><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span><strong>정의</strong>: 특정 클라이언트를 위한 인터페이스 여러 개가 범용 인터페이스 하나보다 낫다.</span></div></div><p>클라이언트가 자신이 사용하지 않는 메서드에 의존하지 않아야 한다.
+<code>ISP</code>는 <code>SRP</code>의 인터페이스 버전이라고 볼 수 있다.</p><h4 id=잘못된-예-3>잘못된 예</h4><ul><li>불필요한 의존성<ul><li><code>RobotWorker</code>는 <code>eat()</code>, <code>sleep()</code> 메서드를 전혀 사용하지 않지만 구현해야 함</li><li>더미 코드나 예외 발생으로 처리해야 하는 문제</li></ul></li><li>계약 위반<ul><li><code>Worker</code> 인터페이스가 너무 많은 책임을 가진다.</li><li>새로운 기능(예: <code>charge()</code>) 추가 시 모든 클래스가 영향 받음</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Worker</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>sleep</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>HumanWorker</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Worker</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 일하기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 먹기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>sleep</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 자기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>RobotWorker</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Worker</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 일하기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 로봇은 먹지 않는데 구현해야 함 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>sleep</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 로봇은 자지 않는데 구현해야 함 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=올바른-예-3>올바른 예</h4><ul><li>명확한 계약<ul><li>각 인터페이스는 단일 기능만 정의</li><li><code>RobotWorker</code>는 <code>work()</code>만 구현하면 된다.</li></ul></li><li>유연한 확장<ul><li>새로운 기능(<code>Rechargeable</code>) 추가 시 기존 코드 수정 불필요</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Workable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Eatable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Sleepable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kt>void</span><span class=w> </span><span class=nf>sleep</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>HumanWorker</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Workable</span><span class=p>,</span><span class=w> </span><span class=n>Eatable</span><span class=p>,</span><span class=w> </span><span class=n>Sleepable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 일하기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>eat</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 먹기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>sleep</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 자기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>RobotWorker</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Workable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>	</span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>work</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=cm>/* 일하기 */</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=dip-dependency-inversion-principle---의존관계-역전-원칙>DIP (Dependency Inversion Principle) - 의존관계 역전 원칙</h3><div class="admonition info"><div class=admonition-header><svg viewBox="0 0 512 512"><path d="M256 512A256 256 0 10256 0a256 256 0 100 512zM216 336h24v-64h-24c-13.3.0-24-10.7-24-24s10.7-24 24-24h48c13.3.0 24 10.7 24 24v88h8c13.3.0 24 10.7 24 24s-10.7 24-24 24h-80c-13.3.0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 110 64 32 32 0 110-64z"/></svg>
+<span><strong>정의</strong>: 고수준 모듈은 저수준 모듈에 의존해서는 안 된다. 둘 다 추상화에 의존해야 한다.</span></div></div><p>구체적인 구현이 아닌 추상화에 의존해야 한다.</p><h4 id=잘못된-예-4>잘못된 예</h4><ul><li>고수준 모듈이 저수준 모듈에 직접 의존</li><li>강한 결합도<ul><li><code>Switch</code>는 <code>LightBulb</code>에 강하게 결합되어 다른 기기 추가가 불가능</li><li>전구 구현 변경 시 <code>Switch</code>도 수정 필요</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=kd>class</span> <span class=nc>LightBulb</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOn</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;전구 켜짐&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOff</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;전구 꺼짐&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Switch</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>LightBulb</span><span class=w> </span><span class=n>bulb</span><span class=p>;</span><span class=w>  </span><span class=c1>// 문제 1: 구체 클래스에 직접 의존</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=nf>Switch</span><span class=p>(</span><span class=n>LightBulb</span><span class=w> </span><span class=n>bulb</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>bulb</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>bulb</span><span class=p>;</span><span class=w>  </span><span class=c1>// 문제 2: 생성자 주입도 구체 클래스 사용</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>operate</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>Math</span><span class=p>.</span><span class=na>random</span><span class=p>()</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>0</span><span class=p>.</span><span class=na>5</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>bulb</span><span class=p>.</span><span class=na>turnOn</span><span class=p>();</span><span class=w>  </span><span class=c1>// 문제 3: 고수준 모듈이 저수준 구현을 직접 호출</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>bulb</span><span class=p>.</span><span class=na>turnOff</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=올바른-예-4>올바른 예</h4><ul><li>결합도 감소<ul><li><code>Switch</code>는 이제 <code>LightBulb</code>, <code>Fan</code> 등 어떤 <code>Switchable</code> 기기와도 작동</li></ul></li><li>계층 구조 역전<ul><li>DIP 적용 전: <code>Switch(고수준)</code> → <code>LightBulb(저수준)</code></li><li>DIP 적용 후: <code>Switch(고수준)</code> ← <code>Switchable(추상화)</code> → <code>LightBulb(저수준)</code></li></ul></li><li>실제 적용 사례<ul><li>Spring Framework의 <code>@Autowired</code></li><li>로깅에서 <code>LoggerInterface</code> 사용 (실제 로거 구현과 분리)</li></ul></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-java data-lang=java><span class=line><span class=cl><span class=c1>// 추상화 인터페이스 정의 (고수준)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>interface</span> <span class=nc>Switchable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOn</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOff</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// 저수준 모듈들이 추상화에 의존</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>LightBulb</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Switchable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOn</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;LED 전구 켜짐&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOff</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;LED 전구 꺼짐&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Fan</span><span class=w> </span><span class=kd>implements</span><span class=w> </span><span class=n>Switchable</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOn</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;팬 작동 시작&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>turnOff</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=n>System</span><span class=p>.</span><span class=na>out</span><span class=p>.</span><span class=na>println</span><span class=p>(</span><span class=s>&#34;팬 정지&#34;</span><span class=p>);</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=c1>// 고수준 모듈이 추상화에 의존</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>class</span> <span class=nc>Switch</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>private</span><span class=w> </span><span class=n>Switchable</span><span class=w> </span><span class=n>device</span><span class=p>;</span><span class=w>  </span><span class=c1>// 추상화에 의존</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=nf>Switch</span><span class=p>(</span><span class=n>Switchable</span><span class=w> </span><span class=n>device</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>this</span><span class=p>.</span><span class=na>device</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>device</span><span class=p>;</span><span class=w>  </span><span class=c1>// DI - Dependency Injection(의존성 주입)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=kd>public</span><span class=w> </span><span class=kt>void</span><span class=w> </span><span class=nf>operate</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>Math</span><span class=p>.</span><span class=na>random</span><span class=p>()</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=n>0</span><span class=p>.</span><span class=na>5</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>device</span><span class=p>.</span><span class=na>turnOn</span><span class=p>();</span><span class=w>  </span><span class=c1>// 다형성 호출</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=n>device</span><span class=p>.</span><span class=na>turnOff</span><span class=p>();</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=결론>🎯결론</h2><p>SOLID 원칙은 서로 연관되어 전체적인 설계 안정성을 이루며, 각 원칙을 종합적으로 적용해야 유연하고 견고한 시스템을 구축할 수 있다.</p><ul><li><code>SRP</code>가 클래스를 단순하게 유지하면 <code>OCP</code> 적용이 쉬워지고</li><li><code>LSP</code>가 상속 계층을 안정화하면 <code>DIP</code>로 확장하기 용이해지며</li><li><code>ISP</code>는 <code>SRP</code>와 <code>DIP</code>를 자연스럽게 지원하는 선순환 구조를 만든다.</li></ul><h3 id=srp-단일-책임-원칙>SRP (단일 책임 원칙)</h3><ul><li><strong>핵심 가치</strong>: <strong>응집도 ↑, 유지보수성 ↑</strong></li><li><strong>실천 방안</strong>:<ul><li>클래스 설계 시 <strong>&ldquo;이 클래스를 수정하는 이유는 단 하나인가?&rdquo;</strong> 자문하기</li><li>책임이 복잡하면 <strong>분할</strong>하고, 관련성 높은 기능은 <strong>응집</strong>시키기</li></ul></li></ul><h3 id=ocp-개방폐쇄-원칙>OCP (개방/폐쇄 원칙)</h3><ul><li><strong>핵심 가치</strong>: <strong>확장성 ↑, 기존 코드 안정성 ↑</strong></li><li><strong>실천 방안</strong>:<ul><li><strong>변하는 부분은 추상화</strong> (인터페이스/상속), <strong>변하지 않는 부분은 고정</strong></li><li><strong>&ldquo;인터페이스에 프로그래밍하라&rdquo;</strong> → 예시처럼 <code>Shape</code> 인터페이스처럼 확장 포인트 제공</li></ul></li></ul><h3 id=lsp-리스코프-치환-원칙>LSP (리스코프 치환 원칙)</h3><ul><li><strong>핵심 가치</strong>: <strong>다형성 안정성 ↑, 계약 준수성 ↑</strong></li><li><strong>실천 방안</strong>:<ul><li>하위 클래스는 <strong>상위 클래스의 행동 규약을 반드시 지켜야 함</strong></li><li>생물학적 분류 != 프로그래밍적 상속</li><li><strong>&ldquo;is-a&rdquo; 관계가 아닌 경우 상속 금지</strong> → 예시처럼 <code>Penguin</code>은 <code>Bird</code>를 상속하면 안 됨</li><li>상속 대신 확장 포인트 제공</li></ul></li></ul><h3 id=isp-인터페이스-분리-원칙>ISP (인터페이스 분리 원칙)</h3><ul><li><strong>핵심 가치</strong>: <strong>불필요한 의존성 ↓, 클라이언트 맞춤 설계</strong></li><li><strong>실천 방안</strong>:<ul><li><strong>&ldquo;클라이언트는 자신이 사용하지 않는 메서드에 의존하지 말아야 한다&rdquo;</strong></li><li>거대한 인터페이스는 <strong>작은 단위로 분할</strong> (예: <code>UserAPI</code> → <code>ReaderAPI</code> + <code>WriterAPI</code>)</li></ul></li></ul><h3 id=dip-의존-역전-원칙>DIP (의존 역전 원칙)</h3><ul><li><strong>핵심 가치</strong>: <strong>모듈 간 결합도 ↓, 유연성 ↑</strong></li><li><strong>실천 방안</strong>:<ul><li><strong>&ldquo;추상화에 의존하라, 구체화에 의존하지 말라&rdquo;</strong></li><li><strong>&ldquo;프로그램을 플러그인 아키텍처로 만든다&rdquo;</strong></li><li>모든 의존성이 추상화를 향하도록 설계하면, 시스템은 유연한 <strong>레고 블록</strong>처럼 조립 가능해진다.</li></ul></li></ul><h3 id=핵심-질문-정리>핵심 질문 정리</h3><div class=table-wrapper><table><thead><tr><th>원칙</th><th>키워드</th><th>핵심 질문</th></tr></thead><tbody><tr><td><strong>SRP</strong></td><td>단일 책임</td><td>&ldquo;이 클래스를 변경하는 이유는 하나인가?&rdquo;</td></tr><tr><td><strong>OCP</strong></td><td>확장 개방</td><td>&ldquo;새 기능을 추가할 때 기존 코드를 수정하는가?&rdquo;</td></tr><tr><td><strong>LSP</strong></td><td>치환 가능</td><td>&ldquo;하위 클래스를 상위 클래스로 대체해도 문제없는가?&rdquo;</td></tr><tr><td><strong>ISP</strong></td><td>인터페이스 분리</td><td>&ldquo;클라이언트가 필요 없는 메서드를 구현하도록 강제하는가?&rdquo;</td></tr><tr><td><strong>DIP</strong></td><td>추상화 의존</td><td>&ldquo;고수준 모듈이 저수준 모듈에 직접 의존하는가?&rdquo;</td></tr></tbody></table></div><h2 id=endnote>⚙️EndNote</h2><h3 id=사전-지식>사전 지식</h3><ul><li>객체 지향 프로그래밍(OOP) 기본 개념 (클래스, 객체, 상속, 다형성 등)</li><li>인터페이스와 추상 클래스의 차이</li><li>의존성 주입(Dependency Injection) 개념</li></ul><h3 id=더-알면-좋은-것들>더 알면 좋은 것들?</h3><ul><li><strong>GRASP 원칙</strong>: SOLID 외에도 일반적인 책임 할당을 위한 소프트웨어 패턴</li><li><strong>디자인 패턴</strong>: SOLID 원칙을 적용한 구체적인 설계 예시들 (팩토리, 전략, 옵저버 패턴 등)</li><li><strong>리팩토링 기법</strong>: SOLID 원칙을 준수하도록 코드를 개선하는 방법</li><li><strong>테스트 주도 개발(TDD)</strong>: SOLID 원칙과 잘 어울리는 개발 방법론</li><li><strong>의존성 주입 프레임워크</strong>: Spring, Guice 등 DIP를 쉽게 적용할 수 있게 도와주는 도구들</li></ul></section><footer class=article-footer><div style=margin-top:2rem;text-align:center><a href=https://www.buymeacoffee.com/b9f1 target=_blank><img src=https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png alt="Buy Me A Coffee" style=height:60px!important;width:217px!important></a></div><section class=article-tags><a href=/tags/devlog/>Devlog</a>
+<a href=/tags/solid/>SOLID</a>
+<a href=/tags/%EC%84%A4%EA%B3%84/>설계</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=[".main-article",".widget--toc"];e.forEach(e=>{const t=document.querySelector(e);t&&renderMathInElement(t,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/2025-04-07-java-solid-srp-and-ocp/><div class=article-details><h2 class=article-title>SOLID 원칙</h2></div></a></article><article><a href=/p/2025-12-30-the-zettelkasten-x-para/><div class=article-details><h2 class=article-title>Zettelkasten x PARA</h2></div></a></article><article><a href=/p/2025-06-21-tdd-testdouble-with-mockito-mock-and-spy/><div class=article-details><h2 class=article-title>테스트 더블 - Test Doubles</h2></div></a></article><article><a href=/p/2025-06-21-tdd-how-far-should-i-go-to-verify-the-input-value/><div class=article-details><h2 class=article-title>입력값 검증 어디까지 해야 할까?</h2></div></a></article><article><a href=/p/2025-05-24-design-dto-vs-command/><div class=article-details><h2 class=article-title>DTO VS Command</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=nine-j/nine-j.github.io data-repo-id=R_kgDOOqUgZw data-category=General data-category-id=DIC_kwDOOqUgZ84CqLyQ data-mapping=url data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"noborder_gray")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2026 B9F1</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.33.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

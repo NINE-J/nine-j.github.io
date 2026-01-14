@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>마이크로서비스 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%84%9C%EB%B9%84%EC%8A%A4/</link><description>Recent content in 마이크로서비스 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 25 Jun 2025 22:17:57 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%84%9C%EB%B9%84%EC%8A%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>컨테이너 오케스트레이션</title><link>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</link><pubDate>Wed, 25 Jun 2025 22:17:57 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-25-infra-what-is-container-orchestration/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Docker는 컨테이너 단위의 애플리케이션 패키징과 실행이 뛰어나지만 실제 운영 환경에서는 수십, 수백 개의 컨테이너를 배포하고 유지해야 하는 복잡한 상황이 발생한다.&lt;/p&gt;
+&lt;p&gt;이 문제를 해결하기 위해 등장한 개념이 컨테이너 오케스트레이션(Container Orchestration)이다.&lt;/p&gt;
+&lt;p&gt;오케스트레이션의 핵심 개념과 필요성, Docker 단독 환경의 한계, Kubernetes를 중심으로 오케스트레이터가 해결하는 세 가지 주요 문제를 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-오케스트레이션이란"&gt;컨테이너 오케스트레이션이란?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;오케스트라(orchestra)에서 유래&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;ul&gt;
+&lt;li&gt;오케스트라: 수십 개의 악기가 각자 연주하지만 지휘자가 이를 정해진 순서와 규칙에 따라 통제하여 하나의 음악으로 만들어낸다.&lt;/li&gt;
+&lt;li&gt;개발 시스템: 수많은 컨테이너, 서비스, 배포, 트래픽, 설정이 따로따로 존재하지만 오케스트레이터가 이를 자동으로 조율하여 하나의 애플리케이션처럼 작동하도록 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;컨테이너 오케스트레이션은 다음과 같은 작업을 자동화한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컨테이너의 배포 및 종료&lt;/li&gt;
+&lt;li&gt;헬스 체크 및 실패 시 자동 복구&lt;/li&gt;
+&lt;li&gt;트래픽에 따라 컨테이너 자동 확장/축소&lt;/li&gt;
+&lt;li&gt;로드 밸런싱, 서비스 디스커버리&lt;/li&gt;
+&lt;li&gt;YAML을 활용한 선언적 구성(Declarative Configuration)을 통한 인프라 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;단일 컨테이너 환경에서는 수작업이나 스크립트로 관리가 가능하지만 수십 개 이상의 컨테이너를 운영하는 클러스터 환경에서는 비효율과 오류를 피하기 어렵다.&lt;/p&gt;
+&lt;h3 id="docker-단독-사용-환경의-한계"&gt;Docker 단독 사용 환경의 한계
+&lt;/h3&gt;&lt;p&gt;Docker는 다음과 같은 측면에서 한계가 존재한다.&lt;/p&gt;
+&lt;h4 id="수동-스케일링"&gt;수동 스케일링
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 명령어로 컨테이너 개수를 수동 조정&lt;/li&gt;
+&lt;li&gt;실시간 트래픽 변화에 대응 불가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="제한된-복구-기능"&gt;제한된 복구 기능
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--restart&lt;/code&gt; 자동 재시작은 가능하지만, 헬스 체크 기반 복구, 다중 노드 상태 관리는 불가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="서비스-수준-추상화-부족"&gt;서비스 수준 추상화 부족
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Docker Compose로 일부 기능(네트워크, 볼륨, 환경변수)은 구성 가능&lt;/li&gt;
+&lt;li&gt;하지만 로드밸런싱, 트래픽 분산, 서비스 디스커버리 등은 부족하거나 수동 구성 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="오케스트레이션이-해결하는-주요-문제-3가지"&gt;오케스트레이션이 해결하는 주요 문제 3가지
+&lt;/h3&gt;&lt;h4 id="자동-확장---auto-scaling"&gt;자동 확장 - Auto Scaling
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 트래픽 급증 시 컨테이너 수를 사람이 조정해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;Horizontal Pod Autoscaler&lt;/code&gt;를 통해 리소스(CPU, 메모리) 사용량 기준으로 Pod 수를 자동 조절&lt;/li&gt;
+&lt;li&gt;예시: CPU 사용률이 80% 이상일 때 3개에서 10개로 자동 확장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자가-복구---self-healing"&gt;자가 복구 - Self-Healing
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 컨테이너가 비정상 종료될 경우 사람이 직접 조치해야 함&lt;/li&gt;
+&lt;li&gt;해결: k8s는 &lt;code&gt;livenessProbe&lt;/code&gt;, &lt;code&gt;readinessProbe&lt;/code&gt;를 통해 주기적으로 상태를 체크하고 실패한 컨테이너는 자동 재시작 또는 교체
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;livenessProbe&lt;/code&gt;: &amp;ldquo;얘가 아직 살아 있나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;자동 재시작&lt;/li&gt;
+&lt;li&gt;컨테이너가 비정상 상태일 경우 자동으로 재시작해줌&lt;/li&gt;
+&lt;li&gt;예: 무한 루프에 빠졌거나 내부적으로는 죽었는데 프로세스는 살아 있는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readinessProbe&lt;/code&gt;: &amp;ldquo;얘가 트래픽 받을 준비가 됐나?&amp;rdquo; 판단하는 검사
+&lt;ul&gt;
+&lt;li&gt;장애 확산 방지&lt;/li&gt;
+&lt;li&gt;준비되지 않은 컨테이너는 Service에 등록되지 않음&lt;/li&gt;
+&lt;li&gt;앱이 시작은 됐지만 DB 연결이 아직 안 됐다면 트래픽 받지 않도록 막아줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="선언적-인프라---declarative-infrastructure"&gt;선언적 인프라 - Declarative Infrastructure
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;문제: 수동 명령어는 현재 상태를 명확히 알기 어렵고 일관성 유지가 어려움&lt;/li&gt;
+&lt;li&gt;해결: k8s에서는 YAML 파일에 &amp;ldquo;이 시스템은 이래야 한다&amp;quot;고 선언하면 클러스터가 이를 자동으로 유지
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 선언 예시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;apiVersion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;apps/v1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deployment&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;replicas&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;template&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;spec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;containers&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;my-app:latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker-compose-vs-kubernetes-비교"&gt;Docker Compose vs Kubernetes 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;Docker Compose&lt;/th&gt;
+&lt;th&gt;Kubernetes&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;스케일링&lt;/td&gt;
+&lt;td&gt;수동 조정 (&lt;code&gt;--scale&lt;/code&gt;)&lt;/td&gt;
+&lt;td&gt;HPA 기반 자동 확장&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;복구&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--restart&lt;/code&gt;로 기본 재시작&lt;/td&gt;
+&lt;td&gt;상태 기반 자가 복구&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;디스커버리&lt;/td&gt;
+&lt;td&gt;내부 DNS 미지원 (v2 기준)&lt;/td&gt;
+&lt;td&gt;서비스명 기반 자동 디스커버리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;낮음&lt;/td&gt;
+&lt;td&gt;높음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;운영 복잡도&lt;/td&gt;
+&lt;td&gt;낮음 (로컬)&lt;/td&gt;
+&lt;td&gt;높지만 강력함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="오케스트레이터-선택-기준"&gt;오케스트레이터 선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;오케스트레이터&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;th&gt;적합한 상황&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Kubernetes&lt;/td&gt;
+&lt;td&gt;CNCF 주도, 생태계 광범위&lt;/td&gt;
+&lt;td&gt;MSA 기반 대규모 서비스&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker Swarm&lt;/td&gt;
+&lt;td&gt;Docker와 연동 용이, 간결함&lt;/td&gt;
+&lt;td&gt;중소 규모 단일 클러스터&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AWS ECS / Fargate&lt;/td&gt;
+&lt;td&gt;서버리스, 비용 최적화&lt;/td&gt;
+&lt;td&gt;AWS 중심의 배포 전략&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너 오케스트레이션은 현대적인 서비스 운영을 위한 기본이자 필수 인프라 기술이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;학습과 실험엔 Docker만으로 충분하지만 실전에서는 운영 자동화, 복구, 확장성, 일관된 인프라 구성이 가능한 오케스트레이터가 반드시 필요하다.&lt;/p&gt;
+&lt;p&gt;특히 Kubernetes는 클라우드 네이티브 환경의 표준으로 자리 잡았다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Docker의 기본 사용법&lt;/li&gt;
+&lt;li&gt;컨테이너 개념 (이미지, 레지스트리, 실행 등)&lt;/li&gt;
+&lt;li&gt;YAML 파일의 구조 이해&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/ko/docs/home/" target="_blank" rel="noopener"
+&gt;Kubernetes 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" target="_blank" rel="noopener"
+&gt;Kubernetes Horizontal Pod Autoscaler&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://landscape.cncf.io/" target="_blank" rel="noopener"
+&gt;CNCF Landscape&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>웹 API 진화의 핵심 전환</title><link>https://blog.b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</link><pubDate>Tue, 20 May 2025 13:23:57 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;과거 웹 서비스 API의 표준은 SOAP(Simple Object Access Protocol)였다.&lt;/p&gt;
+&lt;p&gt;그러나 2010년대를 지나며 REST(Representational State Transfer)가 빠르게 주류로 자리 잡았고 요즘 대부분의 공개 웹 API에서 RESTful API가 사실상의 표준으로 자리 잡고 있다.&lt;/p&gt;
+&lt;p&gt;웹 API의 발전 과정 속에서, SOAP에서 REST로의 전환이 일어난 배경과 그에 따른 장단점을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="soap의-등장과-전성기"&gt;SOAP의 등장과 전성기
+&lt;/h3&gt;&lt;p&gt;SOAP은 WSDL(Web Service Definition Language), XML 기반 메시지 포맷 그리고 HTTP 외에도 SMTP나 FTP를 사용할 수 있는 유연성 덕분에 초기에는 대형 엔터프라이즈 시스템에서 주로 채택되었다.
+보안(SOAP Security), 트랜잭션, 메시지 무결성 등 강력한 스펙이 특징이었다.&lt;/p&gt;
+&lt;p&gt;그러나 SOAP은 다음과 같은 문제를 가지고 있었다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;메시지 포맷이 무겁고 복잡함 (XML 기반)&lt;/li&gt;
+&lt;li&gt;학습 비용이 높고 구현이 어려움&lt;/li&gt;
+&lt;li&gt;브라우저, 모바일 등 가벼운 클라이언트 환경과 맞지 않음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="rest의-부상"&gt;REST의 부상
+&lt;/h3&gt;&lt;p&gt;2000년에 로이 필딩(Roy Fielding)이 논문에서 제시한 REST는 본래 HTTP의 아키텍처 스타일로 제안된 개념이었지만 시간이 지나며 &amp;ldquo;RESTful API&amp;quot;라는 개념으로 대중화되었다.&lt;/p&gt;
+&lt;p&gt;REST의 핵심은 자원(Resource) 지향 아키텍처와 표준 HTTP 메서드(GET, POST, PUT, DELETE)를 활용한 통신이다.&lt;/p&gt;
+&lt;p&gt;REST가 빠르게 채택된 이유는 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTP라는 웹의 표준을 그대로 활용&lt;/li&gt;
+&lt;li&gt;JSON 기반 경량 메시지 포맷 (브라우저/모바일 친화적)&lt;/li&gt;
+&lt;li&gt;상태 없는(stateless) 구조로 확장성 우수&lt;/li&gt;
+&lt;li&gt;클라이언트와 서버 간 결합도가 낮음&lt;/li&gt;
+&lt;li&gt;문서화가 간단하고 테스트/디버깅이 쉬움&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="soap-vs-rest"&gt;SOAP VS REST
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;SOAP&lt;/th&gt;
+&lt;th&gt;REST&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;메시지 포맷&lt;/td&gt;
+&lt;td&gt;XML (무겁고 엄격)&lt;/td&gt;
+&lt;td&gt;JSON, XML (가볍고 유연)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;표준&lt;/td&gt;
+&lt;td&gt;WSDL 등 다양한 스펙 존재&lt;/td&gt;
+&lt;td&gt;명확한 표준 없음 (URI, HTTP 활용)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보안, 트랜잭션&lt;/td&gt;
+&lt;td&gt;WS-Security, WS-Atomic 등 내장 지원&lt;/td&gt;
+&lt;td&gt;HTTP 보안 활용, 트랜잭션 미지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;상태성&lt;/td&gt;
+&lt;td&gt;상태 유지(Stateful) 가능&lt;/td&gt;
+&lt;td&gt;Stateless 기반&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;높음 (설정과 구현 복잡)&lt;/td&gt;
+&lt;td&gt;낮음 (간단한 HTTP 인터페이스)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;확장성과 경량성&lt;/td&gt;
+&lt;td&gt;제한적&lt;/td&gt;
+&lt;td&gt;뛰어남&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="rest-이후의-대안이-있을까"&gt;REST 이후의 대안이 있을까?
+&lt;/h3&gt;&lt;p&gt;REST는 단순하고 확장 가능한 아키텍처지만, 다음과 같은 한계가 존재한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;과도한 데이터 전송 (Over-fetching/Under-fetching)&lt;/li&gt;
+&lt;li&gt;정적인 엔드포인트 설계&lt;/li&gt;
+&lt;li&gt;실시간 양방향 통신 미지원&lt;/li&gt;
+&lt;li&gt;리소스 간 관계 표현의 어려움&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 문제를 해결하기 위한 대안으로 다음 기술이 떠오르고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GraphQL&lt;/strong&gt;: 클라이언트가 필요한 데이터만 요청할 수 있어 Over-fetching/Under-fetching 문제를 해소함.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;gRPC&lt;/strong&gt;: HTTP/2 기반의 양방향 스트리밍과 낮은 대역폭, 빠른 응답속도를 제공하여 마이크로서비스 간 통신에 적합함.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Async API, WebSocket 기반 API&lt;/strong&gt;: 실시간 스트리밍 통신 및 이벤트 기반 시스템에 특화됨.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이렇듯 REST는 여전히 강력한 기본값이지만, 목적에 따라 더 나은 대안들이 상황별로 사용되고 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;페이스북, 트위터, 구글, 아마존 등 주요 플랫폼 API는 거의 모두 REST 기반이다.
+심지어 마이크로소프트도 SOAP에서 REST 기반 API로 점진적으로 이동하고 있다고 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 메서드(GET, POST, PUT, DELETE)&lt;/li&gt;
+&lt;li&gt;XML vs. JSON 포맷&lt;/li&gt;
+&lt;li&gt;클라이언트-서버 아키텍처&lt;/li&gt;
+&lt;li&gt;상태 유지(Stateful) vs 상태 없음(Stateless)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm" target="_blank" rel="noopener"
+&gt;Architectural Styles and the Design of Network-based Software Architectures - Roy Thomas Fielding&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/api-management/restify-soap-api" target="_blank" rel="noopener"
+&gt;Import a SOAP API to API Management and convert it to REST&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design" target="_blank" rel="noopener"
+&gt;RESTful API 디자인 가이드 - Microsoft&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://blog.postman.com/soap-vs-rest/" target="_blank" rel="noopener"
+&gt;SOAP vs REST 비교 블로그 - Postman&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://graphql.org/" target="_blank" rel="noopener"
+&gt;GraphQL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://grpc.io/" target="_blank" rel="noopener"
+&gt;gRPC 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

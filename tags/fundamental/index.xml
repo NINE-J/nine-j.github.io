@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Fundamental on B9F1</title><link>https://blog.b9f1.com/tags/fundamental/</link><description>Recent content in Fundamental on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 27 Jan 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/fundamental/index.xml" rel="self" type="application/rss+xml"/><item><title>Docker 시작하기: 기초 개념과 필수 지식 정리</title><link>https://blog.b9f1.com/p/2025-01-27-getting-started-with-docker/</link><pubDate>Mon, 27 Jan 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-01-27-getting-started-with-docker/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;란 무엇이고 왜 사용하는지 정리한다.&lt;/p&gt;
+&lt;h2 id="docker란"&gt;📌Docker란?
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 애플리케이션을 컨테이너라는 독립된 환경에서 실행할 수 있게 해주는 플랫폼이다.
+&lt;code&gt;Docker&lt;/code&gt;를 이해하기 위해 필요한 기본 개념들과 지식에 대해 알아본다.&lt;/p&gt;
+&lt;h2 id="왜-사용하지"&gt;📌왜 사용하지?
+&lt;/h2&gt;&lt;h3 id="1-일관된-환경-제공"&gt;1. 일관된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 컨테이너를 통해 애플리케이션과 그 종속성들을 포함하는 독립된 환경을 제공한다.
+이를 통해 개발, 테스트, 배포 환경에서 일관된 실행 환경을 보장할 수 있다.
+이는 &amp;ldquo;내 컴에선 잘 되네요. (Works on my machine)&amp;rdquo; 문제를 해결하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="2-효율적인-리소스-사용"&gt;2. 효율적인 리소스 사용
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 컨테이너는 가상 머신보다 가볍고 빠르다.
+컨테이너는 호스트 운영 체제의 커널을 공유하면서 실행되기 때문에, 리소스 오버헤드가 적고 빠른 성능을 제공한다.&lt;/p&gt;
+&lt;h3 id="3-빠른-배포와-스케일링"&gt;3. 빠른 배포와 스케일링
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 사용하면 애플리케이션의 배포와 스케일링이 용이하다.
+이미지를 통해 컨테이너를 빠르게 생성하고 실행할 수 있으며, 필요한 경우 컨테이너를 쉽게 확장할 수 있다.&lt;/p&gt;
+&lt;h3 id="4-이식성"&gt;4. 이식성
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 어디서나 일관된 환경을 제공하기 때문에, 애플리케이션을 다양한 플랫폼에서 쉽게 실행할 수 있다.
+이는 로컬 개발 환경, 테스트 서버, 클라우드 환경 등에서 동일하게 동작한다.&lt;/p&gt;
+&lt;h3 id="5-버전-관리와-롤백"&gt;5. 버전 관리와 롤백
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt; 이미지는 버전 관리가 가능하며, 특정 버전으로 롤백할 수 있다.
+이는 애플리케이션의 안정성과 일관성을 유지하는 데 도움이 된다.&lt;/p&gt;
+&lt;h3 id="6-분리된-환경-제공"&gt;6. 분리된 환경 제공
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 각 애플리케이션을 분리된 컨테이너에서 실행하기 때문에, 서로 간섭 없이 독립적으로 실행할 수 있다.
+이는 보안성과 안정성을 높이는 데 기여한다.&lt;/p&gt;
+&lt;h3 id="7-devops와-cicd-통합"&gt;7. DevOps와 CI/CD 통합
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;는 &lt;code&gt;DevOps&lt;/code&gt;와 &lt;code&gt;CI/CD&lt;/code&gt; 파이프라인과 쉽게 통합할 수 있다.
+이를 통해 자동화된 빌드, 테스트, 배포 프로세스를 구현할 수 있다.&lt;/p&gt;
+&lt;h2 id="docker를-이해하기-위한-기본-지식"&gt;📌Docker를 이해하기 위한 기본 지식
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Docker&lt;/code&gt;를 이해하고 사용하기 위해 다음과 같은 기본 지식이 필요하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;리눅스 명령어와 기초 운영 체제 지식&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 주로 리눅스 환경에서 사용되므로 리눅스 명령어와 파일 시스템 구조에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;가상화 개념&lt;/strong&gt;: &lt;code&gt;Docker&lt;/code&gt;는 가상화 기술의 한 형태이므로, 전통적인 가상 머신과 비교하여 컨테이너의 장점과 차이점을 이해하는 것이 도움이 된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워킹 기초&lt;/strong&gt;: 컨테이너 간의 통신과 네트워킹 설정을 이해하기 위해 기본적인 네트워킹 개념이 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;버전 관리 시스템&lt;/strong&gt;: &lt;code&gt;Dockerfile&lt;/code&gt;과 이미지를 버전 관리하는 데 도움이 되므로 &lt;code&gt;Git&lt;/code&gt;과 같은 버전 관리 시스템에 대한 기본적인 이해가 필요하다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="docker의핵심-개념"&gt;📌Docker의 핵심 개념
+&lt;/h2&gt;&lt;h3 id="1-containers-컨테이너"&gt;1. Containers (컨테이너)
+&lt;/h3&gt;&lt;p&gt;컨테이너는 애플리케이션과 그 종속성들을 포함하는 경량의 독립 실행 환경이다.&lt;/p&gt;
+&lt;p&gt;컨테이너는 동일한 호스트 운영 체제 커널을 공유하면서도 서로 격리되어 실행된다.
+이를 통해 애플리케이션이 어디서나 일관되게 실행될 수 있다.&lt;/p&gt;
+&lt;h3 id="2-images-이미지"&gt;2. Images (이미지)
+&lt;/h3&gt;&lt;p&gt;이미지는 &lt;code&gt;Docker&lt;/code&gt; 컨테이너를 생성하기 위한 읽기 전용 템플릿이다.&lt;/p&gt;
+&lt;p&gt;이미지는 여러 개의 레이어로 구성되며, 각 레이어는 기존 이미지에서 변경된 내용을 포함한다.
+이미지는 재사용 가능하며, &lt;code&gt;Docker Hub&lt;/code&gt;와 같은 레지스트리에 저장하고 배포할 수 있다.&lt;/p&gt;
+&lt;h3 id="3-volumes-볼륨"&gt;3. Volumes (볼륨)
+&lt;/h3&gt;&lt;p&gt;볼륨은 컨테이너와 호스트 간의 데이터를 지속적으로 저장하고 공유하기 위한 메커니즘이다.&lt;/p&gt;
+&lt;p&gt;컨테이너가 삭제되더라도 볼륨에 저장된 데이터는 유지된다.
+볼륨은 컨테이너 간에 데이터를 공유할 때도 유용하하다.&lt;/p&gt;
+&lt;h3 id="4-builds-빌드"&gt;4. Builds (빌드)
+&lt;/h3&gt;&lt;p&gt;빌드는 &lt;code&gt;Dockerfile&lt;/code&gt;을 사용하여 이미지를 생성하는 과정이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Dockerfile&lt;/code&gt;은 애플리케이션 환경을 설정하는 명령어들의 스크립트다.
+&lt;code&gt;docker build&lt;/code&gt; 명령어를 사용하여 &lt;code&gt;Dockerfile&lt;/code&gt;을 기반으로 이미지를 생성할 수 있다.&lt;/p&gt;</description></item></channel></rss>

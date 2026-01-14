@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Modular on B9F1</title><link>https://blog.b9f1.com/tags/modular/</link><description>Recent content in Modular on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 09 Mar 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/modular/index.xml" rel="self" type="application/rss+xml"/><item><title>모듈러 연산</title><link>https://blog.b9f1.com/p/2025-03-09-modular-arithmetic/</link><pubDate>Sun, 09 Mar 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-03-09-modular-arithmetic/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;다양한 알고리즘(암호학, 해시 함수, 알고리즘 최적화 등)에 활용할 수 있는 모듈러 연산(Modular Arithmetic)의 동작 원리를 알아 본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;모듈러 연산(Modular Arithmetic)은 숫자를 특정 값(모듈러, modulus)으로 나눈 나머지를 구하는 연산이다.&lt;/p&gt;
+&lt;h3 id="기본-개념"&gt;기본 개념
+&lt;/h3&gt;$$A \mod  M = R$$&lt;ul&gt;
+&lt;li&gt;$A$ : 피연산자(나누려는 수)&lt;/li&gt;
+&lt;li&gt;$M$ : 모듈러 값(나누는 수)&lt;/li&gt;
+&lt;li&gt;$R$ : 나머지(결과값)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;예를 들어, $17 \mod  5$를 계산하면&lt;/p&gt;
+$$17÷5=3(몫),나머지=2$$&lt;p&gt;따라서,&lt;/p&gt;
+$$17 \mod  5=2$$&lt;h3 id="동치-관계"&gt;동치 관계
+&lt;/h3&gt;$$A \equiv B \pmod{M}$$&lt;p&gt;이 식은 A와 B가 같은 나머지를 가지는 경우를 의미한다.&lt;/p&gt;
+$$17 \equiv 2 \pmod{5}$$&lt;p&gt;이는 17과 2는 5로 나눴을 때 같은 나머지를 가진다는 뜻이다.&lt;/p&gt;
+&lt;h3 id="주요-성질"&gt;주요 성질
+&lt;/h3&gt;&lt;h4 id="덧셈"&gt;덧셈
+&lt;/h4&gt;&lt;p&gt;두 수의 합을 구한 뒤 모듈러 연산을 수행하는 것과, 각각의 수에 대해 먼저 모듈러 연산을 수행한 후 더하는 것은 결과가 같다.&lt;/p&gt;
+$$(A+B) \mod M = [(A \mod M)+(B \mod M)] \mod M$$&lt;h4 id="뺄셈"&gt;뺄셈
+&lt;/h4&gt;&lt;p&gt;두 수의 차이를 구한 뒤 모듈러 연산을 수행하는 것과, 각각 모듈러 연산 후 뺀 값을 모듈러 연산하는 것은 동일하다.
+다만, 결과가 음수일 경우 $M$을 더해 양수로 변환한다.&lt;/p&gt;
+$$(A−B) \mod M = [(A \mod M)−(B \mod M) + M] \mod M$$&lt;h4 id="곱셈"&gt;곱셈
+&lt;/h4&gt;&lt;p&gt;두 수의 곱을 직접 모듈러 연산하는 것과, 각각의 수에 대해 먼저 모듈러 연산을 수행한 후 곱한 값을 다시 모듈러 연산하는 것은 동일하다.&lt;/p&gt;
+$$(A×B) \mod M = [(A \mod M) × (B \mod M)] \mod M$$&lt;h4 id="거듭제곱"&gt;거듭제곱
+&lt;/h4&gt;&lt;p&gt;거듭제곱 후 모듈러 연산을 수행하는 것과, 밑수를 먼저 모듈러 연산한 후 거듭제곱하여 모듈러 연산하는 것은 동일하다.&lt;/p&gt;
+&lt;p&gt;빠르게 계산하는 방법: 모듈러 거듭제곱&lt;/p&gt;
+$$A^B \mod M=[(A \mod M)^B] \mod M$$&lt;h4 id="나눗셈"&gt;나눗셈
+&lt;/h4&gt;&lt;p&gt;모듈러 연산에서 나눗셈은 일반적인 나눗셈이 아니라, $B$의 모듈러 역원(곱셈 역원)을 찾아 곱셈으로 변환하여 계산해야 한다.&lt;/p&gt;
+&lt;p&gt;역원 개념 필요, 보통 확장된 유클리드 알고리즘 사용&lt;/p&gt;
+$$(A/B) \mod M=(A×B^{−1}) \mod M$$&lt;h2 id="pseudo-code"&gt;Pseudo Code
+&lt;/h2&gt;&lt;p&gt;각 연산에 대해 &lt;code&gt;Pseudo code&lt;/code&gt;를 작성해 보자.&lt;/p&gt;
+&lt;h3 id="기본-모듈러-연산"&gt;기본 모듈러 연산
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(1)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular(A, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN A - (A // M) * M # (A를 M으로 나눈 나머지)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;입력: $A,M$&lt;/li&gt;
+&lt;li&gt;출력: $A \mod  M$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="모듈러-덧셈"&gt;모듈러 덧셈
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(1)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular_add(A, B, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN (A % M + B % M) % M
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="모듈러-뺄셈"&gt;모듈러 뺄셈
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(1)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular_subtract(A, B, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; result = (A % M - B % M) % M
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; IF result &amp;lt; 0:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; result += M # 음수가 되지 않도록 보정
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN result
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="모듈러-곱셈"&gt;모듈러 곱셈
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(1)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular_multiply(A, B, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN (A % M * B % M) % M
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="모듈러-거듭제곱-빠른-거듭제곱"&gt;모듈러 거듭제곱 (빠른 거듭제곱)
+&lt;/h3&gt;&lt;p&gt;거듭제곱을 직접 계산하면 O(B) 이므로, 빠르게 계산하는 방법(O(log B))을 사용해야 한다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(log B) (빠른 거듭제곱)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular_exponentiation(A, B, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; result = 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base = A % M
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; WHILE B &amp;gt; 0:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; IF B % 2 == 1: # B가 홀수라면
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; result = (result * base) % M
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; base = (base * base) % M
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; B = B // 2
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN result
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="모듈러-나눗셈-모듈러-역원"&gt;모듈러 나눗셈 (모듈러 역원)
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;시간 복잡도: O(log M)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;$A/B \mod M$ 를 계산하려면, $B$의 모듈러 역원 $B^{-1}$을 찾아야 한다.&lt;/p&gt;
+&lt;p&gt;페르마의 소정리, M이 소수일 때
+&lt;/p&gt;
+$$ B^{−1} \equiv B^{M−2} \pmod{M} $$&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;FUNCTION modular_inverse(B, M):
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RETURN modular_exponentiation(B, M-2, M) # B^(M-2) % M 계산
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;M이 소수일 때만 사용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;모듈러 연산은 시간복잡도 O(1)로 계산할 수 있어 효율적이다.&lt;/li&gt;
+&lt;li&gt;거듭제곱은 O(log B)로 최적화 가능하다.&lt;/li&gt;
+&lt;li&gt;나눗셈은 모듈러 역원을 활용해야 한다.&lt;/li&gt;
+&lt;li&gt;암호학, 해시 함수, 수학적 최적화 등에 널리 사용된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="markdown-수학식-표현"&gt;Markdown 수학식 표현
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Markdown&lt;/code&gt;에서 수학식을 표현하는 방법은 &lt;code&gt;LaTeX 수식&lt;/code&gt;(TeX 수식) 또는 &lt;code&gt;MathJax&lt;/code&gt;라고 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;LaTeX(레이텍) 수식&lt;/strong&gt;: 수학 기호와 공식을 작성하는 데 사용되는 문법&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MathJax(매스잭스)&lt;/strong&gt;: 웹에서 LaTeX 스타일의 수식을 렌더링하는 라이브러리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="인라인-수식"&gt;인라인 수식
+&lt;/h4&gt;&lt;h5 id="예시"&gt;예시
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 인라인 수식
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;모듈러 수학식 $A \mod M=R$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="결과"&gt;결과
+&lt;/h5&gt;&lt;p&gt;인라인 수식: $A \mod M=R$&lt;/p&gt;
+&lt;h4 id="블록-수식"&gt;블록 수식
+&lt;/h4&gt;&lt;h5 id="예시-1"&gt;예시
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# 블록 수식 `$$ ... $$` 형태로 작성한다.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$$ A \mod M=R $$
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="결과-1"&gt;결과
+&lt;/h5&gt;$$ A \mod M=R $$</description></item></channel></rss>

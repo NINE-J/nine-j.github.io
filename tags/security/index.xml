@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on B9F1</title><link>https://blog.b9f1.com/tags/security/</link><description>Recent content in Security on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 04 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/security/index.xml" rel="self" type="application/rss+xml"/><item><title>OAuth 2.0 핵심 구조 이해하기</title><link>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 인증 인프라를 설계하며 OAuth 2.0이 표준처럼 자리 잡았다는 사실을 체감하고 있다.&lt;/p&gt;
+&lt;p&gt;특히 소셜 로그인이나 외부 리소스 접근 권한 위임 기능을 구현하면서 “Authorization Code Grant” 방식의 구조와 흐름을 완벽히 이해하는 것이 중요하다고 판단해 이 글을 작성하게 되었다.&lt;/p&gt;
+&lt;p&gt;이번 포스팅에서는 OAuth 2.0의 주요 컴포넌트와 함께 Authorization Code Grant가 어떤 흐름으로 동작하는지 실전 중심으로 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="oauth-20의-주요-컴포넌트"&gt;OAuth 2.0의 주요 컴포넌트
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;컴포넌트&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Owner&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스(정보)의 실제 소유자. 보통 사용자(User)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Client&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스 접근을 요청하는 애플리케이션 (ex. 우리가 개발하는 웹앱)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Authorization Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인증을 담당하며, Access Token을 발급하는 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;보호된 리소스를 제공하는 API 서버 (Authorization Server와 분리될 수도 있음)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="authorization-code-grant-흐름"&gt;Authorization Code Grant 흐름
+&lt;/h3&gt;&lt;p&gt;이 방식은 &lt;strong&gt;보안성과 유연성&lt;/strong&gt;을 모두 만족하는 방식으로, 웹 앱에서 가장 많이 사용된다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant User
+participant Client (웹앱)
+participant AuthorizationServer
+participant ResourceServer
+User-&gt;&gt;Client: 로그인 요청
+Client-&gt;&gt;AuthorizationServer: 인증 요청 (사용자 브라우저를 리디렉션)
+AuthorizationServer-&gt;&gt;User: 로그인 + 권한 요청
+User-&gt;&gt;AuthorizationServer: 로그인 &amp; 승인
+AuthorizationServer-&gt;&gt;Client: Authorization Code 전달 (리디렉션 URI)
+Client-&gt;&gt;AuthorizationServer: Authorization Code + Client Secret로 Access Token 요청
+AuthorizationServer-&gt;&gt;Client: Access Token + (선택) Refresh Token 전달
+Client-&gt;&gt;ResourceServer: Access Token으로 리소스 요청
+ResourceServer-&gt;&gt;Client: 리소스 응답
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="흐름-요약"&gt;흐름 요약
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;인증 요청:&lt;/strong&gt; Client가 Authorization Server에 인증 요청 URL로 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;사용자 승인:&lt;/strong&gt; 사용자는 로그인 후 권한 승인.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;코드 수신:&lt;/strong&gt; Authorization Server는 Redirect URI에 &lt;code&gt;Authorization Code&lt;/code&gt;를 포함하여 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 요청:&lt;/strong&gt; Client는 받은 코드를 Authorization Server에 전송하며, Access Token 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 수신:&lt;/strong&gt; Authorization Server는 Access Token을 응답.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API 요청:&lt;/strong&gt; Client는 받은 Access Token을 사용해 Resource Server에 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 수신:&lt;/strong&gt; 유효한 토큰이면 리소스를 응답.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="refresh-token은-왜-필요할까"&gt;Refresh Token은 왜 필요할까?
+&lt;/h4&gt;&lt;p&gt;Access Token은 일반적으로 &lt;strong&gt;짧은 유효시간(예: 1시간)&lt;/strong&gt; 을 가진다.
+이때 Refresh Token이 있으면 재로그인 없이 새로운 Access Token을 발급 받을 수 있어 UX 개선에 큰 역할을 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;OAuth 2.0의 핵심은 &lt;strong&gt;책임 분리와 위임&lt;/strong&gt;이며, Authorization Code Grant는 가장 안전하고 실전적인 인증 흐름이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 프로토콜의 기본 흐름&lt;/li&gt;
+&lt;li&gt;RESTful API의 인증/인가 개념&lt;/li&gt;
+&lt;li&gt;HTTPS 통신 방식&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener"
+&gt;RFC 6749: The OAuth 2.0 Authorization Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html" target="_blank" rel="noopener"
+&gt;Spring Security OAuth2 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/" target="_blank" rel="noopener"
+&gt;JWT.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;키워드: &lt;code&gt;PKCE&lt;/code&gt;, &lt;code&gt;Client Credentials&lt;/code&gt;, &lt;code&gt;Implicit Grant&lt;/code&gt;, &lt;code&gt;OpenID Connect&lt;/code&gt;, &lt;code&gt;Refresh Token Rotation&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>세션 vs 토큰 인증 차이</title><link>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 개발자가 꼭 이해하고 있어야 할 인증의 두 축, &lt;strong&gt;세션 기반 인증&lt;/strong&gt;과 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;의 구조적 차이점과 각각의 &lt;strong&gt;보안상 고려사항&lt;/strong&gt;에 대해 다뤄보자.&lt;/p&gt;
+&lt;p&gt;특히 REST API 설계, OAuth2 도입, JWT 사용 시 맞닥뜨리는 여러 결정 포인트에서 어떤 방식을 왜 선택해야 하는지, 실전 관점에서 짚어본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="세션-기반-인증-session-based-authentication"&gt;세션 기반 인증 (Session-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 사용자 정보를 저장한 &lt;strong&gt;세션 ID&lt;/strong&gt;를 생성하고, 클라이언트에 &lt;strong&gt;쿠키로 전달&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 모든 요청에는 쿠키가 자동으로 첨부되어 세션 ID를 통해 인증 정보를 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;서버가 세션 상태를 &lt;strong&gt;직접 저장&lt;/strong&gt; (메모리, Redis 등)&lt;/li&gt;
+&lt;li&gt;브라우저 친화적 (자동 쿠키 처리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CSRF 공격&lt;/strong&gt;에 취약: 쿠키가 자동 전송되기 때문&lt;/li&gt;
+&lt;li&gt;세션 탈취(Session Hijacking) 대비 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SameSite, Secure, HttpOnly&lt;/strong&gt; 쿠키 옵션 사용 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;브라우저 기반의 전통적인 웹 서비스&lt;/li&gt;
+&lt;li&gt;내부망 또는 통제된 환경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="토큰-기반-인증-token-based-authentication"&gt;토큰 기반 인증 (Token-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 &lt;strong&gt;JWT(JSON Web Token)&lt;/strong&gt; 또는 커스텀 토큰을 발급하고, 클라이언트는 이를 &lt;strong&gt;로컬 저장소에 저장&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 요청 시 Authorization 헤더를 통해 &lt;strong&gt;직접 첨부&lt;/strong&gt;해서 인증한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서버 무상태(stateless)&lt;/strong&gt; 인증 방식 (세션 저장 불필요)&lt;/li&gt;
+&lt;li&gt;클라이언트/서버 분리된 구조에 유리&lt;/li&gt;
+&lt;li&gt;JWT는 &lt;strong&gt;자체적으로 서명되어 위변조 검증&lt;/strong&gt; 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;XSS에 취약&lt;/strong&gt;: 토큰을 로컬스토리지에 저장 시 노출 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 탈취 → 장기 권한 노출&lt;/strong&gt; 우려&lt;/li&gt;
+&lt;li&gt;만료시간, Refresh Token 전략, &lt;strong&gt;Token Rotation&lt;/strong&gt; 도입 필요&lt;/li&gt;
+&lt;li&gt;HTTPS 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;모바일 앱, SPA(Single Page App)&lt;/li&gt;
+&lt;li&gt;분산 시스템, 마이크로서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="주요-차이-정리"&gt;주요 차이 정리
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;세션 기반 인증&lt;/th&gt;
+&lt;th&gt;토큰 기반 인증&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;서버 상태&lt;/td&gt;
+&lt;td&gt;상태 유지 (Stateful)&lt;/td&gt;
+&lt;td&gt;상태 없음 (Stateless)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;저장소&lt;/td&gt;
+&lt;td&gt;서버 메모리/DB/Redis&lt;/td&gt;
+&lt;td&gt;클라이언트 로컬 저장소&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인증 전달&lt;/td&gt;
+&lt;td&gt;쿠키 (자동 전송)&lt;/td&gt;
+&lt;td&gt;HTTP Header (직접 전송)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;취약점&lt;/td&gt;
+&lt;td&gt;CSRF, 세션 탈취&lt;/td&gt;
+&lt;td&gt;XSS, 토큰 탈취&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 사례&lt;/td&gt;
+&lt;td&gt;웹 사이트&lt;/td&gt;
+&lt;td&gt;모바일, API 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;인증 방식은 서비스 구조와 위협 모델에 따라 선택하자. 만능은 없다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;클라이언트가 브라우저 중심이고 보안 제어가 가능한 경우엔 &lt;strong&gt;세션 기반 인증&lt;/strong&gt;이, REST API나 모바일 중심이라면 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;이 적절하다.&lt;/p&gt;
+&lt;p&gt;단, 어떤 방식을 쓰든 보안은 추가 설정과 방어 로직 없이는 무너질 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 쿠키/헤더&lt;/li&gt;
+&lt;li&gt;JWT 구조 (Header.Payload.Signature)&lt;/li&gt;
+&lt;li&gt;CSRF, XSS 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" target="_blank" rel="noopener"
+&gt;OWASP 인증 관련 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/introduction" target="_blank" rel="noopener"
+&gt;JWT 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://oauth.net/2/" target="_blank" rel="noopener"
+&gt;OAuth 2.0 개념 정리 및 흐름&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>리눅스설정 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%A6%AC%EB%88%85%EC%8A%A4%EC%84%A4%EC%A0%95/</link><description>Recent content in 리눅스설정 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Jun 2025 10:11:44 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%A6%AC%EB%88%85%EC%8A%A4%EC%84%A4%EC%A0%95/index.xml" rel="self" type="application/rss+xml"/><item><title>WSL에서 PSQL 사용하기</title><link>https://blog.b9f1.com/p/2025-06-27-wsl-using-psql/</link><pubDate>Fri, 27 Jun 2025 10:11:44 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-27-wsl-using-psql/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 개발을 진행하다 보면 WSL에서 &lt;code&gt;psql&lt;/code&gt;을 사용해 Windows에 설치된 PostgreSQL에 접속하고 싶은 상황이 있다.&lt;/p&gt;
+&lt;p&gt;그러나 단순한 클라이언트 설치만으로는 접속이 되지 않는다. 방화벽, 접속 허용 설정, 포트 개방 등 네트워크 보안 요소를 고려해야 하기 때문이다.&lt;/p&gt;
+&lt;p&gt;WSL에서 PostgreSQL 접속 방법을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="postgresql-클라이언트-설치"&gt;PostgreSQL 클라이언트 설치
+&lt;/h3&gt;&lt;p&gt;Windows에 구성된 PostgreSQL에 접속하기 위해 클라이언트를 설치해야 한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install postgresql-client
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;apt-get&lt;/code&gt;은 더 오래된 전통적인 CLI 툴&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;스크립트나 자동화에 주로 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;apt&lt;/code&gt;는 &lt;code&gt;apt-get&lt;/code&gt;과 &lt;code&gt;apt-cache&lt;/code&gt;의 여러 기능을 합쳐 사용자 친화적으로 만든 통합 명령어&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;2014년 즈음부터 Debian/Ubuntu에 포함되었고 Ubuntu 16.04부터 기본으로 권장&lt;/li&gt;
+&lt;li&gt;깔끔한 출력과 심플한 옵션 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;일상적인 사용에 &lt;code&gt;apt&lt;/code&gt;가 권장되며 스크립트 자동화, 하위 호환에 &lt;code&gt;apt-get&lt;/code&gt;을 사용할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="windows-ip-확인"&gt;Windows IP 확인
+&lt;/h3&gt;&lt;p&gt;PostgreSQL 서버가 설치된 Windows 쪽 IP를 알아야 접속이 가능하다.
+이때 &lt;code&gt;ifconfig&lt;/code&gt;이 아니라 다음 명령어를 사용해야 정확하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ip route &lt;span class="p"&gt;|&lt;/span&gt; grep default
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 예시 결과&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;default via 172.27.208.1 dev eth0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;172.27.208.1&lt;/code&gt;이 &lt;strong&gt;WSL에서 Windows를 바라보는 IP (게이트웨이 IP)&lt;/strong&gt; 이므로 이 주소를 접속 대상 IP로 사용한다.&lt;/p&gt;
+&lt;h3 id="windows-postgresql-서버-설정-변경"&gt;Windows PostgreSQL 서버 설정 변경
+&lt;/h3&gt;&lt;h4 id="postgresqlconf"&gt;postgresql.conf
+&lt;/h4&gt;&lt;p&gt;Windows에 설치된 PostgreSQL 설정 디렉토리에서 아래 설정을 찾아 수정한다.&lt;/p&gt;
+&lt;p&gt;보통은 기본 설치 경로에 있다. &lt;code&gt;C:\Program Files\PostgreSQL\{version}\data&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;listen_addresses&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 원하는 IP만&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;listen_addresses&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;localhost,172.27.208.1&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt; 와일드 카드로 전체를 여는 것보다 특정 IP에서 들어오는 것만 명시적으로 지정하는 것이 보안상 안전하다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="pg_hbaconf"&gt;pg_hba.conf
+&lt;/h4&gt;&lt;p&gt;해당 대역(WSL 내부 IP 포함)을 명시적으로 허용해야 접속 가능하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;host all all 172.27.208.1 md5
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;수정 후에는 반드시 PostgreSQL 서비스를 재시작해야 설정이 반영된다.&lt;/p&gt;
+&lt;p&gt;Windows의 &lt;code&gt;services.msc&lt;/code&gt;에서 PostgreSQL을 다시 시작하거나 명령어를 사용해 재시작한다.&lt;/p&gt;
+&lt;h3 id="windows-방화벽에서-포트-열기"&gt;Windows 방화벽에서 포트 열기
+&lt;/h3&gt;&lt;p&gt;WSL은 Windows의 입장에선 외부 네트워크로 간주된다.
+기본적으로 TCP 5432 포트는 차단되어 있다.&lt;/p&gt;
+&lt;p&gt;따라서 명시적으로 인바운드 규칙을 추가해야 한다.
+기본적인 설정으로 가정하고 정리한다.&lt;/p&gt;
+&lt;p&gt;설정 경로:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows의 실행 &amp;gt; &lt;code&gt;wf.msc&lt;/code&gt; (Windows Defender 방화벽 고급 보안)
+&lt;ul&gt;
+&lt;li&gt;또는 제어판에서 방화벽 &amp;gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙에서 새 규칙 추가
+&lt;ul&gt;
+&lt;li&gt;유형: 포트&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트: 5432&lt;/li&gt;
+&lt;li&gt;작업: 연결 허용&lt;/li&gt;
+&lt;li&gt;프로필: 도메인/개인/공용 모두 선택&lt;/li&gt;
+&lt;li&gt;이름: Allow PostgreSQL 5432 for WSL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="연결-테스트"&gt;연결 테스트
+&lt;/h3&gt;&lt;p&gt;WSL 터미널에서 명령 실행 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nc -zv 172.27.208.1 &lt;span class="m"&gt;5432&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 포트 정상적으로 붙게 되면&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Connection to 172.27.208.1 &lt;span class="m"&gt;5432&lt;/span&gt; port &lt;span class="o"&gt;[&lt;/span&gt;tcp/postgresql&lt;span class="o"&gt;]&lt;/span&gt; succeeded!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;그 다음 실제 접속&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 호스트, 유저, DB&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;psql -h 172.27.208.1 -U postgres -d postgres
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;WSL은 로컬처럼 보이지만 네트워크적으로는 별개의 장치로 취급된다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;단순히 PostgreSQL을 설치하는 것만으로 접속이 불가능하다.
+&lt;code&gt;listen_addresses&lt;/code&gt;, &lt;code&gt;pg_hba.conf&lt;/code&gt;, 방화벽 인바운드 설정까지 모두 갖춰져야 제대로 동작한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;WSL 기본 개념&lt;/li&gt;
+&lt;li&gt;PostgreSQL 서버와 클라이언트 구조&lt;/li&gt;
+&lt;li&gt;Windows 방화벽 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/" target="_blank" rel="noopener"
+&gt;WSL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/" target="_blank" rel="noopener"
+&gt;PostgreSQL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/runtime-config-connection.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;listen_addresses&lt;/code&gt; 설명&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/auth-pg-hba-conf.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;pg_hba.conf&lt;/code&gt; 인증 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

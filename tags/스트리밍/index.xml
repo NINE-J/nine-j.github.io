@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>스트리밍 on B9F1</title><link>https://blog.b9f1.com/tags/%EC%8A%A4%ED%8A%B8%EB%A6%AC%EB%B0%8D/</link><description>Recent content in 스트리밍 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 19 Apr 2025 10:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EC%8A%A4%ED%8A%B8%EB%A6%AC%EB%B0%8D/index.xml" rel="self" type="application/rss+xml"/><item><title>TCP vs UDP</title><link>https://blog.b9f1.com/p/2025-04-19-differences-between-tcp-and-udp/</link><pubDate>Sat, 19 Apr 2025 10:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-19-differences-between-tcp-and-udp/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;네트워크 기초에서 가장 먼저 마주치는 질문 중 하나 &amp;ldquo;TCP와 UDP는 뭐가 다른가?&amp;rdquo;
+이 두 전송 계층 프로토콜의 구조적 차이, 성능 트레이드오프, 사용 사례 등을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="전송-계층의-두-얼굴"&gt;전송 계층의 두 얼굴
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;패킷이란?&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;정보 기술에서 패킷 방식의 컴퓨터 네트워크가 전달하는 데이터의 형식화된 블록이다.
+즉, 컴퓨터 네트워크에서 데이터를 주고 받을 때 정해 놓은 규칙이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;인터넷은 데이터를 잘게 나눈 패킷을 여러 장비를 통해 전달하는 구조다.
+이때 각 패킷이 어떤 방식으로 전송되는지를 결정짓는 핵심이 바로 전송 계층의 프로토콜이다.
+대표적으로 TCP(Transmission Control Protocol)과 UDP(User Datagram Protocol)이 있다.&lt;/p&gt;
+&lt;h4 id="tcp란"&gt;TCP란?
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;연결 지향(Connection-oriented) 방식&lt;/li&gt;
+&lt;li&gt;데이터 전달의 신뢰성 보장: 손실, 순서 뒤바뀜, 중복 등 방지&lt;/li&gt;
+&lt;li&gt;3-way handshake로 연결 성립&lt;/li&gt;
+&lt;li&gt;흐름 제어 및 혼잡 제어 존재&lt;/li&gt;
+&lt;li&gt;대표 사례: HTTP, HTTPS, FTP, 이메일(SMTP/IMAP)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="udp란"&gt;UDP란?
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;비연결형(Connectionless) 방식&lt;/li&gt;
+&lt;li&gt;빠르지만 신뢰성 없음: 패킷 손실, 순서 바뀜 감수&lt;/li&gt;
+&lt;li&gt;handshake 없음, 오버헤드 낮고 속도가 빠름&lt;/li&gt;
+&lt;li&gt;대표 사례: 스트리밍, 게임, VoIP(인터넷 전화), 실시간 방송&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="빠르게-비교해보기"&gt;빠르게 비교해보기
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;TCP&lt;/th&gt;
+&lt;th&gt;UDP&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;연결 방식&lt;/td&gt;
+&lt;td&gt;연결형 (3-way handshake)&lt;/td&gt;
+&lt;td&gt;비연결형&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;신뢰성&lt;/td&gt;
+&lt;td&gt;높음 (재전송, 순서 보장)&lt;/td&gt;
+&lt;td&gt;낮음 (유실 감수)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;속도&lt;/td&gt;
+&lt;td&gt;느림&lt;/td&gt;
+&lt;td&gt;빠름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;헤더 크기&lt;/td&gt;
+&lt;td&gt;20바이트 이상&lt;/td&gt;
+&lt;td&gt;8바이트&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 사례&lt;/td&gt;
+&lt;td&gt;웹, 파일 전송, 이메일&lt;/td&gt;
+&lt;td&gt;게임, 영상/음성 스트리밍, DNS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;택배와 엽서로 예를 들어보자.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP = 택배
+&lt;ul&gt;
+&lt;li&gt;받는 사람 확인&lt;/li&gt;
+&lt;li&gt;배송 상태 추적&lt;/li&gt;
+&lt;li&gt;중간에 깨지면 다시 보내줌&lt;/li&gt;
+&lt;li&gt;도착 순서 지켜줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;UDP = 엽서
+&lt;ul&gt;
+&lt;li&gt;우체통에 넣으면 바로 간다&lt;/li&gt;
+&lt;li&gt;누가 받았는지 모름&lt;/li&gt;
+&lt;li&gt;중간에 없어지면 그냥 잃어버림&lt;/li&gt;
+&lt;li&gt;빨리 도착함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="선택-기준"&gt;선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;추천 프로토콜&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 유실이 치명적인 경우 (예: 은행 송금, 로그인 등)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;TCP&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;속도가 중요하고, 약간의 유실은 괜찮은 경우 (예: 실시간 영상통화, 게임)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;UDP&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;TCP는 신뢰, UDP는 속도
+전송 계층에서 무엇을 우선시하느냐에 따라 선택이 달라진다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;정확성이 생명인 금융 거래, 로그인 등은 TCP&lt;/li&gt;
+&lt;li&gt;실시간성과 속도가 중요한 게임, 방송은 UDP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;OSI 7계층 모델 중 전송 계층의 역할&lt;/li&gt;
+&lt;li&gt;IP(인터넷 프로토콜)가 패킷을 어떻게 전달하는지 개념 이해&lt;/li&gt;
+&lt;li&gt;클라이언트-서버 모델에 대한 기초&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.wireshark.org/" target="_blank" rel="noopener"
+&gt;Wireshark로 TCP/UDP 패킷 캡쳐하기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc793" target="_blank" rel="noopener"
+&gt;RFC 793 (TCP)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc768" target="_blank" rel="noopener"
+&gt;RFC 768 (UDP)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_establishment" target="_blank" rel="noopener"
+&gt;3-way handshake 개념과 흐름도&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

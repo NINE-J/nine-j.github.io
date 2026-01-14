@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>POJO on B9F1</title><link>https://blog.b9f1.com/tags/pojo/</link><description>Recent content in POJO on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 29 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/pojo/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring 핵심 철학</title><link>https://blog.b9f1.com/p/2025-04-29-spring-core-philosophy/</link><pubDate>Tue, 29 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-29-spring-core-philosophy/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Framework는 지금껏 사용해야 하니 필요한 만큼만 알아보고 사용할 수 있다면 그만이었다.
+그게 프레임워크의 장점이기도 하지만 자세히 알고 다루는 게 당연히 좋을 것이다.&lt;/p&gt;
+&lt;p&gt;Spring의 기본 철학과 그게 왜 중요한지 실제 코드에선 어떻게 드러나는지 정리해보고 싶어졌다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Spring Framework는 &lt;strong&gt;POJO 기반 개발 철학&lt;/strong&gt;을 중심으로 복잡한 엔터프라이즈 애플리케이션을 단순화 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;객체지향 설계 원칙(SRP, SoC, DRY 등)&lt;/strong&gt; 을 자연스럽게 실현할 수 있도록 설계되어 클린 아키텍처의 이상을 구현한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;테스트 주도 개발(TDD)&lt;/strong&gt; 을 내재화하여 단위 테스트 및 통합 테스트가 손쉬운 구조를 지향한다.&lt;/li&gt;
+&lt;li&gt;전통적인 Java EE와의 차별점은 단순한 기술적 비교를 넘어 &lt;strong&gt;철학적 차별화&lt;/strong&gt;로 설명할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="pojo-기반-개발---순수-자바의-진정한-의미"&gt;POJO 기반 개발 - 순수 자바의 진정한 의미
+&lt;/h3&gt;&lt;p&gt;Spring은 POJO(Plain Old Java Object)라는 개념을 강조한다.&lt;/p&gt;
+&lt;p&gt;그냥 평범한 자바 객체가 왜 중요한가.&lt;/p&gt;
+&lt;p&gt;알고 보니 그 핵심은 프레임워크에 종속되지 않은 코드 작성이었다.
+즉, Spring 없이도 돌아가는 순수 자바 객체를 만들어야 유지보수나 테스트가 더 쉬워진다는 것이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;POJO의 핵심 특징
+&lt;ul&gt;
+&lt;li&gt;특별한 인터페이스/상속이 필요 없다.&lt;/li&gt;
+&lt;li&gt;어노테이션 없이도 돌아가는 단순한 구조&lt;/li&gt;
+&lt;li&gt;getter/setter만 있는 평범한 자바 객체&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;자주 강조되는 부분은 비침투성(Non-Invasiveness)인데, 이건 &amp;ldquo;내 비즈니스 로직에 프레임워크 종속적인 코드를 심지 않아도 된다&amp;quot;는 뜻이다.&lt;/p&gt;
+&lt;p&gt;정말 중요한 개념 같아서 메모해놨던 문장이다.&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Spring Framework의 핵심 원칙 중 하나는 &amp;lsquo;비침투성&amp;rsquo;입니다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;비즈니스 로직이나 도메인 모델에 프레임워크 종속 클래스를 억지로 넣지 않아도 실행되어야 한다는 의미입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;직접 작성한 간단한 예제도 다시 떠올려 봤다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;OrderService&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;final&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PaymentProcessor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;paymentProcessor&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;OrderService&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PaymentProcessor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;paymentProcessor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;paymentProcessor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;paymentProcessor&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;processOrder&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Order&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;paymentProcessor&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;charge&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Spring 없이도 동작하는 순수 자바코드. 이게 바로 Spring이 지향하는 방식이라는 걸 확실히 알게 됐다.&lt;/p&gt;
+&lt;h4 id="pojo의-재밌는-일화"&gt;POJO의 재밌는 일화
+&lt;/h4&gt;&lt;p&gt;&lt;a class="link" href="https://martinfowler.com/bliki/POJO.html" target="_blank" rel="noopener"
+&gt;마틴 파울러 형님의 POJO 소개&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;**POJO (Plain Old Java Object)**는 &amp;ldquo;평범한 자바 객체&amp;quot;라는 의미의 약어입니다.&lt;/p&gt;
+&lt;p&gt;이 용어는 2000년 9월, 저(마틴 파울러), 레베카 파슨스, 조쉬 매켄지가 한 컨퍼런스에서 발표를 준비하던 중에 만들어졌습니다.
+그 발표에서는 &lt;strong&gt;비즈니스 로직을 Entity Bean 같은 복잡한 구조 대신, 일반 자바 객체에 담을 때 얻는 여러 이점&lt;/strong&gt;에 대해 이야기하려고 했습니다.
+그런데 우리는 사람들이 왜 그렇게까지 &lt;strong&gt;일반 자바 객체 사용을 꺼려하는지&lt;/strong&gt; 의문이 들었고, 결론적으로 &amp;ldquo;그 객체들이 단지 이름이 멋지지 않기 때문&amp;quot;이라는 데 생각이 모였습니다.
+그래서 우리가 이름을 하나 붙여줬고, 그 이름이 아주 잘 퍼져 나가게 된 것이죠.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="객체지향-설게-원칙"&gt;객체지향 설게 원칙
+&lt;/h3&gt;&lt;p&gt;Spring의 또 다른 포인트는 객체지향 설계 원칙이었다.
+사실 SOLID 원칙 같은 건 교과서적으로만 알고 있었는데 Spring 구조 안에서 그게 자연스럽게 드러난다는 걸 배웠다.&lt;/p&gt;
+&lt;h4 id="drydont-repeat-yourself"&gt;DRY(Don&amp;rsquo;t Repeat Yourself)
+&lt;/h4&gt;&lt;p&gt;중복 방지를 위해 AOP(관점지향 프로그래밍)를 활용하는 방식이 인상적이었다.&lt;/p&gt;
+&lt;p&gt;단순히 기능적으로 쓸 수 있다는 게 아니라 반복되는 패턴을 추상화하고 코드의 관심사를 깔끔히 분리하려는 시도구나.&lt;/p&gt;
+&lt;p&gt;예를 들어 트랜잭션 처리, 로깅 같은 건 매번 코드에 쓰지 않고 &lt;code&gt;@Transactional&lt;/code&gt;, &lt;code&gt;@Aspect&lt;/code&gt;로 공통화 하는 방식의 AOP를 도입하면 횡단 관심사를 코드 밖으로 꺼낼 수 있다.&lt;/p&gt;
+&lt;h4 id="srpsingle-responsibility-principle"&gt;SRP(Single Responsibility Principle)
+&lt;/h4&gt;&lt;p&gt;서비스, 컨트롤러, 레포지토리로 책임을 나누는 계층 구조 덕분에 코드가 깔끔하게 분리될 수 있다.
+&amp;ldquo;변화의 이유가 하나여야 한다&amp;quot;는 SRP 원칙을 확실히 이해하고 넘어간다.&lt;/p&gt;
+&lt;h4 id="socseparation-of-concerns"&gt;SoC(Separation of Concerns)
+&lt;/h4&gt;&lt;p&gt;DI(의존성 주입), AOP 같은 개념이 결국 각자의 역할에 집중할 수 있게 돕는 도구라는 점도 정리해볼 수 있었다.
+예를 들어 &lt;code&gt;@Aspect&lt;/code&gt;로 로깅은 별도로 떼어내고 서비스 로직은 비즈니스에만 집중할 수 있게 한다.&lt;/p&gt;
+&lt;p&gt;예전에 소켓 통신 오류가 계속 발생하는 상황에 트러블 슈팅을 위해 어떤 방법이 있을까 고민해보고 찾아보다가 Aspect 클래스를 생성해서 메서드 실행은 건드리지 않고 내가 원하는 측정만 추가하는 방식이 필요했는데 그냥 쓰고 이게 되네 했던 순간보다 다시 알아보는 지금 &amp;ldquo;코드의 순수성&amp;quot;과 &amp;ldquo;변화 대응력&amp;quot;을 동시에 높이는 설계적인 해법이라서 신기하고 진짜 큰 가치구나 싶다.&lt;/p&gt;
+&lt;h3 id="spring은-테스트를-위한-구조다"&gt;Spring은 테스트를 위한 구조다
+&lt;/h3&gt;&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Drawing%202025-05-06%2000.35.36.excalidraw.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;이건 체감이 정말 컸던 부분이다.
+TDD는 테스트 환경 세팅이 어려운데 Spring은 POJO와 DI 덕분에 이게 정말 단순해진다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Spring에서 TDD 특징
+&lt;ul&gt;
+&lt;li&gt;컨테이너 없어도 단위 테스트 가능 (POJO 덕분!)&lt;/li&gt;
+&lt;li&gt;의존성 주입 덕분에 Mocking이 간단&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@SpringBootTest&lt;/code&gt;로 통합 테스트도 손쉽게 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;테스트했던 가장 단순 코드 &lt;code&gt;@DisplayName&lt;/code&gt; 달아놨던.. 그래서 일관성 없이 어딘 달고 어딘 안 달고&amp;hellip;
+메서드명을 한글로 사용해보자! 😊&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Test&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@DisplayName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;기본 정보로 사용자 생성시 필수 필드가 올바르게 설정되어야 한다&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;createWithBasicInfo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;User&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserFixture&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;createValidUser&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertAll&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getId&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getEmail&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getPassword&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getCreatedAt&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getUpdatedAt&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getUpdatedAt&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isEqualTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getCreatedAt&lt;/span&gt;&lt;span class="p"&gt;()),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getChannels&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isEmpty&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getProfileImageId&lt;/span&gt;&lt;span class="p"&gt;()).&lt;/span&gt;&lt;span class="na"&gt;isNull&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Test&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@DisplayName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;유효한 credentials로 로그인 시 UserResponse 반환&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;loginSuccess&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// given &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;when&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;userRepository&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;findByNameWithPassword&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getPassword&lt;/span&gt;&lt;span class="p"&gt;())).&lt;/span&gt;&lt;span class="na"&gt;thenReturn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Optional&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;ofNullable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// when &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UserResponse&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;authService&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;login&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;loginRequest&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// Then &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="na"&gt;isNotNull&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;assertThat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;usingRecursiveComparison&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isEqualTo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;toUserResponse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;verify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;userRepository&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="na"&gt;findByNameWithPassword&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;loginRequest&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;userName&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;loginRequest&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;password&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RED:&lt;/strong&gt; 구현이 필요해?
+&lt;ul&gt;
+&lt;li&gt;테스트 작성하고 오류를 만나&lt;/li&gt;
+&lt;li&gt;빨간줄이 내가 뭘 만들어야 하는지 알려주는 게 돼&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GREEN:&lt;/strong&gt; 코드 작성 했어?
+&lt;ul&gt;
+&lt;li&gt;테스트를 돌려&lt;/li&gt;
+&lt;li&gt;로직을 수정하고 필요한 걸 또 만들어&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;REFACTOR:&lt;/strong&gt; 개선할 수 있겠는데?
+&lt;ul&gt;
+&lt;li&gt;클린 코드로 개선해보자&lt;/li&gt;
+&lt;li&gt;변경하면서 다시 &lt;strong&gt;RED&lt;/strong&gt;를 만나&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;TestContext Framework도 정말 유용하다.
+트랜잭션 처리나 컨텍스트 초기화 같은 걸 알아서 해주니까 훨씬 간편하게 통합 테스트를 구성할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TestContext Framework의 주요 기능
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;컨텍스트 캐싱&lt;/strong&gt;: 테스트마다 매번 새 컨텍스트를 띄우면 느리니까, 같은 설정이면 재사용해서 속도를 최적화함.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DI 지원&lt;/strong&gt;: 테스트 클래스에 &lt;code&gt;@Autowired&lt;/code&gt; 같은 걸 쓸 수 있게 해줌.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;트랜잭션 관리&lt;/strong&gt;: 테스트가 끝난 후 자동으로 DB 롤백 → 깨끗한 상태 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이벤트 리스너/후크&lt;/strong&gt;: 테스트 실행 전후에 더 복잡한 작업(예: 컨텍스트 초기화)도 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="테스트-중심-개발을-유도하는-설계-철학"&gt;테스트 중심 개발을 유도하는 설계 철학
+&lt;/h4&gt;&lt;p&gt;Spring은 처음부터 테스트 가능한 코드(testable code)를 중심에 두고 설계됐다.
+다음과 같은 구조적 특징이 TDD를 촉진시킨다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;POJO 기반 클래스 → 별도의 컨테이너 없이도 테스트 가능&lt;/li&gt;
+&lt;li&gt;DI를 통한 구성 → 객체간 결합도 감소 → 단위 테스트 용이&lt;/li&gt;
+&lt;li&gt;설정과 환경 분리 → 테스트 대상 코드의 독립성 확보&lt;/li&gt;
+&lt;li&gt;모듈화된 아키텍처 → 책임과 기능 분리 → 테스트 대상을 명확히 구분 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;단순히 테스트가 가능한 수준을 넘어서 테스트 주도 개발을 실질적으로 적용하고 유지할 수 있는 환경을 제공한다는 점에서 의미가 크다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;객체지향 기본 개념&lt;/li&gt;
+&lt;li&gt;JUnit 기본 사용법&lt;/li&gt;
+&lt;li&gt;Mockito 사용 경험&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;POJO란 무엇인가?&lt;/li&gt;
+&lt;li&gt;테스트 주도 개발 개념&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://spring.io/projects/spring-framework" target="_blank" rel="noopener"
+&gt;Spring 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

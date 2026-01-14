@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Blog on B9F1</title><link>https://blog.b9f1.com/tags/blog/</link><description>Recent content in Blog on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 19 Dec 2025 03:24:06 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/blog/index.xml" rel="self" type="application/rss+xml"/><item><title>옵시디언과 블로그</title><link>https://blog.b9f1.com/p/2025-12-19-obsidian-and-blog-wrting-a-note-post-it/</link><pubDate>Fri, 19 Dec 2025 03:24:06 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-12-19-obsidian-and-blog-wrting-a-note-post-it/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;옵시디언을 사용하며 블로그는 따로 정리하거나 재작성해서 Velog, Tistory 등 개발 블로그를 업로드 했었다. 그러다 문득 학습하고 정리하면서 블로그에 배포도 되면 편하겠다 생각했다.&lt;/p&gt;
+&lt;p&gt;Quartz, Jekyll, Hugo 다양한 정적 사이트 생성기를 알아보며 선택한 기준과 배포해서 사용하다가 불편한 점을 만나 전환한 계기도 간략하게 정리한다.&lt;/p&gt;
+&lt;p&gt;거창하게 표현하자면 옵시디언을 SSoT로 삼아 플랫폼에 종속되지 않는 지속 가능한 블로그 아키텍처를 설계한다.&lt;/p&gt;
+&lt;p&gt;요약하면 낭만 쉽지 않다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="블로그-선택-기준"&gt;블로그 선택 기준
+&lt;/h3&gt;&lt;p&gt;Velog, Tistory 등 내가 작성하고 게시만 하면 되고 첨부 파일도 신경 쓸 게 없다. 간편하고 좋다.
+SSG로 블로그를 운영하다가 다시 돌아가거나 둘 다 운영하는 유저도 많은 것 같다.&lt;/p&gt;
+&lt;p&gt;나만의 블로그라는 게 좋아서 정보를 찾아보다가 가장 쉬운 건 Quartz였는데 테마가 아쉬웠다.
+적당히 쉽고 테마가 다양하고 빠르게 시작할 수 있어서 처음엔 Jekyll 블로그를 배포했다.&lt;/p&gt;
+&lt;h4 id="다루기-쉬운가"&gt;다루기 쉬운가?
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;Quartz&lt;/th&gt;
+&lt;th&gt;Jekyll&lt;/th&gt;
+&lt;th&gt;Hugo&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;타겟&lt;/td&gt;
+&lt;td&gt;옵시디언 사용자&lt;/td&gt;
+&lt;td&gt;단순 블로그 입문자&lt;/td&gt;
+&lt;td&gt;대규모 사이트/전문가&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;설치 편의성&lt;/td&gt;
+&lt;td&gt;매우 쉬움&lt;/td&gt;
+&lt;td&gt;보통(Ruby 설치 필요)&lt;/td&gt;
+&lt;td&gt;쉬움(파일 하나면 끝)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;커스텀 난이도&lt;/td&gt;
+&lt;td&gt;쉬움(JS/TS 기반)&lt;/td&gt;
+&lt;td&gt;보통(Liquid 문법)&lt;/td&gt;
+&lt;td&gt;약간 높음(Go 문법, JS 파츠 가능)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="테마가-다양한가"&gt;테마가 다양한가?
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;Jekyll
+&lt;ul&gt;
+&lt;li&gt;가장 오래되어 테마가 수천 개에 달한다. 웬만한 디자인은 이미 누군가 만들었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hugo
+&lt;ul&gt;
+&lt;li&gt;인기가 많아지면서 세련되고 현대적인 테마가 많아졌다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Quartz
+&lt;ul&gt;
+&lt;li&gt;옵시디언 퍼블리싱이라는 특수한 목적에 집중하기 때문에 일반적인 블로그 테마 종류는 적은 것 같다. 대신 소스 수정을 통한 커스텀이 쉽다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="jekyll에서-hugo로-전환한-이유"&gt;Jekyll에서 Hugo로 전환한 이유
+&lt;/h3&gt;&lt;p&gt;빌드가 너무 느리다.
+포스팅 100개도 안 되는데 빌드 시간이 5분 이상 걸리는 것 보고 위기감을 느꼈다.
+캐싱이나 빌드 최적화 방법도 다양한데 일단 이런 작업을 해주어야 할 정도로 느리다는 게 불편했다.&lt;/p&gt;
+&lt;h4 id="hugo-압도적-1위"&gt;Hugo 압도적 1위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: Go 언어(컴파일 언어)&lt;/li&gt;
+&lt;li&gt;성능: 세계에서 가장 빠른 SSG라는 슬로건을 내걸 만큼 빠르다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 문서가 1,000개일 때 빌드 시간이 수 초 내외다. 문서가 10,000개가 넘어가도 수 초 안에 빌드가 완료된다고 한다. 대규모 기술 문서 사이트에 Hugo가 가장 많이 쓰이는 이유라고 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="quartz-준수한-성능-2위"&gt;Quartz 준수한 성능 2위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: TS/Node.js(하이브리드, 컴파일/트랜스파일 + JIT 컴파일)&lt;/li&gt;
+&lt;li&gt;성능: Hugo만큼은 아니지만 상당히 빠르다. 내부적으로 캐싱 시스템이 잘 되어 있어 변경된 부분만 빠르게 업데이트한다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 수백~수천 개의 옵시디언 노트를 처리하기에 충분히 쾌적하다. 다만 복잡한 JS 플러그인을 많이 추가할 수록 조금씩 느려질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="jekyll-비교적-느림-3위"&gt;Jekyll 비교적 느림 3위
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;기술 기반: Ruby (인터프리터 언어)&lt;/li&gt;
+&lt;li&gt;성능: 구조적인 한계로 문서 양이 많아지면 속도가 눈에 띄게 저하된다.&lt;/li&gt;
+&lt;li&gt;체감 속도: 문서가 수천 개를 넘어가면 빌드에 몇 십 분 단위가 걸리기도 한다. 증분 빌드 기능이 있지만 다른 SSG에 비해 느리다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="전환하며-만난-문제"&gt;전환하며 만난 문제
+&lt;/h3&gt;&lt;p&gt;블로그 전환하면서 문서의 속성 값이 문제가 됐었다.
+카테고리를 작성하는데 4~5레벨 이상 허용하는 테마도 있고 그렇지 않은 것도 있다.&lt;/p&gt;
+&lt;p&gt;그냥 세분화한 카테고리가 제대로 적용만 안 되는 거면 수정 없이 사용하겠는데 빌드가 안 되거나 문서가 깨지는 등 문제가 있었다.&lt;/p&gt;
+&lt;p&gt;근데 작성된 문서가 많다면 일괄 편집 프로그램을 찾거나 직접 커스텀하게 만들어서 사용해야 할 것이다.&lt;/p&gt;
+&lt;p&gt;다행히 DataView 플러그인으로 카테고리는 따로 관리하고 있었고 문서가 엄청 많은 상태는 아니어서 속성의 카테고리를 다 제거했다.&lt;/p&gt;
+&lt;p&gt;그리고 Hugo 테마에 맞게 정리해서 일단락되었다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;DataView&lt;/code&gt; 플러그인은 DQL(Dataview Query Language, SQL과 굉장히 비슷하다), DataviewJS(JavaScript) 언어로 사용할 수 있다.
+쿼리가 익숙하든 JS가 익숙하든 편한 걸로 사용하면 될 것 같다.&lt;/p&gt;
+&lt;p&gt;직관적인 이름에 걸맞게 옵시디언에서 관리하는 문서들의 데이터를 가지고 내가 원하는 뷰를 만들 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src="https://blog.b9f1.com/assets/images/Pasted%20image%2020251219044301.png"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;h3 id="무엇을-하고자-하는가"&gt;무엇을 하고자 하는가?
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;플랫폼에 종속되지 않는 문서 관리가 가능한지 고민하고 최대한 표준화하려고 한다.&lt;/li&gt;
+&lt;li&gt;첨부 파일을 양쪽에서 관리하는데 이건 좀 문제가 있다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;PARA&lt;/code&gt; 정리법을 적용해서 잘 사용하고 있기 때문에 경로가 메인이 되면 안 된다. 관리될 수 있는 속성을 정의해야 한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="jekyll에서-hugo로-전환하면서-느낀-것"&gt;Jekyll에서 Hugo로 전환하면서 느낀 것
+&lt;/h4&gt;&lt;p&gt;Templater 플러그인을 사용해서 문서 성격에 따라 개인적으로 필요한 양식은 표준화 했지만 이런 전환점에선 수정이 불가피하다.&lt;/p&gt;
+&lt;p&gt;정착할 수 있다면 좋겠지만 언제든 맘 편히 전환할 수 있는 기반을 만들고 싶다.&lt;/p&gt;
+&lt;h4 id="첨부-파일-관리도-불편"&gt;첨부 파일 관리도 불편
+&lt;/h4&gt;&lt;h5 id="어디에-둬야-하는-거야"&gt;어디에 둬야 하는 거야?
+&lt;/h5&gt;&lt;p&gt;호스팅으로 빼서 URL을 사용하는 등 써드 파티를 적용한 사례도 많다. 무료 이미지 호스팅 사용하다가 사이트가 없어져서 이미지 다 날린 케이스도 있고 비교적 안전하게 운영되고 있는 imgur 플러그인 소개도 가끔 보인다.
+나는 가장 간편하고 안전하게 볼트 내에서 첨부 파일 폴더를 따로 관리하려고 한다.&lt;/p&gt;
+&lt;h5 id="문법은-왜-달라"&gt;문법은 왜 달라?
+&lt;/h5&gt;&lt;p&gt;왜 불편하냐면 옵시디언에서 붙여 넣거나 링크한 건 이런 위키링크 형태다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;![[location/image.png]]&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Markdown 문법이 기대하는 이미지 첨부는 이런 형태다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;![alt](location/image.png)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;사실 이건 설정에서 끌 수 있고 직접 만들어서 간단히 치환하는 방법을 사용할 수도 있다.
+&lt;code&gt;설정 &amp;gt; Options/Files and Links &amp;gt; Use[[WikiLinks]]&lt;/code&gt; 이거 비활성화 하면 기본 마크다운 형태로 삽입할 수 있다.&lt;/p&gt;
+&lt;p&gt;지금 가장 불편한 건 낭만 따라간답시고 일 벌린 다음 잘못 관리하고 있는 것이다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;옵시디언에서 신나게 이미지 넣고 작성한다.&lt;/li&gt;
+&lt;li&gt;Hugo 블로그 저장소에 문서 옮기고 이미지도 옮기고 링크 맞추고..&lt;/li&gt;
+&lt;li&gt;오탈자 없나, 깨지는 건 없나 검토하는 단계로 합리화하기.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이렇게 불편함이 많아지면 포스팅 하나 작성해볼까? 하는 데에 결심이 필요해진다. 안 된다. 개선이 필요하다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;strong&gt;PARA란?&lt;/strong&gt; (PARA method)
+디지털 자료를 관리하는 하나의 방법론이다.&lt;/p&gt;
+&lt;p&gt;하나의 경로에 고정되는 데이터가 아니라 현재 내 관심사에 따라 Project, Resources 폴더로 왔다가 Area, Archive로 갔다가 유연하게 문서가 움직인다.&lt;/p&gt;
+&lt;p&gt;PARA의 자료들은 계속해서 이동하며 장기 기억으로 가져가야 할 데이터, 데드라인을 명확히 하고자 하는 프로젝트, 우선 순위를 재조정 한다거나 계속한 상관 관계에 있다.
+한 곳으로 옮긴 이후 완료되거나 포기하면 죽는 데이터가 아니라 계속해서 돌아가는 자원이 되는 방식쯤으로 이해한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Project&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데드라인이 정해진 작업 즉, &lt;strong&gt;완료가 필요한 것들&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Area&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;데드라인이 명확하지 않은&lt;/strong&gt; 관리하는 것들의 영역&lt;/li&gt;
+&lt;li&gt;ex) 건강, 재정, 공부 등..&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Resource&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;지속적으로 관심을 가지는 주제의 자료들&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Area를 이루기 위한 것들&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Archive&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;위의 것들 중 마무리 지었거나 더이상 사용하지 않는 것들을 &lt;strong&gt;보관&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="어떻게-할-수-있는가"&gt;어떻게 할 수 있는가?
+&lt;/h3&gt;&lt;p&gt;내가 게시할 문서만 동기화하는 건 그리 복잡하지 않겠지만 외부 호스팅 의존이 필요한 이미지가 문제였다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;그냥 이미지 Base64로 박아버리면 첨부 파일 따로 안 해도 되잖아?
+&lt;ul&gt;
+&lt;li&gt;미리 보기 모드가 아닌 수정 모드에서 엄청난 스압을 만나고 문서 용량도 커진다.&lt;/li&gt;
+&lt;li&gt;확장자를 달고 링크된 이미지가 아니라서 CPU가 열일하는 모습을 볼 수 있다.&lt;/li&gt;
+&lt;li&gt;이미 이미지 압축, 스압 줄여주는 플러그인도 있다. ㅋㅋ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;이것저것 고민해보다가 나중에 또 개선해야 하는 거 너무 깊게 고민하지 않기로 했다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id="준비물"&gt;준비물
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;옵시디언 볼트
+&lt;ul&gt;
+&lt;li&gt;GitHub 저장소로 올리고 Private/Public 나눠야 할 수도 있다.&lt;/li&gt;
+&lt;li&gt;GitHub 저장소의 이미지 서빙 기능을 활용하기 위해 이미지 저장소를 따로 만들어야 할 수도 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hugo 블로그 저장소
+&lt;ul&gt;
+&lt;li&gt;GitHub Pages로 배포&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="pocproof-of-concept를-정의해보자"&gt;PoC(Proof of Concept)를 정의해보자
+&lt;/h4&gt;&lt;p&gt;이번 아키텍처의 핵심 목적은 문서를 복사하거나 이미지를 옮기는 수동 작업을 없애고 옵시디언의 PARA 체계를 유지하면서 특정 속성만으로 블로그를 배포하는 것.&lt;/p&gt;
+&lt;h5 id="검증-과제"&gt;검증 과제
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;파일 선별:
+&lt;ul&gt;
+&lt;li&gt;보관함 전체가 아닌 &lt;code&gt;publish: true&lt;/code&gt; 속성을 가진 파일만 추출 가능한가?&lt;/li&gt;
+&lt;li&gt;공개되지 않아야 하는 것들을 분리할 수 있는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;경로 동기화:
+&lt;ul&gt;
+&lt;li&gt;Git Submodule을 통해 옵시디언의 첨부 파일과 Hugo 저장소의 첨부 파일을 물리적으로 일치 시킬 수 있는가?&lt;/li&gt;
+&lt;li&gt;GitHub 저장소 자체가 호스팅 서버 역할을 하며 Hugo가 빌드 과정에서 상대 경로를 기반으로 URL을 생성하는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;문법 변환: 옵시디언 전용 문법(Callouts 등)을 Hugo가 이해하는 표준 마크다운이나 숏코드로 자동 치환 가능한가?&lt;/li&gt;
+&lt;li&gt;배포 자동화: 가벼운 명령어로 빌드 및 배포가 완료되는가?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="다이어그램"&gt;다이어그램
+&lt;/h4&gt;&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+%% 상단: 소스 관리 (Private)
+subgraph Source_Private
+Obs[Obsidian_Repo]
+end
+%% 중단: 공유 자원 (Public)
+subgraph Shared_Resources
+Assets[Assets_Repo]
+end
+%% 하단: 배포 엔진 (Public)
+subgraph Deployment_Public
+Hugo[Hugo_Repo]
+end
+%% 관계 설명 (서브모듈 포함 관계)
+Assets --- |Submodule| Obs
+Assets --- |Submodule| Hugo
+%% 데이터 흐름 (CI/CD)
+Obs -.-&gt; |"Filter(publish:true) &amp; Push"| Hugo
+%% 스타일링
+style Obs fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+style Assets fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+style Hugo fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant Obs as Obsidian_Repo (Private Vault)
+participant ObsAction as GitHub_Actions (Obsidian Repo)
+participant AssetRepo as Assets_Repo (Submodule / Public)
+participant HugoRepo as Hugo_Repo (Public, GitHub Pages)
+Note over Obs: 문서 작성 (Properties에 publish: true 추가)
+Obs-&gt;&gt;Obs: git push (Private Repo로)
+Obs-&gt;&gt;ObsAction: 1. Push 이벤트 트리거
+rect rgb(240, 240, 240)
+Note over ObsAction: [추출 및 변환 단계]
+ObsAction-&gt;&gt;ObsAction: 2. 보관함 스캔 (publish: true 검색)
+ObsAction-&gt;&gt;ObsAction: 3. 마크다운 변환 (WikiLink -&gt; MarkDown, 또는 설정으로 대체)
+end
+ObsAction-&gt;&gt;AssetRepo: 4. 신규 이미지 Push (Submodule 업데이트)
+ObsAction-&gt;&gt;HugoRepo: 5. 추출된 글(md) &amp; 이미지 링크 전달 (Git Push)
+Note over HugoRepo: [자동 배포 단계]
+HugoRepo-&gt;&gt;HugoRepo: 6. Hugo 빌드 프로세스 시작
+Note over HugoRepo: 7. 빌드 결과물(HTML) 생성 및 호스팅 시작
+Note over HugoRepo: https://ID.github.io 접속 가능
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="첨부-파일을-어떻게-관리해야-할까"&gt;첨부 파일을 어떻게 관리해야 할까?
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;옵시디언 볼트에서 관리 중인 Assets 폴더를 저장소로 만들어 원격에 업로드&lt;/li&gt;
+&lt;li&gt;Assets 원격 저장소를 옵시디언 볼트의 Submodule로 지정&lt;/li&gt;
+&lt;li&gt;하게 되면 git은 Submodule을 특별하게 취급기 때문에 따로 &lt;code&gt;.gitignore&lt;/code&gt; 파일에 Assets 폴더를 추가하지 않아도 된다.&lt;/li&gt;
+&lt;li&gt;이미지를 추가하는 경우 Submodule 폴더인 Assets 폴더에 추가.&lt;/li&gt;
+&lt;li&gt;옵시디언 프로그램에서 복사한 이미지 붙여 넣기의 경우 설정에 의해 지정된 경로에 이미지가 생성된다. Submodule 폴더인 Assets 폴더로 지정. 3과 동일하게 동작&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="변경-사항을-어떻게-업로드-하지"&gt;변경 사항을 어떻게 업로드 하지?
+&lt;/h4&gt;&lt;p&gt;이후 옵시디언 볼트에서 작업 후 변경 사항을 push하려면?&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Assets 저장소를 먼저 push. 명령어 만들어두면 편할 듯? 편해? 이게?
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; Assets &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;&amp;#34;update assets: {{date}}&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ..
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git commit -m &lt;span class="s2"&gt;&amp;#34;vault backup: {{date}}&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; git push
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Assets 업데이트 된 후 옵시디언 볼트 push&lt;/li&gt;
+&lt;li&gt;옵시디언 원격 저장소의 GitHub Actions 실행된다.&lt;/li&gt;
+&lt;li&gt;GitHub Actions는 기능 수행만 하는 것이 아니라 임시 서버가 된다.&lt;/li&gt;
+&lt;li&gt;GitHub Actions 실행되는 환경 안에서
+&lt;ol&gt;
+&lt;li&gt;새롭게 포스팅 되어야 하는 문서들 필터링. 조건은 &lt;code&gt;publish: true&lt;/code&gt; 뿐인데 이미 게시된 건 어떻게 알고 새로운 것만 배포에 사용하지?
+&lt;ol&gt;
+&lt;li&gt;방식 A: 전체 덮어쓰기(가장 확실)
+&lt;ul&gt;
+&lt;li&gt;배포할 때마다 Hugo 저장소의 &lt;code&gt;content/posts&lt;/code&gt; 폴더를 비운다.&lt;/li&gt;
+&lt;li&gt;현재 Obsidian에서 &lt;code&gt;publish: true&lt;/code&gt;인 모든 파일을 다시 복사해서 넣는 방식&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장점&lt;/strong&gt;: 상태 관리가 필요 없고 Obsidian에서 &lt;code&gt;publish: false&lt;/code&gt;로 바꾼 글이 블로그에서 자동으로 사라진다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점&lt;/strong&gt;: 파일이 아주 많아진다면 아주 미세하게 시간이 더 걸리지만, Hugo와 Git은 변경되지 않은 파일은 무시하므로 효율적&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;방식 B: 파일 비교(증분 방식)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git diff&lt;/code&gt; 명령어를 사용하여 마지막 배포 커밋 이후 변경되거나 추가된 파일만 찾기&lt;/li&gt;
+&lt;li&gt;하지만 이 방식은 Obsidian에서 글을 수정했을 때 블로그에 반영하기가 까다로워 보통 &lt;strong&gt;방식 A&lt;/strong&gt;를 권장합니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Obsidian 저장소와 Hugo 저장소를 동시에 Clone
+&lt;ol&gt;
+&lt;li&gt;필터링 스크립트 실행 (Python이나 Shell 스크립트)&lt;/li&gt;
+&lt;li&gt;찾은 파일들을 Hugo 저장소의 &lt;code&gt;content/posts&lt;/code&gt; 경로로 복사&lt;/li&gt;
+&lt;li&gt;Actions 서버가 사용자 권한을 가지고 Hugo 저장소에 원격 Push&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;이미지 관리
+&lt;ol&gt;
+&lt;li&gt;물리적 전송은 없다.&lt;/li&gt;
+&lt;li&gt;1번 단계에서 Assets를 원격에 업로드했기 때문에 Hugo 저장소는 빌드될 때 Assets Submodule의 최신 커밋을 바라보게만 설정&lt;/li&gt;
+&lt;li&gt;Hugo 저장소의 배포 Actions가 실행될 때 &lt;code&gt;git submidule update --remote&lt;/code&gt; 명령어를 수행하여 최신 이미지를 스스로 긁어오기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="첨부-파일-저장소-만들고-submodule-지정"&gt;첨부 파일 저장소 만들고 Submodule 지정
+&lt;/h3&gt;&lt;p&gt;이 저장소는 이제 옵시디언 볼트 저장소와 블로그 배포 저장소에서 서브 모듈로 활용하게 된다.&lt;/p&gt;
+&lt;h4 id="첨부-파일-저장소-업로드"&gt;첨부 파일 저장소 업로드
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;[Obsidian Vault]/[attachment location]&lt;/code&gt; 안의 소스를 잠시 백업&lt;/li&gt;
+&lt;li&gt;별도 저장소로 업로드&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="부모-저장소에서-submodule-지정"&gt;부모 저장소에서 Submodule 지정
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;Obsidian 루트 폴더에서 해당 폴더를 삭제하거나 이름을 변경&lt;/li&gt;
+&lt;li&gt;서브 모듈 등록
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git submodule add &lt;span class="o"&gt;[&lt;/span&gt;원격_저장소_URL&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;로컬에서_사용할_경로&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;등록 중 멈추는 경우 한 번에 주고 받을 수 있는 데이터의 용량 제한 때문일 수 있다. 부모 저장소에서 데이터 용량 제한을 늘린다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 버퍼 크기를 낭낭하게 500MB로 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global http.postBuffer &lt;span class="m"&gt;524288000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;그럼 로컬 앱에선 이미지가 잘 표현된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;서브 모듈에 변경이 발생하면 부모 저장소에서도 변경 사항이 있다고 표시된다.
+내용은 없지만 서브 모듈의 최신 상태를 바라보기 위한 포인터가 변경되는 거라고 한다.&lt;/p&gt;
+&lt;p&gt;서브 모듈 커밋 업로드, 부모 저장소에서 업데이트 두 번의 작업을 해야 하니 그냥 부모 저장소에선 서브 모듈의 변경을 무시하고 GitHub Actions에서 항상 서브 모듈의 최신 상태를 바라보도록 설정해야겠다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 서브모듈의 포인터 변화(커밋 변경)를 무시하도록 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config -f .gitmodules submodule.&lt;span class="s2"&gt;&amp;#34;[로컬에서_사용할_경로]&amp;#34;&lt;/span&gt;.ignore all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;명령어가 정상적으로 실행되면 &lt;code&gt;.gitmodules&lt;/code&gt; 파일에 다음과 같이 기록된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;[submodule &amp;#34;[로컬에서_사용할_경로]&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; path = [로컬에서_사용할_경로]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; url = [원격_저장소_URL]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ignore = all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;만약 지정하다가 실수하면 &lt;code&gt;.gitmodules&lt;/code&gt;, &lt;code&gt;.git/config&lt;/code&gt; 여기저기 기록이 남기 때문에 깔끔하게 지우는 절차가 중요하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;해당 경로를 제거&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.git/modules/&lt;/code&gt; 내부 보관소에서 서브 모듈 데이터 삭제&lt;/li&gt;
+&lt;li&gt;실제 폴더가 남아있다면 물리적으로 삭제&lt;/li&gt;
+&lt;li&gt;필요하다면 변경 사항 커밋&lt;/li&gt;
+&lt;li&gt;올바르게 다시 등록
+&lt;ol&gt;
+&lt;li&gt;만약 이미 존재하는 폴더라는 오류가 발생한다면 캐시를 비워야 할 수도 있다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="블로그-저장소에서-submodule-지정"&gt;블로그 저장소에서 Submodule 지정
+&lt;/h4&gt;&lt;p&gt;또 문제가 있다. 계획대로라면&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;이제 첨부 파일은 서브 모듈로 분리해서 관리&lt;/li&gt;
+&lt;li&gt;배포 시 post 경로는 새롭게 비운 뒤 업데이트&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;수동으로 낭만 있게 관리한다고 합리화하며 다음과 같은 트리로 관리하고 있던 구조를 바꿔야 한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hugo_Blog/content/post
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├─ [YEAR]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ ├─ [MONTH]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ └─ [DATE-TITLE]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ ├─ index.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ ├─ image1.[jpg|png]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ │ └─ image2.[jpg|png]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;│ └─ ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├─ ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└─ README.md
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;일단 백업해두고 한 번 비우고 배포 돌리면 채워지겠지 뭐.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문서는 &lt;code&gt;content/post&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;정적 파일은 &lt;code&gt;static/assets/images&lt;/code&gt;, 이게 서브 모듈&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="성능이-우려되는데-일단-되는지-보자"&gt;성능이 우려되는데 일단 되는지 보자
+&lt;/h3&gt;&lt;p&gt;지금 계획은 Obsidian 커밋과 업로드 이후 GitHub Actions가 동작한다.
+다음과 같은 작업이 필요하고 $O(n)$의 복잡도를 가지게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;그나마 최적화를 위해 모든 문서의 상단만 읽고 게시 가능한지 판단&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;http&lt;/code&gt;, &lt;code&gt;https&lt;/code&gt; 등으로 시작하는 이미 외부 URL인 것을 제외한 로컬에서 등록한 이미지라고 판단되는 것들을 Hugo 구조에 맞게 치환&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;간단히 최적화 방안이 있는지만 확인&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PARA 체계를 이용하지만 대부분 Resource에서 작업하니까 여기만 스캔&lt;/li&gt;
+&lt;li&gt;Area, Archive 갔다가 문서 개정이 필요한 경우 Resource로 옮겨서 배포 후 정리&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;grep&lt;/code&gt;을 활용한 고속 필터링: 모든 파일을 열어서 내용을 확인하는 대신 파일 시스템 레벨에서 게시 가능 플래그를 포함한 파일 목록만 먼저 뽑기
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 내용에 &amp;#39;publish: true&amp;#39;가 포함된 파일 리스트만 추출&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;grep -l &lt;span class="s2"&gt;&amp;#34;publish: true&amp;#34;&lt;/span&gt; *.md &amp;gt; publish_list.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sed&lt;/code&gt; 또는 &lt;code&gt;perl&lt;/code&gt; 이용한 일괄 치환: 파일을 하나씩 열어 저장하는 방식이 아니라 스트림 방식으로 메모리에서 바로 치환. 이런 식으로
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# http 또는 https로 시작하지 않는(?!http) 이미지 링크만 타겟팅&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;perl -i -pe &lt;span class="s1"&gt;&amp;#39;s/!\[\[(?!https?:\/\/)(.*?)\]\]/!\[\[\/assets\/$1\]\]/g&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;대상파일&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Git Diff를 활용한 증분 배포
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 마지막 커밋 이후 바뀐 파일만 골라내기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git diff --name-only HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이걸로 기대할 수 있는 것?
+복잡도는 $O(n)$이지만 실제 작업량$(n)$을 필터링으로 줄이고 작업 속도를 스트림 처리로 극대화&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;PARA 체계와 &lt;code&gt;grep&lt;/code&gt;의 시너지
+&lt;ul&gt;
+&lt;li&gt;전체 문서에서 Resource로 스캔 범위 제한&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;grep&lt;/code&gt;은 파일을 메모리에 다 올리지 않고 바이너리 수준에서 패턴만 훑고 지나가기 때문에 수천 개의 파일을 찾아도 거의 파일 시스템 탐색 속도와 맞먹음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;perl&lt;/code&gt; 스트림 처리로 속도 최적화
+&lt;ul&gt;
+&lt;li&gt;파일을 열고 닫는 오버헤드가 없음&lt;/li&gt;
+&lt;li&gt;한 줄씩 흐르듯 지나가며 치환하므로 텍스트 데이터 처리에 있어서는 이론적으로 최대 속도&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Git Diff 증분 배포
+&lt;ul&gt;
+&lt;li&gt;$(n)$을 전체 문서-Resource-오늘 내가 수정한 문서로 범위 제한&lt;/li&gt;
+&lt;li&gt;문서가 많아져도 오늘 3개만 작업했다면 작업량은 3개뿐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;그 다음으로 고민해볼 것&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이미지 존재 여부 체크: 치환된 이미지 파일이 실제 서브 모듈에 있는지 체크하여 누락된 이미지가 있다면 빌드 타임에 경고&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;rsync&lt;/code&gt; 활용: 파일이 변경된 경우에만 복사하므로 I/O를 한 번 더 아낄 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="obsidian-저장소에서-github-actions-작성"&gt;Obsidian 저장소에서 GitHub Actions 작성
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;publish: true&lt;/code&gt;인 파일만 골라낸다.&lt;/li&gt;
+&lt;li&gt;위키 링크를 표준 마크다운으로 바꾸고 이미지 경로를 &lt;code&gt;assets&lt;/code&gt;로 변경&lt;/li&gt;
+&lt;li&gt;가공된 파일을 Hugo 저장소로 보내기, 이후 Hugo 저장소에서 빌드 트리거&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="github-token-설정"&gt;GitHub Token 설정
+&lt;/h4&gt;&lt;p&gt;Obsidian 저장소가 Hugo 저장소에 접근하여 파일을 push해야 하므로 PAT(Personal Access Token) 필요&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;GitHub 설정 &amp;gt; Developer settings &amp;gt; Personal access tokens&lt;/code&gt;에서 생성
+&lt;ul&gt;
+&lt;li&gt;권한: repo 전체&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;생성한 토큰을 Obsidian 저장소의 &lt;code&gt;Settings &amp;gt; Secrets and variable &amp;gt; Actions&lt;/code&gt;에 등록&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="githubworkflowsdeployyml"&gt;.github/workflows/deploy.yml
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;v1.0.2까지 기록됨&lt;/p&gt;
+&lt;p&gt;현재 버전은 위키링크 변환 시 OS에서 허용하는 파일명의 특수 기호, 공백 등을 고려하지 않아 문제가 발생할 수 있음.&lt;/p&gt;
+&lt;p&gt;이후 저장소 문서로 관리 예정.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;옵시디언의 위키링크와 로컬 이미지 경로를 AST 기반 Node 변환 스크립트로 표준 마크다운 및 형식으로 변환하도록 구현&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;deploy.yml&lt;/code&gt;에서 기존 Perl 치환을 제거하고 해당 스크립트 호출로 교체&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;트리거 및 타겟팅 제어
+&lt;ul&gt;
+&lt;li&gt;특정 경로 감시: &lt;code&gt;02.Resource/**&lt;/code&gt; 폴더 내의 변경 사항이 발생할 때만 배포가 실행되도록 제한하여 불필요한 빌드를 방지한다.&lt;/li&gt;
+&lt;li&gt;멀티 저장소 체크아웃: 옵시디언 저장소뿐만 아니라 배포 대상인 Hugo 저장소를 동시에 관리한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;파일 스캐닝 (awk 활용)
+&lt;ul&gt;
+&lt;li&gt;조건부 배포 필터링: 모든 파일을 배포하는 것이 아니라, 파일 상단 15줄 이내에 publish: true 또는 false 설정이 있는 파일만 추출한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;경로 확장성: 주석 처리를 통해 03.Area, 04.Archive 등 다른 PARA 폴더로의 확장 가능성&lt;/li&gt;
+&lt;li&gt;마크다운 변환 (Perl 정규식 활용)
+&lt;ul&gt;
+&lt;li&gt;코드 블록 보호: 변환 시 코드 블록(&amp;hellip;) 내부나 인라인 코드는 건드리지 않도록 스킵 로직 적용&lt;/li&gt;
+&lt;li&gt;링크 체계 자동 보정: 옵시디언 전용 위키링크를 표준 마크다운 이미지 링크로 변환&lt;/li&gt;
+&lt;li&gt;모든 로컬 이미지 경로를 Hugo 기준으로 자동 보정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Front Matter 동적 변환: publish 상태값에 따라 Hugo가 인식하는 draft 필드(true/false)를 자동으로 삽입하여 배포 상태를 동기화&lt;/li&gt;
+&lt;li&gt;동기화 및 업서트 (UPSERT)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;rsync&lt;/code&gt; 체크섬 비교: 단순히 파일을 덮어쓰는 것이 아니라, &lt;code&gt;--checksum&lt;/code&gt; 옵션을 통해 실제 내용의 변경이 있는 파일만 선별적으로 업데이트&lt;/li&gt;
+&lt;li&gt;임시 스테이징: &lt;code&gt;temp_posts&lt;/code&gt; 폴더에서 모든 변환 작업을 마친 후 최종본만 대상 저장소에 동기화하여 안정성 확보&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자동 커밋 및 배포 최적화
+&lt;ul&gt;
+&lt;li&gt;변경 감지: &lt;code&gt;git diff --cached --quiet&lt;/code&gt; 명령을 사용하여 실제로 변경된 내용이 있을 때만 커밋을 생성&lt;/li&gt;
+&lt;li&gt;이력 추적: 커밋 메시지에 배포 시각을 포함하여 버전 관리를 용이하게 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt; 10
+&lt;/span&gt;&lt;span class="lnt"&gt; 11
+&lt;/span&gt;&lt;span class="lnt"&gt; 12
+&lt;/span&gt;&lt;span class="lnt"&gt; 13
+&lt;/span&gt;&lt;span class="lnt"&gt; 14
+&lt;/span&gt;&lt;span class="lnt"&gt; 15
+&lt;/span&gt;&lt;span class="lnt"&gt; 16
+&lt;/span&gt;&lt;span class="lnt"&gt; 17
+&lt;/span&gt;&lt;span class="lnt"&gt; 18
+&lt;/span&gt;&lt;span class="lnt"&gt; 19
+&lt;/span&gt;&lt;span class="lnt"&gt; 20
+&lt;/span&gt;&lt;span class="lnt"&gt; 21
+&lt;/span&gt;&lt;span class="lnt"&gt; 22
+&lt;/span&gt;&lt;span class="lnt"&gt; 23
+&lt;/span&gt;&lt;span class="lnt"&gt; 24
+&lt;/span&gt;&lt;span class="lnt"&gt; 25
+&lt;/span&gt;&lt;span class="lnt"&gt; 26
+&lt;/span&gt;&lt;span class="lnt"&gt; 27
+&lt;/span&gt;&lt;span class="lnt"&gt; 28
+&lt;/span&gt;&lt;span class="lnt"&gt; 29
+&lt;/span&gt;&lt;span class="lnt"&gt; 30
+&lt;/span&gt;&lt;span class="lnt"&gt; 31
+&lt;/span&gt;&lt;span class="lnt"&gt; 32
+&lt;/span&gt;&lt;span class="lnt"&gt; 33
+&lt;/span&gt;&lt;span class="lnt"&gt; 34
+&lt;/span&gt;&lt;span class="lnt"&gt; 35
+&lt;/span&gt;&lt;span class="lnt"&gt; 36
+&lt;/span&gt;&lt;span class="lnt"&gt; 37
+&lt;/span&gt;&lt;span class="lnt"&gt; 38
+&lt;/span&gt;&lt;span class="lnt"&gt; 39
+&lt;/span&gt;&lt;span class="lnt"&gt; 40
+&lt;/span&gt;&lt;span class="lnt"&gt; 41
+&lt;/span&gt;&lt;span class="lnt"&gt; 42
+&lt;/span&gt;&lt;span class="lnt"&gt; 43
+&lt;/span&gt;&lt;span class="lnt"&gt; 44
+&lt;/span&gt;&lt;span class="lnt"&gt; 45
+&lt;/span&gt;&lt;span class="lnt"&gt; 46
+&lt;/span&gt;&lt;span class="lnt"&gt; 47
+&lt;/span&gt;&lt;span class="lnt"&gt; 48
+&lt;/span&gt;&lt;span class="lnt"&gt; 49
+&lt;/span&gt;&lt;span class="lnt"&gt; 50
+&lt;/span&gt;&lt;span class="lnt"&gt; 51
+&lt;/span&gt;&lt;span class="lnt"&gt; 52
+&lt;/span&gt;&lt;span class="lnt"&gt; 53
+&lt;/span&gt;&lt;span class="lnt"&gt; 54
+&lt;/span&gt;&lt;span class="lnt"&gt; 55
+&lt;/span&gt;&lt;span class="lnt"&gt; 56
+&lt;/span&gt;&lt;span class="lnt"&gt; 57
+&lt;/span&gt;&lt;span class="lnt"&gt; 58
+&lt;/span&gt;&lt;span class="lnt"&gt; 59
+&lt;/span&gt;&lt;span class="lnt"&gt; 60
+&lt;/span&gt;&lt;span class="lnt"&gt; 61
+&lt;/span&gt;&lt;span class="lnt"&gt; 62
+&lt;/span&gt;&lt;span class="lnt"&gt; 63
+&lt;/span&gt;&lt;span class="lnt"&gt; 64
+&lt;/span&gt;&lt;span class="lnt"&gt; 65
+&lt;/span&gt;&lt;span class="lnt"&gt; 66
+&lt;/span&gt;&lt;span class="lnt"&gt; 67
+&lt;/span&gt;&lt;span class="lnt"&gt; 68
+&lt;/span&gt;&lt;span class="lnt"&gt; 69
+&lt;/span&gt;&lt;span class="lnt"&gt; 70
+&lt;/span&gt;&lt;span class="lnt"&gt; 71
+&lt;/span&gt;&lt;span class="lnt"&gt; 72
+&lt;/span&gt;&lt;span class="lnt"&gt; 73
+&lt;/span&gt;&lt;span class="lnt"&gt; 74
+&lt;/span&gt;&lt;span class="lnt"&gt; 75
+&lt;/span&gt;&lt;span class="lnt"&gt; 76
+&lt;/span&gt;&lt;span class="lnt"&gt; 77
+&lt;/span&gt;&lt;span class="lnt"&gt; 78
+&lt;/span&gt;&lt;span class="lnt"&gt; 79
+&lt;/span&gt;&lt;span class="lnt"&gt; 80
+&lt;/span&gt;&lt;span class="lnt"&gt; 81
+&lt;/span&gt;&lt;span class="lnt"&gt; 82
+&lt;/span&gt;&lt;span class="lnt"&gt; 83
+&lt;/span&gt;&lt;span class="lnt"&gt; 84
+&lt;/span&gt;&lt;span class="lnt"&gt; 85
+&lt;/span&gt;&lt;span class="lnt"&gt; 86
+&lt;/span&gt;&lt;span class="lnt"&gt; 87
+&lt;/span&gt;&lt;span class="lnt"&gt; 88
+&lt;/span&gt;&lt;span class="lnt"&gt; 89
+&lt;/span&gt;&lt;span class="lnt"&gt; 90
+&lt;/span&gt;&lt;span class="lnt"&gt; 91
+&lt;/span&gt;&lt;span class="lnt"&gt; 92
+&lt;/span&gt;&lt;span class="lnt"&gt; 93
+&lt;/span&gt;&lt;span class="lnt"&gt; 94
+&lt;/span&gt;&lt;span class="lnt"&gt; 95
+&lt;/span&gt;&lt;span class="lnt"&gt; 96
+&lt;/span&gt;&lt;span class="lnt"&gt; 97
+&lt;/span&gt;&lt;span class="lnt"&gt; 98
+&lt;/span&gt;&lt;span class="lnt"&gt; 99
+&lt;/span&gt;&lt;span class="lnt"&gt;100
+&lt;/span&gt;&lt;span class="lnt"&gt;101
+&lt;/span&gt;&lt;span class="lnt"&gt;102
+&lt;/span&gt;&lt;span class="lnt"&gt;103
+&lt;/span&gt;&lt;span class="lnt"&gt;104
+&lt;/span&gt;&lt;span class="lnt"&gt;105
+&lt;/span&gt;&lt;span class="lnt"&gt;106
+&lt;/span&gt;&lt;span class="lnt"&gt;107
+&lt;/span&gt;&lt;span class="lnt"&gt;108
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Deploy Posts to Hugo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;push&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;branches&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;main &lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 브랜치명&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;paths&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# PARA 체계 중 배포 대상이 포함된 폴더만 감시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s1"&gt;&amp;#39;02.Resource/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;#     - &amp;#39;03.Area/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;#     - &amp;#39;04.Archive/**&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;jobs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;deploy&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;runs-on&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ubuntu-latest&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;steps&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Checkout Obsidian Vault&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@v4&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;fetch-depth&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 증분 배포(diff)를 위해 전체 이력 가져오기&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Set up Hugo Repo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;uses&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;actions/checkout@v4&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;with&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;repository&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="l"&gt;계정]/[Hugo_저장소_이름]&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;token&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;${{ secrets.HUGO_DEPLOY_TOKEN }}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;hugo-dest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Hugo 저장소를 임시 폴더에 체크아웃&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Filter and Transform Posts&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 1. 폴더를 비우지 않고, 변환 작업을 위한 임시 스테이징 폴더 생성
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; mkdir -p temp_posts
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; mkdir -p hugo-dest/content/post/ # 대상 폴더가 없을 경우 대비
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 2. 하위 폴더 탐색 및 awk 실행
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # shopt -s globstar: ** 패턴 사용을 위한 셸 옵션 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; shopt -s globstar
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; PUBLISH_FILES=$(awk &amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; FNR &amp;lt;= 15 &amp;amp;&amp;amp; /publish: (true|false)/ { print FILENAME; nextfile }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; FNR &amp;gt; 15 { nextfile }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 스캔 범위 02.Resource로 제한할 때 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; &amp;#39; 02.Resource/**/*.md || true)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 스캔 범위 일시적으로 늘릴 때 활성화
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; #&amp;#39; 02.Resource/**/*.md 03.Area/**/*.md 04.Archive/**/*.md || true)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; if [ -z &amp;#34;$PUBLISH_FILES&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; echo &amp;#34;배포 대상 파일이 없습니다.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; exit 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 3. 파일 복사 및 변환 대상을 temp_posts로 지정
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 공백이 포함된 파일명을 안전하게 처리하기 위해 IFS 설정
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; SAVEIFS=$IFS
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; IFS=$&amp;#39;\n&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; for file in $PUBLISH_FILES; do
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 파일명만 추출
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; filename=$(basename &amp;#34;$file&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # hugo-dest가 아닌 임시 폴더(temp_posts)에 먼저 복사
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; dest=&amp;#34;temp_posts/$filename&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 복사 (파일 경로에 따옴표 필수)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 4. Perl 통합 치환 (코드 블록 보호 및 경로 보정)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 동적 백틱 개수 대응: 시작한 백틱 개수만큼 닫는 백틱이 나올 때까지 스킵
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 인라인 코드 보호: 한 줄 내의 백틱 영역 스킵
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # - 위키링크 변환 `![[]]` -&amp;gt; `![]()` 및 표준링크 프리픽스 보정을 한 번의 스캔으로 처리
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -0777 -pe &amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; s/
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; (?:^|\n)(`{3,})[\s\S]*?\n\1(?:\n|$) (*SKIP)(*F) |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; `[^`\n]+` (*SKIP)(*F) |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; (?:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; !\[\[(?!https?:\/\/)(.*?)\]\] |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; !\[(.*?)\]\((?!https?:\/\/|\/assets\/images\/)(.*?)\)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; )
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; /
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; $2 ? &amp;#34;![](\/assets\/images\/$2)&amp;#34; : &amp;#34;!\[$3\](\/assets\/images\/$4)&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; /gex&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # [추가] publish: false 발견 시 바로 다음 줄에 draft: true 삽입, Hugo에서 제공하는 front matter 활용
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # s/찾을패턴/대체패턴/g 활용
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^(publish:\s*false)/$1\ndraft: true/g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^(publish:\s*true)/$1\ndraft: false/g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; perl -i -pe &amp;#39;s/^image:\s*$/# image: /g&amp;#39; &amp;#34;$dest&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; done
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 5. rsync를 이용한 UPSERT (변경 상태 비교 및 동기화)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # --checksum: 파일 내용이 실제로 변했는지 체크
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; rsync -av --checksum temp_posts/ hugo-dest/content/post/
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # IFS 복구
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; IFS=$SAVEIFS&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;Push to Hugo Repo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="sd"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; cd hugo-dest
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git config user.name &amp;#34;github-actions[bot]&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git config user.email &amp;#34;github-actions[bot]@users.noreply.github.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git add .
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; # 변경사항이 있을 때만 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; if ! git diff --cached --quiet; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git commit -m &amp;#34;Update posts from Obsidian (at $(date +&amp;#39;%Y-%m-%d %H:%M:%S&amp;#39;))&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; echo &amp;#34;변경 사항이 없어 배포를 진행하지 않습니다.&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="sd"&gt; fi&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;마크다운 표준에서는 코드 블록 내부에 &lt;code&gt;```&lt;/code&gt;이 들어갈 경우 외부 감싸개는 그보다 많은 백틱 4개(&lt;code&gt;````&lt;/code&gt;)를 사용하도록 권장한다.&lt;/p&gt;
+&lt;p&gt;만약 코드 내부에 백틱 4개가 들어있다면 외부는 5개로 감싸야 하며, 이 개수에는 제한이 없다.
+반드시 바깥쪽이 안쪽보다 최소 1개는 더 많아야 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="파일-탐색-방식-기술-비교"&gt;파일 탐색 방식 기술 비교
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;방식&lt;/th&gt;
+&lt;th&gt;기술적 명칭&lt;/th&gt;
+&lt;th&gt;특징 (비유)&lt;/th&gt;
+&lt;th&gt;효율성&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;grep&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;고속 전수 조사&lt;/td&gt;
+&lt;td&gt;책을 아주 빨리 넘기며 단어를 찾지만, &lt;strong&gt;결국 끝까지 다 읽음&lt;/strong&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;중간&lt;/strong&gt; (단순하지만 낭비 있음)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;find + head&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;개별 정밀 조사&lt;/td&gt;
+&lt;td&gt;책 한 권을 꺼내 &lt;strong&gt;앞부분만 보고 다시 꽂기를 반복&lt;/strong&gt;. (책을 꺼내고 넣는 동작이 너무 많음)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;낮음&lt;/strong&gt; (오버헤드 큼)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;&lt;code&gt;awk&lt;/code&gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;조건부 조기 종료 스캔&lt;/td&gt;
+&lt;td&gt;책을 펼쳐 &lt;strong&gt;앞부분에 단어가 없으면 즉시 다음 책으로 넘어감&lt;/strong&gt;.&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;최상&lt;/strong&gt; (가장 지능적임)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="이미지가-왜-자꾸-안-나와"&gt;이미지가 왜 자꾸 안 나와?
+&lt;/h3&gt;&lt;p&gt;Obsidian 저장소, Hugo 저장소에서 Asssets 저장소를 서브 모듈로 등록했다.
+로컬 앱에선 이미지가 잘 보인다. 근데 Hugo 빌드 및 배포하면 포스팅에 이미지가 안 나온다?&lt;/p&gt;
+&lt;p&gt;Hugo는 내부적으로 루트에 assets 폴더가 있고 static 폴더는 정적 리소스로 빌드에 포함된다.
+assets 하위 img 폴더는 사이트 UI에 사용되는 것 같은데 static 폴더에 등록해둔 서브 모듈의 소스는 왜 배포된 포스팅에 제대로 노출이 안 되지?&lt;/p&gt;
+&lt;p&gt;GitHub 저장소의 소스를 다른 곳에 서빙하기 위한 권한 문제인가?
+프리픽스가 잘못됐나? 그냥 루트의 assets 폴더에 배치해야 하나?
+근데 static 폴더가 정적 리소스로 사용하기 위해 설계된 구조인데 왜지?&lt;/p&gt;
+&lt;p&gt;Hugo 저장소 GitHub Actions의 yml에서 submodule 정의를 하지 않아서 빌드할 때 포함되지 않았던 것. 빌드할 때 submodule에 대한 정의가 없어서 그냥 빈 폴더처럼 다루고 있었던 것이었다. 경로는 내가 계획한 게 맞았고 Actions 실행되는 동안 내부적으로 그 소스에 접근해서 빌드를 생성할 수 있게 설정이 필요했다.&lt;/p&gt;
+&lt;p&gt;올바르게 구성하고 이미지 확인까지 한 후 기존의 포스팅을 다시 점검하는 시간을 가지게 됐다.&lt;/p&gt;
+&lt;h3 id="properties-관리"&gt;Properties 관리
+&lt;/h3&gt;&lt;p&gt;문서 상단 Properties를 표준화해서 관리한다면 이후에 다른 모듈로 변경할 때 상당히 간편한 전환을 기대할 수 있겠다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;publish&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;draft&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;title&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;문서 제목&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;description&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;문서 설명&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;author&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;작성자&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;date&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;작성일시&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;categories&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;Level1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;Level2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;tag1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;tag2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;Status&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;ToDo&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="상태-유지형-업데이트-개선-방향"&gt;상태 유지형 업데이트 개선 방향
+&lt;/h3&gt;&lt;p&gt;현재는 문서량이 적으므로 전수 조사 후 전체 복사 방식이 가장 에러가 없고 관리하기 편하다.&lt;/p&gt;
+&lt;p&gt;지금처럼 모두 지우고 새로 복사하는 것이 아니라 &lt;strong&gt;파일의 변경 상태를 비교&lt;/strong&gt;하여 필요한 동작만 수행하는 방식으로 개선해보자.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# AS-IS: 전체 삭제 후 복사&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 1. 일단 다 지움 (이 때문에 Git 히스토리가 매번 끊김)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;rm -rf hugo-dest/content/post/*&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;mkdir -p hugo-dest/content/post/&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 2. 파일마다 바로 Hugo 저장소로 복사&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;for file in $PUBLISH_FILES; do&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;dest=&amp;#34;hugo-dest/content/post/$filename&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# 여기서 치환을 수행 (치환 중 실패하면 Hugo 저장소 파일이 오염됨)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;done&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# TO-BE: 임시 폴더 작업 후 rsync 동기화&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 1. 기존 파일을 지우지 않고 임시 작업장 생성&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;mkdir -p temp_posts&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 2. 임시 폴더에서 안전하게 모든 변환 완료&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;for file in $PUBLISH_FILES; do&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;dest=&amp;#34;temp_posts/$filename&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;cp &amp;#34;$file&amp;#34; &amp;#34;$dest&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c"&gt;# Perl 치환 수행 (성공한 결과물만 임시 폴더에 쌓임)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;done&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 3. rsync로 실제 바뀐 파일만 골라서 Hugo 저장소에 &amp;#39;동기화&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="l"&gt;rsync -av --checksum temp_posts/ hugo-dest/content/post/&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;신규 게시, 업데이트하고 싶은 건 &lt;code&gt;Resource&lt;/code&gt;로 가져온다&amp;quot;는 단 하나의 원칙만 지키면 된다.
+&lt;strong&gt;Obsidian은 UPSERT에 집중하고 Hugo는 게시 상태를 판단한다.&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;수정(Update):&lt;/strong&gt; &lt;code&gt;Resource&lt;/code&gt;에서 내용을 고치고 배포하면 Hugo에 이미 있는 같은 이름의 파일을 덮어쓴다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;누적(Accumulate):&lt;/strong&gt; &lt;code&gt;Resource&lt;/code&gt;에서 작업이 끝나 &lt;code&gt;Area&lt;/code&gt;로 옮겨버려도 다음 배포 시 &lt;code&gt;Resource&lt;/code&gt;만 스캔하므로 Hugo에 이미 들어가 있는 파일은 건드리지 않고 그대로 유지된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;a class="link" href="https://gohugo.io/content-management/front-matter/" target="_blank" rel="noopener"
+&gt;Hugo - Front matter&lt;/a&gt;
+문서 상단 속성의 &lt;code&gt;publish&lt;/code&gt; 값으로 게시 상태를 판단하려고 했는데 Hugo에서 기본적으로 &lt;code&gt;draft&lt;/code&gt; 값으로 게시 상태를 다룰 수 있어서 이걸 활용한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;옵시디언 데이터를 SSoT로 삼아 GitHub Actions 환경에서 입맛에 맞게 소스를 가공한 뒤 원하는 배포 툴을 이용해 빌드 및 배포하며 GitHub 저장소를 활용해서 첨부 파일을 서빙하는 구조를 완성했다.&lt;/p&gt;
+&lt;p&gt;각 저장소가 어떤 책임을 가지는지, GitHub Actions에서 어떤 처리를 해주면 처리가 간편해지는지 고민해볼 수 있어서 좋았다.&lt;/p&gt;
+&lt;p&gt;호스팅 쓰자. 🙂&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Static Site Generator (SSG)&lt;/strong&gt;: 정적 사이트 생성기. 마크다운 같은 텍스트 파일을 빌드 시점에 정적 HTML로 변환해주는 도구로 Hugo, Jekyll, Quartz 등이 대표적이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git Submodule&lt;/strong&gt;: 하나의 Git 저장소 안에 다른 Git 저장소를 하위 폴더로 포함하는 기능이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Actions (CI/CD)&lt;/strong&gt;: 코드가 Push될 때 특정 작업을 자동으로 수행하는 도구다. 여기서는 문서 필터링, 문법 치환, 파일 전송의 자동화 엔진 역할을 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Regular Expression (Regex)&lt;/strong&gt;: 정규표현식. 특정 패턴의 텍스트를 찾고 바꾸는 규칙이다. 위키링크(&lt;code&gt;![[]]&lt;/code&gt;)를 마크다운 링크(&lt;code&gt;![]()&lt;/code&gt;)로 변환하는 등에 핵심적으로 사용된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;PARA Method&lt;/strong&gt;: 디지털 정보를 관리하는 4단계 체계(Project, Area, Resource, Archive)로, 효율적인 노트 관리를 돕는 프레임워크. &lt;a class="link" href="https://fortelabs.com/blog/para/" target="_blank" rel="noopener"
+&gt;Tiago Forte의 공식 웹사이트&lt;/a&gt;에서 더 상세한 내용을 볼 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hugo Documentation&lt;/strong&gt;: 세계에서 가장 빠른 SSG인 Hugo의 공식 문서. &lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
+&gt;gohugo.io&lt;/a&gt;에서 다양한 테마와 빌드 옵션을 확인할 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Fine-grained PAT&lt;/strong&gt;: 기존 Classic 토큰보다 보안이 강화된 세분화된 접근 토큰 설정 방법이다. 특정 저장소에만 읽기/쓰기 권한을 부여하는 방법 등 권한 관련 학습하면 좋다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Perl One-liner&lt;/strong&gt;: 스크립트 파일 없이 터미널에서 즉시 실행하는 Perl 명령어 활용법이다. 대용량 파일의 스트림 기반 텍스트 처리에 강력한 성능을 발휘한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Incremental Builds&lt;/strong&gt;: 모든 파일을 다시 빌드하지 않고 변경된 파일만 처리하는 방식이다. &lt;code&gt;git diff&lt;/code&gt; 활용 전략을 확장하여 빌드 시간을 더 단축하는 방법을 탐구해 볼 수 있다.&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>보안 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%B3%B4%EC%95%88/</link><description>Recent content in 보안 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 05 Aug 2025 01:58:05 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%B3%B4%EC%95%88/index.xml" rel="self" type="application/rss+xml"/><item><title>JWT 구조를 구체적으로 알아보자</title><link>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</link><pubDate>Tue, 05 Aug 2025 01:58:05 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;최근 백엔드 인증/인가 시스템을 설계하거나 OAuth 2.0 기반의 로그인 시스템을 구축할 때 가장 많이 등장하는 키워드 중 하나가 &lt;code&gt;JWT(JSON Web Token)&lt;/code&gt;이다.&lt;/p&gt;
+&lt;p&gt;JWT의 &lt;strong&gt;3단계 구조&lt;/strong&gt;를 정확히 이해하고, 각 구성 요소가 왜 존재하는지, 어떤 역할을 하는지 예제를 통해 상세히 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;JWT는 기본적으로 &lt;strong&gt;세 부분으로 구성된 문자열&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Header&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Payload&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Signature&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각각의 의미를 뜯어보자.&lt;/p&gt;
+&lt;h3 id="1-header-헤더"&gt;1. Header (헤더)
+&lt;/h3&gt;&lt;p&gt;이 부분은 &lt;strong&gt;토큰을 어떻게 검증할 것인지에 대한 메타 정보&lt;/strong&gt;를 제공한다.
+Base64Url로 인코딩되어 토큰의 첫 번째 파트를 구성한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;alg&lt;/code&gt;(algorithm): 토큰 서명을 생성하기 위한 알고리즘을 명시. 보통 &lt;code&gt;HS256&lt;/code&gt; 또는 &lt;code&gt;RS256&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;typ&lt;/code&gt;(type): 토큰의 타입을 나타냄. JWT를 사용하는 경우 &lt;code&gt;&amp;quot;JWT&amp;quot;&lt;/code&gt;로 고정.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-payload-페이로드"&gt;2. Payload (페이로드)
+&lt;/h3&gt;&lt;p&gt;이 페이로드는 &lt;strong&gt;서명되어 있지만 암호화되어 있진 않다.&lt;/strong&gt; 즉, &lt;strong&gt;누구나 내용을 볼 수 있다.&lt;/strong&gt;&lt;br&gt;
+따라서 민감 정보(password, 주민번호 등)는 절대 포함시키면 안 된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;user1234&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;John Doe&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;iat&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691432621&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691436221&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;(subject): 주체 식별자 (ex. 사용자 ID).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;iat&lt;/code&gt;(issued at): 발급 시간 (Unix timestamp).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;exp&lt;/code&gt;(expiration): 만료 시간.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;role&lt;/code&gt;, &lt;code&gt;email&lt;/code&gt; 등 커스텀 클레임: 인증 또는 인가에 필요한 사용자 속성 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-signature-서명"&gt;3. Signature (서명)
+&lt;/h3&gt;&lt;p&gt;서버는 이 서명을 사용하여 토큰이 &lt;strong&gt;위조되지 않았음을 검증&lt;/strong&gt;할 수 있다.&lt;br&gt;
+서명이 다르면 페이로드가 조작된 것이다. 유효하지 않은 토큰으로 처리된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;HMACSHA256&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;.&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;payload&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;secret&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;앞서 인코딩한 Header와 Payload를 &lt;code&gt;.&lt;/code&gt;으로 연결한 후,&lt;/li&gt;
+&lt;li&gt;비밀 키(&lt;code&gt;secret&lt;/code&gt;)를 이용해 알고리즘(&lt;code&gt;HS256&lt;/code&gt; 등)으로 서명한 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt-예시"&gt;JWT 예시
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJzdWIiOiIxMjM0NTYiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDAwMDAwMDB9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각 부분을 디코딩하면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Header&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Payload&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;123456&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1700000000&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Signature&lt;/strong&gt;: 서버에서 secret key로만 확인 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt의-주요-보안-고려사항"&gt;JWT의 주요 보안 고려사항
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서명만 존재하고, 페이로드는 암호화되지 않는다.&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;민감 정보는 넣지 말 것.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;만료 시간(&lt;code&gt;exp&lt;/code&gt;)을 꼭 설정&lt;/strong&gt;하자.
+&lt;ul&gt;
+&lt;li&gt;토큰 탈취 시 무한히 사용할 수 없도록 하기 위해.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;서버는 반드시 Signature를 검증&lt;/strong&gt;해야 한다.
+&lt;ul&gt;
+&lt;li&gt;서명 검증을 하지 않으면 누구나 Payload만 바꿔도 토큰이 유효해진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;JWT는 “신뢰할 수 있는 정보를 클라이언트에 안전하게 전달하기 위한 구조화된 문자열”이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;Header&lt;/code&gt;는 토큰의 형식과 알고리즘, &lt;code&gt;Payload&lt;/code&gt;는 전달하고자 하는 정보, &lt;code&gt;Signature&lt;/code&gt;는 위조 여부를 판별하는 핵심 키이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Base64 인코딩/디코딩&lt;/li&gt;
+&lt;li&gt;대칭/비대칭 키 개념 (HMAC vs RSA)&lt;/li&gt;
+&lt;li&gt;HTTP 인증 방식 (Bearer Token)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://jwt.io/" target="_blank" rel="noopener"
+&gt;jwt.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html" target="_blank" rel="noopener"
+&gt;Spring Security에서 JWT 사용하기 공식 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;OAuth 2.0과 JWT의 관계&lt;/li&gt;
+&lt;li&gt;JWT vs Session 기반 인증 비교 포스팅&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>OAuth 2.0 핵심 구조 이해하기</title><link>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-understanding-the-oauth-2.0-core-structure/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 인증 인프라를 설계하며 OAuth 2.0이 표준처럼 자리 잡았다는 사실을 체감하고 있다.&lt;/p&gt;
+&lt;p&gt;특히 소셜 로그인이나 외부 리소스 접근 권한 위임 기능을 구현하면서 “Authorization Code Grant” 방식의 구조와 흐름을 완벽히 이해하는 것이 중요하다고 판단해 이 글을 작성하게 되었다.&lt;/p&gt;
+&lt;p&gt;이번 포스팅에서는 OAuth 2.0의 주요 컴포넌트와 함께 Authorization Code Grant가 어떤 흐름으로 동작하는지 실전 중심으로 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="oauth-20의-주요-컴포넌트"&gt;OAuth 2.0의 주요 컴포넌트
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;컴포넌트&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Owner&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스(정보)의 실제 소유자. 보통 사용자(User)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Client&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리소스 접근을 요청하는 애플리케이션 (ex. 우리가 개발하는 웹앱)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Authorization Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인증을 담당하며, Access Token을 발급하는 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Resource Server&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;보호된 리소스를 제공하는 API 서버 (Authorization Server와 분리될 수도 있음)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="authorization-code-grant-흐름"&gt;Authorization Code Grant 흐름
+&lt;/h3&gt;&lt;p&gt;이 방식은 &lt;strong&gt;보안성과 유연성&lt;/strong&gt;을 모두 만족하는 방식으로, 웹 앱에서 가장 많이 사용된다.&lt;/p&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+sequenceDiagram
+participant User
+participant Client (웹앱)
+participant AuthorizationServer
+participant ResourceServer
+User-&gt;&gt;Client: 로그인 요청
+Client-&gt;&gt;AuthorizationServer: 인증 요청 (사용자 브라우저를 리디렉션)
+AuthorizationServer-&gt;&gt;User: 로그인 + 권한 요청
+User-&gt;&gt;AuthorizationServer: 로그인 &amp; 승인
+AuthorizationServer-&gt;&gt;Client: Authorization Code 전달 (리디렉션 URI)
+Client-&gt;&gt;AuthorizationServer: Authorization Code + Client Secret로 Access Token 요청
+AuthorizationServer-&gt;&gt;Client: Access Token + (선택) Refresh Token 전달
+Client-&gt;&gt;ResourceServer: Access Token으로 리소스 요청
+ResourceServer-&gt;&gt;Client: 리소스 응답
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id="흐름-요약"&gt;흐름 요약
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;인증 요청:&lt;/strong&gt; Client가 Authorization Server에 인증 요청 URL로 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;사용자 승인:&lt;/strong&gt; 사용자는 로그인 후 권한 승인.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;코드 수신:&lt;/strong&gt; Authorization Server는 Redirect URI에 &lt;code&gt;Authorization Code&lt;/code&gt;를 포함하여 리디렉트.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 요청:&lt;/strong&gt; Client는 받은 코드를 Authorization Server에 전송하며, Access Token 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 수신:&lt;/strong&gt; Authorization Server는 Access Token을 응답.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API 요청:&lt;/strong&gt; Client는 받은 Access Token을 사용해 Resource Server에 요청.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 수신:&lt;/strong&gt; 유효한 토큰이면 리소스를 응답.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="refresh-token은-왜-필요할까"&gt;Refresh Token은 왜 필요할까?
+&lt;/h4&gt;&lt;p&gt;Access Token은 일반적으로 &lt;strong&gt;짧은 유효시간(예: 1시간)&lt;/strong&gt; 을 가진다.
+이때 Refresh Token이 있으면 재로그인 없이 새로운 Access Token을 발급 받을 수 있어 UX 개선에 큰 역할을 한다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;OAuth 2.0의 핵심은 &lt;strong&gt;책임 분리와 위임&lt;/strong&gt;이며, Authorization Code Grant는 가장 안전하고 실전적인 인증 흐름이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 프로토콜의 기본 흐름&lt;/li&gt;
+&lt;li&gt;RESTful API의 인증/인가 개념&lt;/li&gt;
+&lt;li&gt;HTTPS 통신 방식&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener"
+&gt;RFC 6749: The OAuth 2.0 Authorization Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html" target="_blank" rel="noopener"
+&gt;Spring Security OAuth2 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/" target="_blank" rel="noopener"
+&gt;JWT.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;키워드: &lt;code&gt;PKCE&lt;/code&gt;, &lt;code&gt;Client Credentials&lt;/code&gt;, &lt;code&gt;Implicit Grant&lt;/code&gt;, &lt;code&gt;OpenID Connect&lt;/code&gt;, &lt;code&gt;Refresh Token Rotation&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>세션 vs 토큰 인증 차이</title><link>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</link><pubDate>Mon, 04 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-04-session-vs-token-authentication-difference/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 개발자가 꼭 이해하고 있어야 할 인증의 두 축, &lt;strong&gt;세션 기반 인증&lt;/strong&gt;과 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;의 구조적 차이점과 각각의 &lt;strong&gt;보안상 고려사항&lt;/strong&gt;에 대해 다뤄보자.&lt;/p&gt;
+&lt;p&gt;특히 REST API 설계, OAuth2 도입, JWT 사용 시 맞닥뜨리는 여러 결정 포인트에서 어떤 방식을 왜 선택해야 하는지, 실전 관점에서 짚어본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="세션-기반-인증-session-based-authentication"&gt;세션 기반 인증 (Session-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 사용자 정보를 저장한 &lt;strong&gt;세션 ID&lt;/strong&gt;를 생성하고, 클라이언트에 &lt;strong&gt;쿠키로 전달&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 모든 요청에는 쿠키가 자동으로 첨부되어 세션 ID를 통해 인증 정보를 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;서버가 세션 상태를 &lt;strong&gt;직접 저장&lt;/strong&gt; (메모리, Redis 등)&lt;/li&gt;
+&lt;li&gt;브라우저 친화적 (자동 쿠키 처리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CSRF 공격&lt;/strong&gt;에 취약: 쿠키가 자동 전송되기 때문&lt;/li&gt;
+&lt;li&gt;세션 탈취(Session Hijacking) 대비 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SameSite, Secure, HttpOnly&lt;/strong&gt; 쿠키 옵션 사용 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;브라우저 기반의 전통적인 웹 서비스&lt;/li&gt;
+&lt;li&gt;내부망 또는 통제된 환경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="토큰-기반-인증-token-based-authentication"&gt;토큰 기반 인증 (Token-based Authentication)
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;동작 방식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;로그인 성공 시 서버는 &lt;strong&gt;JWT(JSON Web Token)&lt;/strong&gt; 또는 커스텀 토큰을 발급하고, 클라이언트는 이를 &lt;strong&gt;로컬 저장소에 저장&lt;/strong&gt;한다.&lt;/li&gt;
+&lt;li&gt;이후 요청 시 Authorization 헤더를 통해 &lt;strong&gt;직접 첨부&lt;/strong&gt;해서 인증한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특징&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서버 무상태(stateless)&lt;/strong&gt; 인증 방식 (세션 저장 불필요)&lt;/li&gt;
+&lt;li&gt;클라이언트/서버 분리된 구조에 유리&lt;/li&gt;
+&lt;li&gt;JWT는 &lt;strong&gt;자체적으로 서명되어 위변조 검증&lt;/strong&gt; 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;XSS에 취약&lt;/strong&gt;: 토큰을 로컬스토리지에 저장 시 노출 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;토큰 탈취 → 장기 권한 노출&lt;/strong&gt; 우려&lt;/li&gt;
+&lt;li&gt;만료시간, Refresh Token 전략, &lt;strong&gt;Token Rotation&lt;/strong&gt; 도입 필요&lt;/li&gt;
+&lt;li&gt;HTTPS 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;적합한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;모바일 앱, SPA(Single Page App)&lt;/li&gt;
+&lt;li&gt;분산 시스템, 마이크로서비스&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="주요-차이-정리"&gt;주요 차이 정리
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;세션 기반 인증&lt;/th&gt;
+&lt;th&gt;토큰 기반 인증&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;서버 상태&lt;/td&gt;
+&lt;td&gt;상태 유지 (Stateful)&lt;/td&gt;
+&lt;td&gt;상태 없음 (Stateless)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;저장소&lt;/td&gt;
+&lt;td&gt;서버 메모리/DB/Redis&lt;/td&gt;
+&lt;td&gt;클라이언트 로컬 저장소&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인증 전달&lt;/td&gt;
+&lt;td&gt;쿠키 (자동 전송)&lt;/td&gt;
+&lt;td&gt;HTTP Header (직접 전송)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;취약점&lt;/td&gt;
+&lt;td&gt;CSRF, 세션 탈취&lt;/td&gt;
+&lt;td&gt;XSS, 토큰 탈취&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 사례&lt;/td&gt;
+&lt;td&gt;웹 사이트&lt;/td&gt;
+&lt;td&gt;모바일, API 서버&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;인증 방식은 서비스 구조와 위협 모델에 따라 선택하자. 만능은 없다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;클라이언트가 브라우저 중심이고 보안 제어가 가능한 경우엔 &lt;strong&gt;세션 기반 인증&lt;/strong&gt;이, REST API나 모바일 중심이라면 &lt;strong&gt;토큰 기반 인증&lt;/strong&gt;이 적절하다.&lt;/p&gt;
+&lt;p&gt;단, 어떤 방식을 쓰든 보안은 추가 설정과 방어 로직 없이는 무너질 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 쿠키/헤더&lt;/li&gt;
+&lt;li&gt;JWT 구조 (Header.Payload.Signature)&lt;/li&gt;
+&lt;li&gt;CSRF, XSS 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" target="_blank" rel="noopener"
+&gt;OWASP 인증 관련 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.jwt.io/introduction" target="_blank" rel="noopener"
+&gt;JWT 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://oauth.net/2/" target="_blank" rel="noopener"
+&gt;OAuth 2.0 개념 정리 및 흐름&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>IAM 사용자로 AWS 관리</title><link>https://blog.b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</link><pubDate>Sun, 22 Jun 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-22-aws-why-and-how-to-manage-permissions-as-iam-users-rather-than-root-accounts/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;AWS를 간단히 사용할 땐 Root 계정 하나로 로그인하고 필요한 것만 확인하고 참 편하긴 편하다.
+하지만 몇 번의 프로젝트를 통해 Root 계정은 절대 일상적으로 써선 안 된다는 걸 온몸으로 배웠다.&lt;/p&gt;
+&lt;p&gt;Root 계정과 IAM 사용자 권한의 차이 그리고 왜 IAM 사용자로 운영하는 게 Best Practice인지에 대해 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="root-계정은-일상적으로-사용하지-마라"&gt;Root 계정은 일상적으로 사용하지 마라
+&lt;/h3&gt;&lt;p&gt;AWS 문서에는 다음과 같이 적혀 있다.&lt;/p&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;“We strongly recommend that you don&amp;rsquo;t use the root user for your everyday tasks” &lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html" target="_blank" rel="noopener"
+&gt;docs.aws.amazon.com+8docs.aws.amazon.com+8docs.aws.amazon.com+8&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Root 계정은 결제 수단 변경, 계정 설정 수정, Support 플랜 변경 등 &lt;strong&gt;IAM으로는 불가능한 민감 작업을 수행&lt;/strong&gt;할 수 있기 때문에 AWS는 &lt;strong&gt;MFA 설정, 자동화 억제, 긴급 상황에서만 사용&lt;/strong&gt;하도록 권장한다.&lt;/p&gt;
+&lt;h3 id="iam-사용자로-운영하는-이유"&gt;IAM 사용자로 운영하는 이유
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안 강화&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;IAM 사용자는 권한을 세분화할 수 있어 최소 권한 원칙 구현 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;역할 분리&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;인프라 운영, 결제 조회, 개발자 접근 등을 구분해서 관리 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;추적과 감사&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;누가 어떤 리소스를 언제 썼는지 CloudTrail로 기록 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;팀 확장 대응&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실습 → 팀 운영 → 기업 운영까지 유연하게 확장 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;비용/결제 보호&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;실수로 비싼 리소스를 생성하는 것 방지 가능 (예: GPU EC2, RDS Multi-AZ)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="iam-사용자-권한-관리-방법"&gt;IAM 사용자 권한 관리 방법
+&lt;/h3&gt;&lt;p&gt;처음엔 복잡할 수 있지만 차근차근 순서대로 진행하면서 IAM 사용자를 분리해서 관리해보면 안정감이 느껴지고 권한에 대해 이해할 수 있게 된다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;루트 계정으로 로그인&lt;/li&gt;
+&lt;li&gt;사용자 그룹 생성, IAM 사용자 생성 → 콘솔 접근 허용 + MFA 설정&lt;/li&gt;
+&lt;li&gt;역할에 따라 다음과 같이 그룹화하는 것을 권장. 조직에서 정하는 방식으로 진행하면 된다.
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;BillingViewerGroup&lt;/code&gt; - 결제 정보만 조회&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;InfraAdminGroup&lt;/code&gt; - EC2, RDS 등 자원 생성/삭제&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReadOnlyGroup&lt;/code&gt; - 전체 리소스 조회만 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;정책은 AWS에서 제공하는 관리형 정책부터 시작&lt;/li&gt;
+&lt;li&gt;필요 시 커스텀 정책 작성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="root-계정에만-있는-특수-작업"&gt;Root 계정에만 있는 특수 작업
+&lt;/h3&gt;&lt;p&gt;평소 작업엔 IAM으로 권한을 분리하여 최소 권한 원칙을 지키며 사용해야겠지만 특수한 경우는 어쩔 수 없이 Root 계정으로 로그인해야 할 것이다.&lt;/p&gt;
+&lt;p&gt;Root 계정 로그인 시 단일 인증이 아닌 멀티 인증 방식도 제공하는 것 같다.
+즉 2명 이상의 인증을 통해 로그인을 허용한다.&lt;/p&gt;
+&lt;p&gt;AWS에 따르면 Root 계정만 수행 가능한 작업은 다음과 같다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Activate IAM Access&lt;/code&gt;: IAM 사용자에게 Billing 콘솔 접근 활성화&lt;/li&gt;
+&lt;li&gt;루트 이메일 주소 및 결제 방식 변경&lt;/li&gt;
+&lt;li&gt;루트 계정 비밀번호 또는 액세스 키 재설정&lt;/li&gt;
+&lt;li&gt;AWS 계정 종료&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 작업은 Root 계정이 반드시 있어야만 할 수 있으므로 평시에는 IAM 기반 사용자/역할로 운영하고 Root는 긴급시에만 사용하는 구조가 안전하다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Root 계정은 금고 열쇠와 같다. 평소에는 꺼내지도 말아야 하며 AWS 운영은 IAM 사용자 기반으로 최소 권한 원칙을 엄수해야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;IAM 사용자 기반 운영은 번거로워 보여도 AWS에서 실수 없이 오래 살아남고 싶은 개발자라면 반드시 익숙해져야 할 &lt;strong&gt;안전장치&lt;/strong&gt;다.&lt;/p&gt;
+&lt;p&gt;AWS 문서들이 일관되게 강조하는 IAM 기반 안전 운영 방식을 실천해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="-사전-지식"&gt;### 사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS Root 계정과 IAM 사용자 구조 이해&lt;/li&gt;
+&lt;li&gt;기본적인 AWS Console UI 조작&lt;/li&gt;
+&lt;li&gt;AWS 관리형 정책 및 인라인 정책 개념&lt;/li&gt;
+&lt;li&gt;최소 권한 원칙(Least Privilege Principle)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener"
+&gt;IAM Best Practices (AWS 공식)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-example-policies.html" target="_blank" rel="noopener"
+&gt;AWS Billing 및 Cost Management 정책 예시&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/ko/architecture/well-architected/?wa-lens-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-lens-whitepapers.sort-order=desc&amp;amp;wa-guidance-whitepapers.sort-by=item.additionalFields.sortDate&amp;amp;wa-guidance-whitepapers.sort-order=desc" target="_blank" rel="noopener"
+&gt;Well-Architected Framework&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://aws.amazon.com/free" target="_blank" rel="noopener"
+&gt;AWS Free Tier 안내&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

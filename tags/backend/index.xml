@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Backend on B9F1</title><link>https://blog.b9f1.com/tags/backend/</link><description>Recent content in Backend on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 04 Jan 2026 14:54:18 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/backend/index.xml" rel="self" type="application/rss+xml"/><item><title>당신은 5년 차인가요, 1년 차 5번인가요?</title><link>https://blog.b9f1.com/p/2026-01-04-my-5-years-of-java-experience-collapsed-in-a-60-minute-interview/</link><pubDate>Sun, 04 Jan 2026 14:54:18 +0900</pubDate><guid>https://blog.b9f1.com/p/2026-01-04-my-5-years-of-java-experience-collapsed-in-a-60-minute-interview/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;메일함에서 Medium Daily Digest를 확인하다가 발목이 잡혔다.
+공감할 수 있는 내용이고 자신의 태도에 대해 고민해 볼 수 있는 좋은 글이라고 생각한다.&lt;/p&gt;
+&lt;p&gt;이 글에서 &amp;lsquo;우리&amp;rsquo;, &amp;lsquo;자신&amp;rsquo;이라는 키워드가 자주 등장할 텐데 만약 본인은 포함되지 않는다고 생각한다면 빠르게 뒤로 가기, 탭 닫기를 통해 시간을 아끼길 바란다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;나의 5년 자바 경력이 60분 면접 만에 무너졌다 - My 5 Years of Java Experience Collapsed in a 60-Minute Interview&amp;quot;는 자극적인 제목보다 더 충격적이었던 건, 그 안의 질문들에 선뜻 답하지 못하는 나의 모습이었다.&lt;/p&gt;
+&lt;p&gt;우리는 모두가 자신의 문제를 해결하기 위해 바쁘게 생산적인 일을 한다. 매일 스프린트를 쳐내고, 라이브러리를 가져다 쓰고, 비즈니스 로직을 구현한다. 하지만 &amp;lsquo;어떻게(How)&amp;rsquo; 돌아가게 만드는 것에 익숙해진 나머지, &amp;lsquo;왜(Why)&amp;rsquo; 그렇게 설계되었는지에 대해서는 추상화라는 장막 뒤로 숨겨두곤 한다.&lt;/p&gt;
+&lt;p&gt;이 포스팅은 원작자가 겪은 뼈아픈 면접 기록을 통해, 우리가 놓치고 있었던 &amp;lsquo;백엔드 개발자의 기술적 깊이&amp;rsquo;란 무엇인지, 그리고 &amp;lsquo;연차&amp;rsquo;를 &amp;lsquo;실력&amp;rsquo;으로 치환하기 위해 어떤 태도가 필요한지 정리해본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="어느-5년-차-개발자의-뼈아픈-고백"&gt;어느 5년 차 개발자의 뼈아픈 고백
+&lt;/h3&gt;&lt;p&gt;원문: &lt;a class="link" href="https://blog.stackademic.com/my-5-years-of-java-experience-collapsed-in-a-60-minute-interview-34d8657eba66" target="_blank" rel="noopener"
+&gt;My 5 Years of Java Experience Collapsed in a 60-Minute Interview&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;간단한 것부터 시작하죠.&amp;rdquo; 면접관의 이 한마디가 비수가 되어 돌아오기까지는 그리 오랜 시간이 걸리지 않았습니다. 5년 동안 자바를 다뤄왔고 수많은 마이크로서비스를 배포했으며 운영 환경의 복잡한 버그들을 잡아왔던 한 개발자의 자신감은 60분 만에 산산조각이 났습니다.&lt;/p&gt;
+&lt;p&gt;최근 해외 개발 관련 글에서 공감을 얻고 있는 My 5 Years of Java Experience Collapsed in a 60-Minute Interview라는 글의 이야기다. 이 글은 단순한 면접 탈락 수기가 아니다. 우리가 &amp;lsquo;경험&amp;rsquo;이라고 부르는 시간이 얼마나 허망하게 쌓여있을 수 있는지에 대한 자기반성이자 동시에 우리 모두에게 던지는 경고장이다.&lt;/p&gt;
+&lt;p&gt;나 역시 이 글을 읽으며 묘한 서늘함을 느꼈다. &amp;ldquo;내가 저 자리에 있었다면 과연 면접관의 꼬리 질문을 견뎌낼 수 있었을까?&amp;ldquo;라는 질문에 선뜻 &amp;ldquo;예쓰&amp;quot;라고 답할 수 없었기 때문이다. 우리는 과연 경력이라는 이름 뒤에 숨어 성장을 멈춘 것은 아닐까?&lt;/p&gt;
+&lt;h3 id="왜-우리는-경험을-실력이라-착각하는가"&gt;왜 우리는 경험을 실력이라 착각하는가?
+&lt;/h3&gt;&lt;p&gt;원작자는 5년의 경력을 가졌음에도 &lt;code&gt;Arrays.asList()&lt;/code&gt;로 생성한 리스트에 요소를 추가할 때 왜 에러가 나는지, 왜 공유 자원에 대한 동시성 이슈를 해결할 때 &lt;code&gt;AtomaticInteger&lt;/code&gt;가 대안이 될 수 있는지 명확히 설명하지 못했다. 왜 이런 일이 벌어질까?&lt;/p&gt;
+&lt;h4 id="1-숙련도와-전문성의-괴리-사용과-이해는-다르다"&gt;1. 숙련도와 전문성의 괴리: 사용과 이해는 다르다.
+&lt;/h4&gt;&lt;p&gt;우리는 도구에 익숙해지는 것을 실력이라 착각하곤 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;숙련도(How): 특정 라이브러리의 API를 호출하고 늘 쓰던 패턴으로 서비스를 구축하는 능력.&lt;/li&gt;
+&lt;li&gt;전문성(Why): 그 도구가 내부적으로 어떻게 동작하며, 왜 다른 대안이 아닌 이 기술을 선택했는지 논리적으로 증명하는 능력. 시니어에게 요구되는 것은 전자가 아니라 후자다. 하지만 많은 이들이 프레임워크가 제공하는 편리함(추상화)에 안주하며 내부 원리를 궁금해하지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-업무의-반복성-1년-차-5번-반복의-함정"&gt;2. 업무의 반복성: 1년 차 5번 반복의 함정
+&lt;/h4&gt;&lt;p&gt;원작자는 뼈아픈 통찰을 남겼다. &amp;ldquo;나는 5년 동안 코딩해 왔지만, 5년 동안 배우지는 않았다&amp;quot;라는 것이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;매일 비슷한 비즈니스 로직을 짜고, 기존 템플릿을 복사해 새 서비스를 만들며 바쁘게 보낸 시간은 우리를 익숙한 개발자로 만들 뿐이다.&lt;/li&gt;
+&lt;li&gt;새로운 기술적 난제에 부딪히고 이를 해결하기 위해 깊게 파고드는 경험이 없다면, 그것은 5년의 경력이 아니라 1년의 경험을 5번 반복한 것에 불과하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;우리는 수평적으로 경험을 확장하는 데 급급해 정작 한 분야의 뿌리를 깊게 내리는 수직적 성장을 소홀히 해왔을지도 모른다.&lt;/p&gt;
+&lt;h3 id="백엔드-개발자에게-요구되는-진짜-깊이란"&gt;백엔드 개발자에게 요구되는 진짜 깊이란?
+&lt;/h3&gt;&lt;p&gt;원작자가 마주했던 질문들은 결코 지엽적인 말장난이 아니었다. 이는 백엔드 개발자가 매일 다루는 도구의 한계점과 동작 원리를 얼마나 깊게 인지하고 있는지를 묻는 본질적인 질문들이었다.&lt;/p&gt;
+&lt;h4 id="1-자바-기본기-arraysaslist와-추상화의-함정"&gt;1. 자바 기본기: &lt;code&gt;Arrays.asList()&lt;/code&gt;와 추상화의 함정
+&lt;/h4&gt;&lt;p&gt;단순히 &amp;ldquo;에러가 난다&amp;quot;를 아는 것과 그 이유가 &lt;code&gt;ArrayList&lt;/code&gt;라는 이름 뒤에 숨겨진 구현의 차이 떄문임을 아는 것은 다르다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Arrays.asList()&lt;/code&gt;는 우리가 흔히 쓰는 &lt;code&gt;java.util.ArrayList&lt;/code&gt;가 아니라, 내부 클래스인 &lt;code&gt;Arrays$ArrayList&lt;/code&gt;를 반환한다. 이는 &amp;lsquo;고정 크기&amp;rsquo; 배열을 래핑한 것에 불과하기 때문에 &lt;code&gt;add()&lt;/code&gt; 호출 시 예외를 던지는 것이다.&lt;/p&gt;
+&lt;p&gt;우리가 사용하는 인터페이스(&lt;code&gt;List&lt;/code&gt;) 뒤에 어떤 구체적인 구현체가 숨어 있는지 확인하는 습관이 없다면, 런타임에 예상치 못한 사이드 이펙트를 마주하게 된다.&lt;/p&gt;
+&lt;h4 id="2-concurrency-동시성-이슈를-해결하는-논리적-근거"&gt;2. Concurrency: 동시성 이슈를 해결하는 논리적 근거
+&lt;/h4&gt;&lt;p&gt;공유 자원 문제에 단순히 &lt;code&gt;synchronized&lt;/code&gt;를 붙이는 것은 가장 쉬운 해결책일 수 있지만, 성능 최적화 관점에서는 최악일 수 있다. 면접관이 던진 &lt;code&gt;AtomaticInteger&lt;/code&gt;라는 대안은 Lock-based(비관적 락)와 CAS(Compare-And-Swap, 낙관적 락)의 차이를 이해하고 있는지 묻는 것이다.&lt;/p&gt;
+&lt;p&gt;실무에서 발생하는 데드락이나 성능 저하 문제는 대개 이런 원리에 대한 무지에서 시작된다. &amp;ldquo;돌아가니까 됐다&amp;quot;는 시니어의 답변이 될 수 없다.&lt;/p&gt;
+&lt;h4 id="3-시스템-설계-trade-off의-예술"&gt;3. 시스템 설계: Trade-off의 예술
+&lt;/h4&gt;&lt;p&gt;레이트 리미터 설계 예시에서 중요한 건 &amp;lsquo;정답&amp;rsquo;이 아니다. 왜 고정 윈도우가 아닌 슬라이딩 윈도우를 택했는지, 토큰 버킷 방식이 트래픽 버스트를 어떻게 처리하는지 설명할 수 있어야 한다.&lt;/p&gt;
+&lt;p&gt;모든 기술 선택에는 비용이 따른다. 시니어는 성능, 복잡도, 유지보수성 사이에서 최적의 균형점을 찾는 &amp;lsquo;의사결정권자&amp;rsquo;여야 한다.&lt;/p&gt;
+&lt;h3 id="얕은-지식을-온전히-내-것으로-만드는-전략"&gt;얕은 지식을 온전히 내 것으로 만드는 전략
+&lt;/h3&gt;&lt;p&gt;사실 이건 엉덩이 붙이고 앉아서 사투를 벌이며 체화하는 것 말고 왕도가 있을까 싶다. 자신에게 맞는 효율적인 방법을 찾아 시간을 아낄 수 있다면 더할 나위 없이 좋은 가치가 된다. 하지만 효율을 핑계로 깊이 파고드는 고통을 회피하고 있는 것은 아닌지 스스로 경계해야 한다.&lt;/p&gt;
+&lt;p&gt;파편화된 지식을 경험으로 연결하기 위해 내가 실천하고 있는, 그리고 원작자가 제안한 &amp;lsquo;리셋&amp;rsquo; 전략이다.&lt;/p&gt;
+&lt;h4 id="1-소스-코드-여행go-to-declaration"&gt;1. 소스 코드 여행(Go to Declaration)
+&lt;/h4&gt;&lt;p&gt;IDE에서 라이브러리 메서드를 사용할 때 &lt;code&gt;Ctrl+Click&lt;/code&gt;을 누르는 습관을 들여야 한다. 내가 호출한 메서드가 내부적으로 어떤 객체를 생성하고 어떤 예외를 던지는지 직접 눈으로 확인하는 과정이 쌓여 기술적 깊이가 된다.&lt;/p&gt;
+&lt;h4 id="2-문서화와-언어화"&gt;2. 문서화와 언어화
+&lt;/h4&gt;&lt;p&gt;머릿속으로 안다고 생각하는 것과 그것을 타인에게 설명하는 것은 천지 차이다. 학습한 내용을 블로그에 정리하거나 동료에게 공유해보자. 논리의 빈틈은 설명하려 할 때 비로소 드러난다.&lt;/p&gt;
+&lt;h4 id="pocproof-of-concept-중심-학습"&gt;PoC(Proof of Concept) 중심 학습
+&lt;/h4&gt;&lt;p&gt;이론으로만 배운 개념은 금방 휘발된다. &lt;code&gt;AtomaticInteger&lt;/code&gt;가 정말 &lt;code&gt;synchronized&lt;/code&gt;보다 빠른지, 1000개의 스레드를 돌려 직접 벤치마크 코드를 작성해 보아라. 직접 현상을 재현하고 데이터를 눈으로 확인한 지식은 결코 무너지지 않는다.&lt;/p&gt;
+&lt;h3 id="연차의-무게를-감당하는-개발자가-되기-위해"&gt;연차의 무게를 감당하는 개발자가 되기 위해
+&lt;/h3&gt;&lt;p&gt;원작자는 마지막에 이렇게 말한다. &amp;ldquo;당신의 경험은 그것을 깊이 있게 설명할 수 있을 떄만 의미가 있다.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;5년, 10년이라는 숫자가 주는 안락함에 속지 말자. 오늘 내가 작성한 코드 한 줄의 &amp;lsquo;이유&amp;rsquo;를 설명하지 못한다면 우리는 그저 거대한 프레임워크의 부품으로 머물 뿐이다. 연차에 어울리는 무게감은 내가 아는 기술의 뿌리에서 나온다. 내일의 우리는 오늘보다 조금 더 깊은 개발자이기를 바란다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;경력은 단순히 시간이 흐른 결과가 아니라 그 시간 동안 쌓아 올린 논리적 근거의 총합이다.
+효율을 핑계로 깊이 파고드는 고통을 회피하고 있는 것은 아닌지 스스로 경계해야 한다.&lt;/p&gt;</description></item><item><title>JWT 구조를 구체적으로 알아보자</title><link>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</link><pubDate>Tue, 05 Aug 2025 01:58:05 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-05-lets-find-out-the-structure-and-each-component-of-json-web-token-in-detail/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;최근 백엔드 인증/인가 시스템을 설계하거나 OAuth 2.0 기반의 로그인 시스템을 구축할 때 가장 많이 등장하는 키워드 중 하나가 &lt;code&gt;JWT(JSON Web Token)&lt;/code&gt;이다.&lt;/p&gt;
+&lt;p&gt;JWT의 &lt;strong&gt;3단계 구조&lt;/strong&gt;를 정확히 이해하고, 각 구성 요소가 왜 존재하는지, 어떤 역할을 하는지 예제를 통해 상세히 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;p&gt;JWT는 기본적으로 &lt;strong&gt;세 부분으로 구성된 문자열&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Header&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Payload&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;.&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Signature&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각각의 의미를 뜯어보자.&lt;/p&gt;
+&lt;h3 id="1-header-헤더"&gt;1. Header (헤더)
+&lt;/h3&gt;&lt;p&gt;이 부분은 &lt;strong&gt;토큰을 어떻게 검증할 것인지에 대한 메타 정보&lt;/strong&gt;를 제공한다.
+Base64Url로 인코딩되어 토큰의 첫 번째 파트를 구성한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;alg&lt;/code&gt;(algorithm): 토큰 서명을 생성하기 위한 알고리즘을 명시. 보통 &lt;code&gt;HS256&lt;/code&gt; 또는 &lt;code&gt;RS256&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;typ&lt;/code&gt;(type): 토큰의 타입을 나타냄. JWT를 사용하는 경우 &lt;code&gt;&amp;quot;JWT&amp;quot;&lt;/code&gt;로 고정.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-payload-페이로드"&gt;2. Payload (페이로드)
+&lt;/h3&gt;&lt;p&gt;이 페이로드는 &lt;strong&gt;서명되어 있지만 암호화되어 있진 않다.&lt;/strong&gt; 즉, &lt;strong&gt;누구나 내용을 볼 수 있다.&lt;/strong&gt;&lt;br&gt;
+따라서 민감 정보(password, 주민번호 등)는 절대 포함시키면 안 된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;user1234&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;John Doe&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;iat&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691432621&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1691436221&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sub&lt;/code&gt;(subject): 주체 식별자 (ex. 사용자 ID).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;iat&lt;/code&gt;(issued at): 발급 시간 (Unix timestamp).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;exp&lt;/code&gt;(expiration): 만료 시간.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;role&lt;/code&gt;, &lt;code&gt;email&lt;/code&gt; 등 커스텀 클레임: 인증 또는 인가에 필요한 사용자 속성 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-signature-서명"&gt;3. Signature (서명)
+&lt;/h3&gt;&lt;p&gt;서버는 이 서명을 사용하여 토큰이 &lt;strong&gt;위조되지 않았음을 검증&lt;/strong&gt;할 수 있다.&lt;br&gt;
+서명이 다르면 페이로드가 조작된 것이다. 유효하지 않은 토큰으로 처리된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-gdscript3" data-lang="gdscript3"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;HMACSHA256&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;.&amp;#34;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;base64UrlEncode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;payload&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="n"&gt;secret&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;앞서 인코딩한 Header와 Payload를 &lt;code&gt;.&lt;/code&gt;으로 연결한 후,&lt;/li&gt;
+&lt;li&gt;비밀 키(&lt;code&gt;secret&lt;/code&gt;)를 이용해 알고리즘(&lt;code&gt;HS256&lt;/code&gt; 등)으로 서명한 값.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt-예시"&gt;JWT 예시
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;eyJzdWIiOiIxMjM0NTYiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MDAwMDAwMDB9.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;각 부분을 디코딩하면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Header&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;alg&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;HS256&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;typ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;JWT&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Payload&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;sub&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;123456&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;admin&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;&amp;#34;exp&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1700000000&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Signature&lt;/strong&gt;: 서버에서 secret key로만 확인 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="jwt의-주요-보안-고려사항"&gt;JWT의 주요 보안 고려사항
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;서명만 존재하고, 페이로드는 암호화되지 않는다.&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;민감 정보는 넣지 말 것.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;만료 시간(&lt;code&gt;exp&lt;/code&gt;)을 꼭 설정&lt;/strong&gt;하자.
+&lt;ul&gt;
+&lt;li&gt;토큰 탈취 시 무한히 사용할 수 없도록 하기 위해.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;서버는 반드시 Signature를 검증&lt;/strong&gt;해야 한다.
+&lt;ul&gt;
+&lt;li&gt;서명 검증을 하지 않으면 누구나 Payload만 바꿔도 토큰이 유효해진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;JWT는 “신뢰할 수 있는 정보를 클라이언트에 안전하게 전달하기 위한 구조화된 문자열”이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;Header&lt;/code&gt;는 토큰의 형식과 알고리즘, &lt;code&gt;Payload&lt;/code&gt;는 전달하고자 하는 정보, &lt;code&gt;Signature&lt;/code&gt;는 위조 여부를 판별하는 핵심 키이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Base64 인코딩/디코딩&lt;/li&gt;
+&lt;li&gt;대칭/비대칭 키 개념 (HMAC vs RSA)&lt;/li&gt;
+&lt;li&gt;HTTP 인증 방식 (Bearer Token)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://jwt.io/" target="_blank" rel="noopener"
+&gt;jwt.io&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener"
+&gt;RFC 7519: JSON Web Token (JWT)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html" target="_blank" rel="noopener"
+&gt;Spring Security에서 JWT 사용하기 공식 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;OAuth 2.0과 JWT의 관계&lt;/li&gt;
+&lt;li&gt;JWT vs Session 기반 인증 비교 포스팅&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Spring Boot와 웹서버</title><link>https://blog.b9f1.com/p/2025-04-28-springboot-and-web-servers/</link><pubDate>Mon, 28 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-28-springboot-and-web-servers/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;웹 서버와 WAS의 차이점을 명확히 이해하고 Spring Boot의 내장 톰캣이 어떤 역할을 하는지 알아본다.
+또한, Spring Boot에서 사용되는 다양한 Bean 등록 방법과 각각의 장단점을 비교 분석한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="web-server-vs-web-application-server"&gt;Web Server VS Web Application Server
+&lt;/h3&gt;&lt;h4 id="웹-서버web-server"&gt;웹 서버(Web Server)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;정적 콘텐츠(HTML, CSS, JS, 이미지 등)을 제공하는 서버&lt;/li&gt;
+&lt;li&gt;클라이언트의 요청을 받아 파일 시스템의 리소스를 반환&lt;/li&gt;
+&lt;li&gt;동적 처리 불가능 WAS와 연동 필요&lt;/li&gt;
+&lt;li&gt;예: Nginx, Apache HTTP Server 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="웹-애플리케이션-서버web-application-server"&gt;웹 애플리케이션 서버(Web Application Server)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;편하게 &amp;lsquo;와쓰&amp;rsquo;라고 발음하는 경우가 많다.&lt;/li&gt;
+&lt;li&gt;동적 콘텐츠(비즈니스 로직, DB 연동)를 처리하는 서버&lt;/li&gt;
+&lt;li&gt;서블릿 컨테이너를 포함해 애플리에킹션 실행 환경 제공&lt;/li&gt;
+&lt;li&gt;웹 서버의 기능도 일부 포함 가능 (단, 정적 리소스 처리 효율성이 떨어짐)&lt;/li&gt;
+&lt;li&gt;예: Tomcat, Jetty 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="주요-차이점"&gt;주요 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;웹 서버&lt;/th&gt;
+&lt;th&gt;WAS&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;역할&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;정적 콘텐츠 제공&lt;/td&gt;
+&lt;td&gt;동적 콘텐츠 처리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;예시&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Nginx, Apache&lt;/td&gt;
+&lt;td&gt;Tomcat, Jetty&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;성능&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;정적 파일 처리 최적화&lt;/td&gt;
+&lt;td&gt;애플리케이션 로직 실행&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;보안&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;리버스 프록시, 로드 밸런싱&lt;/td&gt;
+&lt;td&gt;세션 관리, 트랜잭션 처리&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="spring-boot의-내장-톰캣은-was"&gt;Spring Boot의 내장 톰캣은 WAS
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Spring Boot는 내장형 톰캣을 기본으로 제공한다.
+&lt;ul&gt;
+&lt;li&gt;별도의 WAS 설치 없이 실행이 가능하단 소리다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;spring-boot-starter-web&lt;/code&gt; 의존성 추가 시 자동 구성된다.&lt;/li&gt;
+&lt;li&gt;WAS로 동작하지만 정적 리소스도 처리 가능하다. (개발용으로 충분)&lt;/li&gt;
+&lt;li&gt;프로덕션 환경에서는 Nginx + Spring Boot(Tomcat) 등 조합을 사용하는 것이 좋다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="spring-boot에서-bean-등록-방법-비교"&gt;Spring Boot에서 Bean 등록 방법 비교
+&lt;/h3&gt;&lt;h4 id="컴포넌트-스캔"&gt;컴포넌트 스캔
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;@Component&lt;/code&gt;, &lt;code&gt;@Service&lt;/code&gt;, &lt;code&gt;Repository&lt;/code&gt;, &lt;code&gt;@Controller&lt;/code&gt; 등 어노테이션으로 간단히 빈 등록이 가능하다. 명확한 케이스를 나타내는 어노테이션을 사용하는데, 대부분 &lt;code&gt;@Component&lt;/code&gt;를 상속 받고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;장점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;간편한 등록 &lt;code&gt;@Component&lt;/code&gt; 및 하위 어노테이션 자동 감지&lt;/li&gt;
+&lt;li&gt;의존성 자동 주입 &lt;code&gt;@Autowired&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;명시적 제어 불가능&lt;/li&gt;
+&lt;li&gt;모든 빈이 스캔되므로 불필요한 빈이 등록될 수 있다.&lt;/li&gt;
+&lt;li&gt;커스터마이징이 어렵다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="자바-설정-클래스"&gt;자바 설정 클래스
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;@Configuration&lt;/code&gt; + &lt;code&gt;@Bean&lt;/code&gt; 조합으로 명시적 등록 방법&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Configuration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;AppConfig&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Bean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MyService&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;myService&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;MyServiceImpl&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;장점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;명시적 빈 등록&lt;/li&gt;
+&lt;li&gt;필요한 빈만 선택적으로 등록 가능&lt;/li&gt;
+&lt;li&gt;외부 라이브러리 빈 등록에 유용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;수동 등록이 번거로울 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="import를-이용한-빈-등록"&gt;Import를 이용한 빈 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Configuration&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Import&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="n"&gt;DatabaseConfig&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SecurityConfig&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;AppConfig&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;장점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;모듈화된 설정 관리 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;의존성 관계가 명확하지 않을 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="xml-기반-빈-등록"&gt;XML 기반 빈 등록
+&lt;/h4&gt;&lt;p&gt;legacy한 기술이라서 &amp;ldquo;이런 방법이 있구나&amp;rdquo; 정도만 이해하자.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;bean&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;myService&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;com.example.MyServiceImpl&amp;#34;&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;장점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;레거시 시스템과 호환성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;단점:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;가독성이 떨어진다.&lt;/li&gt;
+&lt;li&gt;유지보수가 어렵다.&lt;/li&gt;
+&lt;li&gt;최신 Spring에 권장되지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="최적의-방법은"&gt;최적의 방법은?
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;컴포넌트 스캔: 일반적인 애플리케이션 빈 등록&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Bean&lt;/code&gt; 수동 등록: 외부 라이브러리, 커스텀 설정 필요 시&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Import&lt;/code&gt;: 설정 분리 시 유용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Servlet Container: 웹 애플리케이션 실행 환경
+&lt;ul&gt;
+&lt;li&gt;예: Tomcat&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;DI(Dependency Injection): Spring의 핵심 개념, 빈 간의 의존성 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/how-to/webserver.html#page-title" target="_blank" rel="noopener"
+&gt;Spring 공식 문서 - Embedded Web Servers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

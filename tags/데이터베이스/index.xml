@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>데이터베이스 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4/</link><description>Recent content in 데이터베이스 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Jun 2025 10:11:44 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>WSL에서 PSQL 사용하기</title><link>https://blog.b9f1.com/p/2025-06-27-wsl-using-psql/</link><pubDate>Fri, 27 Jun 2025 10:11:44 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-27-wsl-using-psql/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;백엔드 개발을 진행하다 보면 WSL에서 &lt;code&gt;psql&lt;/code&gt;을 사용해 Windows에 설치된 PostgreSQL에 접속하고 싶은 상황이 있다.&lt;/p&gt;
+&lt;p&gt;그러나 단순한 클라이언트 설치만으로는 접속이 되지 않는다. 방화벽, 접속 허용 설정, 포트 개방 등 네트워크 보안 요소를 고려해야 하기 때문이다.&lt;/p&gt;
+&lt;p&gt;WSL에서 PostgreSQL 접속 방법을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="postgresql-클라이언트-설치"&gt;PostgreSQL 클라이언트 설치
+&lt;/h3&gt;&lt;p&gt;Windows에 구성된 PostgreSQL에 접속하기 위해 클라이언트를 설치해야 한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install postgresql-client
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;apt-get&lt;/code&gt;은 더 오래된 전통적인 CLI 툴&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;스크립트나 자동화에 주로 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;apt&lt;/code&gt;는 &lt;code&gt;apt-get&lt;/code&gt;과 &lt;code&gt;apt-cache&lt;/code&gt;의 여러 기능을 합쳐 사용자 친화적으로 만든 통합 명령어&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;2014년 즈음부터 Debian/Ubuntu에 포함되었고 Ubuntu 16.04부터 기본으로 권장&lt;/li&gt;
+&lt;li&gt;깔끔한 출력과 심플한 옵션 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;일상적인 사용에 &lt;code&gt;apt&lt;/code&gt;가 권장되며 스크립트 자동화, 하위 호환에 &lt;code&gt;apt-get&lt;/code&gt;을 사용할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="windows-ip-확인"&gt;Windows IP 확인
+&lt;/h3&gt;&lt;p&gt;PostgreSQL 서버가 설치된 Windows 쪽 IP를 알아야 접속이 가능하다.
+이때 &lt;code&gt;ifconfig&lt;/code&gt;이 아니라 다음 명령어를 사용해야 정확하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ip route &lt;span class="p"&gt;|&lt;/span&gt; grep default
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 예시 결과&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;default via 172.27.208.1 dev eth0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;172.27.208.1&lt;/code&gt;이 &lt;strong&gt;WSL에서 Windows를 바라보는 IP (게이트웨이 IP)&lt;/strong&gt; 이므로 이 주소를 접속 대상 IP로 사용한다.&lt;/p&gt;
+&lt;h3 id="windows-postgresql-서버-설정-변경"&gt;Windows PostgreSQL 서버 설정 변경
+&lt;/h3&gt;&lt;h4 id="postgresqlconf"&gt;postgresql.conf
+&lt;/h4&gt;&lt;p&gt;Windows에 설치된 PostgreSQL 설정 디렉토리에서 아래 설정을 찾아 수정한다.&lt;/p&gt;
+&lt;p&gt;보통은 기본 설치 경로에 있다. &lt;code&gt;C:\Program Files\PostgreSQL\{version}\data&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;listen_addresses&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 원하는 IP만&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;listen_addresses&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;localhost,172.27.208.1&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt; 와일드 카드로 전체를 여는 것보다 특정 IP에서 들어오는 것만 명시적으로 지정하는 것이 보안상 안전하다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="pg_hbaconf"&gt;pg_hba.conf
+&lt;/h4&gt;&lt;p&gt;해당 대역(WSL 내부 IP 포함)을 명시적으로 허용해야 접속 가능하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;host all all 172.27.208.1 md5
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;수정 후에는 반드시 PostgreSQL 서비스를 재시작해야 설정이 반영된다.&lt;/p&gt;
+&lt;p&gt;Windows의 &lt;code&gt;services.msc&lt;/code&gt;에서 PostgreSQL을 다시 시작하거나 명령어를 사용해 재시작한다.&lt;/p&gt;
+&lt;h3 id="windows-방화벽에서-포트-열기"&gt;Windows 방화벽에서 포트 열기
+&lt;/h3&gt;&lt;p&gt;WSL은 Windows의 입장에선 외부 네트워크로 간주된다.
+기본적으로 TCP 5432 포트는 차단되어 있다.&lt;/p&gt;
+&lt;p&gt;따라서 명시적으로 인바운드 규칙을 추가해야 한다.
+기본적인 설정으로 가정하고 정리한다.&lt;/p&gt;
+&lt;p&gt;설정 경로:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows의 실행 &amp;gt; &lt;code&gt;wf.msc&lt;/code&gt; (Windows Defender 방화벽 고급 보안)
+&lt;ul&gt;
+&lt;li&gt;또는 제어판에서 방화벽 &amp;gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙에서 새 규칙 추가
+&lt;ul&gt;
+&lt;li&gt;유형: 포트&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트: 5432&lt;/li&gt;
+&lt;li&gt;작업: 연결 허용&lt;/li&gt;
+&lt;li&gt;프로필: 도메인/개인/공용 모두 선택&lt;/li&gt;
+&lt;li&gt;이름: Allow PostgreSQL 5432 for WSL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="연결-테스트"&gt;연결 테스트
+&lt;/h3&gt;&lt;p&gt;WSL 터미널에서 명령 실행 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nc -zv 172.27.208.1 &lt;span class="m"&gt;5432&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 포트 정상적으로 붙게 되면&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Connection to 172.27.208.1 &lt;span class="m"&gt;5432&lt;/span&gt; port &lt;span class="o"&gt;[&lt;/span&gt;tcp/postgresql&lt;span class="o"&gt;]&lt;/span&gt; succeeded!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;그 다음 실제 접속&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 호스트, 유저, DB&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;psql -h 172.27.208.1 -U postgres -d postgres
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;WSL은 로컬처럼 보이지만 네트워크적으로는 별개의 장치로 취급된다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;단순히 PostgreSQL을 설치하는 것만으로 접속이 불가능하다.
+&lt;code&gt;listen_addresses&lt;/code&gt;, &lt;code&gt;pg_hba.conf&lt;/code&gt;, 방화벽 인바운드 설정까지 모두 갖춰져야 제대로 동작한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;WSL 기본 개념&lt;/li&gt;
+&lt;li&gt;PostgreSQL 서버와 클라이언트 구조&lt;/li&gt;
+&lt;li&gt;Windows 방화벽 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/windows/wsl/" target="_blank" rel="noopener"
+&gt;WSL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/" target="_blank" rel="noopener"
+&gt;PostgreSQL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/runtime-config-connection.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;listen_addresses&lt;/code&gt; 설명&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/auth-pg-hba-conf.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;pg_hba.conf&lt;/code&gt; 인증 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>ACID</title><link>https://blog.b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</link><pubDate>Sun, 15 Jun 2025 16:50:13 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-15-db-transaction-four-principles-acid/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;데이터베이스나 분산 시스템에서 트랜잭션은 안정성을 보장하는 핵심 개념이다.
+특히 ACID(원자성, 일관성, 고립성, 지속성) 속성은 신뢰할 수 있는 데이터 처리를 위한 기본 토대다.&lt;/p&gt;
+&lt;p&gt;이번 글에서는 ACID 각각의 속성이 보장되지 않을 때 어떤 문제들이 발생할 수 있는지 예시와 일반적인 해결책을 간단히 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="atomicity---원자성"&gt;Atomicity - 원자성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;모든 작업이 수행되거나, 아무것도 수행되지 않아야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;원자성이 깨지면, 하나의 트랜잭션 안에서 일부 작업만 처리되고 나머지가 실패한 상태가 될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: A → B로 계좌 이체 중 A 계좌에서 출금은 됐지만 B 계좌로 입금이 되기 전 장애가 발생한 경우 → 금액 손실.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 시스템 상태가 불완전하게 갱신되어 데이터 손실 가능.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DBMS가 제공하는 &lt;strong&gt;트랜잭션 롤백&lt;/strong&gt;(Rollback) 메커니즘 사용.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;try-catch&lt;/code&gt;를 통해 예외 발생 시 &lt;code&gt;rollback()&lt;/code&gt; 호출하도록 처리.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;setAutoCommit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;withdraw&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fromAccount&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;deposit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;toAccount&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;commit&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;catch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Exception&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;rollback&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 전체 트랜잭션이 되돌아감&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="consistency---일관성"&gt;Consistency - 일관성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;트랜잭션 전후의 데이터 상태는 항상 시스템 규칙을 만족해야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;일관성은 데이터베이스에 정의된 &lt;strong&gt;제약 조건, 외래키, 트리거, 비즈니스 규칙 등&lt;/strong&gt;이 항상 유지되어야 한다는 의미다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: 주문 시 존재하지 않는 상품 ID가 참조되거나, 재고가 음수가 되는 경우.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 무결성이 깨진 데이터가 DB에 저장될 수 있음.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DB 레벨: 외래 키, 유일성 제약, &lt;code&gt;CHECK&lt;/code&gt;, &lt;code&gt;NOT NULL&lt;/code&gt; 등의 &lt;strong&gt;제약 조건 설정&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;애플리케이션 레벨: 추가적인 &lt;strong&gt;비즈니스 유효성 검사&lt;/strong&gt; 코드 구현&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;단, 일관성은 트랜잭션이 &lt;strong&gt;성공적으로 끝났을 경우에만&lt;/strong&gt; 보장된다. 실패한 트랜잭션은 원자성과 함께 롤백되어 무결성을 해치지 않음.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="isolation---고립성"&gt;Isolation - 고립성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;각 트랜잭션은 서로 독립적으로 실행돼야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;고립성이 깨지면 동시에 실행 중인 트랜잭션들이 서로 영향을 주며 비정상적인 데이터가 조회되거나 저장될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;주요 문제 유형:&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;문제&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;예시&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Dirty Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;다른 트랜잭션이 아직 커밋하지 않은 데이터를 읽음&lt;/td&gt;
+&lt;td&gt;B가 업데이트 중인 데이터를 A가 미리 읽음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Non-repeatable Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;같은 조건으로 두 번 조회했는데 결과가 달라짐&lt;/td&gt;
+&lt;td&gt;A가 한 사용자의 나이를 두 번 조회하는 사이 B가 그 값을 수정&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Phantom Read&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;같은 조건으로 조회했는데 행 개수가 달라짐&lt;/td&gt;
+&lt;td&gt;A가 “나이 ≥ 30” 조건으로 조회한 후 B가 새로운 30세 사용자를 삽입&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;격리 수준 비교 (ANSI SQL 기준):&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;수준&lt;/th&gt;
+&lt;th&gt;보장 범위&lt;/th&gt;
+&lt;th&gt;발생 가능한 문제&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;READ UNCOMMITTED&lt;/td&gt;
+&lt;td&gt;아무것도 보장 안 됨&lt;/td&gt;
+&lt;td&gt;Dirty Read, Non-repeatable Read, Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;READ COMMITTED&lt;/td&gt;
+&lt;td&gt;커밋된 데이터만 읽음&lt;/td&gt;
+&lt;td&gt;Non-repeatable Read, Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;REPEATABLE READ&lt;/td&gt;
+&lt;td&gt;동일 쿼리 결과 동일&lt;/td&gt;
+&lt;td&gt;Phantom Read&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SERIALIZABLE&lt;/td&gt;
+&lt;td&gt;가장 강력, 완전한 고립&lt;/td&gt;
+&lt;td&gt;성능 저하 가능성&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DB 격리 수준을 적절히 설정 (성능 vs 고립성 트레이드오프 고려)&lt;/li&gt;
+&lt;li&gt;비즈니스 중요도에 따라 적용 수준을 유연하게 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="durability---지속성"&gt;Durability - 지속성
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;트랜잭션이 커밋되면, 그 결과는 영구히 저장되어야 한다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;지속성이 보장되지 않으면, 트랜잭션이 커밋되었더라도 시스템 장애 발생 시 데이터가 유실될 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;: 사용자가 결제를 완료했는데, 직후 서버 다운으로 주문 내역이 저장되지 않음 → 신뢰성 손상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;문제점&lt;/strong&gt;: 커밋 이후에도 데이터 유실 가능 → 사용자 신뢰도 하락&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 방안&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;DBMS의 &lt;strong&gt;WAL(Write-Ahead Logging)&lt;/strong&gt;: 로그를 먼저 디스크에 기록하고 나서 커밋 처리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RAID, 이중화 스토리지&lt;/strong&gt;, 디스크 플러시(sync) 전략&lt;/li&gt;
+&lt;li&gt;분산 시스템에서는 &lt;strong&gt;Replication, Quorum 기반의 커밋&lt;/strong&gt; 방식도 사용됨&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;트랜잭션의 ACID 속성은 단순한 개념이 아니라, 실제 시스템에서 &lt;strong&gt;데이터 무결성과 안정성의 최후 보루&lt;/strong&gt;다.&lt;/p&gt;
+&lt;p&gt;속성이 하나라도 무너지면 “커밋됐지만 저장되지 않음”, “이체했는데 금액이 사라짐”, “동시 접속 시 데이터 꼬임” 같은 치명적 문제가 발생할 수 있다.&lt;/p&gt;
+&lt;p&gt;결국 이는 &lt;strong&gt;비즈니스 신뢰성&lt;/strong&gt;과 &lt;strong&gt;사용자 경험&lt;/strong&gt;에 직결된다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;트랜잭션 정의와 트랜잭션 경계 설정&lt;/li&gt;
+&lt;li&gt;데이터베이스의 커밋/롤백 메커니즘&lt;/li&gt;
+&lt;li&gt;SQL 격리 수준과 락(lock) 종류 (공유 락, 배타 락 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/transaction-iso.html" target="_blank" rel="noopener"
+&gt;PostgreSQL Isolation Levels 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html" target="_blank" rel="noopener"
+&gt;MySQL 트랜잭션 격리 수준 비교&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://martin.kleppmann.com/" target="_blank" rel="noopener"
+&gt;Martin Kleppmann&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>역정규화, 언제 그리고 왜 사용하는가?</title><link>https://blog.b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</link><pubDate>Mon, 02 Jun 2025 08:57:20 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-02-db-erd-reverse-normalization-when-and-why-do-you-use-it/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;데이터베이스 정규화는 이상 현상을 방지하고 데이터 일관성을 보장하기 위한 핵심 원칙이다.&lt;/p&gt;
+&lt;p&gt;그러나 실전에서는 정규화된 모델이 항상 최고의 선택은 아니다.
+자세한 내용은 다음에 다뤄보고 이번엔 &lt;strong&gt;역정규화(Denormalization)&lt;/strong&gt; 가 필요하게 되는 상황과, 이를 적용할 때의 고려사항 및 장단점을 간단한 사례와 함께 살펴본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="정규화와-현실의-간극"&gt;정규화와 현실의 간극
+&lt;/h3&gt;&lt;p&gt;정규화는 테이블 간 중복을 줄이고 무결성을 유지하기 위한 훌륭한 이론이다.
+하지만 현실에서는 다음과 같은 상황에서 정규화된 모델이 병목이 되기도 한다.&lt;/p&gt;
+&lt;h4 id="역정규화가-필요한-대표적인-상황"&gt;역정규화가 필요한 대표적인 상황
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;복잡한 조인이 빈번하게 발생하는 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 게시판 목록을 조회할 때 게시글, 작성자, 댓글 수 등 여러 테이블을 조인해야 하는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;실시간 조회 성능이 중요한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;OLTP 시스템 또는 사용자 피드, 홈화면 로딩 등 수 ms 단위 응답이 필요한 상황&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;읽기 비율이 매우 높은 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;쓰기보다 읽기가 훨씬 많고, 동일한 데이터를 반복 조회하는 경우 캐싱 효과를 극대화하기 위해 역정규화를 적용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;집계 데이터가 자주 필요한 경우&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;주문 총액, 리뷰 수, 좋아요 수 등 매번 COUNT, SUM을 하지 않고 별도로 저장&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="역정규화-적용-시-고려사항"&gt;역정규화 적용 시 고려사항
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;고려 내용&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 정합성&lt;/td&gt;
+&lt;td&gt;중복된 컬럼이 여러 테이블에 있을 경우, 변경 시 일관성 유지가 어려움&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;유지보수 복잡도&lt;/td&gt;
+&lt;td&gt;역정규화된 필드는 직접 관리하거나 트리거, 애플리케이션 로직으로 동기화해야 함&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;성능 이점&lt;/td&gt;
+&lt;td&gt;조회 속도와 쿼리 단순화에는 확실한 효과가 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 증가&lt;/td&gt;
+&lt;td&gt;중복 데이터로 인해 테이블 크기가 커질 수 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;→ &lt;strong&gt;결국, ‘성능’과 ‘정합성’ 사이의 균형&lt;/strong&gt;을 고려하여 설계해야 한다.&lt;/p&gt;
+&lt;h3 id="장단점-비교"&gt;장단점 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;장점&lt;/th&gt;
+&lt;th&gt;단점&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;- 조인 최소화로 인한 속도 향상 &lt;br&gt;- 쿼리 복잡도 감소 &lt;br&gt;- 집계 데이터 미리 보관 가능&lt;/td&gt;
+&lt;td&gt;- 데이터 정합성 문제 가능성 &lt;br&gt;- 유지보수 로직 증가 &lt;br&gt;- 중복 데이터로 저장 공간 낭비&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="실무에서의-팁"&gt;실무에서의 팁
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정규화된 모델로 먼저 설계하고&lt;/strong&gt;, 필요한 곳에만 역정규화한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;집계용 컬럼은 write-through 방식&lt;/strong&gt;으로 관리하거나, 이벤트 기반 비동기 처리도 고려한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Redis, ElasticSearch와 같은 서브 시스템&lt;/strong&gt;으로 조회 성능을 분산시키는 것도 대안이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;“모든 데이터베이스는 처음엔 정규화로 시작하고, 결국엔 역정규화로 최적화된다.”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;정규화와 역정규화는 대립이 아닌 균형의 문제다.
+목적에 맞는 데이터 구조 설계가 진짜 실력이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;제1정규형~제3정규형 이해&lt;/li&gt;
+&lt;li&gt;기본 SQL 조인과 인덱스 작동 방식&lt;/li&gt;
+&lt;li&gt;데이터베이스 성능 튜닝 기초&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://martinfowler.com/books/refactoringDatabases.html" target="_blank" rel="noopener"
+&gt;Martin Fowler - Refactoring Databases&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;PostgreSQL Performance Tuning&lt;/li&gt;
+&lt;li&gt;CQRS (Command Query Responsibility Segregation) 아키텍처&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>DDL VS DML</title><link>https://blog.b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</link><pubDate>Mon, 02 Jun 2025 08:34:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-02-db-sql-differences-between-ddl-and-dml/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;SQL은 데이터베이스를 다루기 위한 언어지만, 그 목적에 따라 크게 두 가지로 나뉜다.&lt;/p&gt;
+&lt;p&gt;바로 &lt;strong&gt;DDL(Data Definition Language)&lt;/strong&gt; 과 &lt;strong&gt;DML(Data Manipulation Language)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이 둘의 차이점을 명확히 정리하고, 각각의 대표적인 명령어와 그 용도를 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ddl-데이터-정의-언어-data-definition-language"&gt;DDL: 데이터 정의 언어 (Data Definition Language)
+&lt;/h3&gt;&lt;p&gt;DDL은 데이터베이스의 구조를 정의하는 데 사용된다.
+즉, &lt;strong&gt;테이블, 스키마, 인덱스, 뷰&lt;/strong&gt; 등을 생성, 변경, 삭제할 때 사용하는 명령어들이다.
+이러한 작업은 데이터의 틀을 잡는 작업이므로, 주로 개발 초기나 데이터 모델링 단계에서 많이 사용된다.&lt;/p&gt;
+&lt;h4 id="대표-명령어"&gt;대표 명령어
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CREATE&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;테이블이나 데이터베이스 객체를 생성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;INT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;PRIMARY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;KEY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;VARCHAR&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ALTER&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;기존 테이블의 구조 변경 (컬럼 추가/수정/삭제 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ADD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;email&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;VARCHAR&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DROP&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;테이블이나 객체를 삭제&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;DROP&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TRUNCATE&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;테이블을 비우되, 테이블 구조는 남김&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;TRUNCATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;DDL 명령은 대부분 &lt;strong&gt;자동 커밋(autocommit)&lt;/strong&gt; 되어, 되돌릴 수 없는 경우가 많다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="dml-데이터-조작-언어-data-manipulation-language"&gt;DML: 데이터 조작 언어 (Data Manipulation Language)
+&lt;/h3&gt;&lt;p&gt;DML은 이미 정의된 테이블 내의 &lt;strong&gt;데이터를 다루는 데&lt;/strong&gt; 사용된다.
+즉, 데이터를 조회하고, 추가하고, 수정하고, 삭제하는 등의 &amp;ldquo;행위&amp;quot;에 관련된 명령어들이다.&lt;/p&gt;
+&lt;h4 id="대표-명령어-1"&gt;대표 명령어
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SELECT&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데이터를 조회&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;WHERE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;INSERT&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;새로운 데이터를 추가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;INSERT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;INTO&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;VALUES&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Alice&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;기존 데이터를 수정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;UPDATE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;SET&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Bob&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;WHERE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;DELETE&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데이터를 삭제&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;DELETE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;users&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;WHERE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;DML 명령은 &lt;strong&gt;트랜잭션(transaction)&lt;/strong&gt; 에 의해 제어되며, &lt;code&gt;COMMIT&lt;/code&gt; 혹은 &lt;code&gt;ROLLBACK&lt;/code&gt;이 가능하다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ddl-vs-dml-요약-비교"&gt;DDL vs DML 요약 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;DDL&lt;/th&gt;
+&lt;th&gt;DML&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;목적&lt;/td&gt;
+&lt;td&gt;데이터 구조 정의&lt;/td&gt;
+&lt;td&gt;데이터 조작&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;대상&lt;/td&gt;
+&lt;td&gt;테이블, 뷰, 인덱스 등&lt;/td&gt;
+&lt;td&gt;테이블 내 행(row)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;트랜잭션&lt;/td&gt;
+&lt;td&gt;자동 커밋(rollback 불가)&lt;/td&gt;
+&lt;td&gt;트랜잭션 제어 가능&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 시점&lt;/td&gt;
+&lt;td&gt;설계, 구조 변경&lt;/td&gt;
+&lt;td&gt;운영, 조회/수정/삭제/추가&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="ddl-dml-dcl이란"&gt;DDL, DML, DCL이란?
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;분류&lt;/th&gt;
+&lt;th&gt;명령어&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;DML&lt;/strong&gt;(Data Manipulation Language)데이터 조작어&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;SELECT&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;데이터베이스에 저장된 데이터를 조회하거나 검색하는 명령어.일명 &lt;code&gt;RETRIEVE&lt;/code&gt;라고도 함.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;INSERT&lt;/code&gt; &lt;code&gt;UPDATE&lt;/code&gt; &lt;code&gt;DELETE&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;테이블에 데이터를 삽입, 수정, 삭제하는 명령어.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;DDL&lt;/strong&gt;(Data Definition Language)데이터 정의어&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;CREATE&lt;/code&gt; &lt;code&gt;ALTER&lt;/code&gt; &lt;code&gt;DROP&lt;/code&gt; &lt;code&gt;RENAME&lt;/code&gt; &lt;code&gt;TRUNCATE&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;테이블, 뷰, 인덱스 등 데이터 구조를 정의(생성, 변경, 삭제, 이름변경 등)하는 명령어.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;DCL&lt;/strong&gt;(Data Control Language)데이터 제어어&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;GRANT&lt;/code&gt; &lt;code&gt;REVOKE&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;사용자에게 데이터베이스 객체에 대한 권한을 부여하거나 회수하는 명령어.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;TCL&lt;/strong&gt;(Transaction Control Language)트랜잭션 제어어&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;COMMIT&lt;/code&gt; &lt;code&gt;ROLLBACK&lt;/code&gt; &lt;code&gt;SAVEPOINT&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;DML 명령으로 변경된 데이터를 트랜잭션 단위로 확정하거나 취소하거나, 중간 저장점을 설정하는 명령어.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;DDL은 구조를, DML은 내용을 다룬다.
+데이터베이스를 이해하고 활용하려면 이 두 가지의 차이를 명확히 아는 것이 핵심이다.
+DDL로 틀을 만들고, DML로 그 틀 안을 채우는 구조로 SQL을 학습해 보자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;데이터베이스 기본 개념 (테이블, 행, 열)&lt;/li&gt;
+&lt;li&gt;SQL 구문 기본 문법&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.postgresql.org/docs/current/sql-commands.html" target="_blank" rel="noopener"
+&gt;PostgreSQL Documentation – SQL Commands&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://sqlbolt.com/" target="_blank" rel="noopener"
+&gt;SQLBolt – Learn SQL the easy way&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.w3schools.com/sql/" target="_blank" rel="noopener"
+&gt;W3Schools SQL Tutorial&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

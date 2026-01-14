@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Podman on B9F1</title><link>https://blog.b9f1.com/tags/podman/</link><description>Recent content in Podman on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 24 Jun 2025 14:04:36 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/podman/index.xml" rel="self" type="application/rss+xml"/><item><title>컨테이너 기술 vs Docker</title><link>https://blog.b9f1.com/p/2025-06-24-infra-same-but-different-concept-container-technology-and-docker/</link><pubDate>Tue, 24 Jun 2025 14:04:36 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-24-infra-same-but-different-concept-container-technology-and-docker/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Docker와 컨테이너는 다르다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;많은 개발자가 처음 접하는 컨테이너 기술은 Docker로 이어지지만 사실 Docker는 컨테이너 기술을 기반으로 만들어진 하나의 구현체일 뿐이다.&lt;/p&gt;
+&lt;p&gt;Docker보다 훨씬 이전에 등장했던 컨테이너 기술의 뿌리를 짚고 Docker가 어떤 혁신을 만들어냈는지, 또 최근에는 어떤 대체 도구들이 등장했는지 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="컨테이너-기술의-본질"&gt;컨테이너 기술의 본질
+&lt;/h3&gt;&lt;p&gt;컨테이너란 운영체제 수준에서 프로세스를 격리(isolation)하여 마치 독립된 시스템처럼 동작하게 하는 기술이다.&lt;/p&gt;
+&lt;p&gt;이 격리는 주로 아래 두 가지 리눅스 커널 기능을 조합해서 이루어진다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;네임스페이스(namespace)
+&lt;ul&gt;
+&lt;li&gt;프로세스, 파일 시스템, 사용자 ID, 네트워크 등 다양한 시스템 리소스를 다른 컨테이너와 분리하는 기술&lt;/li&gt;
+&lt;li&gt;첫 등장: 2002년 mount namespace (&lt;code&gt;Linux 2.4.19&lt;/code&gt;), 본격적으로 컨테이너화 가능해진 시점은 &lt;code&gt;2008년 2.6.24&lt;/code&gt; 이후&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;cgroups(control groups)
+&lt;ul&gt;
+&lt;li&gt;CPU, 메모리, 디스크 등 리소스 사용량을 제한하고 분리할 수 있도록 해주는 기능&lt;/li&gt;
+&lt;li&gt;구글이 2006년 내부적으로 개발, &lt;code&gt;2008년 리눅스 2.6.24&lt;/code&gt;에 정식 포함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;리눅스 커널 2.6.24부터 namespace와 cgroups가 안정적으로 통합되며 현대적인 컨테이너 개념이 실현 가능해졌다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="docker-이전에도-컨테이너는-있었다"&gt;Docker 이전에도 컨테이너는 있었다
+&lt;/h3&gt;&lt;p&gt;컨테이너 기술이 단지 Docker로부터 시작되었다고 생각하지 말자.
+대표적인 두 가지 사례만 봐도 충분하다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Google Borg(2006~)
+&lt;ul&gt;
+&lt;li&gt;구글은 자체 클러스터 관리 시스템인 Borg에서 &lt;code&gt;process containers&lt;/code&gt;라는 이름으로 컨테이너 기술을 도입해 사용하고 있었다. 이 경험은 나중에 &lt;code&gt;Kubernetes&lt;/code&gt;(&lt;code&gt;k8s&lt;/code&gt;)로 이어지게 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LXC(Linux Containers)
+&lt;ul&gt;
+&lt;li&gt;2008년 등장한 LXC는 리눅스 네임스페이스와 cgroups를 조합해 독립된 사용자 공간을 제공하는 최초의 완전한 리눅스 컨테이너 런타임이었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;즉, Docker 이전에도 컨테이너는 실제 운영 환경에서 사용되고 있었다.&lt;/p&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;k8s&lt;/code&gt;(kubernetes), &lt;code&gt;i18n&lt;/code&gt;(internationalization), &lt;code&gt;a11y&lt;/code&gt;(accessibility) 같은 축약어는 단어의 첫 글자 + 생략된 글자 수 + 마지막 글자 형태로 만들어진 축약어다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;긴 단어를 짧게 줄여서 쓰기 편하게&lt;/li&gt;
+&lt;li&gt;기술 문서나 코드에서 가독성과 공간 절약을 위해&lt;/li&gt;
+&lt;li&gt;축약하면서도 고유성을 유지&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="docker는-무엇이-달랐나"&gt;Docker는 무엇이 달랐나?
+&lt;/h3&gt;&lt;p&gt;Docker는 2013년에 등장하여 기존 컨테이너 기술을 개발자 친화적으로 쉽게 쓸 수 있도록 UX를 패키징한 도구로서 주목받았다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Docker는 컨테이너 기술 자체를 발명한 게 아니라 그것을 &amp;lsquo;쉽게 쓸 수 있도록&amp;rsquo; 만들어 낸 데 혁신이 있다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Docker의 핵심 혁신:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DockerFile&lt;/code&gt;로 정의 가능한 이미지 기반 환경 구성&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;docker run&lt;/code&gt; 같은 직관적인 CLI&lt;/li&gt;
+&lt;li&gt;Docker Hub를 통한 이미지 공유 및 배포&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="또-다른-컨테이너-도구들"&gt;또 다른 컨테이너 도구들
+&lt;/h3&gt;&lt;p&gt;컨테이너 기술은 OCI(Open Container Initiative)라는 표준에 의해 정의된다.
+이 표준을 기반으로 다양한 런타임이 Docker 외에도 등장하고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Container Runtime: 컨테이너를 실행하는 역할
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;runc&lt;/code&gt;: Docker도 내부적으로 사용하는 기본 실행기&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;conatinerd&lt;/code&gt;: CNCF가 관리하는 Docker 독립형 런타임&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CRI-O&lt;/code&gt;: Kubernetes 전용으로 설계된 경량 런타임임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Docker 대체 도구:
+&lt;ul&gt;
+&lt;li&gt;Podman: rootless 컨테이너, systemd 통합 지원, Docker Daemon 없이 작동&lt;/li&gt;
+&lt;li&gt;Buildah: Dockerfile 없이 이미지 빌드 가능, Podman과 연동&lt;/li&gt;
+&lt;li&gt;Kubernetes: 직접 컨테이너를 실행하지 않지만 런타임 인터페이스(Container Runtime Interface - CRI)를 통해 위 런타임과 연동&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="docker는-이제-표준이-아니다"&gt;Docker는 이제 표준이 아니다?
+&lt;/h3&gt;&lt;p&gt;2020년 이후 Kubernetes는 Docker를 기본 런타임에서 제외했고 대신 &lt;code&gt;containered&lt;/code&gt;, &lt;code&gt;CRI-O&lt;/code&gt;와 같은 런타임을 사용한다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Docker가 문제가 아니라 Docker의 구조가 Kubernetes와 궁합이 맞지 않아서다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Kubernetes는 CRI라는 표준 API로 런타임을 호출한다.
+하지만 Docker는 이 CRI를 직접 구현하지 않고 중간 계층(containerd + shim)을 사용해 간접적으로 연동된다.&lt;/p&gt;
+&lt;p&gt;오히려 containerd나 CRI-O처럼 CRI를 직접 구현한 런타임이 더 효율적이다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;컨테이너는 기술이고 Docker는 그 기술을 손쉽게 만든 하나의 도구다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Docker는 훌륭한 UX 도구지만 그 자체가 컨테이너 기술의 전부는 아니다.
+컨테이너 생태계는 이제 Docker를 넘어 다양화되고 있으며 오픈소스 커뮤니티와 표준화가 이를 이끌고 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;이미지 빌드와 레이어 개념&lt;/li&gt;
+&lt;li&gt;Kubernetes의 CRI(Container Runtime Interface)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Linux_namespaces" target="_blank" rel="noopener"
+&gt;Linux namespaces - Wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Cgroups" target="_blank" rel="noopener"
+&gt;Cgroups - Wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Linux_namespaces" target="_blank" rel="noopener"
+&gt;리눅스 커널 2.6 - 네임스페이스 기반 컨테이너 기술&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://news.ycombinator.com/item?id=30327507" target="_blank" rel="noopener"
+&gt;Google Borg (2006~) – Docker 이전부터 컨테이너 활용&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.aquasec.com/blog/a-brief-history-of-containers-from-1970s-chroot-to-docker-2016" target="_blank" rel="noopener"
+&gt;LXC (Linux Containers) – Docker보다 선행한 사례&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://opencontainers.org/" target="_blank" rel="noopener"
+&gt;Open Container Initiative (OCI)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://podman.io/" target="_blank" rel="noopener"
+&gt;Podman 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://containerd.io/" target="_blank" rel="noopener"
+&gt;containerd 공식 사이트&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CS on B9F1</title><link>https://blog.b9f1.com/categories/cs/</link><description>Recent content in CS on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 30 Aug 2025 13:33:52 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/categories/cs/index.xml" rel="self" type="application/rss+xml"/><item><title>네트워크 계층 모델 비교</title><link>https://blog.b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</link><pubDate>Sat, 30 Aug 2025 13:33:52 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-08-30-comparison-of-network-layer-models/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;네트워크를 이해할 때 가장 먼저 마주하는 개념이 바로 &lt;strong&gt;계층 모델(Layered Model)&lt;/strong&gt; 이다.&lt;/p&gt;
+&lt;p&gt;대표적으로 &lt;strong&gt;TCP/IP 4계층 모델&lt;/strong&gt;과 &lt;strong&gt;OSI 7계층 모델&lt;/strong&gt;이 있는데, 두 모델은 네트워크 통신을 구조적으로 설명하는 기준이 된다.&lt;/p&gt;
+&lt;p&gt;두 모델을 각각 설명하고, 어떤 차이가 있으며 실무에서는 어떻게 이해하면 좋은지 다뤄본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="osi-7계층-모델"&gt;OSI 7계층 모델
+&lt;/h3&gt;&lt;p&gt;국제표준화기구(ISO)에서 제정한 &lt;strong&gt;OSI(Open Systems Interconnection)&lt;/strong&gt; 모델은 네트워크 통신 과정을 7단계로 나눈다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;물리 계층 (Physical)&lt;/strong&gt;: 전기 신호, 케이블, 하드웨어 전송 매체&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 링크 계층 (Data Link)&lt;/strong&gt;: MAC 주소, 프레임 전송, 오류 검출 (예: Ethernet, Switch)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 계층 (Network)&lt;/strong&gt;: IP 주소 기반 라우팅 (예: IP, Router)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: 종단 간 통신, 신뢰성 보장 (예: TCP, UDP)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;세션 계층 (Session)&lt;/strong&gt;: 세션 관리, 연결 유지/종료 (예: NetBIOS)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;표현 계층 (Presentation)&lt;/strong&gt;: 데이터 형식 변환, 암호화 (예: SSL/TLS, JPEG)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 사용자 서비스 제공 (예: HTTP, FTP, SMTP)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+flowchart LR
+%% 송신 측
+subgraph Sender[송신 측 - Encapsulation]
+direction TB
+A1[응용 계층] --&gt; A2[전송 계층] --&gt; A3[네트워크 계층] --&gt; A4[데이터 링크 계층] --&gt; A5[물리 계층]
+A1_side[Data] --- A1
+A2_side[TCP/UDP Header + Data] --- A2
+A3_side[IP Header + TCP Segment] --- A3
+A4_side[MAC Header + IP Packet + CRC] --- A4
+A5_side[010101 비트 스트림] --- A5
+end
+%% 수신 측
+subgraph Receiver[수신 측 - Decapsulation]
+direction TB
+B5[물리 계층] --&gt; B4[데이터 링크 계층] --&gt; B3[네트워크 계층] --&gt; B2[전송 계층] --&gt; B1[응용 계층]
+B5_side[010101 비트 스트림] --- B5
+B4_side[프레임 해제 → IP Packet] --- B4
+B3_side[패킷 해제 → TCP Segment] --- B3
+B2_side[세그먼트 해제 → Data] --- B2
+B1_side[Application Data 복원] --- B1
+end
+%% 송수신 연결
+A5 --전송--&gt; B5
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id="tcpip-4계층-모델"&gt;TCP/IP 4계층 모델
+&lt;/h3&gt;&lt;p&gt;실제 인터넷 프로토콜에서 사용되는 구조는 &lt;strong&gt;TCP/IP 모델&lt;/strong&gt;이다. OSI보다 단순화되어 있으며, 실무에서는 이 모델을 주로 따른다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 액세스 계층 (Network Access)&lt;/strong&gt;: 하드웨어 인터페이스, 데이터 링크 &amp;amp; 물리 계층 포함&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인터넷 계층 (Internet)&lt;/strong&gt;: IP 주소 기반 라우팅 (IP, ICMP 등)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전송 계층 (Transport)&lt;/strong&gt;: TCP/UDP 기반 통신 제어&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;응용 계층 (Application)&lt;/strong&gt;: 애플리케이션 서비스 (HTTP, FTP, DNS, SMTP 등)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;오늘날 인터넷이 동작하는 실제 표준 구조다.&lt;/p&gt;
+&lt;h3 id="두-모델의-비교"&gt;두 모델의 비교
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;OSI 7계층&lt;/th&gt;
+&lt;th&gt;TCP/IP 4계층&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;계층 수&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;TCP/IP는 실용적으로 단순화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;정의 기관&lt;/td&gt;
+&lt;td&gt;ISO&lt;/td&gt;
+&lt;td&gt;ARPANET/DoD&lt;/td&gt;
+&lt;td&gt;목적 차이: 이론 vs 실무&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;표현/세션&lt;/td&gt;
+&lt;td&gt;독립 계층 존재&lt;/td&gt;
+&lt;td&gt;응용 계층에 통합&lt;/td&gt;
+&lt;td&gt;OSI는 세밀, TCP/IP는 실용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;전송 계층&lt;/td&gt;
+&lt;td&gt;TCP/UDP 모두 포함&lt;/td&gt;
+&lt;td&gt;동일&lt;/td&gt;
+&lt;td&gt;신뢰성(연결형 vs 비연결형) 제공&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보급&lt;/td&gt;
+&lt;td&gt;이론/교육 중심&lt;/td&gt;
+&lt;td&gt;인터넷 표준&lt;/td&gt;
+&lt;td&gt;TCP/IP가 사실상 전세계 표준&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="mermaid-container zoomable"&gt;
+&lt;pre class="mermaid"&gt;
+graph TD
+subgraph OSI_7
+OSI1["응용 계층&lt;br/&gt;(Application)"]
+OSI2["표현 계층&lt;br/&gt;(Presentation)"]
+OSI3["세션 계층&lt;br/&gt;(Session)"]
+OSI4["전송 계층&lt;br/&gt;(Transport)"]
+OSI5["네트워크 계층&lt;br/&gt;(Network)"]
+OSI6["데이터 링크 계층&lt;br/&gt;(Data Link)"]
+OSI7["물리 계층&lt;br/&gt;(Physical)"]
+end
+subgraph TCPIP_4
+TCP1["응용 계층&lt;br/&gt;(Application)"]
+TCP2["전송 계층&lt;br/&gt;(Transport)"]
+TCP3["인터넷 계층&lt;br/&gt;(Internet)"]
+TCP4["네트워크 액세스 계층&lt;br/&gt;(Network Access)"]
+end
+%% 매핑 관계
+OSI1 --&gt; TCP1
+OSI2 --&gt; TCP1
+OSI3 --&gt; TCP1
+OSI4 --&gt; TCP2
+OSI5 --&gt; TCP3
+OSI6 --&gt; TCP4
+OSI7 --&gt; TCP4
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;네트워크 공부 초기에 &amp;ldquo;OSI 7계층&amp;quot;을 무조건 외워야 하는지 의문이었다.
+하지만 실무에서는 “이론적 설명”보다 TCP/IP 모델이 더 쓰인다.
+결국 “OSI는 네트워크 교과서의 언어, TCP/IP는 인터넷의 언어”라고 이해하면 쉽다.
+즉, &lt;strong&gt;OSI는 이상적인 개념도, TCP/IP는 현실 세계 지도&lt;/strong&gt;라고 비유할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;OSI 7계층은 개념적 학습과 문제 진단에 유용하고, TCP/IP 4계층은 인터넷의 실제 동작 표준이다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;즉, 공부할 때는 OSI로 세밀하게 이해하고, 실무에서는 TCP/IP로 단순하게 적용하는 것이 가장 효율적이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;네트워크 기본 용어 (패킷, 프레임, 포트, 프로토콜)&lt;/li&gt;
+&lt;li&gt;인터넷 프로토콜(IP), TCP/UDP 개념&lt;/li&gt;
+&lt;li&gt;OSI와 TCP/IP 모델의 역사적 배경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/OSI_model" target="_blank" rel="noopener"
+&gt;Wikipedia - OSI model&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>공공데이터포털 API</title><link>https://blog.b9f1.com/p/2025-06-06-cs-network-open-api-url-service_key_is_not_registered_error/</link><pubDate>Fri, 06 Jun 2025 11:28:27 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-06-06-cs-network-open-api-url-service_key_is_not_registered_error/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;공공데이터포털의 API 사용 시&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;포털에서 발급 받은 Encoding 또는 Decoding 키를 이용해 포털에서 테스트 응답 확인이 가능하다.&lt;/li&gt;
+&lt;li&gt;Postman 등 REST API를 테스트할 수 있는 툴에서 동일하게 응답 확인이 가능하다.&lt;/li&gt;
+&lt;li&gt;프로젝트에서 &lt;code&gt;.http&lt;/code&gt; 테스트하거나 프로그램 실행 시 &lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt; 오류를 만난다?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="url-인코딩"&gt;URL 인코딩
+&lt;/h3&gt;&lt;h4 id="퍼센트-인코딩"&gt;퍼센트 인코딩
+&lt;/h4&gt;&lt;p&gt;URL 인코딩에서는 퍼센트 인코딩(Percent encoding)이라는 방식을 사용한다.
+퍼센트 인코딩은 &lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank" rel="noopener"
+&gt;RFC 3986&lt;/a&gt;에 정의되어 있다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;퍼센트 인코딩 URL 인코딩&amp;rdquo; 뿐만 아니라 URI, URN에도 사용될 수 있고 정확히는 &amp;lsquo;퍼센트 인코딩(Percent encoding)&amp;lsquo;이라는 용어가 더 적합하다고 한다.&lt;/p&gt;
+&lt;p&gt;퍼센트 인코딩을 하는 이유는 인터넷에서 주고 받을 수 있는 문자는 ASCII 문자 뿐이기 때문이다.
+따라서 ASCII가 아닌 문자는 전송 가능한 형태로 인코딩을 해야 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;퍼센트 인코딩은 URL에서 URL로 사용할 수 없는 문자나 URL로 사용할 순 없지만 의미가 외곡될 수 있는 문자를 &lt;code&gt;%XX&lt;/code&gt; (XX는 16진수)로 변환하는 방법이다.
+&lt;ul&gt;
+&lt;li&gt;예를 들어 한글은 ASCII가 아니기 때문에 UTF-8과 같은 방식으로 인코딩해야 한다.
+&lt;ul&gt;
+&lt;li&gt;예: 감자 -&amp;gt; %EA%B0%90%EC%9E%90&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ASCII라도 예약된 의미를 가진 문자의 경우 그 문자 자체를 전달하고 싶다면 escape 처리가 필요하다.
+&lt;ul&gt;
+&lt;li&gt;예를 들어 &lt;code&gt;/&lt;/code&gt; URL의 각 레벨을 구분, &lt;code&gt;&amp;amp;&lt;/code&gt; 쿼리 파라미터를 구분, &lt;code&gt;=&lt;/code&gt; 쿼리 파라미터 값 지정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;A&amp;amp;B&lt;/code&gt;라는 글자를 보내고 싶을 땐 &lt;code&gt;A%26B&lt;/code&gt; 이런 식으로 &lt;code&gt;&amp;amp;&lt;/code&gt;을 이스케이프 처리
+URL Encoding 사이트를 이용할 수도 있다.
+&lt;a class="link" href="https://www.url-encode-decode.com/" target="_blank" rel="noopener"
+&gt;https://www.url-encode-decode.com/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="공공데이터포털-open-api"&gt;공공데이터포털 Open API
+&lt;/h4&gt;&lt;p&gt;공공데이터포털에서 제공하는 apiKey는 W3C recommendations for URI addressing에 따라 &lt;code&gt;+&lt;/code&gt;를 &lt;code&gt;%2B&lt;/code&gt;로 변환한다.&lt;/p&gt;
+&lt;p&gt;문제는 &lt;code&gt;new URI()&lt;/code&gt;, &lt;code&gt;URIComponents&lt;/code&gt; 등을 사용해도 발생하는 &lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt; 오류였다.&lt;/p&gt;
+&lt;h5 id="resttemplategetforentity"&gt;&lt;code&gt;RestTemplate.getForEntity()&lt;/code&gt;
+&lt;/h5&gt;&lt;p&gt;내부 코드를 좀 살펴보면 첫 번째 파라미터가 &lt;code&gt;URI&lt;/code&gt; 타입인 것을 확인할 수 있고 &lt;code&gt;new URI()&lt;/code&gt;로 맛있게 말아서 넘겨도 똑같은 오류를 만난다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;getForEntity&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;URI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Class&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;throws&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RestClientException&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;RequestCallback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;requestCallback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;acceptHeaderRequestCallback&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ResponseExtractor&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;ResponseEntity&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseExtractor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseEntityExtractor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;responseType&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;nonNull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HttpMethod&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;GET&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;requestCallback&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;responseExtractor&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;그 원인은 &lt;code&gt;+&lt;/code&gt; 기호가 인코딩 시 제외되는 문자이기 때문이었다.
+따라서 아래와 같이 문제가 되는 기호를 먼저 정리하고 넘기는 방식으로 성공적인 응답을 받을 수 있었다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// + 기호는 인코딩에서 제외되기 때문에 미리 변환하고 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;// URI 클래스를 사용하면 URL 전송 할 때 문자열 그대로 날아가는 것이 아닌, 한 번 인코딩을 해서 보내준다 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;URI&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;+&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;#34;%2B&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;물론 이런 패턴 말고 다른 방법도 있을 수 있지만 인터넷에서 주고 받는 URL 인코딩에 대해 더 알아 볼 수 있었다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;SERVICE_KEY_IS_NOT_REGISTERED_ERROR&lt;/code&gt;의 원인은 잘못된 URL 인코딩 처리였다.&lt;/p&gt;
+&lt;p&gt;공공데이터포털에서 제공하는 Open API는 &lt;code&gt;+&lt;/code&gt; 기호를 &lt;code&gt;%2B&lt;/code&gt;로 인코딩해야 하며, 이를 올바르게 처리하지 않으면 인증 오류가 발생한다. &lt;code&gt;RestTemplate&lt;/code&gt;이나 &lt;code&gt;URI&lt;/code&gt;를 사용할 때도 인코딩 방식의 차이를 주의 깊게 살펴야 한다.&lt;/p&gt;
+&lt;p&gt;퍼센트 인코딩의 정확한 이해와 사전 처리만으로도 오류를 쉽게 해결할 수 있었다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;퍼센트 인코딩(Percent Encoding) 또는 URL 인코딩의 개념&lt;/li&gt;
+&lt;li&gt;ASCII 문자 집합과 URL에서 허용되는 문자&lt;/li&gt;
+&lt;li&gt;Java의 &lt;code&gt;URI&lt;/code&gt;, &lt;code&gt;URLEncoder&lt;/code&gt;, &lt;code&gt;RestTemplate&lt;/code&gt;의 동작 방식 차이&lt;/li&gt;
+&lt;li&gt;공공데이터포털의 OpenAPI 인증 구조&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc3986" target="_blank" rel="noopener"
+&gt;RFC 3986 - URI Generic Syntax&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URLEncoder.html" target="_blank" rel="noopener"
+&gt;&lt;code&gt;URLEncoder&lt;/code&gt; vs &lt;code&gt;URI&lt;/code&gt; 차이점&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html" target="_blank" rel="noopener"
+&gt;Spring Framework RestTemplate 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="참고-자료"&gt;참고 자료
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://velog.io/@yeahg_dev/%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%8F%AC%ED%84%B8-SERVICEKEYISNOTREGISTEREDERROR-%EC%9B%90%EC%9D%B8-%ED%8C%8C%ED%97%A4%EC%B9%98%EA%B8%B0" target="_blank" rel="noopener"
+&gt;공공데이터포털 SERVICE_KEY_IS_NOT_REGISTERED_ERROR 원인 파헤치기&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>웹 API 진화의 핵심 전환</title><link>https://blog.b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</link><pubDate>Tue, 20 May 2025 13:23:57 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-05-20-soap-to-rest-key-transition-in-web-api-evolution/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;과거 웹 서비스 API의 표준은 SOAP(Simple Object Access Protocol)였다.&lt;/p&gt;
+&lt;p&gt;그러나 2010년대를 지나며 REST(Representational State Transfer)가 빠르게 주류로 자리 잡았고 요즘 대부분의 공개 웹 API에서 RESTful API가 사실상의 표준으로 자리 잡고 있다.&lt;/p&gt;
+&lt;p&gt;웹 API의 발전 과정 속에서, SOAP에서 REST로의 전환이 일어난 배경과 그에 따른 장단점을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="soap의-등장과-전성기"&gt;SOAP의 등장과 전성기
+&lt;/h3&gt;&lt;p&gt;SOAP은 WSDL(Web Service Definition Language), XML 기반 메시지 포맷 그리고 HTTP 외에도 SMTP나 FTP를 사용할 수 있는 유연성 덕분에 초기에는 대형 엔터프라이즈 시스템에서 주로 채택되었다.
+보안(SOAP Security), 트랜잭션, 메시지 무결성 등 강력한 스펙이 특징이었다.&lt;/p&gt;
+&lt;p&gt;그러나 SOAP은 다음과 같은 문제를 가지고 있었다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;메시지 포맷이 무겁고 복잡함 (XML 기반)&lt;/li&gt;
+&lt;li&gt;학습 비용이 높고 구현이 어려움&lt;/li&gt;
+&lt;li&gt;브라우저, 모바일 등 가벼운 클라이언트 환경과 맞지 않음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="rest의-부상"&gt;REST의 부상
+&lt;/h3&gt;&lt;p&gt;2000년에 로이 필딩(Roy Fielding)이 논문에서 제시한 REST는 본래 HTTP의 아키텍처 스타일로 제안된 개념이었지만 시간이 지나며 &amp;ldquo;RESTful API&amp;quot;라는 개념으로 대중화되었다.&lt;/p&gt;
+&lt;p&gt;REST의 핵심은 자원(Resource) 지향 아키텍처와 표준 HTTP 메서드(GET, POST, PUT, DELETE)를 활용한 통신이다.&lt;/p&gt;
+&lt;p&gt;REST가 빠르게 채택된 이유는 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTP라는 웹의 표준을 그대로 활용&lt;/li&gt;
+&lt;li&gt;JSON 기반 경량 메시지 포맷 (브라우저/모바일 친화적)&lt;/li&gt;
+&lt;li&gt;상태 없는(stateless) 구조로 확장성 우수&lt;/li&gt;
+&lt;li&gt;클라이언트와 서버 간 결합도가 낮음&lt;/li&gt;
+&lt;li&gt;문서화가 간단하고 테스트/디버깅이 쉬움&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="soap-vs-rest"&gt;SOAP VS REST
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;항목&lt;/th&gt;
+&lt;th&gt;SOAP&lt;/th&gt;
+&lt;th&gt;REST&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;메시지 포맷&lt;/td&gt;
+&lt;td&gt;XML (무겁고 엄격)&lt;/td&gt;
+&lt;td&gt;JSON, XML (가볍고 유연)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;표준&lt;/td&gt;
+&lt;td&gt;WSDL 등 다양한 스펙 존재&lt;/td&gt;
+&lt;td&gt;명확한 표준 없음 (URI, HTTP 활용)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;보안, 트랜잭션&lt;/td&gt;
+&lt;td&gt;WS-Security, WS-Atomic 등 내장 지원&lt;/td&gt;
+&lt;td&gt;HTTP 보안 활용, 트랜잭션 미지원&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;상태성&lt;/td&gt;
+&lt;td&gt;상태 유지(Stateful) 가능&lt;/td&gt;
+&lt;td&gt;Stateless 기반&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;학습 곡선&lt;/td&gt;
+&lt;td&gt;높음 (설정과 구현 복잡)&lt;/td&gt;
+&lt;td&gt;낮음 (간단한 HTTP 인터페이스)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;확장성과 경량성&lt;/td&gt;
+&lt;td&gt;제한적&lt;/td&gt;
+&lt;td&gt;뛰어남&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="rest-이후의-대안이-있을까"&gt;REST 이후의 대안이 있을까?
+&lt;/h3&gt;&lt;p&gt;REST는 단순하고 확장 가능한 아키텍처지만, 다음과 같은 한계가 존재한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;과도한 데이터 전송 (Over-fetching/Under-fetching)&lt;/li&gt;
+&lt;li&gt;정적인 엔드포인트 설계&lt;/li&gt;
+&lt;li&gt;실시간 양방향 통신 미지원&lt;/li&gt;
+&lt;li&gt;리소스 간 관계 표현의 어려움&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이러한 문제를 해결하기 위한 대안으로 다음 기술이 떠오르고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GraphQL&lt;/strong&gt;: 클라이언트가 필요한 데이터만 요청할 수 있어 Over-fetching/Under-fetching 문제를 해소함.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;gRPC&lt;/strong&gt;: HTTP/2 기반의 양방향 스트리밍과 낮은 대역폭, 빠른 응답속도를 제공하여 마이크로서비스 간 통신에 적합함.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Async API, WebSocket 기반 API&lt;/strong&gt;: 실시간 스트리밍 통신 및 이벤트 기반 시스템에 특화됨.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이렇듯 REST는 여전히 강력한 기본값이지만, 목적에 따라 더 나은 대안들이 상황별로 사용되고 있다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;페이스북, 트위터, 구글, 아마존 등 주요 플랫폼 API는 거의 모두 REST 기반이다.
+심지어 마이크로소프트도 SOAP에서 REST 기반 API로 점진적으로 이동하고 있다고 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;HTTP 메서드(GET, POST, PUT, DELETE)&lt;/li&gt;
+&lt;li&gt;XML vs. JSON 포맷&lt;/li&gt;
+&lt;li&gt;클라이언트-서버 아키텍처&lt;/li&gt;
+&lt;li&gt;상태 유지(Stateful) vs 상태 없음(Stateless)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm" target="_blank" rel="noopener"
+&gt;Architectural Styles and the Design of Network-based Software Architectures - Roy Thomas Fielding&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/api-management/restify-soap-api" target="_blank" rel="noopener"
+&gt;Import a SOAP API to API Management and convert it to REST&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design" target="_blank" rel="noopener"
+&gt;RESTful API 디자인 가이드 - Microsoft&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://blog.postman.com/soap-vs-rest/" target="_blank" rel="noopener"
+&gt;SOAP vs REST 비교 블로그 - Postman&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://graphql.org/" target="_blank" rel="noopener"
+&gt;GraphQL 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://grpc.io/" target="_blank" rel="noopener"
+&gt;gRPC 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>TCP vs UDP</title><link>https://blog.b9f1.com/p/2025-04-19-differences-between-tcp-and-udp/</link><pubDate>Sat, 19 Apr 2025 10:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-19-differences-between-tcp-and-udp/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;네트워크 기초에서 가장 먼저 마주치는 질문 중 하나 &amp;ldquo;TCP와 UDP는 뭐가 다른가?&amp;rdquo;
+이 두 전송 계층 프로토콜의 구조적 차이, 성능 트레이드오프, 사용 사례 등을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="전송-계층의-두-얼굴"&gt;전송 계층의 두 얼굴
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;패킷이란?&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;정보 기술에서 패킷 방식의 컴퓨터 네트워크가 전달하는 데이터의 형식화된 블록이다.
+즉, 컴퓨터 네트워크에서 데이터를 주고 받을 때 정해 놓은 규칙이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;인터넷은 데이터를 잘게 나눈 패킷을 여러 장비를 통해 전달하는 구조다.
+이때 각 패킷이 어떤 방식으로 전송되는지를 결정짓는 핵심이 바로 전송 계층의 프로토콜이다.
+대표적으로 TCP(Transmission Control Protocol)과 UDP(User Datagram Protocol)이 있다.&lt;/p&gt;
+&lt;h4 id="tcp란"&gt;TCP란?
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;연결 지향(Connection-oriented) 방식&lt;/li&gt;
+&lt;li&gt;데이터 전달의 신뢰성 보장: 손실, 순서 뒤바뀜, 중복 등 방지&lt;/li&gt;
+&lt;li&gt;3-way handshake로 연결 성립&lt;/li&gt;
+&lt;li&gt;흐름 제어 및 혼잡 제어 존재&lt;/li&gt;
+&lt;li&gt;대표 사례: HTTP, HTTPS, FTP, 이메일(SMTP/IMAP)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="udp란"&gt;UDP란?
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;비연결형(Connectionless) 방식&lt;/li&gt;
+&lt;li&gt;빠르지만 신뢰성 없음: 패킷 손실, 순서 바뀜 감수&lt;/li&gt;
+&lt;li&gt;handshake 없음, 오버헤드 낮고 속도가 빠름&lt;/li&gt;
+&lt;li&gt;대표 사례: 스트리밍, 게임, VoIP(인터넷 전화), 실시간 방송&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="빠르게-비교해보기"&gt;빠르게 비교해보기
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;TCP&lt;/th&gt;
+&lt;th&gt;UDP&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;연결 방식&lt;/td&gt;
+&lt;td&gt;연결형 (3-way handshake)&lt;/td&gt;
+&lt;td&gt;비연결형&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;신뢰성&lt;/td&gt;
+&lt;td&gt;높음 (재전송, 순서 보장)&lt;/td&gt;
+&lt;td&gt;낮음 (유실 감수)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;속도&lt;/td&gt;
+&lt;td&gt;느림&lt;/td&gt;
+&lt;td&gt;빠름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;헤더 크기&lt;/td&gt;
+&lt;td&gt;20바이트 이상&lt;/td&gt;
+&lt;td&gt;8바이트&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;사용 사례&lt;/td&gt;
+&lt;td&gt;웹, 파일 전송, 이메일&lt;/td&gt;
+&lt;td&gt;게임, 영상/음성 스트리밍, DNS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;택배와 엽서로 예를 들어보자.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP = 택배
+&lt;ul&gt;
+&lt;li&gt;받는 사람 확인&lt;/li&gt;
+&lt;li&gt;배송 상태 추적&lt;/li&gt;
+&lt;li&gt;중간에 깨지면 다시 보내줌&lt;/li&gt;
+&lt;li&gt;도착 순서 지켜줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;UDP = 엽서
+&lt;ul&gt;
+&lt;li&gt;우체통에 넣으면 바로 간다&lt;/li&gt;
+&lt;li&gt;누가 받았는지 모름&lt;/li&gt;
+&lt;li&gt;중간에 없어지면 그냥 잃어버림&lt;/li&gt;
+&lt;li&gt;빨리 도착함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="선택-기준"&gt;선택 기준
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;추천 프로토콜&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 유실이 치명적인 경우 (예: 은행 송금, 로그인 등)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;TCP&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;속도가 중요하고, 약간의 유실은 괜찮은 경우 (예: 실시간 영상통화, 게임)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;UDP&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;TCP는 신뢰, UDP는 속도
+전송 계층에서 무엇을 우선시하느냐에 따라 선택이 달라진다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;정확성이 생명인 금융 거래, 로그인 등은 TCP&lt;/li&gt;
+&lt;li&gt;실시간성과 속도가 중요한 게임, 방송은 UDP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;OSI 7계층 모델 중 전송 계층의 역할&lt;/li&gt;
+&lt;li&gt;IP(인터넷 프로토콜)가 패킷을 어떻게 전달하는지 개념 이해&lt;/li&gt;
+&lt;li&gt;클라이언트-서버 모델에 대한 기초&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.wireshark.org/" target="_blank" rel="noopener"
+&gt;Wireshark로 TCP/UDP 패킷 캡쳐하기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc793" target="_blank" rel="noopener"
+&gt;RFC 793 (TCP)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://datatracker.ietf.org/doc/html/rfc768" target="_blank" rel="noopener"
+&gt;RFC 768 (UDP)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_establishment" target="_blank" rel="noopener"
+&gt;3-way handshake 개념과 흐름도&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Buffer란 무엇인가?</title><link>https://blog.b9f1.com/p/2025-04-11-cs-what-is-buffer/</link><pubDate>Fri, 11 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-11-cs-what-is-buffer/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;버퍼(Buffer)는 컴퓨터 과학에서 핵심적인 개념으로, 데이터가 시스템의 서로 다른 구성 요소 간에 처리되거나 전송되는 동안 임시로 저장되는 메모리 영역이다.&lt;/p&gt;
+&lt;p&gt;버퍼는 데이터 흐름을 관리하고 하드웨어나 소프트웨어 간 속도 차이로 인한 성능 병목 현상을 완화하며 효율성을 보장하는 데 필수적이다.&lt;/p&gt;
+&lt;p&gt;특정 프로그래밍 언어에 국한되지 않는 개념인 CS에서 버퍼의 개념, 종류, 사용 사례 등을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="버퍼란-무엇인가"&gt;버퍼란 무엇인가?
+&lt;/h3&gt;&lt;p&gt;버퍼는 데이터를 한 곳에서 다른 곳으로 이동하거나 처리할 때 임시로 저장하는 메모리 공간이다.&lt;/p&gt;
+&lt;p&gt;예를 들어, 빠른 처리 장치(예: CPU)와 느린 장치(예: 하드디스크) 간의 데이터 전송 속도 차이를 조정하거나, 네트워크를 통해 패킷이 전송될 때 데이터 손실을 방지하기 위해 버퍼가 사용된다.&lt;/p&gt;
+&lt;p&gt;쉽게 말해, 버퍼는 데이터를 &amp;ldquo;중간에 잠시 보관&amp;quot;하여 시스템이 원활하게 작동하도록 돕는 역할을 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;주요 기능&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;속도 차이 완화&lt;/strong&gt;: 서로 다른 속도로 작동하는 장치 간 데이터 흐름을 조정.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;효율성 증대&lt;/strong&gt;: 데이터를 모아서 한 번에 처리해 처리 속도를 높임.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;안정성 확보&lt;/strong&gt;: 데이터 손실이나 끊김을 방지.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="버퍼의-중요성"&gt;버퍼의 중요성
+&lt;/h3&gt;&lt;p&gt;버퍼는 컴퓨터 과학의 여러 분야에서 필수적이다.&lt;/p&gt;
+&lt;p&gt;운영체제, 네트워킹, 데이터베이스, 멀티미디어 처리 등 다양한 영역에서 버퍼를 활용해 성능을 최적화하고 사용자 경험을 개선한다.&lt;/p&gt;
+&lt;p&gt;예를 들어:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;운영체제&lt;/strong&gt;: 디스크 읽기/쓰기 작업에서 입출력(I/O) 버퍼를 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워킹&lt;/strong&gt;: TCP/UDP 프로토콜에서 송수신 버퍼로 패킷을 관리.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;멀티미디어&lt;/strong&gt;: 비디오 스트리밍에서 끊김 없는 재생을 위해 데이터를 미리 저장.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터베이스&lt;/strong&gt;: 쿼리 결과를 빠르게 제공하기 위해 캐시 버퍼를 활용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;버퍼는 단순한 메모리 저장 공간 이상의 역할을 하며, 시스템 설계와 성능 최적화에서 중요한 요소이다.&lt;/p&gt;
+&lt;h3 id="버퍼의-종류"&gt;버퍼의 종류
+&lt;/h3&gt;&lt;p&gt;버퍼는 사용 목적, 구현 방식, 위치 등에 따라 다양한 방식으로 분류할 수 있다.&lt;/p&gt;
+&lt;h4 id="1-사용-목적에-따른-분류"&gt;1. 사용 목적에 따른 분류
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;입출력 버퍼&lt;/strong&gt;: 파일 읽기/쓰기, 디스크 I/O에서 데이터를 임시 저장. 예: 하드디스크에서 데이터를 읽을 때 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 버퍼&lt;/strong&gt;: 네트워크 패킷을 저장해 전송 지연을 줄임. 예: 라우터의 송수신 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;캐시 버퍼&lt;/strong&gt;: 자주 사용하는 데이터를 빠르게 접근하도록 저장. 예: 데이터베이스 쿼리 캐시.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;스트리밍 버퍼&lt;/strong&gt;: 비디오/오디오 스트리밍에서 끊김 없는 재생을 위해 데이터를 미리 저장. 예: 유튜브의 버퍼링.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;그래픽 버퍼&lt;/strong&gt;: 화면 렌더링에서 프레임 데이터를 저장. 예: GPU의 프레임 버퍼.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-구현-방식에-따른-분류"&gt;2. 구현 방식에 따른 분류
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;소프트웨어 버퍼&lt;/strong&gt;: 응용 프로그램에서 메모리에 할당된 버퍼. 예: 파일 스트림 처리 시 메모리 내 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;하드웨어 버퍼&lt;/strong&gt;: 물리적 장치에 내장된 버퍼. 예: 네트워크 카드의 패킷 버퍼.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-위치에-따른-분류"&gt;3. 위치에 따른 분류
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;커널 버퍼&lt;/strong&gt;: 운영체제 커널에서 관리. 예: 디스크 I/O 작업의 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;사용자 공간 버퍼&lt;/strong&gt;: 응용 프로그램에서 관리. 예: 애플리케이션의 데이터 스트림 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장치 버퍼&lt;/strong&gt;: 하드웨어 장치에 위치. 예: 프린터의 출력 버퍼.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="4-크기-및-관리-방식에-따른-분류"&gt;4. 크기 및 관리 방식에 따른 분류
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;고정 크기 버퍼&lt;/strong&gt;: 크기가 고정된 버퍼. 예: 네트워크 패킷의 고정 크기 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;동적 크기 버퍼&lt;/strong&gt;: 필요에 따라 크기가 조정되는 버퍼. 예: 스트리밍 앱의 적응형 버퍼.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;순환 버퍼(Circular Buffer)&lt;/strong&gt;: 데이터를 덮어쓰며 재사용하는 방식. 예: 로그 시스템이나 실시간 데이터 처리.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="버퍼의-사용-사례"&gt;버퍼의 사용 사례
+&lt;/h3&gt;&lt;p&gt;버퍼는 다양한 상황에서 활용된다.
+실세계와 컴퓨터 시스템에서의 대표적인 사용 사례를 알아본다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;비디오 스트리밍&lt;/strong&gt;: 유튜브나 넷플릭스 같은 플랫폼은 영상 데이터를 미리 버퍼에 저장해 끊김 없는 재생을 보장한다. 버퍼링이 완료되면 영상이 재생되며, 이는 네트워크 속도와 재생 속도 간 차이를 조정하는 과정이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 입출력&lt;/strong&gt;: 파일을 읽거나 쓸 때, 데이터를 한 번에 처리하지 않고 버퍼에 모아 효율적으로 처리한다. 예를 들어, 텍스트 편집기에서 파일을 저장할 때 버퍼를 사용해 데이터를 디스크에 기록.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 통신&lt;/strong&gt;: 라우터나 네트워크 스택에서 패킷을 임시로 저장해 네트워크 혼잡을 관리한다. TCP 프로토콜은 송수신 버퍼를 사용해 데이터 전송의 신뢰성을 높인다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;게임 개발&lt;/strong&gt;: 게임 엔진에서 프레임 버퍼는 렌더링된 이미지를 저장해 부드러운 그래픽 출력을 보장한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="버퍼-관리의-모범-사례"&gt;버퍼 관리의 모범 사례
+&lt;/h3&gt;&lt;p&gt;효과적인 버퍼 관리는 시스템 성능과 안정성에 큰 영향을 미친다.
+버퍼를 사용할 때 고려해야 할 모범 사례다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;적절한 버퍼 크기 선택&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;너무 큰 버퍼는 메모리 낭비를 초래하고, 너무 작은 버퍼는 성능 저하를 일으킨다.&lt;/li&gt;
+&lt;li&gt;사용 사례에 따라 최적의 크기를 실험적으로 결정해본다.
+&lt;ul&gt;
+&lt;li&gt;예: 스트리밍에서는 네트워크 속도를 고려해 동적으로 조정.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;버퍼 오버플로우 방지&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;버퍼에 입력되는 데이터 크기를 철저히 검증해 오버플로우를 방지한다.
+&lt;ul&gt;
+&lt;li&gt;이는 보안 취약점(예: 버퍼 오버플로우 공격)을 예방하는 데 중요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;입력 데이터의 경계를 항상 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;동기화 관리&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 프로세스나 스레드가 동일한 버퍼에 접근할 때는 동기화 메커니즘(예: 락, 세마포어)을 사용해 데이터 무결성을 유지한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;메모리 효율성 고려&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;불필요한 버퍼 할당을 피하고, 사용이 끝난 버퍼는 즉시 해제한다.&lt;/li&gt;
+&lt;li&gt;순환 버퍼를 활용해 메모리 재사용을 최적화할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;성능 모니터링&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;버퍼 사용이 시스템 성능에 미치는 영향을 주기적으로 분석한다.
+&lt;ul&gt;
+&lt;li&gt;예: 네트워크 버퍼가 과부하 상태라면 크기를 조정하거나 처리 속도를 최적화해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="버퍼-관련-주의사항"&gt;버퍼 관련 주의사항
+&lt;/h3&gt;&lt;p&gt;버퍼는 강력한 도구지만, 잘못 사용하면 문제를 일으킬 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;버퍼 오버플로우(Buffer Overflow)&lt;/strong&gt;: 버퍼 크기를 초과하는 데이터 입력으로 인해 발생하며, 시스템 충돌이나 보안 취약점을 유발할 수 있다. 2000년대 초반 많은 소프트웨어가 이 문제로 해킹당한 사례가 있다고 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메모리 누수&lt;/strong&gt;: 버퍼를 해제하지 않으면 메모리 사용량이 증가해 시스템 성능이 저하될 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;지연 시간 증가&lt;/strong&gt;: 과도한 버퍼링은 데이터 처리 지연을 초래할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;예: 실시간 애플리케이션에서 큰 버퍼는 부적절하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;비효율적 관리&lt;/strong&gt;: 부적절한 버퍼 크기나 방식은 CPU 사용량 증가, 응답 시간 지연 등으로 이어질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;버퍼는 컴퓨터 과학에서 데이터 흐름을 원활하게 하고 성능을 최적화하며, 시스템 안정성을 높이는 데 없어서는 안 될 요소이다.&lt;/p&gt;
+&lt;p&gt;운영체제, 네트워킹, 데이터베이스, 멀티미디어 등 다양한 분야에서 버퍼는 필수적이며, 올바른 설계와 관리를 통해 최대한의 효율성을 끌어낼 수 있다.&lt;/p&gt;
+&lt;p&gt;버퍼의 종류와 사용 사례를 이해하고, 모범 사례를 준수한다면 시스템 성능을 크게 향상 시킬 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;p&gt;버퍼를 깊이 이해하기 위해 다음의 사전 지식과 추가 개념을 알아두면 도움이 된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;메모리 관리&lt;/strong&gt;: 버퍼는 메모리 할당과 해제의 일부이므로, 메모리 관리 원리(스택, 힙, 가비지 컬렉션 등)를 이해하면 버퍼 설계가 쉬워진다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;동시성(Concurrency)&lt;/strong&gt;: 다중 스레드 환경에서 버퍼 접근 시 동기화 문제를 다루기 위해 락(Lock)이나 세마포어(Semaphore) 같은 개념을 알아야 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;네트워크 프로토콜&lt;/strong&gt;: TCP/UDP와 같은 프로토콜에서 버퍼가 어떻게 작동하는지 이해하면 네트워크 버퍼링을 최적화할 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안&lt;/strong&gt;: 버퍼 오버플로우 공격과 같은 보안 취약점을 예방하려면 안전한 코딩 기법(예: 입력 검증)을 익히는 것이 중요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자료구조&lt;/strong&gt;: 순환 버퍼(Circular Buffer)와 같은 특정 버퍼 구현은 큐(Queue)와 유사하므로, 기본 자료구조를 학습하면 도움이 된다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;성능 최적화&lt;/strong&gt;: 캐싱, 지연 시간(Latency), 처리량(Throughput) 같은 개념을 이해하면 버퍼 크기와 관리 방식을 최적화할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;제로 카피(Zero-Copy)&lt;/strong&gt;: 버퍼 복사를 최소화해 성능을 높이는 기법.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;비동기 I/O&lt;/strong&gt;: 비동기 프로그래밍에서 버퍼가 어떻게 활용되는지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;실시간 시스템&lt;/strong&gt;: 낮은 지연 시간을 요구하는 환경에서 버퍼 관리 방법.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;버퍼 풀(Buffer Pool)&lt;/strong&gt;: 데이터베이스에서 다수의 버퍼를 관리하는 방식.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>URL 입력 후 ENTER 키</title><link>https://blog.b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</link><pubDate>Tue, 08 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-08-what-happens-when-you-type-a-url-in-the-browser-and-press-enter/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;사용자가 브라우저에 URL을 입력하고 엔터를 누르면, 요청한 웹페이지를 가져와 화면에 표시하기까지 복잡한 일련의 과정이 진행된다.&lt;/p&gt;
+&lt;p&gt;이 과정은 여러 시스템, 프로토콜, 그리고 인터넷 스택의 다양한 계층을 포함한다.
+엔지니어에게 이 과정을 이해하는 것은 성능 최적화, 보안 강화, 문제 해결에 필수적이다.&lt;/p&gt;
+&lt;p&gt;이 과정을 기술적으로 상세히 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="네트워킹"&gt;네트워킹
+&lt;/h3&gt;&lt;p&gt;브라우저는 언제 URL을 분석해서 요청을 처리할 방법을 결정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;URL의 구성 요소&lt;/strong&gt; (예: &lt;code&gt;https://www.example.com:443/path?query=value#fragment&lt;/code&gt;)
+&lt;ul&gt;
+&lt;li&gt;스키마/프로토콜: &lt;code&gt;https&lt;/code&gt;는 사용할 프로토콜(HTTP/HTTPS)을 나타낸다.&lt;/li&gt;
+&lt;li&gt;도메인: &lt;code&gt;www.example.com&lt;/code&gt;은 서버를 지정한다.&lt;/li&gt;
+&lt;li&gt;포트: &lt;code&gt;:443&lt;/code&gt;(선택 사항 HTTP는 기본 80, HTTPS는 443)&lt;/li&gt;
+&lt;li&gt;경로: &lt;code&gt;/path&lt;/code&gt;는 요청할 리소스를 식별한다.&lt;/li&gt;
+&lt;li&gt;쿼리: &lt;code&gt;?query=value&lt;/code&gt;는 추가 매개변수를 제공한다.&lt;/li&gt;
+&lt;li&gt;프래그먼트: &lt;code&gt;#fragment&lt;/code&gt;는 페이지 내 특정 섹션을 가리킨다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;유효성 검사&lt;/strong&gt;: 브라우저는 URL의 문법이 올바른지 확인한다.
+&lt;ul&gt;
+&lt;li&gt;잘못된 경우 검색 쿼리로 처리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HSTS 확인&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTPS 연결을 위해 브라우저는 HSTS(HTTP Strict Transport Security) 목록을 확인하여 도메인이 보안 연결을 요구하는지 확인한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인코딩&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;특수 문자는 URL 인코딩 (예: 공백을 &lt;code&gt;%20&lt;/code&gt;으로 변환)을 통해 처리된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="dns-조회"&gt;DNS 조회
+&lt;/h3&gt;&lt;p&gt;도메인 이름을 실제 서버의 IP 주소로 변환하는 과정.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;로컬 캐시 확인&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;브라우저와 OS는 먼저 로컬 DNS 캐시를 확인한다.
+&lt;ul&gt;
+&lt;li&gt;예: 브라우저 캐시, &lt;code&gt;/etc/hosts&lt;/code&gt; 파일&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;재귀적 DNS 쿼리&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;캐시에 없으면 시스템은 ISP의 DNS 리졸버 또는 공용 DNS (예: 8.8.8.8)에 쿼리를 보낸다.
+&lt;ul&gt;
+&lt;li&gt;ISP: Internet Service Provider, DNS: Domain Name System&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;리졸버는 루트 DNS 서버, TLD(최상위 도메인, &lt;code&gt;.com&lt;/code&gt;) 서버, 권한 있는 네임 서버를 순차적으로 질의하여 IP 주소를 얻는다.
+&lt;ul&gt;
+&lt;li&gt;TLD: Top-Level Domain&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 레코드&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;A&lt;/code&gt; 레코드(IPv4 주소) 또는 &lt;code&gt;AAAA&lt;/code&gt; 레코드(IPv6 주소)를 반환.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CNAME&lt;/code&gt; 레코드가 있으면 추가 조회가 필요할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 캐싱&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;조회된 IP는 TTL에 따라 로컬에 캐싱되어 이후 요청을 가속화한다.
+&lt;ul&gt;
+&lt;li&gt;TTL: Time To Live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DNS 보안&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;DNSSEC을 사용하면 응답의 무결성을 보장한다.
+&lt;ul&gt;
+&lt;li&gt;DNSSEC: DNS Security Extensions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="tcp-연결"&gt;TCP 연결
+&lt;/h3&gt;&lt;p&gt;브라우저는 서버와 안정적인 연결을 설정하기 위해 TCP 프로토콜을 사용한다.
+TCP: Transmission Control Protocol (전송 제어 프로토콜)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;3 Way 핸드셰이크&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;SYN&lt;/code&gt; 패킷을 서버로 전송&lt;/li&gt;
+&lt;li&gt;서버가 &lt;code&gt;SYN-ACK&lt;/code&gt;로 응답&lt;/li&gt;
+&lt;li&gt;클라이언트가 &lt;code&gt;ACK&lt;/code&gt;로 보내 연결을 완료
+&lt;ul&gt;
+&lt;li&gt;SYN: SYNchronization (동기화), ACK: ACKnowledgement (확인)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소켓 생성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트와 서버는 각각 소켓을 열어 데이터를 주고 받을 준비를 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;지연 요소&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;네트워크 레이턴시와 패킷 손실은 연결 시간을 늘릴 수 있다.&lt;/li&gt;
+&lt;li&gt;TCP Slow Start는 초기 전송 속도를 조절한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Keep-Alive&lt;/strong&gt;: HTTP/1.1부터는 연결을 재사용하여 오버헤드를 줄인다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="tls-핸드셰이크-https"&gt;TLS 핸드셰이크 (HTTPS)
+&lt;/h3&gt;&lt;p&gt;HTTPS 요청의 경우 데이터 보안을 위해 TLS(Transport Layer Security) 연결을 설정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;TLS 협상&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트는 &lt;code&gt;ClientHello&lt;/code&gt; 메시지로 지원하는 암호화 스위트와 TLS 버전을 전송.&lt;/li&gt;
+&lt;li&gt;서버는 &lt;code&gt;SeverHello&lt;/code&gt;로 선택한 암호화 방식과 인증서를 응답&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증서 검증&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;클라이언트는 서버의 인증서를 CA로 검증
+&lt;ul&gt;
+&lt;li&gt;CA: Certificate Authority&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인증서의 도메인 일치 여부와 유효 기간을 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;키 교환&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Diffie-Hellman 또는 RSA를 사용해 세션 키를 생성&lt;/li&gt;
+&lt;li&gt;이후 데이터는 대칭 암호화(예: AES)로 보호&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;성능 고려사항&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;TLS 1.3은 핸드셰이크를 단순화하여 지연을 줄임&lt;/li&gt;
+&lt;li&gt;세션 재개는 이전 연결의 캐시를 활용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="http-통신"&gt;HTTP 통신
+&lt;/h3&gt;&lt;h4 id="http-요청"&gt;HTTP 요청
+&lt;/h4&gt;&lt;p&gt;브라우저는 서버에 HTTP 요청을 보내 리소스를 요청한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;요청 구성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;메서드: &lt;code&gt;GET&lt;/code&gt;, &lt;code&gt;POST&lt;/code&gt; 등.&lt;/li&gt;
+&lt;li&gt;헤더: &lt;code&gt;Host&lt;/code&gt;, &lt;code&gt;User-Agent&lt;/code&gt;, &lt;code&gt;Accept&lt;/code&gt;, &lt;code&gt;Cookie&lt;/code&gt; 등.&lt;/li&gt;
+&lt;li&gt;바디: &lt;code&gt;POST&lt;/code&gt; 요청 시 데이터 포함 (예: JSON, Form 데이터).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HTTP/2 및 HTTP/3&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTP/2는 멀티플렉싱과 헤더 압축을 지원&lt;/li&gt;
+&lt;li&gt;HTTP/3는 UDP 기반 QUIC를 사용하여 성능을 개선&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프록시 및 CDN&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;요청은 프록시 서버나 CDN(예: Cloudflare)을 거칠 수 있음&lt;/li&gt;
+&lt;li&gt;CDN은 캐싱된 콘텐츠를 제공해 지연을 줄임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="서버-응답"&gt;서버 응답
+&lt;/h4&gt;&lt;p&gt;서버는 요청을 처리하고 응답을 반환한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;응답 구성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;상태 코드
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;200 OK&lt;/code&gt;, &lt;code&gt;404 Not Found&lt;/code&gt;, &lt;code&gt;301 Moved Permanently&lt;/code&gt; 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;헤더
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Content-Type&lt;/code&gt;, &lt;code&gt;Content-Length&lt;/code&gt;, &lt;code&gt;Cache-Control&lt;/code&gt; 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;바디
+&lt;ul&gt;
+&lt;li&gt;HTML, JSON, 이미지 등의 콘텐츠&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;리다이렉션&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;301&lt;/code&gt; 또는 &lt;code&gt;302&lt;/code&gt; 상태 코드는 브라우저를 다른 URL로 이동시킴&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;압축&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;gzip&lt;/code&gt; 또는 &lt;code&gt;brotli&lt;/code&gt;로 콘텐츠를 압축해 전송 속도를 높임&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="렌더링"&gt;렌더링
+&lt;/h3&gt;&lt;h4 id="html-파싱-및-dom-구축"&gt;HTML 파싱 및 DOM 구축
+&lt;/h4&gt;&lt;p&gt;브라우저는 서버에서 받은 HTML을 파싱하여 DOM을 생성한다.
+DOM: Document Object Model&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;파싱 과정
+&lt;ul&gt;
+&lt;li&gt;HTML은 바이트 스트림에서 토큰으로 분해됨&lt;/li&gt;
+&lt;li&gt;토큰은 노드로 변환되어 DOM 트리로 조립&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;오류 처리
+&lt;ul&gt;
+&lt;li&gt;잘못된 HTML(예: 닫히지 않은 태그)도 최대한 파싱&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;비동기 로딩
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; 태그는 기본적으로 파싱을 차단하나, &lt;code&gt;async&lt;/code&gt; 또는 &lt;code&gt;defer&lt;/code&gt; 속성으로 최적화 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="css-파싱-및-렌더-트리"&gt;CSS 파싱 및 렌더 트리
+&lt;/h4&gt;&lt;p&gt;CSS는 스타일을 정의하고 렌더 트리를 생성해 화면에 표시할 요소를 결정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;CSSOM 생성
+&lt;ul&gt;
+&lt;li&gt;CSS는 CSSOM으로 변환
+&lt;ul&gt;
+&lt;li&gt;CSSOM: CSS Object Model&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;렌더 트리
+&lt;ul&gt;
+&lt;li&gt;DOM과 CSSOM을 결합해 보이는 요소만 표함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;리플로우
+&lt;ul&gt;
+&lt;li&gt;스타일 변경 시 레이아웃을 재계산&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="자바스크립트-실행"&gt;자바스크립트 실행
+&lt;/h4&gt;&lt;p&gt;자바스크립트는 동적 콘텐츠를 생성하고 페이지를 조작한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;엔진
+&lt;ul&gt;
+&lt;li&gt;V8(Chrome), SpiderMonkey(Firefox) 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;이벤트 루프
+&lt;ul&gt;
+&lt;li&gt;비동기 작업(예: &lt;code&gt;setTimeout&lt;/code&gt;, AJAX)을 처리.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;성능 병목
+&lt;ul&gt;
+&lt;li&gt;무거운 스크립트는 렌더링을 지연시킬 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="화면-렌더링"&gt;화면 렌더링
+&lt;/h4&gt;&lt;p&gt;브라우저는 렌더 트리를 기반으로 픽셀을 화면에 그린다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;레이아웃: 요소의 위치와 크기를 계산&lt;/li&gt;
+&lt;li&gt;페인팅: 계산된 스타일을 픽셀로 변환&lt;/li&gt;
+&lt;li&gt;합성: GPU를 활용해 레이어를 합성&lt;/li&gt;
+&lt;li&gt;최적화: 하드웨어 가속과 캐싱으로 성능 개선&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;URL 입력부터 화면 표시까지의 과정은 네트워킹(DNS, TCP, TLS, HTTP)과 웹 기술(파싱, 렌더링)의 긴밀한 협력으로 이루어진다.&lt;/p&gt;
+&lt;p&gt;각 단계는 성능, 보안, 사용자 경험에 직접적인 영향을 미치며 엔지니어는 이를 이해함으로써 최적화와 문제 해결의 기반을 마련할 수 있다.&lt;/p&gt;
+&lt;h3 id="과정-요약"&gt;과정 요약
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;URL 파싱: 브라우저는 URL을 분석하여 프로토콜(예: HTTPS), 도메인, 경로 등을 식별하고 요청 준비를 한다.&lt;/li&gt;
+&lt;li&gt;DNS 조회: 도메인 이름을 IP 주소로 변환하며, 로컬 캐시 또는 DNS 서버를 통해 빠르게 처리된다.&lt;/li&gt;
+&lt;li&gt;TCP 연결: 클라이언트와 서버 간 안정적인 연결을 위해 3Way 핸드셰이크를 수행한다.&lt;/li&gt;
+&lt;li&gt;TLS 핸드셰이크 (HTTPS): 보안 연결을 위해 인증서 검증과 세션 키 교환을 통해 데이터를 암호화 한다.&lt;/li&gt;
+&lt;li&gt;HTTP 요청/응답: 브라우저가 서버에 리소스를 요청하고, 서버는 HTML, CSS, 이미지 등으로 응답한다.&lt;/li&gt;
+&lt;li&gt;렌더링
+&lt;ul&gt;
+&lt;li&gt;HTML을 파싱해 DOM을 구축하고 CSS를 적용해 렌더 트리를 생성&lt;/li&gt;
+&lt;li&gt;자바스크립트를 실행해 동적 콘텐츠를 처리&lt;/li&gt;
+&lt;li&gt;레이아웃 계산, 페인팅, 합성을 통해 화면에 페이지를 표시&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;OSI 7계층&lt;/strong&gt;: DNS(TCP/UDP), HTTP, TLS는 응용/전송 계층에서 동작.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TCP/IP 모델&lt;/strong&gt;: 인터넷 프로토콜 스택의 기본 구조 이해.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;브라우저 엔진&lt;/strong&gt;: Webkit, Blink, Gecko의 렌더링 방식 차이.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알면-좋을-것들"&gt;더 알면 좋을 것들
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;웹 성능 최적화&lt;/strong&gt;: Critical Rendering Path, Lazy Loading.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안&lt;/strong&gt;: CORS, CSRF, XSS 방지 기법.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;모니터링&lt;/strong&gt;: Lighthouse, Web Vitals로 성능 측정.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프로그레시브 웹 앱(PWA)&lt;/strong&gt;: 오프라인 캐싱과 빠른 로딩.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;브라우저 개발자 도구&lt;/strong&gt;: 네트워크 탭과 성능 분석 활용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="참조-자료"&gt;참조 자료
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://velog.io/@forest_xox/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%A3%BC%EC%86%8C%EC%B0%BD%EC%97%90-URL%EC%9D%84-%EC%9E%85%EB%A0%A5%ED%95%98%EB%A9%B4-%EC%9D%BC%EC%96%B4%EB%82%98%EB%8A%94-%EC%9D%BC" target="_blank" rel="noopener"
+&gt;[네트워크] 주소창에 URL을 입력하면 일어나는 일&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://medium.com/@alysachan830/what-happens-from-typing-in-a-url-to-displaying-a-website-part-1-dns-cache-and-dns-lookup-86441848ea59" target="_blank" rel="noopener"
+&gt;DNS cache and DNS lookup: What happens from typing in a URL to displaying a website? (Part 1)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://hyunki99.tistory.com/109" target="_blank" rel="noopener"
+&gt;[네트워크] 브라우저 주소창에 URL을 입력 시 일어나는 일 정리 (DNS)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

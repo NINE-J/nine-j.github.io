@@ -1,0 +1,2312 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on B9F1</title><link>https://blog.b9f1.com/categories/git/</link><description>Recent content in Git on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 12 Apr 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/categories/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 원격 브랜치 설정</title><link>https://blog.b9f1.com/p/2025-04-12-git-remote-branch-settings-in-a-single-branch-clone-environment/</link><pubDate>Sat, 12 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-12-git-remote-branch-settings-in-a-single-branch-clone-environment/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;싱글 브랜치 명령어를 사용해서 특정 브랜치만 클론한 저장소에서는 원격 저장소의 다른 브랜치를 확인할 수 없다.&lt;/p&gt;
+&lt;p&gt;이런 상황에서 원격 브랜치를 추가, 삭제, 추적하는 방법을 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="어떤-상황이냐면"&gt;어떤 상황이냐면?
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone -b &amp;lt;브랜치_이름&amp;gt; --single-branch &amp;lt;원격_저장소_URL&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위 명령으로 특정 브랜치만 클론하면 &lt;code&gt;.git/config&lt;/code&gt; 파일에 해당 브랜치에 대한 정보만 기록된다.&lt;/p&gt;
+&lt;p&gt;특정 브랜치만 추적하기 위해 의도적으로 싱글 브랜치 클론을 받은 거라서 문제라고 하긴 뭐하지만, 추가적으로 다른 브랜치를 확인하고 싶은 경우를 예로 든다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git remote show &amp;lt;저장소&amp;gt;&lt;/code&gt; 또는 &lt;code&gt;git branch -a&lt;/code&gt; 명령어를 실행해도 원격 저장소의 다른 브랜치 목록을 확인할 수 없다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; 또는 &lt;code&gt;git switch&lt;/code&gt; 명령어를 사용하여 원격의 다른 브랜치로 전환할 수 없다.
+특정 브랜치만 로컬로 가져와 추적하고 원격 저장소에 또 다른 어떤 브랜치가 있는지 모르기 때문이다.&lt;/p&gt;
+&lt;h3 id="어떡하지"&gt;어떡하지?
+&lt;/h3&gt;&lt;h4 id="원격-브랜치-확인"&gt;원격 브랜치 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 로컬, 원격 모두 보기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch -a
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 원격 브랜치 보기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch -r
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;하지만 싱글 브랜치 옵션으로 로컬에 클론했기 때문에 특정 브랜치만 확인되고 나머지 원격 저장소에 존재하는 브랜치를 확인할 수 없다.&lt;/p&gt;
+&lt;h4 id="원격-브랜치-추가-추적"&gt;원격 브랜치 추가 추적
+&lt;/h4&gt;&lt;p&gt;1개 또는 그 이상의 브랜치를 추적할 수 있게 추가한 뒤 &lt;code&gt;fetch&lt;/code&gt; 명령으로 브랜치에 대한 업데이트를 가져온다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git remote set-branches&lt;/code&gt; 명령 사용 시 옵션을 함께 사용하지 않으면 덮어쓰기 되는 걸 주의하자.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 옵션 없이 사용하면 .git/config 덮어쓰기 된다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches origin &amp;lt;브랜치_이름1&amp;gt; &amp;lt;브랜치_이름2&amp;gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# --add 옵션과 함께&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches origin --add &amp;lt;브랜치_이름1&amp;gt; &amp;lt;브랜치_이름2&amp;gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 이후 조회 &amp;lt;저장소&amp;gt; = origin 또는 upstream&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote show &amp;lt;저장소&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 조회 후 업데이트 가져오기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;원격 브랜치 정보를 가져왔고 전환할 수 있게 됐다면,
+직접 전환하거나 브랜치 목록을 추가할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 추적하며 전환&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout -t &amp;lt;브랜치_이름&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 로컬 브랜치를 생성하며 원격 브랜치를 추적하도록 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout -b &amp;lt;브랜치_이름&amp;gt; origin/&amp;lt;브랜치_이름&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;브랜치 전환이 정상적으로 됐다면 원격 브랜치를 제대로 추적하고 있는지 확인한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch -vv
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 출력 결과&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 브랜치명1 1q2w3e4r [origin/브랜치명1] Merge pull request&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;#* 브랜치명2 4r3e2w1q [origin/브랜치명2] feat: shomething&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="추가가-된다면-삭제는"&gt;추가가 된다면 삭제는?
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;git remote set-branches&lt;/code&gt; 명령어에는 &lt;code&gt;--add&lt;/code&gt; 옵션이 있어서 추가할 수 있지만 삭제 옵션은 없다.
+덮어쓰기가 가능하다는 점을 이용해서 추적 중지하고 싶은 브랜치를 제외하고 등록한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 옵션 없이 사용하면 .git/config 덮어쓰기 된다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches origin &amp;lt;브랜치_이름1&amp;gt; &amp;lt;브랜치_이름2&amp;gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 이후 조회 &amp;lt;저장소&amp;gt; = origin 또는 upstream&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote show &amp;lt;저장소&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;추적 브랜치를 조정하는 작업은 &lt;code&gt;fetch&lt;/code&gt; 명령 시 업데이트 정보를 확인하거나 브랜치를 전환하기 위함이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;원격 저장소에 브랜치가 많은데 모두 받긴 싫고 특정 브랜치로만 작업하고자 한다면 싱글 브랜치로 특정 브랜치만 가진 클론을 생성할 수 있다.&lt;/li&gt;
+&lt;li&gt;이후 추가적으로 다른 브랜치의 정보도 확인이 필요하다면 조정할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;추적 브랜치를 추가하면 브랜치 목록에서 확인할 수 있다.
+하지만 한 번이라도 추적이 된 브랜치라면 &lt;code&gt;git remote set-branches&lt;/code&gt; 명령을 통해 제외하더라도 &lt;code&gt;git branch -r&lt;/code&gt; 또는 &lt;code&gt;git branch -a&lt;/code&gt; 옵션을 통한 명령어의 결과에선 계속 확인된다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;fetch&lt;/code&gt; 설정과 원격 브랜치 목록 조회 명령어가 서로 다른 정보를 사용하기 때문이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="최후의-수단"&gt;최후의 수단
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;.git/config&lt;/code&gt; 파일을 직접 수정한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;.git/config&lt;/code&gt; 파일을 텍스트 편집기로 연다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[remote &amp;quot;origin&amp;quot;]&lt;/code&gt;과 같이 원하는 섹션에서 삭제하려는 브랜치에 대한 &lt;code&gt;fetch&lt;/code&gt; 항목을 찾아 삭제하고 파일을 저장한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;파일 정보를 예를 들면 아래와 같다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;[remote &amp;#34;origin&amp;#34;]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; url = &amp;lt;원격_저장소_URL&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; fetch = +refs/heads/브랜치명2:refs/remotes/origin/브랜치명2
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; fetch = +refs/heads/브랜치명3:refs/remotes/origin/브랜치명3
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; fetch = +refs/heads/브랜치명4:refs/remotes/origin/브랜치명4
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item><item><title>Git 추적 브랜치 관리</title><link>https://blog.b9f1.com/p/2025-04-08-git-reflect-changes-to-fork-repository/</link><pubDate>Tue, 08 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-08-git-reflect-changes-to-fork-repository/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Git 원격 저장소를 클론할 때 모든 브랜치를 클론하지 않고 필요한 특정 브랜치만 클론하는 방법.
+&lt;code&gt;git fetch&lt;/code&gt; 명령 시 업데이트를 확인할 브랜치를 지정하는 방법.
+추가로 Fork한 저장소의 브랜치명이 바뀐 경우를 반영 방법을 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="저장소-클론-시-특정-브랜치만"&gt;저장소 클론 시 특정 브랜치만
+&lt;/h3&gt;&lt;p&gt;저장소 클론 시 특정 브랜치만 추적하고 싶다면 브랜치명과 &lt;code&gt;--single-branch&lt;/code&gt;을 사용한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone -b &amp;lt;브랜치_이름&amp;gt; --single-branch &amp;lt;원격_저장소_URL&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이렇게 하나의 브랜치만 내려 받으면 하나의 브랜치만 추적 관리되고 &lt;code&gt;fetch&lt;/code&gt; 명령 시 다른 브랜치의 업데이트는 확인하지 않아 필요한 브랜치만 업데이트 되니 효율적인 것 같다.&lt;/p&gt;
+&lt;h3 id="특정-브랜치의-업데이트만-확인"&gt;특정 브랜치의 업데이트만 확인
+&lt;/h3&gt;&lt;p&gt;저장소에 브랜치가 너무 많거나 뭐 다른 이유가 있어서 &lt;code&gt;git fetch&lt;/code&gt; 명령 실행 시 모든 브랜치를 업데이트하는 것이 아니라 특정 브랜치의 업데이트만 확인하고 싶을 때&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# git remote -v 명령으로 조회한 저장소 이름 origin, upstream 등등&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 해당 명령은 실행마다 덮어씌워지는 점 참고&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches &amp;lt;저장소 이름&amp;gt; &amp;lt;브랜치_이름1&amp;gt; &amp;lt;브랜치_이름2&amp;gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기존 목록은 유지한채로 특정 브랜치를 더 추가하고 싶다면&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches &amp;lt;저장소 이름&amp;gt; &amp;lt;브랜치_이름1&amp;gt; &amp;lt;브랜치_이름2&amp;gt; --add &amp;lt;브랜치_이름3&amp;gt; &amp;lt;브랜치_이름4&amp;gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 이후 적용 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# git remote -v 명령으로 조회한 저장소 이름 origin, upstream 등등&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote show &amp;lt;저장소 이름&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git remote show&lt;/code&gt; 명령으로 확인하면 특정 브랜치만 추적 설정된 게 보인다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git remote -r&lt;/code&gt; 또는 &lt;code&gt;git remote -a&lt;/code&gt;의 경우 이미 추적된 브랜치는 계속 목록이 표시된다.&lt;/li&gt;
+&lt;li&gt;하지만 &lt;code&gt;git fetch&lt;/code&gt; 명령에 가져오는 건 &lt;code&gt;git remote set-branches&lt;/code&gt;명령으로 설정한 브랜치만 최신화 된다.&lt;/li&gt;
+&lt;li&gt;만약 &lt;code&gt;git remote set-branches&lt;/code&gt; 설정 후 다른 브랜치의 업데이트도 확인해야 한다면 &lt;code&gt;git fetch --all&lt;/code&gt;을 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;모든 브랜치를 다시 추적하겠다면 와일드 카-드&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# git remote -v 명령으로 조회한 저장소 이름 origin, upstream 등등&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-branches &amp;lt;저장소 이름&amp;gt; &lt;span class="s2"&gt;&amp;#34;*&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;origin, upstream 저장소에서 삭제된 브랜치 로컬에 반영해서 추적 브랜치 최신화&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch --prune origin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch --prune upstream
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="upstream-원본-저장소의-변경"&gt;upstream 원본 저장소의 변경
+&lt;/h3&gt;&lt;p&gt;Github에서 Fork한 저장소를 로컬에 클론하면 upstream을 등록하게 된다.
+그럼 origin, upstream 두 remote를 가진 저장소에서 변경 사항을 어떻게 반영할지 고민해본다.&lt;/p&gt;
+&lt;p&gt;Github에서 포크한 저장소의 원본 저장소에서 브랜치명 변경이 발생한 케이스에
+Pull Request할 때 어떤 브랜치를 어떤 브랜치에 합칠 건지 선택하기 때문에 내가 포크한 저장소의 브랜치는 원본 브랜치와 꼭 동일하게 맞출 필요가 없긴 하다.&lt;/p&gt;
+&lt;p&gt;근데 일단 변경 사항과 동일하게 맞춰 보고 싶었다.&lt;/p&gt;
+&lt;h3 id="원하는-해결책"&gt;원하는 해결책
+&lt;/h3&gt;&lt;p&gt;내 작업 사항은 유지하면서, 원본 저장소에서 변경된 브랜치를 고대~로 내가 포크한 저장소에 반영하고 싶음&lt;/p&gt;
+&lt;h3 id="문제"&gt;문제
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Github에서 포크한 저장소의 경우 원본 저장소의 변경은 새롭게 받아올 수 있는데, 브랜치명만 바뀐 경우 반영할 수 있는 기능이 없음.&lt;/li&gt;
+&lt;li&gt;Pull Request 걸려 있는 상태임
+&lt;ul&gt;
+&lt;li&gt;브랜치명이 변경되면 PR은 자동으로 닫힘&lt;/li&gt;
+&lt;li&gt;PR 걸린 브랜치는 살려놔도 됨&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="신속한-해결책"&gt;신속한 해결책
+&lt;/h3&gt;&lt;p&gt;그냥 깔끔하고 신속한 방법으로 맞추겠다 하면&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;깔끔하게 새롭게 포크 받기&lt;/li&gt;
+&lt;li&gt;upstream에 대한 미러 클론을 로컬에 받아서 &lt;code&gt;.git&lt;/code&gt; 파일을 기존 저장소에 교체
+&lt;ul&gt;
+&lt;li&gt;로컬 브랜치와 충돌이 발생할 수 있음&lt;/li&gt;
+&lt;li&gt;로컬 커밋 이력이 사라지고 새롭게 포크하는 것과 차이가 없음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="복잡한-해결책"&gt;복잡한 해결책
+&lt;/h3&gt;&lt;h4 id="github에서-브랜치-이름-수정"&gt;Github에서 브랜치 이름 수정
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;정성스럽게 각 브랜치의 이름을 변경한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="원본-저장소의-브랜치-변경을-일괄-적용"&gt;원본 저장소의 브랜치 변경을 일괄 적용
+&lt;/h4&gt;&lt;p&gt;내가 작업한 브랜치만 남기고 모두 정리한 상태로 upstream에 변경된 브랜치들을 내려 받아 포크한 저장소에 반영할 예정&lt;/p&gt;
+&lt;p&gt;로컬 저장소의 origin을 upstream 주소로 변경
+또는 upstream의 브랜치를 로컬에 생성&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch -r &lt;span class="p"&gt;|&lt;/span&gt; awk &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s1"&gt;&amp;#39;^origin/HEAD$&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; remote&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; git branch --track &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;remote&lt;/span&gt;&lt;span class="p"&gt;#origin/&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;$remote&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;모든 브랜치를 받아온 뒤 다시 origin 복구
+이후 origin에 모든 브랜치 업로드&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s1"&gt;&amp;#39;^*&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; branch&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; git push origin &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="nv"&gt;$branch&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;마지막으로 필요한 브랜치만 남기고 모두 삭제&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# main, develop, master, 특정브랜치이름 만 남기고 삭제&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s1"&gt;&amp;#39;main\|develop\|master\|특정브랜치이름&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s1"&gt;&amp;#39;^*&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; xargs git branch -D
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="물리-파일-수정"&gt;물리 파일 수정
+&lt;/h3&gt;&lt;p&gt;권장되지 않는 방법이지만 빠르게 반영되고 좋다.
+&lt;code&gt;.git&lt;/code&gt; 폴더 아래 필요한 파일들을 삭제하거나 수정한다.&lt;/p&gt;</description></item><item><title>Git tag</title><link>https://blog.b9f1.com/p/2025-04-03-git-tag/</link><pubDate>Thu, 03 Apr 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-04-03-git-tag/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;특정 커밋에 추가적인 기록을 남길 수 있는 &lt;code&gt;tag&lt;/code&gt;를 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="tag"&gt;tag
+&lt;/h3&gt;&lt;p&gt;Git &lt;code&gt;tag&lt;/code&gt;는 Git 버전 관리 시스템에서 특정 커밋을 가리키는 참조 포인터다.
+주로 프로젝트의 중요한 시점인 release, alpha, beta 등을 표시하기 위해 사용된다.&lt;/p&gt;
+&lt;h3 id="tag-사용-시나리오"&gt;tag 사용 시나리오
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;소프트웨어 release 버전 표시 (v1.0.0, v2.1.3 등)&lt;/li&gt;
+&lt;li&gt;중요한 개발 이정표 (알파/베타, 주요 기능 완성)&lt;/li&gt;
+&lt;li&gt;프로덕션 배포 시점 기록&lt;/li&gt;
+&lt;li&gt;버그 수정을 위한 특정 시점 참조&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="의미-있는-버전-명명-규칙"&gt;의미 있는 버전 명명 규칙
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;MAJOR.MINOR.PATCH&lt;/code&gt; -&amp;gt; &lt;code&gt;v2.1.3&lt;/code&gt; 형태로 Semantic Versioning (&lt;code&gt;SemVer&lt;/code&gt;)을 추천한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MAJOR: 설계의 변경 또는 큰 구조적 변경&lt;/li&gt;
+&lt;li&gt;MINOR: 기능 추가 등 중요도가 중간 정도 되는 경우&lt;/li&gt;
+&lt;li&gt;PATCH: 작은 버그 수정, 문서 수정 등&lt;/li&gt;
+&lt;li&gt;각 버전은 꼭 1, 2자리 제한이 아니라 관리 규칙에 따라 계속 증가할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="예시"&gt;예시
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.4.0-alpha.1 -m &lt;span class="s2"&gt;&amp;#34;Alpha release&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 초기 개발 단계&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v0.1.0 -m &lt;span class="s2"&gt;&amp;#34;프로젝트 구성&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 첫 안정판&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.0.0 -m &lt;span class="s2"&gt;&amp;#34;안정판 배포&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 핫픽스 적용 후&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.0.1 -m &lt;span class="s2"&gt;&amp;#34;긴급 건 핫픽스&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="주석-tag-우선-사용"&gt;주석 tag 우선 사용
+&lt;/h3&gt;&lt;p&gt;가능하면 주석 태그 사용하는 것이 좋다.&lt;/p&gt;
+&lt;h4 id="예시-1"&gt;예시
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 명령줄에서 큰따옴표를 닫지 않고 줄바꿈하여 작성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.2.0 -m &lt;span class="s2"&gt;&amp;#34;안정화 버전 v1.2.0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;- 검색 기능 추가
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;- 모바일 레이아웃 이슈 수정
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;- 의존성 업데이트&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 자동으로 열리는 기본 에디터를 사용할 수도 있다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v2.1.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="특정-커밋에-tag"&gt;특정 커밋에 tag
+&lt;/h3&gt;&lt;p&gt;특정 커밋을 확인 후 해시값으로 태그를 생성할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 커밋 해시 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git log
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 해시값으로 태그 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.1.1 a1b2c3d -m &lt;span class="s2"&gt;&amp;#34;이게 짱짱 버전임&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="tag-수정"&gt;tag 수정
+&lt;/h3&gt;&lt;p&gt;Git tag는 일반적으로 수정이 불가능하다.
+삭제 후 재생성해야 한다.&lt;/p&gt;
+&lt;h4 id="수정-불가-이유"&gt;수정 불가 이유
+&lt;/h4&gt;&lt;p&gt;태그는 특정 커밋을 가리키는 고정된 참조로 일단 생성되면 내용 변경이 불가능하다.
+이는 버전 관리의 핵심 원칙 중 하나로 릴리스 버전의 무결성을 보장하기 위함이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;버전 관리의 신뢰성&lt;/strong&gt;: 한 번 릴리스된 버전은 변하지 않아야 한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;배포 추적 용이성&lt;/strong&gt;: 프로덕션에서 실행 중인 코드 버전을 정확히 추적 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;의존성 관리&lt;/strong&gt;: 다른 프로젝트에서 특정 태그 버전을 의존할 때 문제 방지&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="삭제-후-재등록"&gt;삭제 후 재등록
+&lt;/h4&gt;&lt;p&gt;수정이 불가하니 태그를 삭제하고 재등록해서 깔끔한 내용을 유지한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. 로컬 태그 삭제&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -d v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. 원격 태그 삭제 (필요시)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin :refs/tags/v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 3. 새 태그 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.0.0 &lt;span class="o"&gt;{&lt;/span&gt;새로운 커밋 해시&lt;span class="o"&gt;}&lt;/span&gt; -m &lt;span class="s2"&gt;&amp;#34;수정된 메시지&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="강제-등록"&gt;강제 등록
+&lt;/h4&gt;&lt;p&gt;이미 푸시된 태그를 덮어쓰거나 강제로 처리해야 하는 경우 특별히 주의해서 적용한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -f -a v1.0.0 &lt;span class="o"&gt;{&lt;/span&gt;커밋 해시&lt;span class="o"&gt;}&lt;/span&gt; -m &lt;span class="s2"&gt;&amp;#34;새 메시지&amp;#34;&lt;/span&gt; &lt;span class="c1"&gt;# 로컬에서 강제 재설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push -f origin v1.0.0 &lt;span class="c1"&gt;# 원격 강제 푸시&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="tag-push"&gt;tag push
+&lt;/h3&gt;&lt;p&gt;단일 tag push&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;모든 tag를 한 번에 push&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin --tags
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;push한 tags 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git ls-remote --tags origin
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="tag-push-실패-시"&gt;tag push 실패 시
+&lt;/h4&gt;&lt;p&gt;태그 중복 또는 최신화가 되지 않아서 push 거절되는 경우&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 최신 tags 동기화&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch --tags
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 충돌 시 강제로 push (주의)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push -f origin v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="cicd-연동-예시"&gt;CI/CD 연동 예시
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Github Actions&lt;/code&gt;에서 특정 tag를 커밋했을 때를 가정하면 아래처럼 작성할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# .github/workflows/release.yml&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;name: Release Build
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;on:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; push:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; tags:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; - &lt;span class="s1"&gt;&amp;#39;v*&amp;#39;&lt;/span&gt; &lt;span class="c1"&gt;# v로 시작하는 tag push될 때 실행&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="tag-장단점"&gt;tag 장단점
+&lt;/h3&gt;&lt;h4 id="장점"&gt;장점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;버전 관리에 용이하다. 명확한 릴리스 포인트를 제공한다.&lt;/li&gt;
+&lt;li&gt;어떤 코드가 어떤 버전으로 배포되었는지 추적할 수 있다.&lt;/li&gt;
+&lt;li&gt;태그된 버전은 변경되지 않는 참조 지점을 제공하므로 안정성을 보장한다.&lt;/li&gt;
+&lt;li&gt;팀원들이 특정 버전을 쉽게 확인할 수 있어서 협업 효율성에 좋다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단점"&gt;단점
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;과도하게 사용 시 관리 복잡성이 증가한다.&lt;/li&gt;
+&lt;li&gt;일단 생성된 태그는 이동할 수 없다.
+&lt;ul&gt;
+&lt;li&gt;재설정을 해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;CI/CD 파이프라인과의 통합이 브랜치보다 덜 직관적이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="고급-활용"&gt;📌고급 활용
+&lt;/h2&gt;&lt;h3 id="tag-메시지-템플릿-시스템"&gt;tag 메시지 템플릿 시스템
+&lt;/h3&gt;&lt;p&gt;전역 템플릿을 설정해서 일관된 tag 이력을 남길 수 있다.
+특정 위치에 템플릿 파일 생성한다. 예: &lt;code&gt;~/.git-templates/tag_template&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# [%(tag)] 릴리스 노트
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## 주요 변경 사항
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;%(body)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## 기술적 세부사항
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 커밋 해시: %(object)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 태그 생성일: %(taggerdate:iso8601)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## QA 체크리스트
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 스모크 테스트 통과
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 성능 테스트 완료
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 보안 검증 완료
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;파일 생성 후 git config 적용&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global tag.template ~/#.git-templates/tag_template 등 파일
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="템플릿-적용-예시"&gt;템플릿 적용 예시
+&lt;/h4&gt;&lt;p&gt;자동으로 에디터가 열릴 수 있게 명령어 실행&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag -a v1.3.0 &lt;span class="c1"&gt;# 자동으로 템플릿 로드&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;에디터에 표시될 내용&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;# [v1.3.0] 릴리스 노트
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## 주요 변경 사항
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;이곳에 변경 내용 작성
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## 기술적 세부사항
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 커밋 해시: q1w2e3r4t5
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 태그 생성일: 2023-11-15T14:30:00+09:00
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;## QA 체크리스트
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 스모크 테스트 통과
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 성능 테스트 완료
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- [ ] 보안 검증 완료
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="고급-활용-1"&gt;고급 활용
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Git 템플릿 작성 방법을 숙지하면 커스텀 태그 메시지 템플릿을 효과적으로 관리할 수 있다.&lt;/li&gt;
+&lt;li&gt;자동 버전 관리 시스템을 구축하여 프로젝트 버전 관리를 자동화할 수 있다.&lt;/li&gt;
+&lt;li&gt;CI/CD 파이프라인 연동 시 사용하는 배포 플랫폼(GitHub Actions, GitLab CI, Jenkins 등)에 따라 구현 방식이 달라질 수 있으니 주의가 필요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="pr-요청-시-tag는"&gt;PR 요청 시 tag는?
+&lt;/h3&gt;&lt;p&gt;태그는 본인 저장소에서 관리하기 위함이고 Fork한 원본 저장소에 PR을 하는 등의 작업에 tag는 같이 옮겨지지 않는다.&lt;/p&gt;
+&lt;h4 id="fork-저장소에서-원본-저장소-pr-시나리오"&gt;Fork 저장소에서 원본 저장소 PR 시나리오
+&lt;/h4&gt;&lt;h5 id="자신의-fork에만-태그가-있는-경우"&gt;자신의 Fork에만 태그가 있는 경우
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;로컬/Fork 저장소에서 태그 생성&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git tag v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin v1.0.0 &lt;span class="c1"&gt;# 자신의 Fork에만 태그 존재&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="2"&gt;
+&lt;li&gt;원본 저장소로 PR 생성 -&amp;gt; 태그는 전송되지 않음.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5 id="원본-저장소의-태그를-참조하는-경우"&gt;원본 저장소의 태그를 참조하는 경우
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;원본 저장소에 이미 존재하는 태그(&lt;code&gt;v1.0.0&lt;/code&gt;)를 기반으로 작업&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch upstream &lt;span class="c1"&gt;# 원본 저장소의 태그 동기화&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="2"&gt;
+&lt;li&gt;새 커밋 후 PR 생성 -&amp;gt; 원본의 태그는 이동하지 않음.
+&lt;ul&gt;
+&lt;li&gt;태그가 가리키는 커밋은 고정되어 있음.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="왜-태그가-pr과-함께-전송되지-않지"&gt;왜 태그가 PR과 함께 전송되지 않지?
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;보안성: 태그는 릴리스 버전을 표시하는 중요한 참조이므로, 임의로 변경되는 것 방지.&lt;/li&gt;
+&lt;li&gt;권한 분리:
+&lt;ul&gt;
+&lt;li&gt;일반 기여자는 브랜치로만 PR 전송 가능.&lt;/li&gt;
+&lt;li&gt;태그 생성/수정은 저장소 관리자(&lt;code&gt;maintainer&lt;/code&gt;) 권한이 필요.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;버전 관리 무결성: 원본 저장소의 태그는 공식 릴리스로 간주되므로, PR을 통해 덮어쓸 수 없음.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="만약-태그를-원본-저장소에-반영해야-한다면"&gt;만약 태그를 원본 저장소에 반영해야 한다면?
+&lt;/h4&gt;&lt;p&gt;방법이 다양하겠지만 현실적이고 보편적인 방법 두 가지로 정리해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;관리자에게 요청&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;[요청 내용]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 태그 이름: v1.0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 대상 커밋: q1w2e3r4
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;- 이유: 버전 1.0.0 릴리스 준비 완료
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start="2"&gt;
+&lt;li&gt;Github Releases 활용
+&lt;ul&gt;
+&lt;li&gt;PR 머지 후, 원본 저장소에서 Release 탭에서 수동으로 태그 생성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description></item><item><title>Git Reset VS Checkout</title><link>https://blog.b9f1.com/p/2025-03-30-git-reset-vs-checkout/</link><pubDate>Sun, 30 Mar 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-03-30-git-reset-vs-checkout/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt;과 &lt;code&gt;git checkout&lt;/code&gt;은 과거 커밋으로 이동하거나 작업 상태를 수정하는 데 사용되는 명령어다.
+두 명령어는 서로 다른 목적과 작동 방식을 가지며, 특히 &lt;code&gt;staging&lt;/code&gt; 영역을 다룰 때도 활용한다.
+그 목적과 작동 방식에 대한 차이를 알아본다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="reset"&gt;reset
+&lt;/h3&gt;&lt;p&gt;잘못된 커밋을 취소하거나 과거의 특정 시점으로 브랜치를 완전히 되돌려야 할 때 사용한다.
+이 명령어는 커밋 이력뿐만 아니라 &lt;code&gt;staging&lt;/code&gt; 영역과 작업 디렉토리 상태를 조정할 수 있다.&lt;/p&gt;
+&lt;p&gt;3가지 옵션과 함께 사용할 수 있으며 &lt;code&gt;git reset [--option] [commitHash]&lt;/code&gt; 형태로 사용한다.
+옵션을 지정하지 않으면 기본 옵션은 &lt;code&gt;--mixed&lt;/code&gt;로 실행된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 커밋 기록만 되돌리고 작업 디렉토리와 스테이징 영역의 변경 사항은 유지&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset --soft
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 커밋 기록과 스테이징 영역을 되돌리고 작업 디렉토리에 변경 사항은 유지&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset --mixed
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 커밋 기록, 스테이징 영역, 작업 디렉토리 모두를 되돌린다.(주의: 되돌린 변경 사항은 복구할 수 없다.)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset --hard
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;옵션&lt;/th&gt;
+&lt;th&gt;커밋 기록&lt;/th&gt;
+&lt;th&gt;스테이징 영역&lt;/th&gt;
+&lt;th&gt;작업 디렉토리&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--soft&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋으로 되돌림&lt;/td&gt;
+&lt;td&gt;변경 사항 유지&lt;/td&gt;
+&lt;td&gt;변경 사항 유지&lt;/td&gt;
+&lt;td&gt;커밋 기록만 되돌리고 변경 사항은 유지한다. 되돌린 커밋 이후의 변경 사항을 다시 커밋하려는 경우에 유용하다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--mixed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋으로 되돌림&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋 상태로 되돌림&lt;/td&gt;
+&lt;td&gt;변경 사항 유지&lt;/td&gt;
+&lt;td&gt;커밋 기록과 스테이징 영역을 되돌리고 작업 디렉토리의 변경 사항은 유지된다. 되돌린 커밋 이후의 변경 사항을 수정하거나 다시 스테이징하려는 경우 사용한다. (기본 옵션)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--hard&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋으로 되돌림&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋 상태로 되돌림&lt;/td&gt;
+&lt;td&gt;❗지정된 커밋 상태로 되돌림&lt;/td&gt;
+&lt;td&gt;❗커밋 기록, 스테이징 영역, 작업 디렉토리 모두를 되돌린다. 되돌린 커밋 이후의 모든 변경 사항은 완전히 삭제되며, 복구할 수 없다. 변경 사항을 완전히 버리고 과거 시점으로 되돌아 가려는 경우에 사용해야 한다. (주의해서 사용해야 한다.)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="staging-영역과-reset"&gt;staging 영역과 reset
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt;이 스테이징 영역에 사용되는 이유는 &lt;code&gt;--mixed&lt;/code&gt;와 &lt;code&gt;--soft&lt;/code&gt; 옵션은 스테이징 영역을 조작할 수 있기 때문이다.
+예를 들어 &lt;code&gt;git reset --mixed HEAD&lt;/code&gt;는 스테이징 영역의 모든 파일을 &lt;code&gt;unstage&lt;/code&gt; 상태로 내리고 작업 디렉토리의 변경 사항은 유지한다.
+이는 잘못 스테이징한 파일을 내리거나 커밋 전에 스테이징 상태를 재조정할 때 유용하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add file1.txt &lt;span class="c1"&gt;# file1.txt를 staging에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git reset HEAD file1.txt &lt;span class="c1"&gt;# file1.txt를 staging에서 내림&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="reset-명령-후-기존-head로-돌아가는-방법"&gt;reset 명령 후 기존 HEAD로 돌아가는 방법
+&lt;/h4&gt;&lt;h5 id="orig_head-사용"&gt;ORIG_HEAD 사용
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git reset&lt;/code&gt; 명령어를 실행하면 Git은 &lt;code&gt;ORIG_HEAD&lt;/code&gt;라는 특수한 참조에 이전 &lt;code&gt;HEAD&lt;/code&gt; 위치를 저장한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git reset --hard ORIG_HEAD&lt;/code&gt; 명령어를 사용하여 &lt;code&gt;reset&lt;/code&gt; 실행 직전의 &lt;code&gt;HEAD&lt;/code&gt; 위치로 돌아갈 수 있다.&lt;/li&gt;
+&lt;li&gt;이 방법은 &lt;code&gt;reset&lt;/code&gt; 실행 직후에만 사용할 수 있으며, 다른 명령어를 실행하면 &lt;code&gt;ORIG_HEAD&lt;/code&gt;가 변경될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reset HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Unstaged changes after reset:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M file2.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reset --hard ORIG_HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HEAD is now at 2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="reflog-사용"&gt;reflog 사용
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git reflog&lt;/code&gt;는 Git 저장소에서 &lt;code&gt;HEAD&lt;/code&gt;가 이동한 모든 기록을 보여준다. 이를 통해 &lt;code&gt;reset&lt;/code&gt; 실행 전의 &lt;code&gt;HEAD&lt;/code&gt; 위치를 찾을 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git reflog&lt;/code&gt; 명령어를 실행하면 &lt;code&gt;HEAD&lt;/code&gt;가 이동한 기록과 해당 커밋의 해시값이 표시된다.&lt;/li&gt;
+&lt;li&gt;기존 &lt;code&gt;HEAD&lt;/code&gt;위치의 커밋 해시값을 찾은 후 &lt;code&gt;git reset --hard [커밋 해시값]&lt;/code&gt; 명령어를 사용하여 해당 위치로 돌아갈 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reset HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Unstaged changes after reset:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;M file2.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reflog
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a HEAD@&lt;span class="o"&gt;{&lt;/span&gt;0&lt;span class="o"&gt;}&lt;/span&gt;: reset: moving to HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 HEAD@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;: commit: 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a HEAD@&lt;span class="o"&gt;{&lt;/span&gt;2&lt;span class="o"&gt;}&lt;/span&gt;: commit: 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 HEAD@&lt;span class="o"&gt;{&lt;/span&gt;3&lt;span class="o"&gt;}&lt;/span&gt;: commit &lt;span class="o"&gt;(&lt;/span&gt;initial&lt;span class="o"&gt;)&lt;/span&gt;: 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reset --hard HEAD@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HEAD is now at 2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="checkout"&gt;checkout
+&lt;/h3&gt;&lt;p&gt;과거의 특정 시점의 파일 상태를 확인하거나, 다른 브랜치로 전환할 때 사용한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;브랜치로 이동하면 해당 브랜치의 최신 커밋으로 작업 디렉토리와 스테이징 영역의 상태가 변경되고 새로운 커밋은 해당 브랜치에 추가된다.&lt;/li&gt;
+&lt;li&gt;특정 커밋으로 이동하면 &lt;code&gt;detached HEAD&lt;/code&gt; 상태가 되어 새로운 커밋을 만들면 현재 브랜치와 분리된 별도의 커밋 기록이 생성된다.
+&lt;ul&gt;
+&lt;li&gt;현재 브랜치와 분리된 임시적인 커밋 기록에 생성된다.&lt;/li&gt;
+&lt;li&gt;이 임시 커밋 기록은 특정 브랜치에 열결되지 않으므로 나중에 브랜치에 병합하거나 저장하지 않으면 사라질 수 있다.&lt;/li&gt;
+&lt;li&gt;임시 커밋의 작업 내용을 유지하려면 새로운 브랜치를 생성해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="staging-영역과-checkout"&gt;staging 영역과 checkout
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt;이 스테이징 영역에 사용되는 이유는 &lt;code&gt;git checkout -- [file]&lt;/code&gt; 명령은 특정 파일을 마지막 커밋 상태로 되돌리며, 스테이징 영역에서도 해당 파일을 &lt;code&gt;unstaged&lt;/code&gt; 상태로 내린다.
+이는 작업 디렉토리와 스테이징 영역의 변경 사항을 취소하고 저장소 상태로 되돌릴 때 유용하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add file1.txt &lt;span class="c1"&gt;# file1.txt를 staging에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout -- file1.txt &lt;span class="c1"&gt;# file1.txt의 변경 사항&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="checkout-명령-후-기존-head로-돌아가는-방법"&gt;checkout 명령 후 기존 HEAD로 돌아가는 방법
+&lt;/h4&gt;&lt;h5 id="orig_head-사용-1"&gt;ORIG_HEAD 사용
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git reset&lt;/code&gt; 명령어를 실행하면 Git은 &lt;code&gt;ORIG_HEAD&lt;/code&gt;라는 특수한 참조에 이전 &lt;code&gt;HEAD&lt;/code&gt; 위치를 저장한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git checkout ORIG_HEAD&lt;/code&gt; 명령어를 사용하여 &lt;code&gt;checkout&lt;/code&gt; 실행 직전의 &lt;code&gt;HEAD&lt;/code&gt; 위치로 돌아갈 수 있다.&lt;/li&gt;
+&lt;li&gt;이 방법은 &lt;code&gt;reset&lt;/code&gt; 실행 직후에만 사용할 수 있으며, 다른 명령어를 실행하면 &lt;code&gt;ORIG_HEAD&lt;/code&gt;가 변경될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git checkout HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HEAD is now at 817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;* &lt;span class="o"&gt;(&lt;/span&gt;HEAD detached at 817f30a&lt;span class="o"&gt;)&lt;/span&gt; master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git checkout ORIG_HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Switched to branch &lt;span class="s1"&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;* master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="reflog-사용-1"&gt;reflog 사용
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git reflog&lt;/code&gt;는 Git 저장소에서 &lt;code&gt;HEAD&lt;/code&gt;가 이동한 모든 기록을 보여준다. 이를 통해 &lt;code&gt;checkout&lt;/code&gt; 실행 전의 &lt;code&gt;HEAD&lt;/code&gt; 위치를 찾을 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git reflog&lt;/code&gt; 명령어를 실행하면 &lt;code&gt;HEAD&lt;/code&gt;가 이동한 기록과 해당 커밋의 해시값이 표시된다.&lt;/li&gt;
+&lt;li&gt;기존 &lt;code&gt;HEAD&lt;/code&gt; 위치의 커밋 해시값을 찾은 후 &lt;code&gt;git checkout [커밋 해시값]&lt;/code&gt; 명령어를 사용하여 해당 위치로 돌아간다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git checkout HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HEAD is now at 817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;* &lt;span class="o"&gt;(&lt;/span&gt;HEAD detached at 817f30a&lt;span class="o"&gt;)&lt;/span&gt; master
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git reflog
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a HEAD@&lt;span class="o"&gt;{&lt;/span&gt;0&lt;span class="o"&gt;}&lt;/span&gt;: checkout: moving to HEAD~1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 HEAD@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;: commit: 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a HEAD@&lt;span class="o"&gt;{&lt;/span&gt;2&lt;span class="o"&gt;}&lt;/span&gt;: commit: 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 HEAD@&lt;span class="o"&gt;{&lt;/span&gt;3&lt;span class="o"&gt;}&lt;/span&gt;: commit &lt;span class="o"&gt;(&lt;/span&gt;initial&lt;span class="o"&gt;)&lt;/span&gt;: 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git checkout HEAD@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Switched to branch &lt;span class="s1"&gt;&amp;#39;master&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;2f8b5a0 세 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;817f30a 두 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;55c82a4 첫 번째 커밋
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;* master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="staging-영역에서-reset과-checkout의-사용-이유"&gt;staging 영역에서 reset과 checkout의 사용 이유
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt;과 &lt;code&gt;git checkout&lt;/code&gt;은 스테이징 영역을 다룰 때 활용되는데 이는 두 명령어가 파일 상태를 조정하는 방식 때문이다.&lt;/p&gt;
+&lt;h4 id="reset-1"&gt;reset
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;스테이징 영역의 파일을 내리는 데 주로 사용된다.&lt;/li&gt;
+&lt;li&gt;변경된 파일을 작업 디렉토리에 남기고 스테이징 상태만 초기화할 때 유용하다.
+&lt;ul&gt;
+&lt;li&gt;예: 실수로 스테이징한 파일을 내리고 다시 수정하고 싶을 때&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="checkout-1"&gt;checkout
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;스테이징 영역과 작업 디렉토리의 변경 사항을 모두 취소하며 파일을 마지막 커밋 상태로 되돌린다.&lt;/li&gt;
+&lt;li&gt;스테이징에 올린 파일을 버리고 원래 상태로 복구할 때 사용된다.
+&lt;ul&gt;
+&lt;li&gt;예: 실수로 수정한 파일을 완전히 되돌리고 싶을 때&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;reset&lt;/code&gt;은 과거를 수정하고, &lt;code&gt;checkout&lt;/code&gt;은 현재를 전환한다고 볼 수 있다.
+두 명령어는 스테이징 영역을 다룰 때 보완적으로 사용되며, 상황에 따라 적절히 선택해야 한다.&lt;/p&gt;
+&lt;h3 id="reset-2"&gt;reset
+&lt;/h3&gt;&lt;p&gt;주로 커밋 히스토리를 수정하거나 스테이징 영역과 작업 디렉토리를 특정 상태로 되돌릴 때 사용한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git reset&lt;/code&gt;은 브랜치의 커밋 이력을 변경하여 특정 커밋으로 되돌리는데 사용된다.&lt;/li&gt;
+&lt;li&gt;커밋이력 자체를 변경한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="checkout-2"&gt;checkout
+&lt;/h3&gt;&lt;p&gt;브랜치 간 전환이나 특정 파일/커밋 상태를 작업 디렉토리에 반영할 때 사용한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git checkout&lt;/code&gt;은 작업 디렉토리와 스테이징 영역의 상태를 특정 커밋 또는 브랜치로 변경하는 데 사용된다.&lt;/li&gt;
+&lt;li&gt;파일의 특정 시점 정보를 확인하기 위함.&lt;/li&gt;
+&lt;li&gt;브랜치 전환에 사용.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="차이점"&gt;차이점
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;reset&lt;/code&gt;은 커밋 히스토리와 상태를 적극적으로 변경하며 되돌리기 중심.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;checkout&lt;/code&gt;은 주로 상태 확인이나 전환에 초점, 히스토리 변경 없음.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Git Stash</title><link>https://blog.b9f1.com/p/2025-03-30-git-stash-how-to-use/</link><pubDate>Sun, 30 Mar 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-03-30-git-stash-how-to-use/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;stash&lt;/code&gt; 명령어는 작업 중인 변경사항을 임시로 저장하고 나중에 다시 적용할 수 있게 해주는 유용한 기능이다.
+&lt;code&gt;stack&lt;/code&gt; 자료구조 형태로 동작한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;가장 최근에 저장한 &lt;code&gt;stash&lt;/code&gt;가 맨 위 &lt;code&gt;stash@{0}&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;그 다음으로 최근에 저장한 &lt;code&gt;stash&lt;/code&gt;가 &lt;code&gt;stash@{1}&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;이런 식으로 숫자가 커질 수록 오래된 &lt;code&gt;stash&lt;/code&gt;가 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="stash"&gt;stash
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;stash&lt;/code&gt;는 현재 작업 중인 변경사항을 임시로 저장하여 작업 디렉토리를 깨끗한 상태(&lt;code&gt;HEAD&lt;/code&gt;와 동일한 상태)로 만들고 나중에 저장했던 변경 사항을 다시 적용할 수 있게 해주는 Git 명령어다.&lt;/p&gt;
+&lt;h3 id="사용-목적"&gt;사용 목적
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;브랜치 전환&lt;/strong&gt;: 현재 작업 중인 변경 사항을 커밋하지 않고 다른 브랜치로 전환해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;긴급 수정&lt;/strong&gt;: 갑자기 긴급한 버그 수정이 필요할 때 현재 작업을 일시 중단해야 할 경우&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;작업 중단 및 재개&lt;/strong&gt;: 작업을 임시로 중단하고 나중에 다시 시작해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;충돌 방지&lt;/strong&gt;: pull 등의 명령어로 인한 충돌을 피하고 싶을 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;실험적 변경 사항 관리&lt;/strong&gt;: 확신이 없는 변경 사항을 안전하게 저장해두고 싶을 때&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="기본-명령어"&gt;기본 명령어
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;대괄호(&lt;code&gt;[]&lt;/code&gt;)는 명령어 설명에서 선택적 매개변수를 나타낸다.&lt;/li&gt;
+&lt;li&gt;중괄호(&lt;code&gt;{}&lt;/code&gt;)는 stash 인덱스의 실제 구문의 일부이므로 명령어 실행 시 반드시 포함해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="변경-사항-저장"&gt;변경 사항 저장
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 최신 문법 (권장)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push -m &lt;span class="s2"&gt;&amp;#34;메시지&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 옛 문법 (Git 2.13 이전, 현재는 deprecated)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash save &lt;span class="s2"&gt;&amp;#34;메시지&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="저장된-stash-목록-확인"&gt;저장된 stash 목록 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash list
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 출력 예시&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;stash@&lt;span class="o"&gt;{&lt;/span&gt;0&lt;span class="o"&gt;}&lt;/span&gt;: WIP on main: 1a2b3c4 이전 커밋 메시지
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;stash@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;: On feature-branch: 상세 메시지
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="저장된-stash-적용하기"&gt;저장된 stash 적용하기
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 가장 최근의 stash 적용&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash apply
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 특정 stash 적용&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash apply stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="stash-적용-후-삭제"&gt;stash 적용 후 삭제
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 가장 최근의 stash 적용 후 삭제&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 단, 적용 시 충돌이나 실패가 발생하는 경우 삭제되지 않고 유지된다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash pop
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 특정 stash 적용 후 삭제&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash pop stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="특정-stash-삭제"&gt;특정 stash 삭제
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash drop stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="모든-stash-삭제"&gt;모든 stash 삭제
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash clear
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="stash의-내용-확인하기"&gt;stash의 내용 확인하기
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 최근 stash와 현재 디렉토리의 차이점 보기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash show
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 더 자세한 차이점 보기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash show -p
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 특정 stash의 차이점 보기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash show -p stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="심화-사용법"&gt;심화 사용법
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;대괄호(&lt;code&gt;[]&lt;/code&gt;)는 명령어 설명에서 선택적 매개변수를 나타낸다.&lt;/li&gt;
+&lt;li&gt;중괄호(&lt;code&gt;{}&lt;/code&gt;)는 stash 인덱스의 실제 구문의 일부이므로 명령어 실행 시 반드시 포함해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="특정-파일만-stash"&gt;특정 파일만 stash
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push -m &lt;span class="s2"&gt;&amp;#34;메시지&amp;#34;&lt;/span&gt; 파일1 파일2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="staged-된-파일만-stash"&gt;staged 된 파일만 stash
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push --staged -m &lt;span class="s2"&gt;&amp;#34;메시지&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="untracked-파일도-함께-stash하기"&gt;Untracked 파일도 함께 stash하기
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash -u
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash --include-untracked
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="새-브랜치에-stash-적용"&gt;새 브랜치에 stash 적용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash branch 새브랜치명 &lt;span class="o"&gt;[&lt;/span&gt;stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="stash로부터-특정-파일만-복원"&gt;stash로부터 특정 파일만 복원
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout stash@&lt;span class="o"&gt;{&lt;/span&gt;n&lt;span class="o"&gt;}&lt;/span&gt; -- 파일경로
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="실제-활용-시나리오"&gt;📌실제 활용 시나리오
+&lt;/h2&gt;&lt;h3 id="작업-중-급한-버그-수정하기"&gt;작업 중 급한 버그 수정하기
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 작업 중인 변경 사항 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push -m &lt;span class="s2"&gt;&amp;#34;현재 기능 개발 중&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# main 브랜치로 전환&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout main
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 버그 수정 브랜치 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout -b hotfix
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 버그 수정 작업...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 버그 수정 커밋&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -a -m &lt;span class="s2"&gt;&amp;#34;중요 버그 수정&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# main 브랜치에 병합&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout main
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git merge hotfix
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git branch -d hotfix
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원래 작업 브랜치로 돌아가기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout feature-branch
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 저장해둔 작업 복원&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash pop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="충돌-해결하기"&gt;충돌 해결하기
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 변경 사항 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 변경 사항 가져오기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git pull
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 저장한 변경 사항 적용 시도&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash pop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="충돌이-발생하는-경우"&gt;충돌이 발생하는 경우
+&lt;/h4&gt;&lt;p&gt;충돌을 텍스트 편집기, IDE 등에서 수동으로 해결한 후&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add .
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -m &lt;span class="s2"&gt;&amp;#34;충돌 해결 및 stash 적용&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="여러-개의-stash-관리"&gt;여러 개의 stash 관리
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 첫 번째 작업 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push -m &lt;span class="s2"&gt;&amp;#34;기능 A 작업 중&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 다른 작업 후 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash push -m &lt;span class="s2"&gt;&amp;#34;기능 B 작업 중&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# stash 목록 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash list
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기능 A 작업으로 돌아가기&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git stash apply stash@&lt;span class="o"&gt;{&lt;/span&gt;1&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="주의사항"&gt;📌주의사항
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git stash save&lt;/code&gt;는 Git 2.13 이후 deprecated 되었으며, 공식 문서에서도 &lt;code&gt;git stash push&lt;/code&gt; 사용을 권장한다.&lt;/li&gt;
+&lt;li&gt;최신 Git에서는 &lt;code&gt;save&lt;/code&gt; 명령이 제대로 동작하지 않거나 오류가 발생할 수 있다.&lt;/li&gt;
+&lt;li&gt;모든 &lt;code&gt;stash&lt;/code&gt; 관련 명령은 &lt;code&gt;push&lt;/code&gt;, &lt;code&gt;apply&lt;/code&gt;, &lt;code&gt;pop&lt;/code&gt;, &lt;code&gt;list&lt;/code&gt; 등의 명확한 옵션 기반 사용법으로 전환하는 것이 좋다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;stash&lt;/code&gt;는 임시 저장소이므로 너무 오랫동안 중요한 변경 사항을 &lt;code&gt;stash&lt;/code&gt;에만 보관하지 않는 것이 좋다.&lt;/li&gt;
+&lt;li&gt;여러 &lt;code&gt;stash&lt;/code&gt;를 사용할 때는 명확한 메시지를 사용하여 구분하는 것이 중요하다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;stash&lt;/code&gt;는 주로 로컬 작업에 사용되며 원격 저장소에 공유되지 않는다.&lt;/li&gt;
+&lt;li&gt;병합 충돌이 있는 파일은 &lt;code&gt;stash&lt;/code&gt;할 수 없다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="git-config을-통한-stash-관련-설정"&gt;Git config을 통한 stash 관련 설정
+&lt;/h3&gt;&lt;p&gt;필요에 따라 적용한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# stash 시 untracked 파일을 항상 포함하도록 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global stash.showIncludeUntracked &lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# stash 명령 별칭(alias) 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.st stash
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.stp &lt;span class="s1"&gt;&amp;#39;stash pop&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --global alias.stl &lt;span class="s1"&gt;&amp;#39;stash list&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="stash-options"&gt;stash options
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;옵션&lt;/th&gt;
+&lt;th&gt;축약형&lt;/th&gt;
+&lt;th&gt;영어 설명&lt;/th&gt;
+&lt;th&gt;한글 설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--all&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-a&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;include ignored files&lt;/td&gt;
+&lt;td&gt;무시된(ignored) 파일까지 포함하여 stash한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--include-untracked&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-u&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;include untracked files&lt;/td&gt;
+&lt;td&gt;추적되지 않는(untracked) 파일까지 포함하여 stash한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--keep-index&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-k&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;all changes already added to the index are left intact&lt;/td&gt;
+&lt;td&gt;이미 인덱스(스테이징 영역)에 추가된 변경사항은 그대로 유지한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--message&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-m&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;specify stash description&lt;/td&gt;
+&lt;td&gt;stash에 대한 설명(메시지)을 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-keep-index&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;all changes already added to the index are undone&lt;/td&gt;
+&lt;td&gt;인덱스에 추가된 변경사항도 모두 되돌린다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--patch&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-p&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;interactively select hunks from diff between HEAD and working tree to stash&lt;/td&gt;
+&lt;td&gt;HEAD와 작업 디렉토리 간의 차이를 대화형으로 선택하여 stash한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--pathspec-file-nul&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;pathspec elements are separated with NUL character&lt;/td&gt;
+&lt;td&gt;경로 지정자(pathspec) 요소가 NUL 문자로 구분된다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--pathspec-from-file&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;read pathspec from file&lt;/td&gt;
+&lt;td&gt;파일에서 경로 지정자(pathspec)를 읽는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--quiet&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-q&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;suppress all output&lt;/td&gt;
+&lt;td&gt;모든 출력을 억제한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="stash-show-options"&gt;stash show options
+&lt;/h3&gt;&lt;h1 id="git-stash-show-옵션-테이블"&gt;Git Stash Show 옵션 테이블
+&lt;/h1&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;옵션&lt;/th&gt;
+&lt;th&gt;축약형&lt;/th&gt;
+&lt;th&gt;영어 설명&lt;/th&gt;
+&lt;th&gt;한글 설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--abbrev&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;use specified digits to display object names&lt;/td&gt;
+&lt;td&gt;객체 이름을 표시할 때 지정된 자릿수를 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--anchored&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffs using the &amp;ldquo;anchored diff&amp;rdquo; algorithm&lt;/td&gt;
+&lt;td&gt;&amp;ldquo;anchored diff&amp;rdquo; 알고리즘을 사용하여 차이점을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--binary&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;in addition to &amp;ndash;full-index, output binary diffs for git-apply&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--full-index&lt;/code&gt;와 함께 사용하면 git-apply를 위한 바이너리 차이점을 출력한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--break-rewrites&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-B&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;break complete rewrite changes into pairs of given size&lt;/td&gt;
+&lt;td&gt;완전 재작성된 변경사항을 지정된 크기의 쌍으로 분리한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--cc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-c&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;combined diff format for merge commits&lt;/td&gt;
+&lt;td&gt;병합 커밋을 위한 결합된 diff 형식을 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--check&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;warn if changes introduce trailing whitespace or space/tab indents&lt;/td&gt;
+&lt;td&gt;변경사항이 후행 공백이나 공백/탭 들여쓰기를 도입하는 경우 경고한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--color&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show colored diff&lt;/td&gt;
+&lt;td&gt;색상이 있는 diff를 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--color-moved&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;color moved lines differently&lt;/td&gt;
+&lt;td&gt;이동된 라인을 다른 색상으로 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--color-moved-ws&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;configure how whitespace is ignored when performing move detection for &amp;ndash;color-moved&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--color-moved&lt;/code&gt; 사용 시 이동 감지에서 공백을 무시하는 방법을 설정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--color-words&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show colored-word diff&lt;/td&gt;
+&lt;td&gt;단어 단위로 색상이 있는 diff를 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--compact-summary&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate compact summary in diffstat&lt;/td&gt;
+&lt;td&gt;diffstat에 간결한 요약을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--cumulative&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;synonym for &amp;ndash;dirstat=cumulative&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;--dirstat=cumulative&lt;/code&gt;의 동의어.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--diff-algorithm&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;choose a diff algorithm&lt;/td&gt;
+&lt;td&gt;diff 알고리즘을 선택한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--diff-filter&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;select certain kinds of files for diff&lt;/td&gt;
+&lt;td&gt;diff를 위한 특정 종류의 파일을 선택한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--dirstat&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate dirstat by amount of changes&lt;/td&gt;
+&lt;td&gt;변경 양에 따라 dirstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--dirstat-by-file&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate dirstat by number of files&lt;/td&gt;
+&lt;td&gt;파일 수에 따라 dirstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--dst-prefix&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;use given prefix for destination&lt;/td&gt;
+&lt;td&gt;대상 파일에 주어진 접두사를 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--exit-code&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;report exit code 1 if differences, 0 otherwise&lt;/td&gt;
+&lt;td&gt;차이가 있으면 종료 코드 1, 그렇지 않으면 0을 반환한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ext-diff&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;allow external diff helper to be executed&lt;/td&gt;
+&lt;td&gt;외부 diff 도우미 실행을 허용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--find-copies&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-C&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;detect copies as well as renames with given scope&lt;/td&gt;
+&lt;td&gt;주어진 범위 내에서 이름 변경뿐만 아니라 복사도 감지한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--find-copies-harder&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;try harder to find copies&lt;/td&gt;
+&lt;td&gt;복사본을 찾기 위해 더 많은 노력을 기울인다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--find-object&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;look for differences that change the number of occurrences of specified object&lt;/td&gt;
+&lt;td&gt;지정된 객체의 발생 횟수를 변경하는 차이점을 찾는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--find-renames&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-M&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;detect renames with given scope&lt;/td&gt;
+&lt;td&gt;주어진 범위 내에서 이름 변경을 감지한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--follow&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;continue listing the history of a file beyond renames&lt;/td&gt;
+&lt;td&gt;파일 이름이 변경된 경우에도 파일 기록을 계속 나열한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--full-index&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show full object name of pre- and post-image blob&lt;/td&gt;
+&lt;td&gt;변경 전후 이미지 blob의 전체 객체 이름을 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--histogram&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffs with histogram algorithm&lt;/td&gt;
+&lt;td&gt;히스토그램 알고리즘으로 diff를 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-all-space&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-w&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;ignore white space when comparing lines&lt;/td&gt;
+&lt;td&gt;라인 비교 시 모든 공백을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-blank-lines&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;ignore changes whose lines are all blank&lt;/td&gt;
+&lt;td&gt;빈 줄만 있는 변경사항을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-cr-at-eol&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;ignore carriage-return at end of line&lt;/td&gt;
+&lt;td&gt;줄 끝의 캐리지 리턴(CR)을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-matching-lines&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-I&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;ignore changes whose lines all match regex&lt;/td&gt;
+&lt;td&gt;모든 라인이 정규식과 일치하는 변경사항을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-space-at-eol&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;ignore changes in whitespace at end of line&lt;/td&gt;
+&lt;td&gt;줄 끝의 공백 변경을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-space-change&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-b&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;ignore changes in amount of white space&lt;/td&gt;
+&lt;td&gt;공백 양의 변경을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ignore-submodules&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;ignore changes to submodules&lt;/td&gt;
+&lt;td&gt;서브모듈 변경을 무시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--inter-hunk-context&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;combine hunks closer than N lines&lt;/td&gt;
+&lt;td&gt;N 라인보다 가까운 헝크를 결합한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--irreversible-delete&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-D&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;omit the preimage for deletes&lt;/td&gt;
+&lt;td&gt;삭제에 대한 이전 이미지를 생략한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ita-invisible-in-index&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;hide &amp;lsquo;git add -N&amp;rsquo; entries from the index&lt;/td&gt;
+&lt;td&gt;인덱스에서 &amp;lsquo;git add -N&amp;rsquo; 항목을 숨긴다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--line-prefix&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;prepend additional prefix to every line of output&lt;/td&gt;
+&lt;td&gt;출력의 모든 라인에 추가 접두사를 붙인다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--minimal&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;spend extra time to make sure the smallest possible diff is produced&lt;/td&gt;
+&lt;td&gt;가능한 가장 작은 diff를 생성하기 위해 추가 시간을 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--name-only&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show only names of changed files&lt;/td&gt;
+&lt;td&gt;변경된 파일의 이름만 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--name-status&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show only names and status of changed files&lt;/td&gt;
+&lt;td&gt;변경된 파일의 이름과 상태만 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-color&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;turn off colored diff&lt;/td&gt;
+&lt;td&gt;색상 diff를 끈다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-color-moved-ws&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;don&amp;rsquo;t ignore whitespace when performing move detection&lt;/td&gt;
+&lt;td&gt;이동 감지 시 공백을 무시하지 않는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-ext-diff&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;disallow external diff helper to be executed&lt;/td&gt;
+&lt;td&gt;외부 diff 도우미 실행을 허용하지 않는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-indent-heuristic&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;disable heuristic that shifts diff hunk boundaries to make patches easier to read&lt;/td&gt;
+&lt;td&gt;패치를 더 쉽게 읽을 수 있게 하는 diff 헝크 경계 이동 휴리스틱을 비활성화한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-patch&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-s&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;suppress diff output&lt;/td&gt;
+&lt;td&gt;diff 출력을 억제한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-prefix&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;do not show any source or destination prefix&lt;/td&gt;
+&lt;td&gt;소스나 대상 접두사를 표시하지 않는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-renames&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;turn off rename detection&lt;/td&gt;
+&lt;td&gt;이름 변경 감지를 끈다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--no-textconv&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;do not allow external text conversion filters to be run when comparing binary files&lt;/td&gt;
+&lt;td&gt;바이너리 파일 비교 시 외부 텍스트 변환 필터 실행을 허용하지 않는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--numstat&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate more machine-friendly diffstat&lt;/td&gt;
+&lt;td&gt;기계 친화적인 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--output&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;output to a specific file&lt;/td&gt;
+&lt;td&gt;특정 파일로 출력한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--output-indicator-context&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;specify the character to indicate a context line&lt;/td&gt;
+&lt;td&gt;컨텍스트 라인을 나타내는 문자를 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--output-indicator-new&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;specify the character to indicate a new line&lt;/td&gt;
+&lt;td&gt;새 라인을 나타내는 문자를 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--output-indicator-old&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;specify the character to indicate a old line&lt;/td&gt;
+&lt;td&gt;이전 라인을 나타내는 문자를 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--patch&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-u&lt;/code&gt;, &lt;code&gt;-p&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;generate diff in patch format&lt;/td&gt;
+&lt;td&gt;패치 형식으로 diff를 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--patch-with-raw&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate patch but also keep the default raw diff output&lt;/td&gt;
+&lt;td&gt;패치를 생성하지만 기본 raw diff 출력도 유지한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--patch-with-stat&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate patch and prepend its diffstat&lt;/td&gt;
+&lt;td&gt;패치를 생성하고 그 앞에 diffstat을 추가한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--patience&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffs with patience algorithm&lt;/td&gt;
+&lt;td&gt;patience 알고리즘으로 diff를 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--pickaxe-all&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;when -S finds a change, show all changes in that changeset&lt;/td&gt;
+&lt;td&gt;-S가 변경을 찾으면 해당 변경 세트의 모든 변경을 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--pickaxe-regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;treat argument of -S as regular expression&lt;/td&gt;
+&lt;td&gt;-S의 인수를 정규식으로 처리한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--raw&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate default raw diff output&lt;/td&gt;
+&lt;td&gt;기본 raw diff 출력을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--relative&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;exclude changes outside and output relative to given directory&lt;/td&gt;
+&lt;td&gt;주어진 디렉토리 외부의 변경을 제외하고 상대적으로 출력한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--rename-empty&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;use empty blobs as rename source&lt;/td&gt;
+&lt;td&gt;빈 blob을 이름 변경 소스로 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--rotate-to&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show the change in specified path first&lt;/td&gt;
+&lt;td&gt;지정된 경로의 변경을 먼저 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--shortstat&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate summary diffstat&lt;/td&gt;
+&lt;td&gt;요약 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--skip-to&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;skip the output to the specified path&lt;/td&gt;
+&lt;td&gt;지정된 경로까지의 출력을 건너뛴다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--src-prefix&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;use given prefix for source&lt;/td&gt;
+&lt;td&gt;소스에 주어진 접두사를 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--stat&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffstat instead of patch&lt;/td&gt;
+&lt;td&gt;패치 대신 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--stat-count&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffstat with limited lines&lt;/td&gt;
+&lt;td&gt;제한된 라인으로 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--stat-graph-width&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffstat with a given graph width&lt;/td&gt;
+&lt;td&gt;주어진 그래프 너비로 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--stat-width&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate diffstat with a given width&lt;/td&gt;
+&lt;td&gt;주어진 너비로 diffstat을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--submodule&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;select output format for submodule differences&lt;/td&gt;
+&lt;td&gt;서브모듈 차이에 대한 출력 형식을 선택한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--summary&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;generate condensed summary of extended header information&lt;/td&gt;
+&lt;td&gt;확장 헤더 정보의 간결한 요약을 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--text&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-a&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;treat all files as text&lt;/td&gt;
+&lt;td&gt;모든 파일을 텍스트로 취급한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--textconv&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;allow external text conversion filters to be run when comparing binary files&lt;/td&gt;
+&lt;td&gt;바이너리 파일 비교 시 외부 텍스트 변환 필터 실행을 허용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--unified&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;-U&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;generate diff with given lines of context&lt;/td&gt;
+&lt;td&gt;주어진 라인 수의 컨텍스트로 diff를 생성한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--word-diff&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;show word diff&lt;/td&gt;
+&lt;td&gt;단어 단위 diff를 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--word-diff-regex&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;specify what constitutes a word&lt;/td&gt;
+&lt;td&gt;단어를 구성하는 것을 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--ws-error-highlight&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;specify where to highlight whitespace errors&lt;/td&gt;
+&lt;td&gt;공백 오류를 강조 표시할 위치를 지정한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-G&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;look for differences whose added or removed line matches the given regex&lt;/td&gt;
+&lt;td&gt;추가되거나 제거된 라인이 주어진 정규식과 일치하는 차이점을 찾는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-O&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;output patch in the order of glob-pattern lines in given file&lt;/td&gt;
+&lt;td&gt;주어진 파일의 glob-패턴 라인 순서대로 패치를 출력한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-R&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;do a reverse diff&lt;/td&gt;
+&lt;td&gt;역방향 diff를 수행한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-S&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;look for differences that add or remove the given string&lt;/td&gt;
+&lt;td&gt;주어진 문자열을 추가하거나 제거하는 차이점을 찾는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-l&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;limit number of rename/copy targets to run&lt;/td&gt;
+&lt;td&gt;실행할 이름 변경/복사 대상 수를 제한한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-z&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;use NUL termination on output&lt;/td&gt;
+&lt;td&gt;출력에 NUL 종료를 사용한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</description></item><item><title>Git Rebase 사용 목적 및 대체 기능</title><link>https://blog.b9f1.com/p/2025-03-27-git-rebase-purpose-and-alternative-features/</link><pubDate>Thu, 27 Mar 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2025-03-27-git-rebase-purpose-and-alternative-features/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;merge&lt;/code&gt; 기능이 있지만 &lt;code&gt;rebase&lt;/code&gt;를 사용하는 목적?
+사용에 주의가 필요한 기능이라면, 협업에선 어떤 상황에 사용되는지?&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="rebase-사용-목적"&gt;Rebase 사용 목적
+&lt;/h3&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;&lt;code&gt;rebase&lt;/code&gt;는 개인적으로 작업하는 브랜치나 깔끔한 히스토리를 유지해야 하는 경우에 유용하게 사용된다. 하지만 공유 브랜치에서는 협업 시 혼란을 야기할 수 있으므로 사용에 신중해야 한다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;rebase&lt;/code&gt;는 브랜치 변경 사항을 다른 브랜치에 통합하는 강력한 도구로, 특히 다음과 같은 목적을 위해 사용된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;merge&lt;/code&gt;와 달리 불필요한 병합 커밋을 생성하지 않고 히스토리를 재작성하여 이해하기 쉽고 추적하기 용이한 선형적인 히스토리를 유지한다.&lt;/li&gt;
+&lt;li&gt;선형적인 히스토리는 코드 변경 사항을 순차적으로 검토할 수 있도록 도와 코드 리뷰 효율성을 높인다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git bisect&lt;/code&gt;와 같은 도구를 사용하여 문제 발생 커밋을 빠르게 찾고 해결하는 데 유용하다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;interactive rebase&lt;/code&gt;를 통해 커밋 순서 변경, 병합, 삭제 등 다양한 방법으로 커밋 히스토리를 정리하고 관리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="rebase-대체-기능-및-비교"&gt;Rebase 대체 기능 및 비교
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;rebase&lt;/code&gt;와 유사한 기능을 수행하는 &lt;code&gt;merge&lt;/code&gt;가 있으며, 두 기능의 차이점은 다음과 같다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;기능&lt;/th&gt;
+&lt;th&gt;특징&lt;/th&gt;
+&lt;th&gt;장점&lt;/th&gt;
+&lt;th&gt;단점&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;merge&lt;/td&gt;
+&lt;td&gt;브랜치 병합 시 병합 커밋 생성&lt;/td&gt;
+&lt;td&gt;히스토리 변경 없이 브랜치 병합 가능&lt;br&gt;안정적인 협업환경 유지&lt;/td&gt;
+&lt;td&gt;복잡한 커밋 히스토리 생성&lt;br&gt;코드 리뷰 및 문제 해결 어려움&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;rebase&lt;/td&gt;
+&lt;td&gt;커밋 히스토리 재작성&lt;/td&gt;
+&lt;td&gt;깔끔하고 선형적인 커밋 히스토리 유지&lt;br&gt;코드 리뷰 및 문제 해결 용이&lt;br&gt;커밋 정리 및 관리 용이&lt;/td&gt;
+&lt;td&gt;커밋 히스토리 변경으로 인한 잠재적 문제 발생 가능성&lt;br&gt;숙련되지 않은 사용자에게는 복잡할 수 있음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;merge&lt;/code&gt;는 히스토리 변경 없이 브랜치를 병합하고 안정적인 협업 환경을 유지하는데 적합하다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;rebase&lt;/code&gt;는 깔끔하고 선형적인 히스토리를 유지하고 코드 리뷰 및 문제 해결 효율성을 높이는 데 적합하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="rebase-사용-사례"&gt;Rebase 사용 사례
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;기능 브랜치 정리, 코드 리뷰 효율성 향상, release 브랜치 관리, 옾느 소스 프로젝트 기여 등에 사용할 수 있다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="main-브랜치-병합-전-rebase를-통한-커밋-정리"&gt;main 브랜치 병합 전 Rebase를 통한 커밋 정리
+&lt;/h4&gt;&lt;p&gt;여러 개발자가 &lt;code&gt;feature-A&lt;/code&gt;라는 브랜치에서 동시에 작업한다고 생각해보자.
+각 개발자는 자신의 작업을 커밋하고 원격 저장소에 푸시할 것이다.
+&lt;code&gt;feature-A&lt;/code&gt; 브랜치를 &lt;code&gt;main&lt;/code&gt; 브랜치에 병합하기 전에, 각 개발자는 자신의 커밋을 정리하고 &lt;code&gt;main&lt;/code&gt; 브랜치의 최신 변경 사항을 반영하기 위해 &lt;code&gt;rebase&lt;/code&gt;를 사용한다.&lt;/p&gt;
+&lt;h4 id="개발자-a의-작업"&gt;개발자 A의 작업
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;개발자 A는 &lt;code&gt;feature-A&lt;/code&gt; 브랜치에서 작업을 수행하고 다음과 같은 커밋을 생성한다.
+&lt;ul&gt;
+&lt;li&gt;커맷 1: 기능 A의 기본 구조 구현&lt;/li&gt;
+&lt;li&gt;커밋 2: 기능 A의 UI 개선&lt;/li&gt;
+&lt;li&gt;커밋 3: 기능 A의 버그 수정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;개발자 A는 자신의 커밋을 원격 저장소에 푸시한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="개발자-b의-작업"&gt;개발자 B의 작업
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;개발자 B도 &lt;code&gt;feature-A&lt;/code&gt; 브랜치에서 작업을 수행하고 다음과 같은 커밋을 생성한다.
+&lt;ul&gt;
+&lt;li&gt;커밋 1: 기능 A의 데이터 처리 로직 구현&lt;/li&gt;
+&lt;li&gt;커밋 2: 기능 A의 성능 개선&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;개발자 B는 자신의 커밋을 원격 저장소에 푸시한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="작업-후-merge-이전의-rebase"&gt;작업 후 merge 이전의 rebase
+&lt;/h4&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;브랜치의 작업자가 본인만 있는 경우가 아니라면, 강제 푸시 이전 꼭 협업자와의 소통이 필수.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;개발자 B 역시 동일하게 본인의 커밋을 수정할 수 있다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;두서 없이 작업했던 본인의 커밋 내역을 &lt;code&gt;main&lt;/code&gt; 브랜치에 합치기 위해 작업 내역을 정리하는 목적으로 사용할 수 있다.&lt;/p&gt;
+&lt;h5 id="최신-변경-사항-가져오기"&gt;최신 변경 사항 가져오기
+&lt;/h5&gt;&lt;p&gt;&lt;code&gt;main&lt;/code&gt; 브랜치의 최신 변경 사항을 로컬 &lt;code&gt;feature-A&lt;/code&gt; 브랜치에 가져온다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git pull origin main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="rebase-시작"&gt;rebase 시작
+&lt;/h5&gt;&lt;p&gt;&lt;code&gt;rebase&lt;/code&gt;를 시작한다.
+로컬 &lt;code&gt;feature-A&lt;/code&gt; 브랜치의 커밋들을 &lt;code&gt;main&lt;/code&gt; 브랜치의 최신 커밋 위에 재배치한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git rebase origin/main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="충돌-발생-시-해결"&gt;충돌 발생 시 해결
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;충돌이 발생하면 충돌 파일을 수정하고 &lt;code&gt;git add {충돌난 파일}&lt;/code&gt; 명령어를 실행한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git rebase --continue&lt;/code&gt; 명령으로 &lt;code&gt;rebase&lt;/code&gt;를 계속 진행한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="interactive-rebase-선택-사항"&gt;interactive rebase (선택 사항)
+&lt;/h5&gt;&lt;p&gt;커밋 히스토리를 정리한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;commit&lt;/code&gt;을 수정하거나&lt;/li&gt;
+&lt;li&gt;커밋을 합치거나&lt;/li&gt;
+&lt;li&gt;불필요한 커밋을 삭제하는 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git rebase -i origin/main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="원격-저장소에-강제-푸시"&gt;원격 저장소에 강제 푸시
+&lt;/h5&gt;&lt;p&gt;정리된 커밋 히스토리를 원격 저장소에 강제 푸시한다.
+이로 인해 협업 규격에 맞는 커밋으로 수정한 뒤 &lt;code&gt;main&lt;/code&gt; 브랜치에 합칠 수 있게 된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push --force-with-lease origin feature-A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;rebase&lt;/code&gt;는 개인 작업의 유연성과 협업 시 커밋 규격 준수를 가능하게 하는 강력한 도구이지만, 히스토리 변경으로 인한 위험성을 항상 염두에 두어야 한다.
+따라서, &lt;code&gt;rebase&lt;/code&gt;를 사용할 때는 팀원들과 충분히 소통하고 프로젝트의 특성을 고려해서 신중하게 결정해야 한다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="origin-main-vs-originmain"&gt;origin main VS origin/main
+&lt;/h3&gt;&lt;h4 id="origin-main"&gt;origin main
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;origin main&lt;/code&gt;는 나눠서 봐야 한다.
+&lt;code&gt;origin&lt;/code&gt;이라는 원본 저장소, &lt;code&gt;main&lt;/code&gt;이라는 브랜치&lt;/p&gt;
+&lt;p&gt;예를 들어, &lt;code&gt;git pull origin main&lt;/code&gt; 명령이라면 &lt;code&gt;origin&lt;/code&gt;이라는 저장소에서 &lt;code&gt;main&lt;/code&gt; 브랜치를 내려 받는다.&lt;/p&gt;
+&lt;h4 id="originmain"&gt;origin/main
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;origin/main&lt;/code&gt;은 브랜치 자체를 의미한다.
+로컬 저장소에 저장된 원격 저장소 &lt;code&gt;origin&lt;/code&gt;의 &lt;code&gt;main&lt;/code&gt; 브랜치의 상태를 나타내는 일종의 &amp;lsquo;읽기 전용&amp;rsquo; 스냅샷이다.&lt;/p&gt;
+&lt;p&gt;예를 들어, &lt;code&gt;git rebase origin/main&lt;/code&gt; 명령이라면 &lt;code&gt;origin/main&lt;/code&gt; 브랜치에 대해 &lt;code&gt;rebase&lt;/code&gt;를 실행한다.&lt;/p&gt;</description></item><item><title>Git을 사용한 형상 관리 전략</title><link>https://blog.b9f1.com/p/2022-01-14-version-control-strategy-with-git/</link><pubDate>Fri, 14 Jan 2022 10:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/2022-01-14-version-control-strategy-with-git/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;형상 관리는 소스 코드 변경에 대한 모든 관리를 의미하며, 이를 통해 프로젝트의 일관성과 추적 가능성을 유지한다.
+형상 관리 전략은 이러한 변경 사항을 체계적으로 관리하기 위한 방법들을 포함한다.&lt;/p&gt;
+&lt;p&gt;프로젝트와 형상 관리 툴에 따라 달라질 수 있지만,
+이번엔 &lt;code&gt;Git&lt;/code&gt;을 기준으로 형상 관리 전략을 정리한다.&lt;/p&gt;
+&lt;h2 id="형상-관리-브랜치-전략"&gt;📌형상 관리 브랜치 전략
+&lt;/h2&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;브랜치 명명 규칙이 다를 수 있지만, 보편적이라고 생각되는 정보로 정리한다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="주요-브랜치"&gt;주요 브랜치
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;master&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;제품으로 출시될 수 있는 안정된 상태의 코드가 포함된다.&lt;/li&gt;
+&lt;li&gt;배포 가능한 버전만이 병합된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;develop&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;다음 출시 버전을 개발하는 브랜치다.&lt;/li&gt;
+&lt;li&gt;기능 개발과 버그 수정이 이루어진다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="보조-브랜치"&gt;보조 브랜치
+&lt;/h3&gt;&lt;ol start="3"&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;feature&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;새로운 기능을 개발할 때 사용된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;develop&lt;/code&gt; 브랜치에서 파생하며, 작업 완료 후 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;release&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;출시 준비를 위해 사용된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;develop&lt;/code&gt; 브랜치에서 파생하며, QA 단계에서 발생한 버그를 수정한다.&lt;/li&gt;
+&lt;li&gt;준비가 완료되면 &lt;code&gt;master&lt;/code&gt;와 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;hotfix&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;배포된 버전에서 긴급하게 수정이 필요한 버그를 처리할 때 사용된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;master&lt;/code&gt; 브랜치에서 파생하며, 수정 완료 후 &lt;code&gt;master&lt;/code&gt;와 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="단계별-작업-흐름"&gt;📌단계별 작업 흐름
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;초기 브랜치 구성&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;프로젝트 시작 시 &lt;code&gt;master&lt;/code&gt;와 &lt;code&gt;develop&lt;/code&gt; 브랜치를 생성한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;기능 개발&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;새로운 기능 개발 시 &lt;code&gt;develop&lt;/code&gt; 브랜치에서 &lt;code&gt;feature&lt;/code&gt; 브랜치를 생성한다.&lt;/li&gt;
+&lt;li&gt;기능 개발이 완료되면 &lt;code&gt;feature&lt;/code&gt; 브랜치를 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;출시 준비&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;다음 출시를 준비하기 위해 &lt;code&gt;develop&lt;/code&gt; 브랜치에서 &lt;code&gt;release&lt;/code&gt; 브랜치를 생성한다.&lt;/li&gt;
+&lt;li&gt;QA 과정을 거치며 발생한 버그들을 &lt;code&gt;release&lt;/code&gt; 브랜치에서 수정한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;최종 배포&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;QA가 완료되면 &lt;code&gt;release&lt;/code&gt; 브랜치를 &lt;code&gt;master&lt;/code&gt;와 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;master&lt;/code&gt; 브랜치에 새로운 버전 태그를 추가한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;긴급 수정&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;배포된 버전에서 긴급한 버그가 발생하면 &lt;code&gt;master&lt;/code&gt; 브랜치에서 &lt;code&gt;hotfix&lt;/code&gt; 브랜치를 생성한다.&lt;/li&gt;
+&lt;li&gt;버그 수정이 완료되면 &lt;code&gt;hotfix&lt;/code&gt; 브랜치를 &lt;code&gt;master&lt;/code&gt;와 &lt;code&gt;develop&lt;/code&gt; 브랜치로 병합한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="convention"&gt;📌Convention
+&lt;/h2&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;규칙은 일관성을 유지하고, 목적과 내용을 쉽게 파악할 수 있게 도와준다.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="브랜치-명명-규칙"&gt;브랜치 명명 규칙
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;master&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;master&lt;/code&gt;라는 이름을 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;develop&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;develop&lt;/code&gt;라는 이름을 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;feature&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;feature/{기능명}&lt;/code&gt; 형식을 사용한다.&lt;/li&gt;
+&lt;li&gt;ex) &lt;code&gt;feature/login-page&lt;/code&gt;, &lt;code&gt;feature/add-user-profile&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;release&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;release/{버전번호}&lt;/code&gt; 형식을 사용한다.&lt;/li&gt;
+&lt;li&gt;ex) &lt;code&gt;release/1.0.0&lt;/code&gt;, &lt;code&gt;release/2.1.0&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;hotfix&lt;/code&gt; 브랜치&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;hotfix/{수정사항}&lt;/code&gt; 형식을 사용한다.&lt;/li&gt;
+&lt;li&gt;ex) &lt;code&gt;hotfix/urgent-bug&lt;/code&gt;, &lt;code&gt;hotfix/security-patch&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="커밋-메시지-규칙"&gt;커밋 메시지 규칙
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;타입&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;feat&lt;/code&gt;: 새로운 기능 추가&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fix&lt;/code&gt;: 버그 수정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;docs&lt;/code&gt;: 문서 수정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;style&lt;/code&gt;: 코드 포맷팅, 세미콜론 누락 등 (비즈니스 로직에 변경 없음)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;refactor&lt;/code&gt;: 코드 리팩토링&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;test&lt;/code&gt;: 테스트 추가, 수정&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chore&lt;/code&gt;: 기타 변경사항&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;형식&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;{타입}: {변경사항 설명}&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;ex) &lt;code&gt;feat: add login functionality&lt;/code&gt;, &lt;code&gt;fix: resolve user profile bug&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;p&gt;형상 관리 전략은 프로젝트의 변경 사항을 체계적으로 관리하고 추적할 수 있게 하는 중요한 역할을 한다.&lt;/p&gt;
+&lt;p&gt;이를 통해 개발 팀은 코드의 일관성을 유지하고, 배포 과정에서 발생할 수 있는 문제를 최소화할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Git&lt;/code&gt;을 활용한 형상 관리 전략은 다양한 프로젝트에 적용할 수 있으며, 각 브랜치의 역할을 명확히 정의함으로써 효율적인 개발 프로세스를 지원한다.&lt;/p&gt;</description></item></channel></rss>
