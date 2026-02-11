@@ -8,8 +8,8 @@ date: 2025-12-30 14:08:23
 categories:
 tags:
   - devlog
-  - note-template
-# image: Status: ToDo
+
+Status: ToDo
 ---
 ## 📌개요
 
