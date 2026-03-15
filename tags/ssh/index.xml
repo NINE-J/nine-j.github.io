@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SSH on B9F1</title><link>https://blog.b9f1.com/tags/ssh/</link><description>Recent content in SSH on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 15 Oct 2025 18:30:33 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/ssh/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 멀티 SSH 키 관리</title><link>https://blog.b9f1.com/p/b9f1-devlog-git-%EB%A9%80%ED%8B%B0-ssh-%ED%82%A4-%EA%B4%80%EB%A6%AC/</link><pubDate>Wed, 15 Oct 2025 18:30:33 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-git-%EB%A9%80%ED%8B%B0-ssh-%ED%82%A4-%EA%B4%80%EB%A6%AC/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ssh-키-구성-예시"&gt;SSH 키 구성 예시
+&lt;/h3&gt;&lt;h4 id="ssh-키-파일들"&gt;SSH 키 파일들
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519 &lt;span class="c1"&gt;# 기본/개인 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519.pub &lt;span class="c1"&gt;# 기본/개인 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company &lt;span class="c1"&gt;# 회사 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company.pub &lt;span class="c1"&gt;# 회사 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── config &lt;span class="c1"&gt;# SSH 설정 파일&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="ssh-config-설정-sshconfig"&gt;SSH Config 설정 (&lt;code&gt;~/.ssh/config&lt;/code&gt;)
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 경로는 대부분의 OS에서 사용자 폴더를 의미한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 GitHub 설정 (개인 계정용)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정용 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="사용-방법"&gt;사용 방법
+&lt;/h3&gt;&lt;h4 id="1-기본-사용"&gt;1. 기본 사용
+&lt;/h4&gt;&lt;p&gt;일반적인 GitHub URL을 그대로 사용:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com:username/my-project.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-명시적-개인-계정-사용"&gt;2. 명시적 개인 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-회사-계정-사용"&gt;3. 회사 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="새로운-계정키-추가-방법"&gt;새로운 계정/키 추가 방법
+&lt;/h3&gt;&lt;h4 id="1-새-ssh-키-생성"&gt;1. 새 SSH 키 생성
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-keygen -t ed25519 -C &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt; -f ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-ssh-config에-설정-추가"&gt;2. SSH Config에 설정 추가
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# ~/.ssh/config에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-github에-공개-키-등록"&gt;3. GitHub에 공개 키 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 내용 복사&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cat ~/.ssh/id_ed25519_newaccount.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub Settings &amp;gt; SSH and GPG keys&lt;/code&gt;에서 등록&lt;/p&gt;
+&lt;h4 id="4-사용"&gt;4. 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-newaccount:NewAccount/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ssh-연결-테스트"&gt;SSH 연결 테스트
+&lt;/h3&gt;&lt;p&gt;각 계정별로 SSH 연결을 테스트할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 테스트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;성공시 다음과 같은 메시지가 출력된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hi [계정명]! You&amp;#39;ve successfully authenticated, but GitHub does not provide shell access.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="프로젝트별-설정-확인"&gt;프로젝트별 설정 확인
+&lt;/h3&gt;&lt;p&gt;현재 프로젝트가 어떤 SSH 키를 사용하는지 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --list &lt;span class="p"&gt;|&lt;/span&gt; grep remote.origin.url
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="권한-설정"&gt;권한 설정
+&lt;/h3&gt;&lt;p&gt;SSH 파일들의 올바른 권한 설정은 &lt;strong&gt;Unix/Linux 기반 시스템에서 필수&lt;/strong&gt;다.&lt;/p&gt;
+&lt;h4 id="권한-설정이-필요한-환경"&gt;권한 설정이 필요한 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;✅ &lt;strong&gt;Linux/Ubuntu&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;macOS&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;WSL (Windows Subsystem for Linux)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;Docker 컨테이너&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;개발 컨테이너 (Dev Container)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;❌ &lt;strong&gt;Windows 네이티브&lt;/strong&gt; (NTFS 권한으로 자동 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="windows-vs-unixlinux-차이점"&gt;Windows vs Unix/Linux 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;환경&lt;/th&gt;
+&lt;th&gt;권한 시스템&lt;/th&gt;
+&lt;th&gt;SSH 권한 설정&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Windows 네이티브&lt;/td&gt;
+&lt;td&gt;NTFS ACL&lt;/td&gt;
+&lt;td&gt;불필요 (자동)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WSL/Linux/macOS&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker/Dev Container&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="windows에서-ssh-사용하기"&gt;Windows에서 SSH 사용하기
+&lt;/h4&gt;&lt;h5 id="windows-네이티브-환경"&gt;Windows 네이티브 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# PowerShell 또는 Command Prompt에서&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;ssh-keygen&lt;/span&gt; &lt;span class="n"&gt;-t&lt;/span&gt; &lt;span class="n"&gt;ed25519&lt;/span&gt; &lt;span class="n"&gt;-C&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 권한 설정은 Windows가 자동으로 관리&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Windows 네이티브 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;chmod&lt;/code&gt; 명령어 없음&lt;/li&gt;
+&lt;li&gt;NTFS 권한으로 자동 관리&lt;/li&gt;
+&lt;li&gt;SSH 클라이언트가 적절한 권한 자동 설정&lt;/li&gt;
+&lt;li&gt;수동 권한 설정 불필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="wsl-환경"&gt;WSL 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# WSL에서는 Linux와 동일하게 권한 설정 필요&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;WSL 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux 파일 시스템 사용&lt;/li&gt;
+&lt;li&gt;Unix 권한 모델 적용&lt;/li&gt;
+&lt;li&gt;권한 설정 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="macos-darwin"&gt;macOS: Darwin
+&lt;/h3&gt;&lt;h4 id="ssh가-권한을-엄격하게-요구하는-이유-unixlinux"&gt;SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;보안 정책&lt;/strong&gt;: 개인 키가 다른 사용자에게 노출되는 것을 방지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증 무결성&lt;/strong&gt;: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 보호&lt;/strong&gt;: 중요한 인증 정보의 무단 접근 차단&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="올바른-권한-설정"&gt;올바른 권한 설정
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# SSH 디렉토리 권한 (소유자만 접근 가능)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# config 파일 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 키 파일들 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 소유권 설정 (현재 사용자로 설정)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="권한-확인"&gt;권한 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 권한 상태 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 올바른 출력 예시:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# drwx------ (700) 소유자만 SSH 디렉토리 접근&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw------- (600) 소유자만 개인 키/config 파일 접근 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw-r--r-- (644) 공개 키는 다른 사용자도 읽기 가능&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="문제-해결"&gt;문제 해결
+&lt;/h3&gt;&lt;h4 id="권한-오류-해결"&gt;권한 오류 해결
+&lt;/h4&gt;&lt;p&gt;오류 메시지&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Bad owner or permissions on /home/node/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;원인:&lt;/strong&gt; SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 단계:&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;권한 확인&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한이 &lt;code&gt;777&lt;/code&gt; (rwxrwxrwx)인 경우 수정&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소유권 문제인 경우&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한 설정 후 테스트&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="ssh-키가-인식되지-않는-경우"&gt;SSH 키가 인식되지 않는 경우
+&lt;/h4&gt;&lt;p&gt;SSH Agent에 키 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="잘못된-키-사용"&gt;잘못된 키 사용
+&lt;/h4&gt;&lt;p&gt;원격 URL 확인 및 수정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 설정 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 URL 변경&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-url origin git@github.com-&lt;span class="o"&gt;[&lt;/span&gt;account&lt;span class="o"&gt;]&lt;/span&gt;:owner/repository.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="예시-프로젝트-설정"&gt;예시 프로젝트 설정
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;my-blog&lt;/strong&gt;: 기본 설정 사용 (&lt;code&gt;git@github.com:username/my-blog.git&lt;/code&gt;)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH 키: &lt;code&gt;~/.ssh/id_ed25519&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GitHub 계정: 개인 계정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="확장-계획"&gt;확장 계획
+&lt;/h3&gt;&lt;p&gt;향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="현재-구성-검증"&gt;현재 구성 검증
+&lt;/h3&gt;&lt;p&gt;현재 SSH 구성이 올바르게 작동하는지 확인해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;권한 설정 (필수!)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 모든 권한을 한 번에 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SSH 연결 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 성공시: &amp;#34;Hi [username]! You&amp;#39;ve successfully authenticated...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Git push 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;⚠️ 중요:&lt;/strong&gt; 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+&lt;code&gt;Bad owner or permissions&lt;/code&gt; 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새 계정 추가는 키 생성, &lt;code&gt;~/.ssh/config&lt;/code&gt;에 Host 추가, 공개키 등록, &lt;code&gt;ssh -T&lt;/code&gt; 테스트, 원격 URL 설정의 5단계&lt;/li&gt;
+&lt;li&gt;WSL은 &lt;strong&gt;리눅스 홈 경로&lt;/strong&gt;에 &lt;code&gt;.ssh&lt;/code&gt;를 두고, 필요 시 &lt;code&gt;includeIf&lt;/code&gt;/&lt;code&gt;url.insteadOf&lt;/code&gt;로 &lt;strong&gt;디렉터리별 자동 라우팅&lt;/strong&gt;을 적용하면 실수할 일이 줄어든다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SSH 키 쌍&lt;/strong&gt;: &lt;code&gt;ed25519&lt;/code&gt;가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH 설정 파일&lt;/strong&gt;: &lt;code&gt;~/.ssh/config&lt;/code&gt;로 Host 단위 설정(별칭, &lt;code&gt;IdentityFile&lt;/code&gt;, &lt;code&gt;IdentitiesOnly&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퍼미션 기초&lt;/strong&gt;: &lt;code&gt;~/.ssh&lt;/code&gt;(700), 개인키(600), 공개키/&lt;code&gt;config&lt;/code&gt;(644~600).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSL/NTFS 차이&lt;/strong&gt;: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. &lt;strong&gt;리눅스 홈&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → &lt;code&gt;IdentitiesOnly&lt;/code&gt;로 해결.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 원격 URL 형태&lt;/strong&gt;: &lt;code&gt;git@HOST:OWNER/REPO.git&lt;/code&gt;(SCP 구문) 또는 &lt;code&gt;ssh://git@HOST/OWNER/REPO.git&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 라우팅 자동화(선택)&lt;/strong&gt;: &lt;code&gt;~/.gitconfig&lt;/code&gt;의 &lt;code&gt;includeIf&lt;/code&gt;(디렉터리 기준 설정), &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;(호스트 치환).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GitHub Docs: &lt;em&gt;Connecting to GitHub with SSH&lt;/em&gt;, &lt;em&gt;About SSH certificate authorities&lt;/em&gt;, &lt;em&gt;Managing multiple accounts&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;OpenSSH Manual: &lt;code&gt;ssh(1)&lt;/code&gt;, &lt;code&gt;ssh_config(5)&lt;/code&gt;, &lt;code&gt;ssh-agent(1)&lt;/code&gt;, &lt;code&gt;ssh-add(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git Documentation: &lt;code&gt;git-config(1)&lt;/code&gt;(특히 &lt;code&gt;includeIf&lt;/code&gt;, &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;), &lt;code&gt;git-remote(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft Docs: &lt;em&gt;WSL 파일 권한 &amp;amp; NTFS 상호작용&lt;/em&gt; 가이드&lt;/li&gt;
+&lt;li&gt;보안 심화: &lt;em&gt;ed25519-sk&lt;/em&gt;(FIDO2/보안키 기반), &lt;code&gt;ProxyJump&lt;/code&gt;(점프호스트), &lt;code&gt;KnownHosts&lt;/code&gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>AWS 배포 클래식</title><link>https://blog.b9f1.com/p/b9f1-devlog-aws-%EB%B0%B0%ED%8F%AC-%ED%81%B4%EB%9E%98%EC%8B%9D/</link><pubDate>Mon, 23 Jun 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-aws-%EB%B0%B0%ED%8F%AC-%ED%81%B4%EB%9E%98%EC%8B%9D/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring Boot + PostgreSQL 앱을 AWS에 배포해 보려고 한다.
+보안에 주의해야 할 부분들을 고려하면서 진행해 보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ec2-인스턴스-생성"&gt;EC2 인스턴스 생성
+&lt;/h3&gt;&lt;p&gt;Spring Boot 실행하기 위해 EC2를 사용한다.&lt;/p&gt;
+&lt;h4 id="이름-및-태그"&gt;이름 및 태그
+&lt;/h4&gt;&lt;p&gt;원하는 서버 이름으로 설정한다.&lt;/p&gt;
+&lt;h4 id="애플리케이션-및-os-이미지amazon-machine-image"&gt;애플리케이션 및 OS 이미지(Amazon Machine Image)
+&lt;/h4&gt;&lt;p&gt;옵션이 다양해서 필요에 맞게 설정한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AMI: Amazon Linux 또는 Ubuntu
+&lt;ul&gt;
+&lt;li&gt;이번엔 Ubuntu 22.04 LTS&lt;/li&gt;
+&lt;li&gt;64비트(x86)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인스턴스 유형: &lt;code&gt;t2.micro&lt;/code&gt; FreeTier 사용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="키-페어"&gt;키 페어
+&lt;/h4&gt;&lt;p&gt;키 페어 생성:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.pem&lt;/code&gt; 파일 다운로드 (SSH 접속용)&lt;/li&gt;
+&lt;li&gt;생성 시 다운로드 되는 파일 보관&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="네트워크-설정"&gt;네트워크 설정
+&lt;/h4&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;테스트에만 사용하고 운영 시에는 특정 IP 또는 CloudFront, ALB 등으로 제한해야 한다.
+특히 사용하지 않을 땐 아예 보안 그룹에서 제거하고 필요할 때 다시 구성해서 사용하는 것이 좋다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;대부분 자동 설정이고 원격 접속을 위해 SSH 설정&lt;/p&gt;
+&lt;p&gt;SSH 트래픽 허용:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;현재 필요에 맞게 내 ip만 허용 또는 위치 무관 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;추후 보안 그룹 탭에서 변경 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스토리지-구성"&gt;스토리지 구성
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;프리 티어를 사용할 수 있는 고객은 최대 30GB의 EBS 범용(SSD)또는 마그네틱 스토리지를 사용할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;스토리지까지 설정했다면 인스턴스 생성을 클릭해서 인스턴스 생성&lt;/p&gt;
+&lt;h4 id="보안-그룹-수정"&gt;보안 그룹 수정
+&lt;/h4&gt;&lt;p&gt;AWS에서 제공하는 방화벽 인바운드, 아웃바운드 규칙이 존재한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;인바운드(Inbound): 외부에서 &lt;code&gt;EC2&lt;/code&gt;, &lt;code&gt;RDS&lt;/code&gt; 등의 내부로 접근할 때 사용되는 방화벽 규칙&lt;/li&gt;
+&lt;li&gt;아웃바운드(Outbound): &lt;code&gt;EC2&lt;/code&gt;, &lt;code&gt;RDS&lt;/code&gt; 등의 내부에서 외부로 접근할 때 사용되는 방화벽 규칙&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;EC2 &amp;gt; 네트워크 및 보안 &amp;gt; 보안 그룹&lt;/code&gt;으로 이동해서 보안 그룹 설정.
+인스턴스 생성 시 설정했던 일부 보안 그룹을 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;생성 시 구성된 것 외에 필요에 맞게 보안 그룹 생성을 눌러 새로운 보안 그룹을 생성하고 구성한다.&lt;/p&gt;
+&lt;h5 id="인바운드-규칙"&gt;인바운드 규칙
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;인바운드 규칙1:
+&lt;ul&gt;
+&lt;li&gt;유형: 사용자 지정 TCP&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 8080&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: Spring Boot&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙2:
+&lt;ul&gt;
+&lt;li&gt;유형: SSH&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 22&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: SSH 연결&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙3:
+&lt;ul&gt;
+&lt;li&gt;유형: HTTP&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 80&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: HTTP 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;인바운드 규칙4:
+&lt;ul&gt;
+&lt;li&gt;유형: HTTPS&lt;/li&gt;
+&lt;li&gt;프로토콜: TCP&lt;/li&gt;
+&lt;li&gt;포트 범위: 443&lt;/li&gt;
+&lt;li&gt;소스 유형: Anywhere-IPv4&lt;/li&gt;
+&lt;li&gt;소스: 0.0.0.0/0&lt;/li&gt;
+&lt;li&gt;설명 - 선택사항: HTTPS 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="인스턴스에-보안-그룹-적용"&gt;인스턴스에 보안 그룹 적용
+&lt;/h4&gt;&lt;p&gt;인스턴스 &amp;gt; 작업 &amp;gt; 보안 &amp;gt; 보안 그룹 변경 화면으로 이동해서&lt;/p&gt;
+&lt;p&gt;생성했던 보안 그룹 추가 후 저장&lt;/p&gt;
+&lt;h4 id="인스턴스-연결"&gt;인스턴스 연결
+&lt;/h4&gt;&lt;p&gt;예를 들어 아래와 같은 명령으로 SSH 클라이언트에서 접속 시도할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;span class="lnt"&gt;33
+&lt;/span&gt;&lt;span class="lnt"&gt;34
+&lt;/span&gt;&lt;span class="lnt"&gt;35
+&lt;/span&gt;&lt;span class="lnt"&gt;36
+&lt;/span&gt;&lt;span class="lnt"&gt;37
+&lt;/span&gt;&lt;span class="lnt"&gt;38
+&lt;/span&gt;&lt;span class="lnt"&gt;39
+&lt;/span&gt;&lt;span class="lnt"&gt;40
+&lt;/span&gt;&lt;span class="lnt"&gt;41
+&lt;/span&gt;&lt;span class="lnt"&gt;42
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -i &lt;span class="s2"&gt;&amp;#34;sshKey.pem&amp;#34;&lt;/span&gt; ubuntu@ec1-2-34-56-789.ap-northeast-1.compute.amazonaws.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 연결 시 서버 정보 출력 예시&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Welcome to Ubuntu 22.04.5 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux 6.8.0-1029-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Documentation: https://help.ubuntu.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Management: https://landscape.canonical.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Support: https://ubuntu.com/pro
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; System information as of Mon Jun &lt;span class="m"&gt;23&lt;/span&gt; 04:47:28 UTC &lt;span class="m"&gt;2025&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; System load: 0.08 Processes: &lt;span class="m"&gt;101&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Usage of /: 5.8% of 28.89GB Users logged in: &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Memory usage: 20% IPv4 address &lt;span class="k"&gt;for&lt;/span&gt; eth0: 172.31.39.182
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Swap usage: 0%
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; * Ubuntu Pro delivers the most comprehensive open &lt;span class="nb"&gt;source&lt;/span&gt; security and
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; compliance features.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; https://ubuntu.com/aws/pro
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Expanded Security Maintenance &lt;span class="k"&gt;for&lt;/span&gt; Applications is not enabled.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="m"&gt;0&lt;/span&gt; updates can be applied immediately.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Enable ESM Apps to receive additional future security updates.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;See https://ubuntu.com/esm or run: sudo pro status
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;The list of available updates is more than a week old.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;To check &lt;span class="k"&gt;for&lt;/span&gt; new updates run: sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;The programs included with the Ubuntu system are free software&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;the exact distribution terms &lt;span class="k"&gt;for&lt;/span&gt; each program are described in the
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;individual files in /usr/share/doc/*/copyright.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;applicable law.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;To run a &lt;span class="nb"&gt;command&lt;/span&gt; as administrator &lt;span class="o"&gt;(&lt;/span&gt;user &lt;span class="s2"&gt;&amp;#34;root&amp;#34;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;, use &lt;span class="s2"&gt;&amp;#34;sudo &amp;lt;command&amp;gt;&amp;#34;&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;See &lt;span class="s2"&gt;&amp;#34;man sudo_root&amp;#34;&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; details.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="어떻게-배포하는-게-적절할까"&gt;어떻게 배포하는 게 적절할까?
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;상황&lt;/th&gt;
+&lt;th&gt;추천 방법&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;빠른 실험, 개인 개발, MVP&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;JAR 수동 업로드&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;팀 개발, 협업, 배포 자동화 예정&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;GitHub 클론 → 빌드 → 실행&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CI/CD (CodeDeploy, GitHub Actions 등) 준비&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;GitHub 기반&lt;/strong&gt;이 장기적으로 효율&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="rds에-postgresql-생성"&gt;RDS에 PostgreSQL 생성
+&lt;/h3&gt;&lt;p&gt;RDS &amp;gt; 데이터베이스 생성 화면에서 진행한다.&lt;/p&gt;
+&lt;h4 id="rds-생성-시-주의-사항"&gt;RDS 생성 시 주의 사항
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;엔진: PostgreSQL&lt;/li&gt;
+&lt;li&gt;인증 정보: 사용자명, 비밀번호 설정&lt;/li&gt;
+&lt;li&gt;퍼블릭 액세스: 비활성화&lt;/li&gt;
+&lt;li&gt;보안 그룹: EC2 인스턴스의 보안 그룹만 허용하도록 설정`&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="데이터베이스-생성-방식-선택"&gt;데이터베이스 생성 방식 선택
+&lt;/h4&gt;&lt;p&gt;표준 생성 또는 손쉬운 생성 선택&lt;/p&gt;
+&lt;h4 id="엔진-옵션"&gt;엔진 옵션
+&lt;/h4&gt;&lt;p&gt;엔진 유형:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Aurora(MySQL Compatible)&lt;/li&gt;
+&lt;li&gt;Aurora(PostgreSQL Compatible)&lt;/li&gt;
+&lt;li&gt;MySQL&lt;/li&gt;
+&lt;li&gt;PostgreSQL&lt;/li&gt;
+&lt;li&gt;MariaDB&lt;/li&gt;
+&lt;li&gt;Oracle&lt;/li&gt;
+&lt;li&gt;Microsoft SQL Server&lt;/li&gt;
+&lt;li&gt;IBM Db2
+엔진 버전:&lt;/li&gt;
+&lt;li&gt;다중 AZ DB 클러스터를 지원하는 버전만 표시(토글)&lt;/li&gt;
+&lt;li&gt;엔진 버전: PostgreSQL 17.4-R1&lt;/li&gt;
+&lt;li&gt;RDS 확장 지원 활성화(체크)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="템플릿"&gt;템플릿
+&lt;/h4&gt;&lt;p&gt;템플릿 선택:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;프로덕션&lt;/li&gt;
+&lt;li&gt;개발/테스트&lt;/li&gt;
+&lt;li&gt;프리 티어&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="가용성-및-내구성"&gt;가용성 및 내구성
+&lt;/h4&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Info&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;사용 사례에 필요한 가용성과 내구성을 제공하는 배포 옵션을 선택하세요. AWS는 선택한 배포 옵션에 따라 일정 수준의 가동 시간을 제공하기 위해 최선을 다하고 있습니다. &lt;a class="link" href="https://aws.amazon.com/rds/sla" target="_blank" rel="noopener"
+&gt;Amazon RDS SLA(서비스 수준 계약)에 포함되지 않습니다.&lt;/a&gt; .에서 자세히 알아보세요.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;배포 옵션:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;다중 AZ DB 클러스터 배포(인스턴스 3개)&lt;/li&gt;
+&lt;li&gt;다중 AZ DB 인스턴스 배포(인스턴스 2개)&lt;/li&gt;
+&lt;li&gt;단일 AZ DB 인스턴스 배포(인스턴스 1개)
+&lt;ul&gt;
+&lt;li&gt;템플릿 프리 티어의 경우 1개만 선택 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="설정"&gt;설정
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;DB 인스턴스 식별자
+&lt;ul&gt;
+&lt;li&gt;DB 인스턴스 이름을 입력. 이름은 현재 AWS 리전에서 AWS 계정이 소유하는 모든 DB 인스턴스에 대해 고유해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자격 증명 설정
+&lt;ul&gt;
+&lt;li&gt;마스터 사용자 이름: DB 인스턴스의 마스터 사용자에 로그인 ID를 입력&lt;/li&gt;
+&lt;li&gt;자격 증명 관리: AWS Secrets Manager를 사용하거나 마스터 사용자 자격 증명을 관리할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;AWS Secrets Manager에서 관리 - _가장 뛰어난 안정성_RDS는 자동으로 암호를 생성하고 AWS Secrets Manager를 사용하여 전체 수명 주기 동안 암호를 관리한다.&lt;/li&gt;
+&lt;li&gt;자체 관리사용자가 암호를 생성하거나 RDS에서 암호를 생성하고 사용자가 관리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;암호 자동 생성(체크): Amazon RDS에서 자동으로 암호를 생성하거나 사용자가 직접 암호를 지정할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;마스터 암호, 마스터 암호 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="인스턴스-구성"&gt;인스턴스 구성
+&lt;/h4&gt;&lt;p&gt;DB 인스턴스 구성 옵션은 위에서 선택한 엔진에서 지원하는 옵션으로 제한된다.&lt;/p&gt;
+&lt;p&gt;DB 인스턴스 클래스(라디오):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;스탠다드 클래스(m 클래스 포함)&lt;/li&gt;
+&lt;li&gt;메모리 최적화 클래스(r 및 x 클래스 포함)&lt;/li&gt;
+&lt;li&gt;버스터블 클래스(t 클래스 포함)
+&lt;ul&gt;
+&lt;li&gt;db.t4g.micro&lt;/li&gt;
+&lt;li&gt;2 vCPUs, 1 GiB RAM, 네트워크: 최대 2,085Mbps&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스토리지"&gt;스토리지
+&lt;/h4&gt;&lt;p&gt;스토리지 유형:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;범용 SSD(gp2): 볼륨 크기에 따라 기준 성능 설정&lt;/li&gt;
+&lt;li&gt;범용 SSD(gp3): 스토리지와 독립적으로 성능 조정&lt;/li&gt;
+&lt;li&gt;프로비저닝된 IOPS SSD(io1): I/O 프로비저닝 유연성&lt;/li&gt;
+&lt;li&gt;프로비저닝된 IOPS SSD(io2): 지연 시간에 짧고 내구성이 뛰어나며 I/O 집약적인 스토리지&lt;/li&gt;
+&lt;li&gt;마그네틱: 최대 1,000 IOPS로 제한됨(권장되지 않음)
+할당된 스토리지&lt;/li&gt;
+&lt;li&gt;얼만큼의 용량을 할당할 것인지 입력&lt;/li&gt;
+&lt;li&gt;할당된 스토리지 값은 20GiB~6,144GiB여야 한다.&lt;/li&gt;
+&lt;li&gt;이후 필요에 따라 추가 스토리지 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="나머지-설정"&gt;나머지 설정
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;EC2 컴퓨팅 리소스에 연결, EC2 인스턴스 선택 등&lt;/li&gt;
+&lt;li&gt;데이터베이스 인증 방식 선택&lt;/li&gt;
+&lt;li&gt;모니터링 설정&lt;/li&gt;
+&lt;li&gt;추가 구성 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;필요에 맞게 구성을 설정한 후 데이터베이스 생성&lt;/p&gt;
+&lt;h3 id="ec2-연결-후-설치-및-설정"&gt;EC2 연결 후 설치 및 설정
+&lt;/h3&gt;&lt;h4 id="db-설정"&gt;DB 설정
+&lt;/h4&gt;&lt;p&gt;먼저 EC2에 접속한 상태에서 PostgreSQL 클라이언트를 설치하고, &lt;code&gt;postgres&lt;/code&gt; 사용자로 접속한다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. PostgreSQL 클라이언트 설치 (Ubuntu 기준)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install postgresql-client -y
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. RDS에 접속&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;psql -h your-rds-endpoint.rds.amazonaws.com -U postgres -d postgres
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 비밀번호 입력하라고 나옴&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 비밀번호는 RDS 생성 시 설정한 `postgres` 사용자 비번&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;연결에 성공하면 앱 실행을 테스트를 위해 DB, Schema, 사용자를 생성한다.&lt;/p&gt;
+&lt;p&gt;DDL 스크립트를 작성한 sql 파일을 EC2에 배치한 뒤 psql 명령으로 테이블을 생성한다.&lt;/p&gt;
+&lt;h4 id="java-설치"&gt;Java 설치
+&lt;/h4&gt;&lt;p&gt;OpenLogic OpenJDK 17으로 프로젝트 테스트를 했지만 굳이 불필요하다면 openjdk-17-jdk로 충분하다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. 패키지 업데이트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. OpenJDK 17 설치 (기본은 OpenJDK, OpenLogic은 따로 설치)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install openjdk-17-jdk -y
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 설치 후 터미널에서 설정 화면이 나타나는데 필요에 맞게 spacebar로 선택 후 enter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 3. 버전 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="빠르게-수동-테스트"&gt;빠르게 수동 테스트
+&lt;/h3&gt;&lt;p&gt;간단하고 빠른 확인을 위해 빌드 후 수동 업로드로 테스트해본다.&lt;/p&gt;
+&lt;h5 id="jar-빌드"&gt;JAR 빌드
+&lt;/h5&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Warning&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;빌드 전 RDS 인스턴스를 생성하고 DB 설정을 마무리한 후 그 정보로 &lt;code&gt;application-prod.yaml&lt;/code&gt;을 구성한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;./gradlew bootJar
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 또는 ./mvnw package&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h5 id="ec2로-전송"&gt;EC2로 전송
+&lt;/h5&gt;&lt;p&gt;ssh 원격 접속 프로토콜을 기반으로 한 SecureCopy(scp)의 약자.
+원격지에 있는 파일과 디렉터리를 보내거나 가져올 때 사용하는 파일 전송 프로토콜&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;로컬에서
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 경로 `~`는 `/home/ubuntu`를 의미한다.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;scp -i &lt;span class="s2"&gt;&amp;#34;sshKey.pem&amp;#34;&lt;/span&gt; build/libs/app.jar ubuntu@ec1-2-34-56-789.ap-northeast-1.compute.amazonaws.com:~
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;이후 EC2 내부에서 실행하는데 실행 시 프로파일 지정
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -jar app.jar --spring.profiles.active&lt;span class="o"&gt;=&lt;/span&gt;prod
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 정상 실행 후 올라오는 주소 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# http://[퍼블릭IP]:8080&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;80 포트로 바로 실행하는 경우 1024 아래의 포트라서 ubuntu에서 권한 관련 오류를 만날 수 있다.
+Nginx를 사용해서 80 포트 접속 시 8080 포트의 사이트를 연결할 수 있도록 포트 포워딩 설정하는 방식이 안전할 수 있다. 필요에 따라 고민해보자.&lt;/p&gt;
+&lt;h3 id="보안-그룹-설정-확인"&gt;보안 그룹 설정 확인
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;리소스&lt;/th&gt;
+&lt;th&gt;포트&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;EC2&lt;/td&gt;
+&lt;td&gt;8080&lt;/td&gt;
+&lt;td&gt;외부에서 접속 가능해야 함 (브라우저 확인용)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RDS&lt;/td&gt;
+&lt;td&gt;5432&lt;/td&gt;
+&lt;td&gt;EC2 보안 그룹에서만 접근 허용&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="웹-접속-테스트"&gt;웹 접속 테스트
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;http://[EC2 퍼블릭 IP]:8080/&lt;/code&gt; 또는 &lt;code&gt;http://[EC2 퍼블릭 IP]:80/&lt;/code&gt; 주소로 접속 테스트
+Spring Boot 앱이 정상 작동하면 성공!&lt;/p&gt;
+&lt;h3 id="dbeaver-클라이언트-테스트-선택"&gt;DBeaver 클라이언트 테스트 (선택)
+&lt;/h3&gt;&lt;p&gt;RDS에서 퍼블릭 접속을 허용하지 않도록 설정했기 때문에 SSH 터널링을 통해 클라이언트 연결을 시도해야 한다.&lt;/p&gt;
+&lt;p&gt;별도 설정이 필요했던 부분만 정리한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새로운 연결 생성 &amp;gt; Main 탭
+&lt;ul&gt;
+&lt;li&gt;EC2 입장에서 로컬 접속할 수 있게 설정한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SSH 탭
+&lt;ul&gt;
+&lt;li&gt;Use SSH 터널 체크&lt;/li&gt;
+&lt;li&gt;Settings 섹션
+&lt;ul&gt;
+&lt;li&gt;Host/IP: EC2 엔드포인트, Port: 22&lt;/li&gt;
+&lt;li&gt;User Name: EC2 생성 시 User&lt;/li&gt;
+&lt;li&gt;Authentication Method: Public Key&lt;/li&gt;
+&lt;li&gt;Private Key: 생성 시 발급 받은 &lt;code&gt;*.pem&lt;/code&gt; 선택&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Advanced settings 섹션
+&lt;ul&gt;
+&lt;li&gt;Remote host: RDS DB 엔드포인트, Remote Port: 5432&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="다음-단계-선택"&gt;다음 단계 (선택)
+&lt;/h3&gt;&lt;p&gt;필요한 경우 아래와 같은 설정으로 더 효율적인 운영 구조를 만들 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;EC2에서 systemd로 백그라운드 실행 설정&lt;/li&gt;
+&lt;li&gt;PostgreSQL 보안 최적화&lt;/li&gt;
+&lt;li&gt;Route53 + HTTPS 연결&lt;/li&gt;
+&lt;li&gt;CloudWatch 로그 연결&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;보안성과 실용성을 모두 갖춘 Spring Boot + PostgreSQL의 AWS 수동 배포 구조를 성공적으로 구현했다.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;퍼블릭 IP를 열지 않고도 EC2 내부에서 RDS를 안전하게 연결하고, 외부에서는 HTTP/Nginx로만 접근 가능한 구조를 통해 실무에서도 적용 가능한 배포 경험을 확보했다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;실습 기반의 배포 경험은 인프라 지식과 보안 개념까지 익힐 수 있는 좋은 기회였다.&lt;/li&gt;
+&lt;li&gt;Spring Boot 애플리케이션을 EC2에 안전하게 배포하고, RDS 연결 및 DB 초기 설정까지 포함한 완전한 구성 흐름을 경험했다.&lt;/li&gt;
+&lt;li&gt;추후 systemd 등록, TLS 인증서 추가, CI/CD 적용까지 이어질 수 있는 확장 가능한 구성이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;AWS EC2, RDS의 기본 개념&lt;/li&gt;
+&lt;li&gt;SSH 키 기반 원격 접속&lt;/li&gt;
+&lt;li&gt;Spring Boot JAR 빌드 및 실행 방식&lt;/li&gt;
+&lt;li&gt;PostgreSQL 기초 쿼리 및 사용자 권한 설정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/ec2/" target="_blank" rel="noopener"
+&gt;Amazon EC2 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.aws.amazon.com/rds/" target="_blank" rel="noopener"
+&gt;Amazon RDS 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html" target="_blank" rel="noopener"
+&gt;Spring Boot 배포 가이드&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Nginx 리버스 프록시 설정&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://dbeaver.io/" target="_blank" rel="noopener"
+&gt;DBeaver 공식 사이트&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;SSH 터널링 개념&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
