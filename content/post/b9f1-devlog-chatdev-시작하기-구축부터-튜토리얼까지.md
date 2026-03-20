@@ -1,5 +1,5 @@
 ---
-id: 019cf100-0000-0000-0000-000000000001
+id: 019cf174-4be2-787c-a1c7-b0f6511988a3
 slug: b9f1-devlog-chatdev-시작하기-구축부터-튜토리얼까지
 publish: true
 draft: false
@@ -17,7 +17,7 @@ tags:
   - tutorial
   - local-llm
 # image: 
-Status: InProgress
+Status: Testing
 ---
 
 ## 📌개요
