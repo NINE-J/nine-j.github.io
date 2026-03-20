@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>동시성제어 on B9F1</title><link>https://blog.b9f1.com/tags/%EB%8F%99%EC%8B%9C%EC%84%B1%EC%A0%9C%EC%96%B4/</link><description>Recent content in 동시성제어 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 16 Aug 2025 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EB%8F%99%EC%8B%9C%EC%84%B1%EC%A0%9C%EC%96%B4/index.xml" rel="self" type="application/rss+xml"/><item><title>Race condition 뿌리부터 잡기</title><link>https://blog.b9f1.com/p/b9f1-devlog-race-condition-%EB%BF%8C%EB%A6%AC%EB%B6%80%ED%84%B0-%EC%9E%A1%EA%B8%B0/</link><pubDate>Sat, 16 Aug 2025 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-race-condition-%EB%BF%8C%EB%A6%AC%EB%B6%80%ED%84%B0-%EC%9E%A1%EA%B8%B0/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;트래픽이 두 배가 되는 순간, 가장 먼저 터지는 건 &lt;strong&gt;성능&lt;/strong&gt;이 아니라 &lt;strong&gt;정합성&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;멀티스레드 환경의 대표적 복병 &lt;strong&gt;경쟁 상태(Race Condition)&lt;/strong&gt; 는 재현도 어렵고 한 번 새면 데이터 신뢰도가 무너진다.&lt;/p&gt;
+&lt;p&gt;운영 환경에서 빈번하게 마주치는 &lt;strong&gt;경쟁 상태의 원인&lt;/strong&gt;, &lt;strong&gt;재현 패턴&lt;/strong&gt;, &lt;strong&gt;해결 전략의 우선순위&lt;/strong&gt;를 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="경쟁-상태란-무엇인가"&gt;경쟁 상태란 무엇인가?
+&lt;/h3&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;정의&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;여러 스레드가 &lt;strong&gt;공유 상태(shared state)&lt;/strong&gt; 를 동시에 읽고/쓰기 하며 실행 타이밍에 따라 결과가 달라지는 상황.&lt;br&gt;
+핵심 원인 축: &lt;strong&gt;AVR&lt;/strong&gt; - Atomicity(원자성), Visibility(가시성), Reordering(재배치).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Atomicity&lt;/strong&gt;: &lt;code&gt;x = x + 1&lt;/code&gt; 같은 RMW(Read–Modify–Write) 연산이 중간에 끼어들기로 깨지면서 lost update 발생&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Visibility&lt;/strong&gt;: 한 스레드의 쓰기가 다른 스레드에 늦게 보여 stale value(오래된 값) 관측, 잘못된 분기
+&lt;ul&gt;
+&lt;li&gt;stale value: 다른 스레드가 최신 값을 썼음에도 불구하고, 캐시/레지스터 등 중간 계층에 남아있던 &lt;strong&gt;이전 값&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;이 때문에 &lt;strong&gt;중복 및 누락&lt;/strong&gt;뿐 아니라 &lt;code&gt;if (value==0)&lt;/code&gt; 같은 &lt;strong&gt;조건 분기 오류&lt;/strong&gt;가 발생&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Reordering&lt;/strong&gt;: CPU out-of-order 실행이나 JIT 최적화로 happens-before 순서가 무너짐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="위험-신호와-재현-패턴"&gt;위험 신호와 재현 패턴
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;증상&lt;/strong&gt;: 카운터 불일치, 중복/누락, “가끔” 실패하는 테스트, 운영 환경에서만 나타나는 버그(Heisenbug)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;패턴&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;if(없으면 저장)&lt;/code&gt; 후 put (TOCTOU)&lt;/li&gt;
+&lt;li&gt;캐시 초기화 동시 접근&lt;/li&gt;
+&lt;li&gt;통계 카운터 증가&lt;/li&gt;
+&lt;li&gt;잘못된 Lazy init&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Heisenbug&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;하이젠버그는 프로그래밍에서 테스트를 수행할 때 발생되는 버그의 형태 중의 하나로서 문제를 발견하고 수정하기 위한 디버깅을 수행하려고 하면 문제점이 사라지는 형태의 버그를 말한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;TOCTOU (Time Of Check to Time Of Use)&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;검사 시점과 사용 시점 사이의 틈새에서 다른 스레드가 상태를 바꿔 &lt;strong&gt;예상치 못한 버그 및 보안 취약점&lt;/strong&gt;을 유발하는 &lt;strong&gt;클래식 경쟁 조건 유형&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="최소-예제로-보는-버그"&gt;최소 예제로 보는 버그
+&lt;/h3&gt;
+&lt;div class="admonition warning"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/&gt;&lt;/svg&gt;
+&lt;span&gt;원자적이지 않은 연산&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;value++&lt;/code&gt; 는 단일 연산처럼 보이지만, JVM 바이트코드 레벨에서는 &lt;code&gt;getfield&lt;/code&gt; → &lt;code&gt;iconst_1&lt;/code&gt; → &lt;code&gt;iadd&lt;/code&gt; → &lt;code&gt;putfield&lt;/code&gt; 로 분해된다.
+중간에 다른 스레드가 끼어들어 lost update 발생. &lt;code&gt;volatile&lt;/code&gt;은 가시성만 보장해도 원자성은 보장 못 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;BrokenCounter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;private&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;inc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 경쟁 상태&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="바이트코드-관점필드-증가"&gt;바이트코드 관점(필드 증가)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;getfield value&lt;/code&gt; → &lt;code&gt;iconst_1&lt;/code&gt; → &lt;code&gt;iadd&lt;/code&gt; → &lt;code&gt;putfield value&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;단일 연산이 아니라 여러 명령어로 분해됨 → 원자성 깨짐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="interleaving-예-두-스레드"&gt;Interleaving 예 (두 스레드)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;두 번 증가 의도 → 최종 값 1 (한 번만 반영)&lt;/li&gt;
+&lt;li&gt;DB의 &lt;strong&gt;Lost Update anomaly&lt;/strong&gt;와 동일한 문제&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="가시성까지-얽히면-더-위험"&gt;가시성까지 얽히면 더 위험
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;A 스레드가 &lt;code&gt;1&lt;/code&gt; 저장해도, B 스레드는 캐시 coherence 지연으로 여전히 &lt;code&gt;0&lt;/code&gt;(stale value) 관측&lt;/li&gt;
+&lt;li&gt;결과:
+&lt;ol&gt;
+&lt;li&gt;카운터 중복·누락&lt;/li&gt;
+&lt;li&gt;조건 분기 오류 (예: &lt;code&gt;if (get()==0) init()&lt;/code&gt;이 중복 실행)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="왜-volatile로-해결되지-않나"&gt;왜 &lt;code&gt;volatile&lt;/code&gt;로 해결되지 않나?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;volatile&lt;/code&gt;은 가시성(Visibility)과 재배치(Reordering) 방지 일부를 보장한다.&lt;/li&gt;
+&lt;li&gt;하지만 &lt;code&gt;value++&lt;/code&gt; 같은 RMW 원자성은 보장 못 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;volatile&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;inc&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// 여전히 lost update 가능&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="해결-전략-락보다-설계가-먼저"&gt;해결 전략: 락보다 설계가 먼저
+&lt;/h3&gt;&lt;h4 id="상태-자체를-줄여라"&gt;상태 자체를 줄여라
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;불변 객체(Immutable), Copy-on-Write, 메시지 패싱/Actor 모델, 이벤트 루프&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="스레드-컨파인먼트"&gt;스레드 컨파인먼트
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ThreadLocal&lt;/code&gt;, 키 파티셔닝(같은 키는 동일 워커로)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="원자-연산--동시-컬렉션-juc"&gt;원자 연산 &amp;amp; 동시 컬렉션 (J.U.C)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;AtomicInteger.incrementAndGet()&lt;/code&gt; (CAS 기반)
+&lt;ul&gt;
+&lt;li&gt;CAS(Compare-And-Swap)는 &lt;strong&gt;재시도 루프(spin)&lt;/strong&gt; 구조로 동작한다. 즉, 경쟁이 심하면 충돌이 잦아지고 성능이 급격히 저하될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;고경합 환경엔 &lt;code&gt;LongAdder&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;내부적으로 셀(Cell) 배열에 분산 저장하여 스레드 충돌을 줄인다.&lt;/li&gt;
+&lt;li&gt;주기적 집계를 통해 최종 값을 계산 → CAS 충돌 병목이 적음.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ConcurrentHashMap.computeIfAbsent/merge&lt;/code&gt;로 TOCTOU 제거&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;CAS와 성능&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;CAS는 실패 시 루프를 돌며 재시도하는 &lt;strong&gt;spin 기반 알고리즘&lt;/strong&gt;이다.
+경쟁이 적을 땐 락보다 빠르지만, 경쟁이 많으면 계속 충돌 → 재시도로 인해 오히려 락보다 느려질 수 있다.
+이 때문에 고경합 상황에서는 &lt;code&gt;LongAdder&lt;/code&gt; 같은 분산 구조가 더 유리하다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="동기화-synchronization"&gt;동기화 (Synchronization)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;synchronized&lt;/code&gt; (간단, 확실)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReentrantLock&lt;/code&gt; (tryLock, 타임아웃 지원)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ReadWriteLock&lt;/code&gt;, &lt;code&gt;StampedLock&lt;/code&gt; (낙관적 읽기 성능 개선)
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;StampedLock&lt;/code&gt;의 &lt;strong&gt;낙관적 읽기&lt;/strong&gt;는 실제 읽은 값이 도중에 다른 쓰기에 의해 깨지지 않았는지 &lt;code&gt;validate(stamp)&lt;/code&gt; 호출로 반드시 검증해야 안전하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="admonition info"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/&gt;&lt;/svg&gt;
+&lt;span&gt;StampedLock의 validate()&lt;br&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;long stamp = lock.tryOptimisticRead();&lt;/code&gt; → 값 읽기 → &lt;code&gt;if (!lock.validate(stamp)) { ...재시도... }&lt;/code&gt;
+낙관적 읽기는 무조건 성공하는 게 아니라, 읽은 후에 검증(validate)을 반드시 거쳐야 한다. 검증이 실패하면 일반적인 읽기 락을 다시 걸어야 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="가시성-보장--안전한-게시"&gt;가시성 보장 &amp;amp; 안전한 게시
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;volatile&lt;/code&gt; 플래그, &lt;code&gt;final&lt;/code&gt; 필드&lt;/li&gt;
+&lt;li&gt;Safe Publication (동기화 통해 객체를 게시)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="단일-실행--멱등idempotency"&gt;단일 실행 &amp;amp; 멱등(Idempotency)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;멱등 설계, fencing token(순서 보장 토큰)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="실전-시나리오별-추천-레시피"&gt;실전 시나리오별 추천 레시피
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;시나리오&lt;/th&gt;
+&lt;th&gt;증상&lt;/th&gt;
+&lt;th&gt;해법&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;동시 카운팅/지표&lt;/td&gt;
+&lt;td&gt;증발(Lost update)&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;LongAdder&lt;/code&gt; → 주기적 집계&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Lazy 초기화&lt;/td&gt;
+&lt;td&gt;중복 생성&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;computeIfAbsent&lt;/code&gt;, 초기화 전용 락&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;캐시 프리로드&lt;/td&gt;
+&lt;td&gt;중복 로드&lt;/td&gt;
+&lt;td&gt;키 파티셔닝 + 단일 워커&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;읽기 99%&lt;/td&gt;
+&lt;td&gt;락 경합&lt;/td&gt;
+&lt;td&gt;Copy-on-Write, &lt;code&gt;StampedLock&lt;/code&gt; 낙관 읽기&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;고가 연산 임계구역&lt;/td&gt;
+&lt;td&gt;응답 지연&lt;/td&gt;
+&lt;td&gt;임계구역 축소, 분해락(키별 락)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;키 충돌 업데이트&lt;/td&gt;
+&lt;td&gt;중복·경합&lt;/td&gt;
+&lt;td&gt;키별 락/Striped Lock, &lt;code&gt;merge&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="성능-vs-정확성-트레이드오프"&gt;성능 vs 정확성 트레이드오프
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;정확성 고정&lt;/strong&gt;: &lt;code&gt;synchronized&lt;/code&gt;/ConcurrentHashMap으로 정합성 우선 확보&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;핫스팟 튜닝&lt;/strong&gt;: 임계구역 축소, 자료구조 교체&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;마지막에&lt;/strong&gt;: 락-프리/낙관적 기법 적용&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="테스트검증-전략"&gt;테스트·검증 전략
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;jcstress&lt;/strong&gt; (OpenJDK 동시성 경계 테스트 프레임워크)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;확률 테스트&lt;/strong&gt; (스레드 수·코어 수·JVM 옵션 다양화)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;페일패스트 계측&lt;/strong&gt; (불가능 상태 assert)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;장시간 soak test&lt;/strong&gt; (운영 유사 환경)&lt;/li&gt;
+&lt;li&gt;이런 버그는 &lt;strong&gt;Heisenbug&lt;/strong&gt; 특성이 강함 → 반드시 장기간·다양 환경에서 검증 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;공유 상태를 최소화하라.&lt;/strong&gt;
+남는 공유 상태는 반드시 &lt;strong&gt;J.U.C(java.util.concurrent)&lt;/strong&gt; 와 &lt;strong&gt;명시적 동기화&lt;/strong&gt;로 보호하라.
+먼저 정합성을 보장하고, 이후 성능을 최적화하는 순서가 바람직하다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java Memory Model(JMM), happens-before&lt;/li&gt;
+&lt;li&gt;monitor/synchronized, CAS(compare-and-swap)&lt;/li&gt;
+&lt;li&gt;J.U.C(java.util.concurrent): 원자 클래스, 동시 컬렉션&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java Concurrency in Practice (Brian Goetz)&lt;/li&gt;
+&lt;li&gt;Effective Java 동시성 아이템&lt;/li&gt;
+&lt;li&gt;OpenJDK &lt;strong&gt;jcstress&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Oracle Concurrency 튜토리얼&lt;/li&gt;
+&lt;li&gt;Martin Kleppmann: Idempotency / Exactly-once&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
