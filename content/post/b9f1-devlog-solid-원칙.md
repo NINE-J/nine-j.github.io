@@ -7,6 +7,7 @@ author: Nine
 date: 2025-04-07
 categories:
   - 설계
+  - 객체지향
 tags:
   - devlog
   - SOLID
