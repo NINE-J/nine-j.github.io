@@ -8,7 +8,6 @@ date: 2025-12-30T14:26:13
 categories:
 tags:
   - devlog
-  - note-template
 # image: 
 Status: ToDo
 id: 019ce76a-c33f-77ab-b0ad-0b9b818a8739
