@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Software on B9F1</title><link>https://blog.b9f1.com/tags/software/</link><description>Recent content in Software on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 08 Apr 2026 09:46:35 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/software/index.xml" rel="self" type="application/rss+xml"/><item><title>하네스 엔지니어링이란?</title><link>https://blog.b9f1.com/p/b9f1-devlog-%ED%95%98%EB%84%A4%EC%8A%A4-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%A7%81%EC%9D%B4%EB%9E%80/</link><pubDate>Wed, 08 Apr 2026 09:46:35 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-%ED%95%98%EB%84%A4%EC%8A%A4-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%A7%81%EC%9D%B4%EB%9E%80/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;단순히 프롬프트를 잘 쓰는 시대를 넘어, 이제는 AI가 일할 수밖에 없는 환경을 만드는 시대다.&lt;/p&gt;
+&lt;p&gt;최근 앤트로픽(Anthropic)과 주요 기술 커뮤니티에서 화두가 되고 있는 하네스 엔지니어링(Harness Engineering)은 AI 에이전트가 겪는 고질적인 문제인 &amp;lsquo;컨텍스트 부패&amp;rsquo;와 &amp;lsquo;규칙 위반&amp;rsquo;을 구조적으로 해결하기 위한 표준 설계론이다.&lt;/p&gt;
+&lt;p&gt;중요한 점은 하네스 엔지니어링이 완전히 세상에 없던 새로운 기술이 아니라는 것이다.
+이전부터 효율적인 개발을 지향하던 엔지니어들이 암묵적으로 사용하던 기법들을 명확한 단어로 정의하고 표준화하여 AI모델의 지능에만 의존하던 개발 패러다임을 &amp;lsquo;시스템 설계&amp;rsquo; 중심으로 전환하려는 움직임이다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="1-하네스의-비유"&gt;1. 하네스의 비유
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;Harness: 야생마를 길들이는 마구에서 따온 단어&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;하네스 엔지니어링의 본질은 제어되지 않는 힘을 목적에 맞게 정렬하는 것에 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모델은 야생마와 같다. 아무리 뛰어난 지능을 가진 AI 모델이라도 제어 장치가 없다면 사방으로 날뛰며 엉뚱한 결과를 내놓는다.&lt;/li&gt;
+&lt;li&gt;엔지니어링은 마구다. 하네스(마구)를 씌움으로써 모델의 지능에 기댈 것이 아니라, 모델이 실수하고 싶어도 할 수 없는 설계된 환경에 의존하게 만든다.&lt;/li&gt;
+&lt;li&gt;LLM의 출력은 확률적이며 비결정적이다. 이러한 요소를 결정적인 영역으로 끌어들여 시스템의 신뢰성을 확보한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-왜-하네스라는-단어로-표준화하는가"&gt;2. 왜 &amp;lsquo;하네스&amp;rsquo;라는 단어로 표준화하는가?
+&lt;/h3&gt;&lt;p&gt;과거의 프롬프트 엔지니어링만으로는 해결할 수 없는 AI 에이전트의 고질적 문제인 2대 난제를 구조적으로 해결하기 위함이다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;컨텍스트 부패(Context Decay): 장기 실행 프로세스에서 AI 대화가 길어질수록 초기의 목적이나 중요 규칙을 망각하는 현상을 방지한다.&lt;/li&gt;
+&lt;li&gt;규칙 위반(Rule Violation): &amp;ldquo;절대 ~하지 말아라&amp;quot;라는 프롬프트는 언제든 깨질 수 있다. 하네스는 이를 부탁이 아닌 시스템적 강제로 바꾼다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="3-하네스-설계의-3대-표준"&gt;3. 하네스 설계의 3대 표준
+&lt;/h3&gt;&lt;p&gt;하네스 엔지니어링은 다음 세 가지 요소를 통해 AI 에이전트의 활동 반경을 표준화한다.&lt;/p&gt;
+&lt;h4 id="1-컨텍스트-파일을-통한-기억의-표준화"&gt;1. 컨텍스트 파일을 통한 기억의 표준화
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;claude.md&lt;/code&gt;, &lt;code&gt;agent.md&lt;/code&gt;와 같은 &lt;code&gt;*.md&lt;/code&gt; 파일을 정의하여 에이전트가 매번 작업을 시작할 때 읽는 온보딩 문서이자 헌법으로 활용한다.&lt;/li&gt;
+&lt;li&gt;1,000 페이지가 넘는 등의 대용량 설명서가 아닌, 보편적 규칙만 담은 지도 형태로 작성하여 일관성을 유지한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-행동의-제약-자동-강제-시스템"&gt;2. 행동의 제약, 자동 강제 시스템
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;린터(Linter)와 프리커밋 훅: AI에게 잘해달라고 부탁하는 대신, 규칙 위반 시 저장 자체가 불가능한 구조를 설계한다.&lt;/li&gt;
+&lt;li&gt;자동 교정 루프: 시스템이 에러를 발생시키면 에이전트가 이를 보고 스스로 수정하게 하여 피드백 루프를 완성한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-상태-캡쳐-및-재현-checkpointing"&gt;3. 상태 캡쳐 및 재현, Checkpointing
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;앤트로픽이 강조하는 기법으로, 작업 중간에 실패했을 때 처음부터 다시 시작하지 않고 특정 시점의 상태를 캡처하여 그 지점부터 재실행할 수 있게 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-실무-적용-사례-모델이-아닌-시스템의-승리"&gt;4. 실무 적용 사례, 모델이 아닌 시스템의 승리
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;오픈AI(OpenAI): 엔지니어들이 코드 한 줄 쓰지 않고 에이전트 지침서와 테스트 자동화 시스템 등 하네스 구성에만 집중하여 성능을 극대화했다.&lt;/li&gt;
+&lt;li&gt;랭체인(LangChain): 모델은 그대로 둔 채 하네스(검증 구조)만 개선했을 뿐인데, 벤치마크 순위가 25단계나 상승했다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;하네스 엔지니어링은 개발자의 역할을 단순히 &amp;lsquo;코드를 작성하는 사람&amp;rsquo;에서 &amp;lsquo;AI가 신뢰성 있게 움직일 수 있는 궤도를 설계하는 사람&amp;rsquo;으로 변화시킨다.&lt;/p&gt;
+&lt;p&gt;과거에는 코드 한 줄을 정확히 짜는 데 집중했다면, 이제는 에이전트가 올바르게 동작할 수밖에 없는 시스템을 설계하는 엄밀함이 요구된다. AI 에이전트가 기대만큼 동작하지 않는다면 모델의 지능을 탓하기 전에 시스템에 표준화된 하네스가 제대로 갖춰져 있는지 점검해 보자.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;비결정성(Non-determinism): 같은 입력에도 결과가 달라질 수 있는 특성. 하네스는 이를 관리하는 도구&lt;/li&gt;
+&lt;li&gt;전략적 기술 부채: 강력한 하네스가 있다면 리팩터링 시의 위험을 최소화할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Mitchell Hashimoto (2026.02):&lt;/strong&gt; 하네스 엔지니어링 용어의 제안 및 정의.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Anthropic Engineering:&lt;/strong&gt; &lt;a class="link" href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank" rel="noopener"
+&gt;Harness design for long-running application development&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;캐슬 AI (유튜브):&lt;/strong&gt; 하네스 공식문서 분석 및 실무 적용 사례.&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
