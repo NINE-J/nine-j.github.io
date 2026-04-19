@@ -4,7 +4,7 @@ draft: false
 title: DTO VS Command
 description: Request를 그대로 사용하지 말자
 author: Nine
-date: 2025-05-24 17:17:02
+date: 2025-05-24T17:17:02
 categories:
   - 설계
   - 객체지향

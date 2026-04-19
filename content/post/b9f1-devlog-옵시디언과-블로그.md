@@ -4,7 +4,7 @@ draft: false
 title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
-date: 2025-12-19 03:24:06
+date: 2025-12-19T03:24:06
 categories:
   - DevOps
 tags:

@@ -4,7 +4,7 @@ draft: false
 title: 공공데이터포털 API
 description: SERVICE_KEY_IS_NOT_REGISTERED_ERROR
 author: Nine
-date: 2025-06-06 11:28:27
+date: 2025-06-06T11:28:27
 categories:
   - CS
   - Network

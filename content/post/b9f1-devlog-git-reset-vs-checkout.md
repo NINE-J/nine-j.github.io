@@ -4,7 +4,7 @@ draft: false
 title: Git Reset VS Checkout
 description: reset과 checkout의 차이를 이해한다.
 author: Nine
-date: 2025-03-30
+date: 2025-03-30T00:00:00
 categories:
   - VersionControl
   - Git

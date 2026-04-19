@@ -4,7 +4,7 @@ draft: false
 title: Spring MVC
 description: Controller VS RestController
 author: Nine
-date: 2025-05-18 15:20:00
+date: 2025-05-18T15:20:00
 categories:
   - Spring
   - 문법

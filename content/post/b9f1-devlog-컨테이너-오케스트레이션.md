@@ -4,7 +4,7 @@ draft: false
 title: 컨테이너 오케스트레이션
 description: 자동 확장, 자가 복구, 선언형 인프라
 author: Nine
-date: 2025-06-25 22:17:57
+date: 2025-06-25T22:17:57
 categories:
   - Infra
 tags:

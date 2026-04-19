@@ -4,7 +4,7 @@ draft: false
 title: JWT 구조를 구체적으로 알아보자
 description: 보안 토큰의 3단계 구조 분석
 author: Nine
-date: 2025-08-05 01:58:05
+date: 2025-08-05T01:58:05
 categories:
   - Backend
   - Security

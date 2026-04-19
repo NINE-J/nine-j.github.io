@@ -4,7 +4,7 @@ draft: false
 title: GitHub Actions 트리거와 시나리오
 description: 자동화된 CI/CD 파이프라인
 author: Nine
-date: 2025-08-03
+date: 2025-08-03T00:00:00
 categories:
   - DevOps
   - GitHubActions

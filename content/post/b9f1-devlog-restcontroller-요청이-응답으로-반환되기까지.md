@@ -4,7 +4,7 @@ draft: false
 title: "@RestController 요청이 응답으로 반환되기까지"
 description: feat.HttpMessageConverter
 author: Nine
-date: 2025-05-21 21:28:02
+date: 2025-05-21T21:28:02
 categories:
   - SpringBoot
 tags:

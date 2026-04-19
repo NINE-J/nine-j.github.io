@@ -4,7 +4,7 @@ draft: false
 title: AWS RDS vs EC2 직접 설치
 description: 어떤 데이터베이스 운영이 더 현명할까?
 author: Nine
-date: 2025-08-03
+date: 2025-08-03T00:00:00
 categories:
   - Infra
   - Cloud

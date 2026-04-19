@@ -4,7 +4,7 @@ draft: false
 title: Git Stash
 description: 지금 커밋하고 싶지 않아!
 author: Nine
-date: 2025-03-30
+date: 2025-03-30T00:00:00
 categories:
   - VersionControl
   - Git

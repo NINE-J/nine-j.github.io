@@ -4,7 +4,7 @@ draft: false
 title: URL 입력 후 ENTER 키
 description: 무슨 일이 벌어질까?
 author: Nine
-date: 2025-04-08
+date: 2025-04-08T00:00:00
 categories:
   - CS
   - Network

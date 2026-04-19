@@ -6,7 +6,7 @@ draft: false
 title: CrewAI 시작하기 - 설치부터 첫 번째 Crew 실행까지
 description: Multi-Agent Framework CrewAI 환경 구성, 프로젝트 생성, 에이전트 정의, 실행까지 한 번에 정리
 author: Nine
-date: 2026-03-16
+date: 2026-03-16T00:00:00
 categories:
   - AI
   - Multi-Agent

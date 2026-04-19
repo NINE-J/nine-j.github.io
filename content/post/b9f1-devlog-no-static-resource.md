@@ -4,7 +4,7 @@ draft: false
 title: No static resource
 description: .well-known/appspecific/com.chrome.devtools.json.
 author: Nine
-date: 2025-05-20 11:18:19
+date: 2025-05-20T11:18:19
 categories:
   - Browser
   - DevTools

@@ -4,7 +4,7 @@ draft: false
 title: 모듈러 연산
 description: 다양한 알고리즘에 활용할 수 있는 모듈러 연산을 알아본다.
 author: Nine
-date: 2025-03-09
+date: 2025-03-09T00:00:00
 categories:
   - 알고리즘
 tags:

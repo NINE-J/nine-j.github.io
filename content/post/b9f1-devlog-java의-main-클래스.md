@@ -4,7 +4,7 @@ draft: false
 title: Java의 main 클래스
 description: main은 왜 main이지?
 author: Nine
-date: 2025-01-05
+date: 2025-01-05T00:00:00
 categories:
   - Java
   - 기초

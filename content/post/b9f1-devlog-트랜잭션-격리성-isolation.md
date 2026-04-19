@@ -4,7 +4,7 @@ draft: false
 title: 트랜잭션 격리성 - Isolation
 description: 동시성 환경에서 데이터를 지키기 위한 전략
 author: Nine
-date: 2025-06-15 17:31:13
+date: 2025-06-15T17:31:13
 categories:
   - DB
   - Transaction

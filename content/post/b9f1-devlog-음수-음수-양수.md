@@ -4,7 +4,7 @@ draft: false
 title: 음수 * 음수 = 양수?
 description: 태세전환 뭔데
 author: Nine
-date: 2025-12-08 23:00:00
+date: 2025-12-08T23:00:00
 categories:
   - 수학
   - 수의체계

@@ -4,7 +4,7 @@ draft: false
 title: Java 입력 처리 종류
 description: 간단한 사용법과 성능
 author: Nine
-date: 2025-12-02 14:40:41
+date: 2025-12-02T14:40:41
 categories:
   - Java
   - 문법

@@ -4,7 +4,7 @@ draft: false
 title: "psql: 시작하기"
 description: feat.사용자의 password 인증을 실패했습니다
 author: Nine
-date: 2025-04-20
+date: 2025-04-20T00:00:00
 categories:
   - DB
   - PostgreSQL

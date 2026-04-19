@@ -4,7 +4,7 @@ draft: false
 title: Git 원격 브랜치 설정
 description: feat.싱글 브랜치 클론 환경
 author: Nine
-date: 2025-04-12
+date: 2025-04-12T00:00:00
 categories:
   - VersionControl
   - Git

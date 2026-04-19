@@ -4,7 +4,7 @@ draft: false
 title: DDL VS DML
 description: DDL과 DML의 차이점과 주요 명령어
 author: Nine
-date: 2025-06-02 08:34:00
+date: 2025-06-02T08:34:00
 categories:
   - DB
   - SQL

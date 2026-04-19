@@ -4,7 +4,7 @@ draft: false
 title: Git 추적 브랜치 관리
 description: 근데 이제 Fork를 곁들인
 author: Nine
-date: 2025-04-08
+date: 2025-04-08T00:00:00
 categories:
   - VersionControl
   - Git

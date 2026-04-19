@@ -4,7 +4,7 @@ draft: false
 title: AWS 배포 클래식
 description: EC2 & RDS
 author: Nine
-date: 2025-06-23
+date: 2025-06-23T00:00:00
 categories:
   - AWS
 tags:

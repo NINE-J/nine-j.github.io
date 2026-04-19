@@ -4,7 +4,7 @@ draft: false
 title: AWS
 description: What is Amazon Web Services
 author: Nine
-date: 2025-06-20 16:47:07
+date: 2025-06-20T16:47:07
 categories:
   - AWS
 tags:

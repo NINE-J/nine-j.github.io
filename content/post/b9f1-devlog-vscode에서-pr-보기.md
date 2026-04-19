@@ -4,7 +4,7 @@ draft: false
 title: VSCode에서 PR 보기
 description: feat.GitHub Pull Requests
 author: Nine
-date: 2025-05-06
+date: 2025-05-06T00:00:00
 categories:
   - IDE
   - VSCode

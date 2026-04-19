@@ -4,7 +4,7 @@ draft: false
 title: "알고리즘과 자료구조: 고급 정렬"
 description: 고급 정렬을 이해할 수 있다.
 author: Nine
-date: 2025-02-22
+date: 2025-02-22T00:00:00
 categories:
   - 알고리즘
   - 이론

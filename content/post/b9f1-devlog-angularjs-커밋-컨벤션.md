@@ -4,7 +4,7 @@ draft: false
 title: AngularJS 커밋 컨벤션
 description: 자동화와 협업을 만드는 규칙
 author: Nine
-date: 2025-10-15
+date: 2025-10-15T00:00:00
 categories:
   - VersionControl
   - Conventions

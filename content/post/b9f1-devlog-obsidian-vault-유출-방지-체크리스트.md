@@ -4,7 +4,7 @@ draft: true
 title: Obsidian Vault 유출 방지 체크리스트
 description: 플러그인 설정과 API 키를 안전하게 지키는 필수 점검
 author: Nine
-date: 2025-12-30 14:08:23
+date: 2025-12-30T14:08:23
 categories:
 tags:
   - devlog

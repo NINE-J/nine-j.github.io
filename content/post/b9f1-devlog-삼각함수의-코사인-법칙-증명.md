@@ -4,7 +4,7 @@ draft: false
 title: 삼각함수의 코사인 법칙 증명
 description: 코사인 법칙이 성립하는 이유
 author: Nine
-date: 2025-03-13
+date: 2025-03-13T00:00:00
 categories:
   - 수학
   - 삼각함수

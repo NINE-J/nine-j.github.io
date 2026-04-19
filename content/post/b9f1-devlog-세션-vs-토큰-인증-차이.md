@@ -4,7 +4,7 @@ draft: false
 title: 세션 vs 토큰 인증 차이
 description: 인증 방식의 구조와 보안 포인트
 author: Nine
-date: 2025-08-04
+date: 2025-08-04T00:00:00
 categories:
   - Backend
   - Security

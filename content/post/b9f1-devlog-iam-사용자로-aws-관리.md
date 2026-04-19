@@ -4,7 +4,7 @@ draft: false
 title: IAM 사용자로 AWS 관리
 description: 권한 관리 이유 및 방법
 author: Nine
-date: 2025-06-22
+date: 2025-06-22T00:00:00
 categories:
   - AWS
 tags:

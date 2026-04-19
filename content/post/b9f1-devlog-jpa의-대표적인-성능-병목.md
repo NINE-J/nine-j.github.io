@@ -4,7 +4,7 @@ draft: false
 title: JPA의 대표적인 성능 병목
 description: N+1 문제, 왜 생기고 어떻게 해결할까?
 author: Nine
-date: 2025-06-15 15:34:08
+date: 2025-06-15T15:34:08
 categories:
   - SpringBoot
   - JPA

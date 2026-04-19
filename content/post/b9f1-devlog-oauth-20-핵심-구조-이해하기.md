@@ -4,7 +4,7 @@ draft: false
 title: OAuth 2.0 핵심 구조 이해하기
 description: Authorization Code Grant
 author: Nine
-date: 2025-08-04
+date: 2025-08-04T00:00:00
 categories:
   - Backend
   - Security

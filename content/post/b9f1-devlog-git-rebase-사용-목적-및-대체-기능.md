@@ -4,7 +4,7 @@ draft: false
 title: Git Rebase 사용 목적 및 대체 기능
 description: Rebase를 대체할 기능이 있음에도 사용하는 이유가 궁금하다.
 author: Nine
-date: 2025-03-27
+date: 2025-03-27T00:00:00
 categories:
   - VersionControl
   - Git

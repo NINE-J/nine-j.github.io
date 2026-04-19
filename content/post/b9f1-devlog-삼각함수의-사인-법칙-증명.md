@@ -4,7 +4,7 @@ draft: false
 title: 삼각함수의 사인 법칙 증명
 description: 사인 법칙이 성립하는 이유
 author: Nine
-date: 2025-03-12
+date: 2025-03-12T00:00:00
 categories:
   - 수학
   - 삼각함수

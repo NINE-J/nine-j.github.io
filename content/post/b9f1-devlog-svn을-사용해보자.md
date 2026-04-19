@@ -4,7 +4,7 @@ draft: false
 title: SVN을 사용해보자.
 description: "SVN: SubVersion"
 author: Nine
-date: 2022-04-12 10:00:00
+date: 2022-04-12T10:00:00
 categories:
   - VersionControl
   - SVN

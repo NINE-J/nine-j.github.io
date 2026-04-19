@@ -4,7 +4,7 @@ draft: true
 title:
 description:
 author: Nine
-date: 2025-12-30 14:26:13
+date: 2025-12-30T14:26:13
 categories:
 tags:
   - devlog

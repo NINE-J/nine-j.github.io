@@ -4,7 +4,7 @@ draft: false
 title: AWS 배포 기초
 description: 가장 기초적인 개념
 author: Nine
-date: 2025-06-16 17:00:28
+date: 2025-06-16T17:00:28
 categories:
   - AWS
 tags:

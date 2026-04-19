@@ -4,7 +4,7 @@ draft: false
 title: 로컬 캐시 vs 분산 캐시
 description: 선택 기준과 실무 활용
 author: Nine
-date: 2025-08-30 13:25:20
+date: 2025-08-30T13:25:20
 categories:
   - Backend
   - Cache

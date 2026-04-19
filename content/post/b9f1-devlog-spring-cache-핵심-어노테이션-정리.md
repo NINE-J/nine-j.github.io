@@ -4,7 +4,7 @@ draft: false
 title: Spring Cache 핵심 어노테이션 정리
 description: 캐시 제어 3가지 방식
 author: Nine
-date: 2025-08-30 13:12:30
+date: 2025-08-30T13:12:30
 categories:
   - Spring
 tags:

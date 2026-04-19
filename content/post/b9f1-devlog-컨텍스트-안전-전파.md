@@ -4,7 +4,7 @@ draft: false
 title: 컨텍스트 안전 전파
 description: 비동기에서도 잃지 않는 컨텍스트
 author: Nine
-date: 2025-08-16
+date: 2025-08-16T00:00:00
 categories:
   - Backend
   - Observability

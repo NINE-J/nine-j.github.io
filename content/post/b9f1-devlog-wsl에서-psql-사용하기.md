@@ -4,7 +4,7 @@ draft: false
 title: WSL에서 PSQL 사용하기
 description: Windows PostgreSQL 서버와의 연결 설정
 author: Nine
-date: 2025-06-27 10:11:44
+date: 2025-06-27T10:11:44
 categories:
   - WSL
 tags:

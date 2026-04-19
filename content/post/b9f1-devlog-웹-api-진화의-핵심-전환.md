@@ -4,7 +4,7 @@ draft: false
 title: 웹 API 진화의 핵심 전환
 description: 왜 우리는 REST를 선택했는가
 author: Nine
-date: 2025-05-20 13:23:57
+date: 2025-05-20T13:23:57
 categories:
   - CS
   - Network

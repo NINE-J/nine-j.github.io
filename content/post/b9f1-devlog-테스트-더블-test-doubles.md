@@ -4,7 +4,7 @@ draft: false
 title: 테스트 더블 - Test Doubles
 description: feat.Mockito, Mock, Spy
 author: Nine
-date: 2025-06-21 23:29:50
+date: 2025-06-21T23:29:50
 categories:
   - 설계
   - TDD

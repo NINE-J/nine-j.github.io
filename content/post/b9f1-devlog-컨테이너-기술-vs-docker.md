@@ -4,7 +4,7 @@ draft: false
 title: 컨테이너 기술 vs Docker
 description: 컨테이너 기술의 본질을 이해하자
 author: Nine
-date: 2025-06-24 14:04:36
+date: 2025-06-24T14:04:36
 categories:
   - Infra
 tags:

@@ -4,7 +4,7 @@ draft: false
 title: Spring Boot 자동 설정
 description: Auto-Configuration 원리
 author: Nine
-date: 2025-05-06
+date: 2025-05-06T00:00:00
 categories:
   - SpringBoot
 tags:

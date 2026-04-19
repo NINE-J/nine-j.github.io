@@ -4,7 +4,7 @@ draft: false
 title: 네트워크 계층 모델 비교
 description: TCP/IP vs OSI
 author: Nine
-date: 2025-08-30 13:33:52
+date: 2025-08-30T13:33:52
 categories:
   - CS
   - Network

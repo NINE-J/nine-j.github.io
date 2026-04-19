@@ -4,7 +4,7 @@ draft: false
 title: Java 예외 처리의 구조와 진화
 description: Checked VS Unchecked
 author: Nine
-date: 2025-05-05
+date: 2025-05-05T00:00:00
 categories:
   - Java
   - 문법

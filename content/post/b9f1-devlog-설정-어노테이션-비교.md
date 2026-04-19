@@ -4,7 +4,7 @@ draft: false
 title: 설정 어노테이션 비교
 description: "@Configuration vs @TestConfiguration"
 author: Nine
-date: 2025-09-13 21:03:30
+date: 2025-09-13T21:03:30
 categories:
   - Spring
   - Test

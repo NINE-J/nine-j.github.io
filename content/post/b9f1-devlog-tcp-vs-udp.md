@@ -4,7 +4,7 @@ draft: false
 title: TCP vs UDP
 description: 신뢰와 속도 프로토콜 비교
 author: Nine
-date: 2025-04-19 10:00:00
+date: 2025-04-19T10:00:00
 categories:
   - CS
   - Network
