@@ -5,16 +5,16 @@ title: Dynamic Programming
 description: DP를 알아보자
 author: Nine
 date: 2022-01-15T10:00:00
-categories:
+categories: 
   - 알고리즘
-tags:
+tags: 
   - devlog
   - algorithms
   - DP
   - 동적계획법
   - 기저사례
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c185-775f-a24b-aba97fe8b114
 slug: b9f1-devlog-dynamic-programming
 ---

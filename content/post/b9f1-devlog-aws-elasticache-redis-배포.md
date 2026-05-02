@@ -5,9 +5,9 @@ title: AWS ElastiCache Redis 배포
 description: Spring Boot 분산 환경 Redis AWS 운영 구성
 author: Nine
 date: 2025-10-16T17:17:14
-categories:
+categories: 
   - Infra
-tags:
+tags: 
   - devlog
   - Redis
   - AWS
@@ -17,7 +17,7 @@ tags:
   - Infra
   - ElastiCache
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c19d-7654-a41f-a0dd8239f99a
 slug: b9f1-devlog-aws-elasticache-redis-배포
 ---

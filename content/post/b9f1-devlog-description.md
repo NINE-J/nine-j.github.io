@@ -1,15 +1,15 @@
 ---
 publish: false
 draft: true
-title:
-description:
+title: 
+description: 
 author: Nine
 date: 2025-12-30T14:26:13
-categories:
-tags:
+categories: 
+tags: 
   - devlog
 # image: 
-Status: ToDo
+status: ToDo
 id: 019ce76a-c33f-77ab-b0ad-0b9b818a8739
 slug: b9f1-devlog-description
 ---

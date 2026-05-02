@@ -5,9 +5,9 @@ title: Spring 핵심 철학
 description: feat.POJO, DRY, SRP, SoC, TDD
 author: Nine
 date: 2025-04-29T00:00:00
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - devlog
   - Spring
   - 철학
@@ -19,7 +19,7 @@ tags:
   - Framework
   - 프레임워크
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2ad-73e3-bbaa-9b0ef9e20d14
 slug: b9f1-devlog-spring-핵심-철학
 ---

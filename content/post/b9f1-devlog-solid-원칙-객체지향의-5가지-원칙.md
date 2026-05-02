@@ -5,15 +5,15 @@ title: "SOLID 원칙: 객체지향의 5가지 원칙"
 description: 더 유연한 소프트웨어를 위한 설계 지침
 author: Nine
 date: 2025-04-07T00:00:00
-categories:
+categories: 
   - 설계
   - 객체지향
-tags:
+tags: 
   - devlog
   - SOLID
   - 설계
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c20c-72bd-9c28-4a9136446b2f
 slug: b9f1-devlog-solid-원칙-객체지향의-5가지-원칙
 ---

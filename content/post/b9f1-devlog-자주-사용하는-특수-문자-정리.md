@@ -5,15 +5,15 @@ title: 자주 사용하는 특수 문자 정리
 description: 개발, 설계 구조화, 기술 블로그 표현 등
 author: Nine
 date: 2025-10-14T18:19:54
-categories:
+categories: 
   - Utils
-tags:
+tags: 
   - devlog
   - documentation
   - writing
   - symbols
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c320-760d-a281-8cedecf6f61b
 slug: b9f1-devlog-자주-사용하는-특수-문자-정리
 ---

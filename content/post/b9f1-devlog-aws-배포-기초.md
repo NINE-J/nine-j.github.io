@@ -5,12 +5,12 @@ title: AWS 배포 기초
 description: 가장 기초적인 개념
 author: Nine
 date: 2025-06-16T17:00:28
-categories:
+categories: 
   - AWS
-tags:
+tags: 
   - devlog
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c196-7148-960b-5da6064e8185
 slug: b9f1-devlog-aws-배포-기초
 ---

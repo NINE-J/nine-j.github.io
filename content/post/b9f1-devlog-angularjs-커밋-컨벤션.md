@@ -5,16 +5,16 @@ title: AngularJS 커밋 컨벤션
 description: 자동화와 협업을 만드는 규칙
 author: Nine
 date: 2025-10-15T00:00:00
-categories:
+categories: 
   - VersionControl
   - Conventions
-tags:
+tags: 
   - devlog
   - AngularJS
   - Conventions
   - VersionControl
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1e8-70a5-b0a8-6acca90f8132
 slug: b9f1-devlog-angularjs-커밋-컨벤션
 ---

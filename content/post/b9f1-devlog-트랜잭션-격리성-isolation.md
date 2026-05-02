@@ -5,10 +5,10 @@ title: 트랜잭션 격리성 - Isolation
 description: 동시성 환경에서 데이터를 지키기 위한 전략
 author: Nine
 date: 2025-06-15T17:31:13
-categories:
+categories: 
   - DB
   - Transaction
-tags:
+tags: 
   - devlog
   - 트랜잭션
   - Transaction
@@ -20,7 +20,7 @@ tags:
   - 동시성처리
   - 읽기현상
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1f8-760b-af20-2ae42fd7c81e
 slug: b9f1-devlog-트랜잭션-격리성-isolation
 ---

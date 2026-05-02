@@ -5,10 +5,10 @@ title: SVN을 사용해보자.
 description: "SVN: SubVersion"
 author: Nine
 date: 2022-04-12T10:00:00
-categories:
+categories: 
   - VersionControl
   - SVN
-tags:
+tags: 
   - devlog
   - SVN
   - SubVersion
@@ -16,7 +16,7 @@ tags:
   - 버전관리
   - 형상관리
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c326-70b9-9002-5cb666620185
 slug: b9f1-devlog-svn을-사용해보자
 ---

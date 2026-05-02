@@ -5,10 +5,10 @@ title: ACID
 description: 트랜잭션 4대 원칙
 author: Nine
 date: 2025-06-15T16:50:13
-categories:
+categories: 
   - DB
   - Transaction
-tags:
+tags: 
   - devlog
   - ACID
   - DB
@@ -18,7 +18,7 @@ tags:
   - 무결성
   - 분산시스템
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1f2-738e-b1ef-a519f48b71f6
 slug: b9f1-devlog-acid
 ---

@@ -5,10 +5,10 @@ title: No.5597 과제 안 내신 분..?
 description: baekjoon, Java
 author: Nine
 date: 2025-11-17T21:00:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

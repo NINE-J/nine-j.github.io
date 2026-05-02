@@ -7,17 +7,17 @@ title: ChatDev 시작하기 - 구축부터 튜토리얼까지
 description: Multi-Agent System ChatDev 2.0 환경 구성, 실행, 워크플로우 설계 가이드
 author: Nine
 date: 2026-03-15T15:20:00
-categories:
+categories: 
   - AI
   - Multi-Agent
-tags:
+tags: 
   - devlog
   - ChatDev
   - multi-agent-system
   - tutorial
   - local-llm
 # image: 
-Status: Testing
+status: Testing
 ---
 
 ## 📌개요

@@ -5,14 +5,14 @@ title: Git 원격 브랜치 설정
 description: feat.싱글 브랜치 클론 환경
 author: Nine
 date: 2025-04-12T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1d1-747e-91ba-b99a610bcd91
 slug: b9f1-devlog-git-원격-브랜치-설정
 ---

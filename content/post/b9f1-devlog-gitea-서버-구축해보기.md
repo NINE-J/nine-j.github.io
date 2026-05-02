@@ -5,10 +5,10 @@ title: Gitea 서버 구축해보기
 description: 네트워크 망에서 버전 관리
 author: Nine
 date: 2023-12-21T00:00:00
-categories:
+categories: 
   - VersionControl
   - Gitea
-tags:
+tags: 
   - devlog
   - VersionControl
   - Gitea
@@ -17,7 +17,7 @@ tags:
   - 형상관리
   - 버전관리
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1c8-7719-b2ba-bf6a9bf309ca
 slug: b9f1-devlog-gitea-서버-구축해보기
 ---

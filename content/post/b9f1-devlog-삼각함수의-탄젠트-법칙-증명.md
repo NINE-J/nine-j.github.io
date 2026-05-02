@@ -5,17 +5,17 @@ title: 삼각함수의 탄젠트 법칙 증명
 description: 삼각형에서 변과 각의 관계를 이해하는 핵심 법칙
 author: Nine
 date: 2025-03-15T00:00:00
-categories:
+categories: 
   - 수학
   - 삼각함수
-tags:
+tags: 
   - devlog
   - mathematics
   - trigonometric
   - 수학
   - 삼각함수
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1bf-730f-9456-300f39ec8601
 slug: b9f1-devlog-삼각함수의-탄젠트-법칙-증명
 ---

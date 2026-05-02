@@ -5,16 +5,16 @@ title: IntelliJ 메모리 설정
 description: 전역 또는 애플리케이션 별 메모리 설정
 author: Nine
 date: 2025-04-06T00:00:00
-categories:
+categories: 
   - IDE
   - IntelliJ
-tags:
+tags: 
   - devlog
   - IDE
   - IntelliJ
   - VMoptions
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1b2-73db-9745-d56df6ca910c
 slug: b9f1-devlog-intellij-메모리-설정
 ---

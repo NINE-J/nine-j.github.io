@@ -5,14 +5,14 @@ title: Spring VS Spring Boot
 description: 개념적 차이, 특징, 언제 어떤 걸 써야 하는지
 author: Nine
 date: 2025-04-19T12:00:00
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - Spring
   - SpringBoot
   - devlog
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2ab-735d-bdd7-4acd46d395ea
 slug: b9f1-devlog-spring-vs-spring-boot
 ---

@@ -5,9 +5,9 @@ title: Git 멀티 SSH 키 관리
 description: Git/Linux/WSL 환경별 대응
 author: Nine
 date: 2025-10-15T18:30:33
-categories:
+categories: 
   - VersionControl
-tags:
+tags: 
   - devlog
   - SSH
   - SSH-Key
@@ -23,7 +23,7 @@ tags:
   - Infra
   - DevOps
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c329-732d-b48b-c0693a6d2a9b
 slug: b9f1-devlog-git-멀티-ssh-키-관리
 ---

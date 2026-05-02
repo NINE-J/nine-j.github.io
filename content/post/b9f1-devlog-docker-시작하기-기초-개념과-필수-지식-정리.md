@@ -5,16 +5,16 @@ title: "Docker 시작하기: 기초 개념과 필수 지식 정리"
 description: 기초 개념과 필수 지식 정리
 author: Nine
 date: 2025-01-27T00:00:00
-categories:
+categories: 
   - Docker
-tags:
+tags: 
   - devlog
   - Docker
   - Fundamental
   - DevOps
   - CI/CD
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c31d-74f3-a0de-1c3c01ad603e
 slug: b9f1-devlog-docker-시작하기-기초-개념과-필수-지식-정리
 ---

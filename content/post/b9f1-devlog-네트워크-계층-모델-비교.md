@@ -5,10 +5,10 @@ title: 네트워크 계층 모델 비교
 description: TCP/IP vs OSI
 author: Nine
 date: 2025-08-30T13:33:52
-categories:
+categories: 
   - CS
   - Network
-tags:
+tags: 
   - devlog
   - TCP
   - TCP/IP
@@ -20,7 +20,7 @@ tags:
   - 계층모델
   - LayeredModel
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2d5-7508-87b0-f1bdce40132b
 slug: b9f1-devlog-네트워크-계층-모델-비교
 ---

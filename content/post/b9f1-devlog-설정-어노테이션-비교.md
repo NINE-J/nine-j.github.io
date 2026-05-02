@@ -5,16 +5,16 @@ title: 설정 어노테이션 비교
 description: "@Configuration vs @TestConfiguration"
 author: Nine
 date: 2025-09-13T21:03:30
-categories:
+categories: 
   - Spring
   - Test
-tags:
+tags: 
   - devlog
   - SpringBoot
   - Configuration
   - TestConfiguration
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2ce-77b8-9bcf-ba20dd7880c0
 slug: b9f1-devlog-설정-어노테이션-비교
 ---

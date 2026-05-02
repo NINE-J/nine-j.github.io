@@ -5,15 +5,15 @@ title: Java Enum
 description: 제한된 상수의 타입 안정성
 author: Nine
 date: 2025-04-09T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - enum
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c242-7562-810f-b4c3ce267d15
 slug: b9f1-devlog-java-enum
 ---
@@ -37,7 +37,7 @@ Java의 `enum`(열거형)은 타입 안전성(Type-Safety)과 코드 가독성
 #### 기존 방식의 한계
 
 ```java
-public class Status {
+public class status {
 	public static final int ORDERED = 1;
 	public static final int PAID = 2;
 	public static final int DELIVERED = 3;
@@ -47,18 +47,18 @@ public class Status {
 문제점:
 
 * 타입 안정성 부족: `int status = 100;` 처럼 유효하지 않은 값 할당 가능
-* 가독성 낮음: `if (status == 1)` vs `if(status == Status.ORDERED)`
+* 가독성 낮음: `if (status == 1)` vs `if(status == status.ORDERED)`
 * 확장성 부족: 상수에 메서드나 속성을 추가할 수 없음
 
 #### enum의 해결 방안
 
 ```java
-public enum Status {
+public enum status {
 	ORDERED, PAID, DELIVERED
 }
 ```
 
-* 컴파일 타입 검증 `Status status = Status.ORDERED`만 허용 (잘못된 값 컴파일 오류)
+* 컴파일 타입 검증 `status status = status.ORDERED`만 허용 (잘못된 값 컴파일 오류)
 * 명시적 표현으로 코드 가독성 향상
 * 객체처럼 메서드/속성 추가 가능
 
@@ -71,20 +71,20 @@ enum은 컴파일러에 의해 클래스로 변환된다.
 * `values()`, `valueOf()` 자동생성
 
 ```java
-public final class Status extends java.lang.Enum<Status> {
+public final class status extends java.lang.Enum<status> {
     // Enum 상수 = static final 인스턴스
-    public static final Status ORDERED = new Status("ORDERED", 0);
-    public static final Status PAID = new Status("PAID", 1);
+    public static final status ORDERED = new status("ORDERED", 0);
+    public static final status PAID = new status("PAID", 1);
     // ...
 
-    private static final Status[] $VALUES = { ORDERED, PAID };
+    private static final status[] $VALUES = { ORDERED, PAID };
 
-    private Status(String name, int ordinal) {  // 생성자는 private
+    private status(String name, int ordinal) {  // 생성자는 private
         super(name, ordinal);
     }
 
-    public static Status[] values() { return $VALUES.clone(); }
-    public static Status valueOf(String name) { /*...*/ }
+    public static status[] values() { return $VALUES.clone(); }
+    public static status valueOf(String name) { /*...*/ }
 }
 ```
 
@@ -97,7 +97,7 @@ public final class Status extends java.lang.Enum<Status> {
 #### 어떤 것을 대체할 수 있었나
 
 * `public static final` 상수
-* `interface`에 상수 정의(`interface Status { int ORDERED = 1; }`)
+* `interface`에 상수 정의(`interface status { int ORDERED = 1; }`)
 * `Map`이나 `List`로 관리하던 것들
 
 #### enum을 사용하게 된 결정적 이유?
@@ -121,9 +121,9 @@ public final class Status extends java.lang.Enum<Status> {
 `==` vs `equals()`
 
 ```java
-Status status = Status.PAID;
-if (status == Status.PAID) {} // 권장 (빠름)
-if (status.equals(Status.PAID)) {} // 동작하지만 불필요
+status status = status.PAID;
+if (status == status.PAID) {} // 권장 (빠름)
+if (status.equals(status.PAID)) {} // 동작하지만 불필요
 ```
 
 ### 더 알아보기

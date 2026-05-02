@@ -5,9 +5,9 @@ title: 컨테이너 기술 vs Docker
 description: 컨테이너 기술의 본질을 이해하자
 author: Nine
 date: 2025-06-24T14:04:36
-categories:
+categories: 
   - Infra
-tags:
+tags: 
   - devlog
   - Docker
   - 컨테이너기술
@@ -16,7 +16,7 @@ tags:
   - OCI
   - Podman
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1b6-707f-b5e2-644122fb211c
 slug: b9f1-devlog-컨테이너-기술-vs-docker
 ---

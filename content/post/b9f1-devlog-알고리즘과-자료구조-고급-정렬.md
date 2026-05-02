@@ -5,10 +5,10 @@ title: "알고리즘과 자료구조: 고급 정렬"
 description: 고급 정렬을 이해할 수 있다.
 author: Nine
 date: 2025-02-22T00:00:00
-categories:
+categories: 
   - 알고리즘
   - 이론
-tags:
+tags: 
   - devlog
   - algorithms
   - 알고리즘
@@ -21,7 +21,7 @@ tags:
   - radix-sort
   - tim-sort
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c193-725b-95dd-59bd191064b5
 slug: b9f1-devlog-알고리즘과-자료구조-고급-정렬
 ---

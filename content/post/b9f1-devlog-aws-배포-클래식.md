@@ -5,9 +5,9 @@ title: AWS 배포 클래식
 description: EC2 & RDS
 author: Nine
 date: 2025-06-23T00:00:00
-categories:
+categories: 
   - AWS
-tags:
+tags: 
   - devlog
   - AWS
   - SpringBoot
@@ -19,7 +19,7 @@ tags:
   - 클라우드배포
   - 실전배포
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c19b-77ef-bf30-0e82aa901dfc
 slug: b9f1-devlog-aws-배포-클래식
 ---

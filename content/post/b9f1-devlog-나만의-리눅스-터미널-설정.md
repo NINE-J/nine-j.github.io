@@ -5,17 +5,17 @@ title: 나만의 리눅스 터미널 설정
 description: 유용한 터미널 설정을 알아보자
 author: Nine
 date: 2025-02-15T10:00:00
-categories:
+categories: 
   - WSL
   - Terminal
-tags:
+tags: 
   - devlog
   - linux
   - terminal
   - 리눅스
   - 터미널
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c321-7788-8d1a-938e782a75c0
 slug: b9f1-devlog-나만의-리눅스-터미널-설정
 ---

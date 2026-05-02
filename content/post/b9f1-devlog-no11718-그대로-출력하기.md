@@ -5,10 +5,10 @@ title: No.11718 그대로 출력하기
 description: baekjoon, Java
 author: Nine
 date: 2025-12-25T05:30:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

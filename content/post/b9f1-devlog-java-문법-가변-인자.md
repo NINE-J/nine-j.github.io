@@ -5,10 +5,10 @@ title: "Java 문법: 가변 인자"
 description: Java의 가변 인자를 이해하고 적절히 사용할 수 있다.
 author: Nine
 date: 2025-03-29T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - 객체지향
@@ -16,7 +16,7 @@ tags:
   - Polymorphism
   - Dynamic-Binding
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23e-769d-a52b-d4d7c646000e
 slug: b9f1-devlog-java-문법-가변-인자
 ---

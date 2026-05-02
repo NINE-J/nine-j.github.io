@@ -5,9 +5,9 @@ title: IAM 사용자로 AWS 관리
 description: 권한 관리 이유 및 방법
 author: Nine
 date: 2025-06-22T00:00:00
-categories:
+categories: 
   - AWS
-tags:
+tags: 
   - devlog
   - AWS
   - 보안
@@ -16,7 +16,7 @@ tags:
   - Cloud
   - 최소권한원칙
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c19a-7534-b855-e93000681685
 slug: b9f1-devlog-iam-사용자로-aws-관리
 ---

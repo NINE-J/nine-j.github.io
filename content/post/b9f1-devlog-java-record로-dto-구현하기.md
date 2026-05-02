@@ -5,16 +5,16 @@ title: Java Record로 DTO 구현하기
 description: 불변성과 간결성을 동시에 잡는 Java Record
 author: Nine
 date: 2025-04-23T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - DTO
   - Record
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c249-7508-9a19-621b0b772354
 slug: b9f1-devlog-java-record로-dto-구현하기
 ---

@@ -5,10 +5,10 @@ title: 세션 vs 토큰 인증 차이
 description: 인증 방식의 구조와 보안 포인트
 author: Nine
 date: 2025-08-04T00:00:00
-categories:
+categories: 
   - Backend
   - Security
-tags:
+tags: 
   - devlog
   - 인증방식
   - 세션기반인증
@@ -19,7 +19,7 @@ tags:
   - 보안
   - Security
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2a7-72e8-ab48-e32b81cdae14
 slug: b9f1-devlog-세션-vs-토큰-인증-차이
 ---

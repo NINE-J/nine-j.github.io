@@ -5,10 +5,10 @@ title: 테스트 더블 - Test Doubles
 description: feat.Mockito, Mock, Spy
 author: Nine
 date: 2025-06-21T23:29:50
-categories:
+categories: 
   - 설계
   - TDD
-tags:
+tags: 
   - devlog
   - Mockito
   - 단위테스트
@@ -19,7 +19,7 @@ tags:
   - Spy
   - 테스트전략
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c223-75af-b1b7-5af8c634ac91
 slug: b9f1-devlog-테스트-더블-test-doubles
 ---

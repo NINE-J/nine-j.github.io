@@ -5,16 +5,16 @@ title: Git Reset VS Checkout
 description: reset과 checkout의 차이를 이해한다.
 author: Nine
 date: 2025-03-30T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - 형상관리
   - VersionControl
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1ca-7735-b618-3dcbdae2fb26
 slug: b9f1-devlog-git-reset-vs-checkout
 ---

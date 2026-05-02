@@ -5,14 +5,14 @@ title: AWS
 description: What is Amazon Web Services
 author: Nine
 date: 2025-06-20T16:47:07
-categories:
+categories: 
   - AWS
-tags:
+tags: 
   - devlog
   - AWS
   - AmazonWebServices
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c198-769d-805b-7417e721d79d
 slug: b9f1-devlog-aws
 ---

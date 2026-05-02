@@ -5,10 +5,10 @@ title: useWatch 사용한 리렌더링 최적화
 description: react에서 form을 다룰 때 리렌더링 최적화 전략
 author: Nine
 date: 2025-01-25T21:00:00
-categories:
+categories: 
   - react
   - react-hook-form
-tags:
+tags: 
   - devlog
   - react
   - react-hook-form
@@ -16,7 +16,7 @@ tags:
   - useWatch
   - form
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c31e-761d-a429-34e8f0208ad1
 slug: b9f1-devlog-usewatch-사용한-리렌더링-최적화
 ---

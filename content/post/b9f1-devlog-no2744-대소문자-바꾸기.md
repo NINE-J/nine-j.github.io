@@ -5,10 +5,10 @@ title: No.2744 대소문자 바꾸기
 description: baekjoon, Java
 author: Nine
 date: 2025-12-02T13:50:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

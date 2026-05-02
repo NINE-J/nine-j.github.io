@@ -5,15 +5,15 @@ title: SOLID 원칙
 description: 단일 책임 원칙(SRP)과 개방-폐쇄 원칙(OCP)
 author: Nine
 date: 2025-04-07T00:00:00
-categories:
+categories: 
   - 설계
   - 객체지향
-tags:
+tags: 
   - devlog
   - SOLID
   - 설계
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c205-716c-9420-805ed242a602
 slug: b9f1-devlog-solid-원칙
 ---

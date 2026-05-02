@@ -5,10 +5,10 @@ title: Java 예외 처리의 구조와 진화
 description: Checked VS Unchecked
 author: Nine
 date: 2025-05-05T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - exception
@@ -21,7 +21,7 @@ tags:
   - Transactional
   - 트랜잭션
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c24a-73aa-ab47-a25a3083d3dd
 slug: b9f1-devlog-java-예외-처리의-구조와-진화
 ---

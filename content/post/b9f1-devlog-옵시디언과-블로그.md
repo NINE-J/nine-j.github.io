@@ -5,9 +5,9 @@ title: 옵시디언과 블로그
 description: 노트가 곧 포스팅
 author: Nine
 date: 2025-12-19T03:24:06
-categories:
+categories: 
   - DevOps
-tags:
+tags: 
   - devlog
   - Obsidian
   - Blog
@@ -22,7 +22,7 @@ tags:
   - Hugo
   - Submodule
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1ad-747f-9d63-904f4bd103b1
 slug: b9f1-devlog-옵시디언과-블로그
 ---
@@ -630,7 +630,7 @@ tags:
   - tag1
   - tag2
 image:
-Status: ToDo
+status: ToDo
 ```
 
 ### 상태 유지형 업데이트 개선 방향

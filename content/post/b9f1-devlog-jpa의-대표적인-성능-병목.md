@@ -5,10 +5,10 @@ title: JPA의 대표적인 성능 병목
 description: N+1 문제, 왜 생기고 어떻게 해결할까?
 author: Nine
 date: 2025-06-15T15:34:08
-categories:
+categories: 
   - SpringBoot
   - JPA
-tags:
+tags: 
   - devlog
   - SpringBoot
   - JPA
@@ -18,7 +18,7 @@ tags:
   - Hibernate
   - 성능최적화
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2bc-7689-9070-01519d9e919c
 slug: b9f1-devlog-jpa의-대표적인-성능-병목
 ---

@@ -5,9 +5,9 @@ title: Spring Cache 핵심 어노테이션 정리
 description: 캐시 제어 3가지 방식
 author: Nine
 date: 2025-08-30T13:12:30
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - devlog
   - Spring
   - SpringBoot
@@ -17,7 +17,7 @@ tags:
   - CacheEvict
   - 캐시전략
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2b1-7536-be20-f79db6f69e40
 slug: b9f1-devlog-spring-cache-핵심-어노테이션-정리
 ---

@@ -5,16 +5,16 @@ title: IntelliJ IDEA에서 프로젝트 경고
 description: Microsoft Defender may affect IDE
 author: Nine
 date: 2025-04-06T00:00:00
-categories:
+categories: 
   - IDE
   - IntelliJ
-tags:
+tags: 
   - devlog
   - IDE
   - IntelliJ
   - WindowsDefender
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1b3-7421-8dc5-fac326b78780
 slug: b9f1-devlog-intellij-idea에서-프로젝트-경고
 ---

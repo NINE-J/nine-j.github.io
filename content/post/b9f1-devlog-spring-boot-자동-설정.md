@@ -5,9 +5,9 @@ title: Spring Boot 자동 설정
 description: Auto-Configuration 원리
 author: Nine
 date: 2025-05-06T00:00:00
-categories:
+categories: 
   - SpringBoot
-tags:
+tags: 
   - devlog
   - spring
   - spring-boot
@@ -22,7 +22,7 @@ tags:
   - springboot-tips
   - springboot-testing
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2b9-7142-afe3-c62e122e5b16
 slug: b9f1-devlog-spring-boot-자동-설정
 ---

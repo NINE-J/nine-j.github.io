@@ -5,10 +5,10 @@ title: 입력값 검증 어디까지 해야 할까?
 description: 중복 없는 계층별 검증 전략과 트레이드오프 분석
 author: Nine
 date: 2025-06-21T21:08:37
-categories:
+categories: 
   - 설계
   - TDD
-tags:
+tags: 
   - devlog
   - SpringBoot
   - InputValidation
@@ -18,7 +18,7 @@ tags:
   - 유효성검증
   - TDD
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c221-727e-bb6d-19b5a4f09784
 slug: b9f1-devlog-입력값-검증-어디까지-해야-할까
 ---

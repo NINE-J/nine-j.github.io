@@ -5,10 +5,10 @@ title: 공공데이터포털 API
 description: SERVICE_KEY_IS_NOT_REGISTERED_ERROR
 author: Nine
 date: 2025-06-06T11:28:27
-categories:
+categories: 
   - CS
   - Network
-tags:
+tags: 
   - devlog
   - 공공데이터포털
   - OpenAPI
@@ -20,7 +20,7 @@ tags:
   - Spring
   - SpringBoot
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2d4-727e-a299-352fbc133910
 slug: b9f1-devlog-공공데이터포털-api
 ---

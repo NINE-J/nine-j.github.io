@@ -5,16 +5,16 @@ title: Java의 이중 콜론 연산자
 description: Double Colon Operator
 author: Nine
 date: 2025-04-03T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - lambda
   - 함수형_프로그래밍
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23f-75dd-953a-c44bcb89cfc2
 slug: b9f1-devlog-java의-이중-콜론-연산자
 ---

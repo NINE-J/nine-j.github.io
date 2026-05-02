@@ -5,17 +5,17 @@ title: No static resource
 description: .well-known/appspecific/com.chrome.devtools.json.
 author: Nine
 date: 2025-05-20T11:18:19
-categories:
+categories: 
   - Browser
   - DevTools
-tags:
+tags: 
   - devlog
   - chrome-devtools
   - automatic-workspace
   - debugging
   - Spring-MVC
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2cf-773b-8dad-697410c49cd9
 slug: b9f1-devlog-no-static-resource
 ---
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {  
         log.error("[서비스 오류] code: {}, messageKey: {}", e.getErrorCode().getCode(), e.getErrorCode().getMessageKey(), e);  
         ErrorCode errorCode = e.getErrorCode();  
-        HttpStatus status = mapToHttpStatus(errorCode);  
+        Httpstatus status = mapToHttpstatus(errorCode);  
         ...
         return ResponseEntity.status(status).body(response);  
     }  
@@ -77,14 +77,14 @@ public class GlobalExceptionHandler {
     
         // 크롬 버전 때문에 출력되는 에러  
         if (e.getMessage().equals("No static resource .well-known/appspecific/com.chrome.devtools.json.")) {  
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  
+            return ResponseEntity.status(Httpstatus.NOT_FOUND).build();  
         }  
         log.error("[시스템 오류] {}", e.getMessage(), e);  
         ...
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); 
+        return ResponseEntity.status(Httpstatus.INTERNAL_SERVER_ERROR).body(response); 
     }  
   
-    private HttpStatus mapToHttpStatus(ErrorCode errorCode) {  
+    private Httpstatus mapToHttpstatus(ErrorCode errorCode) {  
         ...
     }  
 }

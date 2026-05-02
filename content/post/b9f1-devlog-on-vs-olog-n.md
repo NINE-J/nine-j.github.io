@@ -5,13 +5,13 @@ title: O(n) VS O(log n)
 description: 데이터의 크기가 1백만 개 이상이라면?
 author: Nine
 date: 2025-04-18T00:00:00
-categories:
+categories: 
   - 알고리즘
-tags:
+tags: 
   - devlog
   - algorithms
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c194-706e-9180-ac1c552924aa
 slug: b9f1-devlog-on-vs-olog-n
 ---

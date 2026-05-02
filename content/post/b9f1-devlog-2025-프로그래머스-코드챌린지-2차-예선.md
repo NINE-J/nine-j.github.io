@@ -5,10 +5,10 @@ title: 2025 프로그래머스 코드챌린지 2차 예선
 description: programmers, Java
 author: Nine
 date: 2026-02-14T16:00:00
-categories:
+categories: 
   - 알고리즘
   - 프로그래머스
-tags:
+tags: 
   - algorithms
   - programmers
   - lv2

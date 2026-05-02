@@ -5,9 +5,9 @@ title: Spring에서 AOP란
 description: OOP & AOP
 author: Nine
 date: 2025-05-18T15:20:00
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - devlog
   - Spring
   - SpringAOP
@@ -16,7 +16,7 @@ tags:
   - 프록시패턴
   - SpringBoot
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2af-743f-bb00-e7e06100e080
 slug: b9f1-devlog-spring에서-aop란
 ---

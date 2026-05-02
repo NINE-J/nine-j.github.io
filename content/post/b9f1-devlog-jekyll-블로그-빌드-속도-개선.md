@@ -5,13 +5,13 @@ title: Jekyll 블로그 빌드 속도 개선
 description: 빌드 시간을 최적화 하는 방법
 author: Nine
 date: 2025-05-06T15:11:17
-categories:
+categories: 
   - Jekyll
-tags:
+tags: 
   - devlog
   - Jekyll
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1bc-75e6-8204-bb68ab6ce183
 slug: b9f1-devlog-jekyll-블로그-빌드-속도-개선
 ---

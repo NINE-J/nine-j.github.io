@@ -5,16 +5,16 @@ title: "psql: 시작하기"
 description: feat.사용자의 password 인증을 실패했습니다
 author: Nine
 date: 2025-04-20T00:00:00
-categories:
+categories: 
   - DB
   - PostgreSQL
-tags:
+tags: 
   - devlog
   - PostgreSQL
   - psql
   - DB
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2fc-707d-8847-70401afbe7a7
 slug: b9f1-devlog-psql-시작하기
 ---

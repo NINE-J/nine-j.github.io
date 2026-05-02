@@ -5,10 +5,10 @@ title: 역정규화, 언제 그리고 왜 사용하는가?
 description: 실전에서 역정규화를 선택하는 전략적 사고
 author: Nine
 date: 2025-06-02T08:57:20
-categories:
+categories: 
   - DB
   - ERD
-tags:
+tags: 
   - devlog
   - DB
   - 설계
@@ -18,7 +18,7 @@ tags:
   - 데이터베이스
   - 데이터모델링
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1e9-7104-9781-fee63392010a
 slug: b9f1-devlog-역정규화-언제-그리고-왜-사용하는가
 ---

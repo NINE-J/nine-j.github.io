@@ -5,16 +5,16 @@ title: Java 입력 처리 종류
 description: 간단한 사용법과 성능
 author: Nine
 date: 2025-12-02T14:40:41
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - Syntax
   - 문법
 # image: 
-Status: ToDo
+status: ToDo
 id: 019ce76a-c30b-7488-acca-bfb25eff8888
 slug: b9f1-devlog-java-입력-처리-종류
 ---

@@ -7,10 +7,10 @@ title: 하네스 엔지니어링이란?
 description: AI 에이전트의 야생성을 길들이는 시스템 설계의 표준
 author: Nine
 date: 2026-04-08T09:46:35
-categories:
+categories: 
   - 설계
   - Reliability
-tags:
+tags: 
   - devlog
   - HarnessEngineering
   - SystemDesign
@@ -19,7 +19,7 @@ tags:
   - Software
   - Architecture
 # image: 
-Status: ToDo
+status: ToDo
 ---
 
 ## 📌개요

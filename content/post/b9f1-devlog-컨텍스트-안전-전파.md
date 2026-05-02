@@ -5,10 +5,10 @@ title: 컨텍스트 안전 전파
 description: 비동기에서도 잃지 않는 컨텍스트
 author: Nine
 date: 2025-08-16T00:00:00
-categories:
+categories: 
   - Backend
   - Observability
-tags:
+tags: 
   - devlog
   - SpringBoot
   - Logback
@@ -21,7 +21,7 @@ tags:
   - WebFlux
   - Context-Propagation
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2cc-717a-89da-928d84e90ef5
 slug: b9f1-devlog-컨텍스트-안전-전파
 ---

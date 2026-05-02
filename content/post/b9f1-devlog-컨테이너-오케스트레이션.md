@@ -5,9 +5,9 @@ title: 컨테이너 오케스트레이션
 description: 자동 확장, 자가 복구, 선언형 인프라
 author: Nine
 date: 2025-06-25T22:17:57
-categories:
+categories: 
   - Infra
-tags:
+tags: 
   - devlog
   - Kubernetes
   - 컨테이너기술
@@ -23,7 +23,7 @@ tags:
   - 마이크로서비스
   - MSA
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1b7-73b8-88dc-91b007f44a8d
 slug: b9f1-devlog-컨테이너-오케스트레이션
 ---

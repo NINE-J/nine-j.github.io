@@ -5,10 +5,10 @@ title: DTO VS Command
 description: Request를 그대로 사용하지 말자
 author: Nine
 date: 2025-05-24T17:17:02
-categories:
+categories: 
   - 설계
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - DDD
@@ -20,7 +20,7 @@ tags:
   - 계층분리
   - CleanArchitecture
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c21c-7253-a9b2-fdb985473ee1
 slug: b9f1-devlog-dto-vs-command
 ---

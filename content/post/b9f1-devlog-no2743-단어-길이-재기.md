@@ -5,10 +5,10 @@ title: No.2743 단어 길이 재기
 description: baekjoon, Java
 author: Nine
 date: 2025-11-22T16:00:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

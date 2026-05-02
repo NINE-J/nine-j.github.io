@@ -5,16 +5,16 @@ title: Java의 main 클래스
 description: main은 왜 main이지?
 author: Nine
 date: 2025-01-05T00:00:00
-categories:
+categories: 
   - Java
   - 기초
-tags:
+tags: 
   - devlog
   - Java
   - JLS
   - MainClass
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23a-77ac-8dd8-cb0ef2b19b9d
 slug: b9f1-devlog-java의-main-클래스
 ---

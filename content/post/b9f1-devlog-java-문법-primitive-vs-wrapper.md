@@ -5,16 +5,16 @@ title: "Java 문법: Primitive VS Wrapper"
 description: 두 타입을 알아보고 비교해보자
 author: Nine
 date: 2025-04-10T00:00:00
-categories:
+categories: 
   - Java
   - 문법
-tags:
+tags: 
   - devlog
   - Java
   - Primitive
   - Wrapper
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c243-706b-834e-aa377e8601b4
 slug: b9f1-devlog-java-문법-primitive-vs-wrapper
 ---

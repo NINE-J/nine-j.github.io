@@ -5,10 +5,10 @@ title: DDL VS DML
 description: DDL과 DML의 차이점과 주요 명령어
 author: Nine
 date: 2025-06-02T08:34:00
-categories:
+categories: 
   - DB
   - SQL
-tags:
+tags: 
   - devlog
   - SQL
   - DDL
@@ -16,7 +16,7 @@ tags:
   - 데이터베이스
   - DB
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1f0-77ca-a668-e44f636ebd4a
 slug: b9f1-devlog-ddl-vs-dml
 ---

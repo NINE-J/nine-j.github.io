@@ -5,10 +5,10 @@ title: No.2754 학점계산
 description: baekjoon, Java
 author: Nine
 date: 2025-12-25T04:30:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

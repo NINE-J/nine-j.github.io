@@ -5,17 +5,17 @@ title: "알고리즘과 자료구조: 학습 로드맵"
 description: 알고리즘과 자료구조를 단계별로 학습할 수 있는 로드맵
 author: Nine
 date: 2025-01-28T00:00:00
-categories:
+categories: 
   - 알고리즘
   - 이론
-tags:
+tags: 
   - devlog
   - 알고리즘
   - algorithms
   - 이론
   - theory
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c186-770a-9cde-09505fdf422e
 slug: b9f1-devlog-알고리즘과-자료구조-학습-로드맵
 ---

@@ -5,10 +5,10 @@ title: MSA Outbox 패턴
 description: 트랜잭션 일관성, 이벤트 발행의 신뢰성
 author: Nine
 date: 2025-10-10T19:41:23
-categories:
+categories: 
   - Backend
   - Architecture
-tags:
+tags: 
   - devlog
   - "#MSA"
   - OutboxPattern
@@ -23,7 +23,7 @@ tags:
   - Idempotency
   - Kafka
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c22b-736d-bb70-46067b1c68e1
 slug: b9f1-devlog-msa-outbox-패턴
 ---

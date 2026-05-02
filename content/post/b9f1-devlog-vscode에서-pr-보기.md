@@ -5,10 +5,10 @@ title: VSCode에서 PR 보기
 description: feat.GitHub Pull Requests
 author: Nine
 date: 2025-05-06T00:00:00
-categories:
+categories: 
   - IDE
   - VSCode
-tags:
+tags: 
   - devlog
   - VSCode
   - Github
@@ -16,7 +16,7 @@ tags:
   - PullRequest
   - Extensoins
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1b4-76ab-b4a8-81f877b3300b
 slug: b9f1-devlog-vscode에서-pr-보기
 ---

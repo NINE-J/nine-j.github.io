@@ -5,10 +5,10 @@ title: TCP vs UDP
 description: 신뢰와 속도 프로토콜 비교
 author: Nine
 date: 2025-04-19T10:00:00
-categories:
+categories: 
   - CS
   - Network
-tags:
+tags: 
   - devlog
   - TCP
   - UDP
@@ -20,7 +20,7 @@ tags:
   - 웹
   - web
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2d3-74ce-b127-e2c61249fa0e
 slug: b9f1-devlog-tcp-vs-udp
 ---

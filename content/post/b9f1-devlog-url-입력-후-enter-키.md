@@ -5,15 +5,15 @@ title: URL 입력 후 ENTER 키
 description: 무슨 일이 벌어질까?
 author: Nine
 date: 2025-04-08T00:00:00
-categories:
+categories: 
   - CS
   - Network
-tags:
+tags: 
   - devlog
   - Network
   - Protocol
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2d1-72be-9c4e-c4b94d9b99e1
 slug: b9f1-devlog-url-입력-후-enter-키
 ---

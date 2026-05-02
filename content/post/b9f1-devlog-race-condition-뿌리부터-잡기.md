@@ -5,10 +5,10 @@ title: Race condition 뿌리부터 잡기
 description: 자바 실전 대응 전략
 author: Nine
 date: 2025-08-16T00:00:00
-categories:
+categories: 
   - Backend
   - Concurrency
-tags:
+tags: 
   - devlog
   - race-condition
   - 멀티스레딩
@@ -24,7 +24,7 @@ tags:
   - ConcurrentHashMap
   - jcstrees
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c24b-76a4-8efb-546db85d0965
 slug: b9f1-devlog-race-condition-뿌리부터-잡기
 ---

@@ -5,16 +5,16 @@ title: Git tag
 description: tag 기능을 이해하고 사용한다.
 author: Nine
 date: 2025-04-03T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - 형상관리
   - VersionControl
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1ce-73ba-8f6c-ccafdbb5741d
 slug: b9f1-devlog-git-tag
 ---

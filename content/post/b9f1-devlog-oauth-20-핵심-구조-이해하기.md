@@ -5,10 +5,10 @@ title: OAuth 2.0 핵심 구조 이해하기
 description: Authorization Code Grant
 author: Nine
 date: 2025-08-04T00:00:00
-categories:
+categories: 
   - Backend
   - Security
-tags:
+tags: 
   - devlog
   - OAuth2
   - authorization
@@ -17,7 +17,7 @@ tags:
   - Security
   - Spring-Security
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2a8-71ea-85af-11c2c3bb69e7
 slug: b9f1-devlog-oauth-20-핵심-구조-이해하기
 ---

@@ -5,10 +5,10 @@ title: Zettelkasten x PARA
 description: 수집을 넘어 체득하여 가치를 만드는 지식 관리
 author: Nine
 date: 2025-12-30T00:00:00
-categories:
+categories: 
   - 설계
   - KnowledgeManagement
-tags:
+tags: 
   - devlog
   - Zettelkasten
   - PARA
@@ -16,7 +16,7 @@ tags:
   - 지식관리
   - KnowledgeManagement
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1d5-727d-9da4-1712a8647a77
 slug: b9f1-devlog-zettelkasten-x-para
 ---

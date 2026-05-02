@@ -5,10 +5,10 @@ title: PCCE 기출문제 1번 - 동영상 재생기
 description: programmers, Java
 author: Nine
 date: 2026-02-14T10:00:00
-categories:
+categories: 
   - 알고리즘
   - 프로그래머스
-tags:
+tags: 
   - algorithms
   - programmers
   - lv1

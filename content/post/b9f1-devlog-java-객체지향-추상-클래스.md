@@ -5,15 +5,15 @@ title: "Java 객체지향: 추상 클래스"
 description: 개념과 필요성을 알아보자
 author: Nine
 date: 2025-04-10T00:00:00
-categories:
+categories: 
   - Java
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - Abstract
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c244-7688-a952-ddc6579003d2
 slug: b9f1-devlog-java-객체지향-추상-클래스
 ---

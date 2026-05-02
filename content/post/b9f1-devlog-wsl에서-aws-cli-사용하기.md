@@ -5,12 +5,12 @@ title: WSL에서 AWS-CLI 사용하기
 description: aws-cli 설치 및 사용
 author: Nine
 date: 2025-06-27T12:44:22
-categories:
+categories: 
   - WSL
-tags:
+tags: 
   - devlog
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c322-7442-8ced-0c2359a7b0cb
 slug: b9f1-devlog-wsl에서-aws-cli-사용하기
 ---

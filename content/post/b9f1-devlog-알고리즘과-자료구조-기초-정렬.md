@@ -5,10 +5,10 @@ title: "알고리즘과 자료구조: 기초 정렬"
 description: 기초 정렬을 이해할 수 있다.
 author: Nine
 date: 2025-02-09T00:00:00
-categories:
+categories: 
   - 알고리즘
   - 이론
-tags:
+tags: 
   - devlog
   - algorithms
   - 알고리즘
@@ -21,7 +21,7 @@ tags:
   - selection-sort
   - insertion-sort
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c191-7003-8213-9fb6c705d0aa
 slug: b9f1-devlog-알고리즘과-자료구조-기초-정렬
 ---

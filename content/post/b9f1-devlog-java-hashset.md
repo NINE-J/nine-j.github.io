@@ -5,16 +5,16 @@ title: Java HashSet
 description: 내부 동작 방식과 중복 제거 메커니즘
 author: Nine
 date: 2025-04-18T00:00:00
-categories:
+categories: 
   - Java
   - 자료구조
-tags:
+tags: 
   - devlog
   - Java
   - HashSet
   - 자료구조
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c247-7671-8c47-3302dc3319c2
 slug: b9f1-devlog-java-hashset
 ---

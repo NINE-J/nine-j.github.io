@@ -5,13 +5,13 @@ title: Git 추적 브랜치 관리
 description: 근데 이제 Fork를 곁들인
 author: Nine
 date: 2025-04-08T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1cf-723b-98f9-b73f8453a239
 slug: b9f1-devlog-git-추적-브랜치-관리
 ---

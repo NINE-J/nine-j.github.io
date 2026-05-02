@@ -5,17 +5,17 @@ title: 삼각함수의 사인 법칙 증명
 description: 사인 법칙이 성립하는 이유
 author: Nine
 date: 2025-03-12T00:00:00
-categories:
+categories: 
   - 수학
   - 삼각함수
-tags:
+tags: 
   - devlog
   - mathematics
   - trigonometric
   - 수학
   - 삼각함수
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1be-713e-bd72-a25fe00cf6ee
 slug: b9f1-devlog-삼각함수의-사인-법칙-증명
 ---

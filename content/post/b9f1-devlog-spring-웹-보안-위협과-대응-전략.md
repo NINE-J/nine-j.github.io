@@ -5,10 +5,10 @@ title: Spring 웹 보안 위협과 대응 전략
 description: CSRF, XSS, 세션 고정, JWT 탈취 대응법
 author: Nine
 date: 2025-08-05T01:52:32
-categories:
+categories: 
   - Spring
   - Security
-tags:
+tags: 
   - devlog
   - Spring-Security
   - CSRF
@@ -21,7 +21,7 @@ tags:
   - 세션하이재킹
   - 인증인프라
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2aa-72d5-81df-f68b04d3a1fd
 slug: b9f1-devlog-spring-웹-보안-위협과-대응-전략
 ---

@@ -5,10 +5,10 @@ title: 음수 * 음수 = 양수?
 description: 태세전환 뭔데
 author: Nine
 date: 2025-12-08T23:00:00
-categories:
+categories: 
   - 수학
   - 수의체계
-tags:
+tags: 
   - devlog
   - mathematics
   - NumberSystem
@@ -18,7 +18,7 @@ tags:
   - 음수
   - 마이너스
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1c1-73ef-9bf4-ba6623b6efc9
 slug: b9f1-devlog-음수-음수-양수
 ---

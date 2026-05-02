@@ -5,16 +5,16 @@ title: Git Rebase 사용 목적 및 대체 기능
 description: Rebase를 대체할 기능이 있음에도 사용하는 이유가 궁금하다.
 author: Nine
 date: 2025-03-27T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - 형상관리
   - VersionControl
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1c9-77bf-ae64-31aa5c10a783
 slug: b9f1-devlog-git-rebase-사용-목적-및-대체-기능
 ---

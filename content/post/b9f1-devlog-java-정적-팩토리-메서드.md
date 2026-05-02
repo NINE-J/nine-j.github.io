@@ -5,15 +5,15 @@ title: Java 정적 팩토리 메서드
 description: 생성자 대신 팩토리 메서드를 고려하라
 author: Nine
 date: 2025-04-15T00:00:00
-categories:
+categories: 
   - Java
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - 객체지향
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c246-73ea-aac8-ea3a11b2010b
 slug: b9f1-devlog-java-정적-팩토리-메서드
 ---

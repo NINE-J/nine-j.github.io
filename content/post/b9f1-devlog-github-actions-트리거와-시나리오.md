@@ -5,10 +5,10 @@ title: GitHub Actions 트리거와 시나리오
 description: 자동화된 CI/CD 파이프라인
 author: Nine
 date: 2025-08-03T00:00:00
-categories:
+categories: 
   - DevOps
   - GitHubActions
-tags:
+tags: 
   - devlog
   - github-actions
   - trigger
@@ -18,7 +18,7 @@ tags:
   - 배포자동화
   - 파이프라인
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1ab-7614-9459-eae06d13441e
 slug: b9f1-devlog-github-actions-트리거와-시나리오
 ---

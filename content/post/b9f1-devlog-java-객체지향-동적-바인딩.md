@@ -5,10 +5,10 @@ title: "Java 객체지향: 동적 바인딩"
 description: OOP의 핵심 개념인 다형성과 밀접하게 관련된 동적 바인딩을 이해한다.
 author: Nine
 date: 2025-03-29T00:00:00
-categories:
+categories: 
   - Java
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - 객체지향
@@ -16,7 +16,7 @@ tags:
   - Polymorphism
   - Dynamic-Binding
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23b-76e2-ad99-2cad2ccc5910
 slug: b9f1-devlog-java-객체지향-동적-바인딩
 ---

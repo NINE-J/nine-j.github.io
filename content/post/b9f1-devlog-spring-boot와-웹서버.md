@@ -5,9 +5,9 @@ title: Spring Boot와 웹서버
 description: 웹 서버와 WAS의 차이, 내장 톰캣의 역할
 author: Nine
 date: 2025-04-28T00:00:00
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - devlog
   - SpringBoot
   - WebServer
@@ -17,7 +17,7 @@ tags:
   - Java
   - Backend
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2b8-74a8-906b-b1f405f0601c
 slug: b9f1-devlog-spring-boot와-웹서버
 ---

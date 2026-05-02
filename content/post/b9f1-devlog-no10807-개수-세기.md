@@ -5,10 +5,10 @@ title: No.10807 개수 세기
 description: baekjoon, Java
 author: Nine
 date: 2025-11-17T19:00:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

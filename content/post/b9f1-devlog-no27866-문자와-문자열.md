@@ -5,10 +5,10 @@ title: No.27866 문자와 문자열
 description: baekjoon, Java
 author: Nine
 date: 2025-12-25T05:00:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

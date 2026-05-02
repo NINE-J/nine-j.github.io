@@ -5,10 +5,10 @@ title: 당신은 5년 차인가요, 1년 차 5번인가요?
 description: 5년 차 자바 경력이 단 60분의 면접으로 무너졌다
 author: Nine
 date: 2026-01-04T14:54:18
-categories:
+categories: 
   - Backend
   - Insight
-tags:
+tags: 
   - devlog
   - Java
   - Spring
@@ -23,7 +23,7 @@ tags:
   - 회고
   - Insight
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c239-7485-a1d1-63169126e55e
 slug: b9f1-devlog-당신은-5년-차인가요-1년-차-5번인가요
 ---

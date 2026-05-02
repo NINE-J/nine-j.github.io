@@ -5,16 +5,16 @@ title: Git Stash
 description: 지금 커밋하고 싶지 않아!
 author: Nine
 date: 2025-03-30T00:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - 형상관리
   - VersionControl
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1cd-76dd-bef9-ed8ffd578261
 slug: b9f1-devlog-git-stash
 ---

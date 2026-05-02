@@ -5,9 +5,9 @@ title: 봄 모니터링 지표
 description: feat.Prometheus&Grafana
 author: Nine
 date: 2025-06-17T18:49:24
-categories:
+categories: 
   - SpringBoot
-tags:
+tags: 
   - devlog
   - Prometheus
   - Grafana
@@ -19,7 +19,7 @@ tags:
   - 가시성
   - DevOps
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2ca-712e-8c33-75b23ad2ca9a
 slug: b9f1-devlog-봄-모니터링-지표
 ---
@@ -219,7 +219,7 @@ grafana     | logger=settings t=2025-06-17T12:40:19.581230583Z level=info msg="C
 
 ### Prometheus UI
 
-`http://localhost:9090`으로 접속했다면 `Status > Targets`의 타겟 상태가 UP 상태로 잘 올라와 있는지 확인한다.
+`http://localhost:9090`으로 접속했다면 `status > Targets`의 타겟 상태가 UP 상태로 잘 올라와 있는지 확인한다.
 
 ![](/assets/images/2025-06-17-SpringBoot-Metrics-Monitoring-with-Prometheus-and-Grafana-image02.png)
 
@@ -263,7 +263,7 @@ grafana     | logger=settings t=2025-06-17T12:40:19.581230583Z level=info msg="C
 
 #### yml? yaml?
 
-`yaml` 확장자로 했을 때 Prometheus Status 잘 올라오지 않았고 별다른 설정 문제가 아니라면 기본적으로 찾게되는 확장자가 `yml`인가 싶어 변경했더니 잘 올라왔다.
+`yaml` 확장자로 했을 때 Prometheus status 잘 올라오지 않았고 별다른 설정 문제가 아니라면 기본적으로 찾게되는 확장자가 `yml`인가 싶어 변경했더니 잘 올라왔다.
 
 > \[!INFO] Gemini
 > YAML과 YML은 ==파일 확장자만 다를 뿐, 본질적으로 같은 것을 가리킵니다==. YAML은 "YAML Ain't Markup Language"의 약자로, 사람이 읽기 쉬운 데이터 직렬화 언어입니다.

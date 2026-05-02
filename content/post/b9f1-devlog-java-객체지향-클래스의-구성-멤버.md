@@ -5,17 +5,17 @@ title: "Java 객체지향: 클래스의 구성 멤버"
 description: 필드, 생성자, 메서드를 이해한다.
 author: Nine
 date: 2025-03-29T00:00:00
-categories:
+categories: 
   - Java
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - Class
   - 객체지향
   - OOP
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23c-744c-927c-5ed16e76e50e
 slug: b9f1-devlog-java-객체지향-클래스의-구성-멤버
 ---

@@ -5,17 +5,17 @@ title: Spring MVC
 description: Controller VS RestController
 author: Nine
 date: 2025-05-18T15:20:00
-categories:
+categories: 
   - Spring
   - 문법
-tags:
+tags: 
   - devlog
   - Spring
   - Spring-MVC
   - Controller
   - RestController
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2b0-740c-9404-50af02208b37
 slug: b9f1-devlog-spring-mvc
 ---

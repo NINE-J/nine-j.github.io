@@ -5,16 +5,16 @@ title: Git을 사용한 형상 관리 전략
 description: 변경을 추적하고 체계적으로 관리하기 위한 전략
 author: Nine
 date: 2022-01-14T10:00:00
-categories:
+categories: 
   - VersionControl
   - Git
-tags:
+tags: 
   - devlog
   - 형상관리
   - VersionControl
   - Git
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c325-7769-b60b-d45404fcb6d3
 slug: b9f1-devlog-git을-사용한-형상-관리-전략
 ---

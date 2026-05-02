@@ -5,10 +5,10 @@ title: "Java 객체지향: 오버로드와 오버라이딩"
 description: 오버로드와 오버라이딩의 차이를 안다.
 author: Nine
 date: 2025-03-29T00:00:00
-categories:
+categories: 
   - Java
   - 객체지향
-tags:
+tags: 
   - devlog
   - Java
   - 객체지향
@@ -16,7 +16,7 @@ tags:
   - Overload
   - Override
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c23d-71e2-b857-65e81c8b4a0e
 slug: b9f1-devlog-java-객체지향-오버로드와-오버라이딩
 ---

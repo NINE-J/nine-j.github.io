@@ -5,14 +5,14 @@ title: Buffer란 무엇인가?
 description: 컴퓨터 과학에서 버퍼 이해하기
 author: Nine
 date: 2025-04-11T00:00:00
-categories:
+categories: 
   - CS
-tags:
+tags: 
   - devlog
   - CS
   - Buffer
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1a5-73d9-8724-4415bd43ebb9
 slug: b9f1-devlog-buffer란-무엇인가
 ---

@@ -5,14 +5,14 @@ title: Spring 왜 태어났을까?
 description: Java 생태계의 한계를 돌파한 IoC의 미학
 author: Nine
 date: 2025-04-21T00:00:00
-categories:
+categories: 
   - Spring
-tags:
+tags: 
   - devlog
   - Spring
   - Framework
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2ac-737b-a0b3-ba3774b27c9d
 slug: b9f1-devlog-spring-왜-태어났을까
 ---

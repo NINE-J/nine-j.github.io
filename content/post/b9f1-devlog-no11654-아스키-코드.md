@@ -5,10 +5,10 @@ title: No.11654 아스키 코드
 description: baekjoon, Java
 author: Nine
 date: 2025-11-19T15:20:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

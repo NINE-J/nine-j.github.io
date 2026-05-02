@@ -5,10 +5,10 @@ title: PCCE 기출문제 9번 - 지폐 접기
 description: programmers, Java
 author: Nine
 date: 2026-01-23T09:00:00
-categories:
+categories: 
   - 알고리즘
   - 프로그래머스
-tags:
+tags: 
   - algorithms
   - programmers
   - lv1

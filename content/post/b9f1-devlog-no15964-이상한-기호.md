@@ -5,10 +5,10 @@ title: No.15964 이상한 기호
 description: baekjoon, Java
 author: Nine
 date: 2025-12-25T06:30:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

@@ -5,10 +5,10 @@ title: 웹 API 진화의 핵심 전환
 description: 왜 우리는 REST를 선택했는가
 author: Nine
 date: 2025-05-20T13:23:57
-categories:
+categories: 
   - CS
   - Network
-tags:
+tags: 
   - devlog
   - SOAP
   - RESTful
@@ -19,7 +19,7 @@ tags:
   - JSON
   - HTTP
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2d3-74ce-b127-e6ce0ee2a85d
 slug: b9f1-devlog-웹-api-진화의-핵심-전환
 ---

@@ -5,10 +5,10 @@ title: No.2738 행렬 덧셈
 description: baekjoon, Java
 author: Nine
 date: 2025-11-19T12:50:00
-categories:
+categories: 
   - 알고리즘
   - 백준
-tags:
+tags: 
   - algorithms
   - baekjoon
   - Bronze

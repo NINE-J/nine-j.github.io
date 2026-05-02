@@ -5,10 +5,10 @@ title: 로컬 캐시 vs 분산 캐시
 description: 선택 기준과 실무 활용
 author: Nine
 date: 2025-08-30T13:25:20
-categories:
+categories: 
   - Backend
   - Cache
-tags:
+tags: 
   - devlog
   - LocalCache
   - DistributedCache
@@ -20,7 +20,7 @@ tags:
   - Redis
   - 성능최적화
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c1e0-777c-939e-d22976ed3cbd
 slug: b9f1-devlog-로컬-캐시-vs-분산-캐시
 ---

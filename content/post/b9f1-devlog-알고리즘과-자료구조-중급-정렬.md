@@ -5,10 +5,10 @@ title: "알고리즘과 자료구조: 중급 정렬"
 description: 중급 정렬을 이해할 수 있다.
 author: Nine
 date: 2025-02-10T00:00:00
-categories:
+categories: 
   - 알고리즘
   - 이론
-tags:
+tags: 
   - devlog
   - algorithms
   - 알고리즘
@@ -21,7 +21,7 @@ tags:
   - quick-sort
   - heap-sort
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c192-7769-a126-fe81c35db5aa
 slug: b9f1-devlog-알고리즘과-자료구조-중급-정렬
 ---

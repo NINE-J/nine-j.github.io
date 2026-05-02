@@ -5,9 +5,9 @@ title: "@RestController 요청이 응답으로 반환되기까지"
 description: feat.HttpMessageConverter
 author: Nine
 date: 2025-05-21T21:28:02
-categories:
+categories: 
   - SpringBoot
-tags:
+tags: 
   - devlog
   - SpringBoot
   - RestController
@@ -17,7 +17,7 @@ tags:
   - request-response-lifecycle
   - Spring-MVC
 # image: 
-Status: Done
+status: Done
 id: 019ce76a-c2bb-76af-b607-32a8d59ad4e7
 slug: b9f1-devlog-restcontroller-요청이-응답으로-반환되기까지
 ---
