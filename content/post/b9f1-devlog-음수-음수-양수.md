@@ -6,7 +6,7 @@ description: 태세전환 뭔데
 author: Nine
 date: 2025-12-08T23:00:00
 categories: 
-  - 수학
+  - Math
   - 수의체계
 tags: 
   - devlog

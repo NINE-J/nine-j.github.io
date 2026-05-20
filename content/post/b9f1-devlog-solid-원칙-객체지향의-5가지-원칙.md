@@ -6,8 +6,8 @@ description: 더 유연한 소프트웨어를 위한 설계 지침
 author: Nine
 date: 2025-04-07T00:00:00
 categories: 
-  - 설계
-  - 객체지향
+  - Design
+  - OOP
 tags: 
   - devlog
   - SOLID

@@ -6,7 +6,7 @@ description: 코사인 법칙이 성립하는 이유
 author: Nine
 date: 2025-03-13T00:00:00
 categories: 
-  - 수학
+  - Math
   - 삼각함수
 tags: 
   - devlog

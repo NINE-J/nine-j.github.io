@@ -6,7 +6,7 @@ description: feat.Mockito, Mock, Spy
 author: Nine
 date: 2025-06-21T23:29:50
 categories: 
-  - 설계
+  - Design
   - TDD
 tags: 
   - devlog

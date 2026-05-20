@@ -6,7 +6,7 @@ description: 삼각형에서 변과 각의 관계를 이해하는 핵심 법칙
 author: Nine
 date: 2025-03-15T00:00:00
 categories: 
-  - 수학
+  - Math
   - 삼각함수
 tags: 
   - devlog

@@ -6,7 +6,7 @@ description: 중복 없는 계층별 검증 전략과 트레이드오프 분석
 author: Nine
 date: 2025-06-21T21:08:37
 categories: 
-  - 설계
+  - Design
   - TDD
 tags: 
   - devlog

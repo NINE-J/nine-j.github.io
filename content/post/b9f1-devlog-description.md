@@ -4,21 +4,20 @@ draft: true
 title: 
 description: 
 author: Nine
-date: 2025-12-30T14:26:13
+date: 2026-01-05T00:00:00
 categories: 
 tags: 
   - devlog
 # image: 
 status: ToDo
-id: 019ce76a-c33f-77ab-b0ad-0b9b818a8739
+id: 019ce76a-c310-719d-8136-7c999e228e77
 slug: b9f1-devlog-description
 ---
 
 ## 📌개요
 
-devlog를 작성하게 된 계기와 현재 포스팅에서 다룰 내용을 간략히 소개한다.
-
-데이터 중심 애플리케이션 설계 1장 \~ 12장까지 각 장마다 학습하며 리뷰 작성
+MSA 찬양론이 대두되던 시기부터 회의론에 이르기까지 다양한 기사와 유튜브 영상을 여러 건 접하고 나서 드는 복잡한 감정.
+AI의 발전과 AX를 학습과 업무 프로세스에 녹여내는 속도가 중요한 시대에서 기술적 깊이가 더 요구되는 시점에 이젠 무엇을 준비해야 하는지 AX 시대의 관점에서 본 대안
 
 ## 📌내용
 

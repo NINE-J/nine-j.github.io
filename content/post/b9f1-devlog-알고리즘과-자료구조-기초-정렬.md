@@ -6,7 +6,7 @@ description: 기초 정렬을 이해할 수 있다.
 author: Nine
 date: 2025-02-09T00:00:00
 categories: 
-  - 알고리즘
+  - Algorithms
   - 이론
 tags: 
   - devlog

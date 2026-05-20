@@ -6,7 +6,7 @@ description: 데이터의 크기가 1백만 개 이상이라면?
 author: Nine
 date: 2025-04-18T00:00:00
 categories: 
-  - 알고리즘
+  - Algorithms
 tags: 
   - devlog
   - algorithms

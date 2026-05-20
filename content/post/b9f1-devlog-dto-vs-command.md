@@ -6,8 +6,8 @@ description: Request를 그대로 사용하지 말자
 author: Nine
 date: 2025-05-24T17:17:02
 categories: 
-  - 설계
-  - 객체지향
+  - Design
+  - OOP
 tags: 
   - devlog
   - Java
