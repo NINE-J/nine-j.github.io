@@ -8,7 +8,7 @@ description: PoC 기획 회고
 author: Nine
 date: 2026-05-22
 categories:
-  - Backend
+  - Product
 tags:
   - devlog
   - PoC
