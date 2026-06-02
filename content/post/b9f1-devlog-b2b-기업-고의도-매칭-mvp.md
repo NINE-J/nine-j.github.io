@@ -1,6 +1,6 @@
 ---
 id: 019e81dc-6fdd-7fe2-97a5-09f53e1f2d3d
-slug:
+slug: b9f1-devlog-b2b-기업-고의도-매칭-mvp
 publish: true
 draft: false
 title: B2B 기업 고의도 매칭 MVP
