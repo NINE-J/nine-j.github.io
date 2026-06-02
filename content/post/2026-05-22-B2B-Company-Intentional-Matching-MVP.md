@@ -1,9 +1,9 @@
 ---
 id: 019e81dc-6fdd-7fe2-97a5-09f53e1f2d3d
 slug:
-publish: false
-draft: true
-title: 기업 고의도 매칭 MVP
+publish: true
+draft: false
+title: B2B 기업 고의도 매칭 MVP
 description: PoC 기획 회고
 author: Nine
 date: 2026-05-22
@@ -20,7 +20,7 @@ tags:
   - Prisma
   - PostgreSQL
 # image: 
-status: ToDo
+status: Done
 ---
 
 ## 📌개요
