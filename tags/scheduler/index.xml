@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Scheduler on B9F1</title><link>https://blog.b9f1.com/tags/scheduler/</link><description>Recent content in Scheduler on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 22 May 2026 00:00:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/scheduler/index.xml" rel="self" type="application/rss+xml"/><item><title>B2B 기업 고의도 매칭 MVP</title><link>https://blog.b9f1.com/p/b9f1-devlog-b2b-%EA%B8%B0%EC%97%85-%EA%B3%A0%EC%9D%98%EB%8F%84-%EB%A7%A4%EC%B9%AD-mvp/</link><pubDate>Fri, 22 May 2026 00:00:00 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-b2b-%EA%B8%B0%EC%97%85-%EA%B3%A0%EC%9D%98%EB%8F%84-%EB%A7%A4%EC%B9%AD-mvp/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;이번 프로젝트는 &amp;ldquo;기업 목록을 많이 모으는 서비스&amp;quot;가 아니라, 특정 고객이 지금 연락할 만한 기업과 그 이유를 설명하는 B2B 고의도 매칭 PoC다. 처음에는 수집기, API, 화면, DB, AWS 배포가 모두 중요해 보였지만, 스프린트를 거치며 핵심 질문은 더 좁아졌다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;고객은 왜 이 기업을 지금 봐야 하는가?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;이 질문에 답하려면 BM보다 먼저 증명 순서를 정해야 했다. 돈을 받을 수 있는 기능을 상상하는 것과, 그 기능이 신뢰 가능한 데이터 흐름으로 반복 실행되는 것을 증명하는 일은 다르다. 이번 프로젝트의 PoC는 후자에 가깝다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="1-bm-구상은-기능-목록보다-고객-행동에서-시작해야-했다"&gt;1. BM 구상은 기능 목록보다 고객 행동에서 시작해야 했다
+&lt;/h3&gt;&lt;p&gt;초기 아이디어는 &amp;ldquo;공식/공개 데이터에서 기업 정보를 수집하고 매칭한다&amp;quot;는 형태였다. 하지만 이 표현만으로는 BM이 약하다. 기업 데이터 자체는 상품이 되기 어렵고, 고객은 데이터베이스를 사는 것이 아니라 다음 영업 행동의 근거를 산다.&lt;/p&gt;
+&lt;p&gt;프로젝트의 BM 가설은 다음처럼 좁혀졌다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;고객은 많은 기업 목록보다 &amp;ldquo;지금 연락할 이유가 있는 기업&amp;quot;을 원한다.&lt;/li&gt;
+&lt;li&gt;추천 결과는 점수만 있으면 부족하고, source, event, signal, evidence가 따라와야 한다.&lt;/li&gt;
+&lt;li&gt;고객 화면에는 raw identifier나 내부 수집 payload를 노출하지 않아야 한다.&lt;/li&gt;
+&lt;li&gt;PoC 단계에서는 매출 모델보다 &amp;ldquo;상위 리드가 설명 가능한가&amp;quot;를 먼저 증명해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;그래서 판매 단위는 단순한 크롤링 결과가 아니라, &amp;ldquo;고객 프로필 기준 lead ranking + 근거 bundle + 검증 상태&amp;quot;에 가깝다. 이 관점이 잡히자 &lt;code&gt;/companies&lt;/code&gt; 호환성, &lt;code&gt;/leads&lt;/code&gt; evidence surface, readiness gate의 우선순위가 분명해졌다.&lt;/p&gt;
+&lt;h3 id="2-poc는-크게-만들수록-약해졌다"&gt;2. PoC는 크게 만들수록 약해졌다
+&lt;/h3&gt;&lt;p&gt;스프린트 초반에는 source-neutral staging, audit, score history, evidence graph, raw access audit 같은 확장 구조가 계속 등장했다. 모두 언젠가는 필요할 수 있지만, PoC에서 한 번에 넣으면 검증해야 할 표면이 너무 넓어진다.&lt;/p&gt;
+&lt;p&gt;그래서 MVP-first 방향으로 줄였다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;구분&lt;/th&gt;
+&lt;th&gt;PoC에서 먼저 증명할 것&lt;/th&gt;
+&lt;th&gt;뒤로 미룬 것&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;고객 가치&lt;/td&gt;
+&lt;td&gt;상위 lead와 연락 이유&lt;/td&gt;
+&lt;td&gt;완전한 CRM/영업 자동화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;데이터 모델&lt;/td&gt;
+&lt;td&gt;company, source, event, signal, match 중심 canonical ERD&lt;/td&gt;
+&lt;td&gt;모든 raw/staging/audit 세분화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;검증&lt;/td&gt;
+&lt;td&gt;top N lead evidence와 raw exposure 차단&lt;/td&gt;
+&lt;td&gt;전 source 완전 자동 검증&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;인프라&lt;/td&gt;
+&lt;td&gt;scheduler, job state, artifact/import contract&lt;/td&gt;
+&lt;td&gt;모든 crawler worker 운영 자동화&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;DB&lt;/td&gt;
+&lt;td&gt;PostgreSQL canonical schema와 Prisma migration boundary&lt;/td&gt;
+&lt;td&gt;모든 query의 즉시 Prisma 전환&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;이 선택은 기능을 포기한 것이 아니라, PoC가 대답해야 하는 질문을 줄인 것이다. &amp;ldquo;이 데이터 흐름이 고객에게 믿을 만한 추천을 만들 수 있는가?&amp;ldquo;를 확인하기 전에는 더 넓은 플랫폼 구조가 오히려 판단을 흐린다.&lt;/p&gt;
+&lt;h3 id="3-데이터-관리-전략은-raw-수집보다-경계-설정이-중요했다"&gt;3. 데이터 관리 전략은 raw 수집보다 경계 설정이 중요했다
+&lt;/h3&gt;&lt;p&gt;가장 중요한 데이터 전략은 &amp;ldquo;무엇을 모을 것인가&amp;quot;보다 &amp;ldquo;어디까지 고객에게 보여줄 것인가&amp;quot;였다. crawler가 가져오는 raw 데이터, source별 payload, BRN/CRN 같은 identifier, internal job log는 모두 유용하지만 같은 성격의 데이터가 아니다.&lt;/p&gt;
+&lt;p&gt;현재 정리된 방향은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;source adapter는 source별 해석과 evidence URL, source company key, 실패 reason code를 책임진다.&lt;/li&gt;
+&lt;li&gt;common ingestion layer는 canonical upsert, idempotency, artifact linkage를 책임진다.&lt;/li&gt;
+&lt;li&gt;raw/enriched/rejected artifact는 manifest, checksum, row count, redaction status와 함께 관리한다.&lt;/li&gt;
+&lt;li&gt;customer API는 raw payload가 아니라 evidence summary, match reason, verification level, reviewRequired를 보여준다.&lt;/li&gt;
+&lt;li&gt;migration은 app startup side effect가 아니라 deploy gate를 통해 명시적으로 수행한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이 경계가 있어야 수집기가 늘어나도 API와 고객 화면이 흔들리지 않는다. 반대로 이 경계가 없으면 crawler가 DB에 직접 쓰고, API가 source-specific payload에 기대고, 고객 화면이 내부 구현에 묶인다.&lt;/p&gt;
+&lt;h3 id="4-prisma와-postgresql은-멋진-orm-도입이-아니라-운영-경계-문제였다"&gt;4. Prisma와 PostgreSQL은 &amp;ldquo;멋진 ORM 도입&amp;quot;이 아니라 운영 경계 문제였다
+&lt;/h3&gt;&lt;p&gt;Prisma를 다룬 이유는 단순히 ORM을 쓰기 위해서가 아니었다. 핵심은 canonical schema ownership과 migration ownership을 명확히 하는 것이었다.&lt;/p&gt;
+&lt;p&gt;PostgreSQL은 여전히 프로젝트의 중심이다. 복잡한 JSONB/LATERAL query나 이미 안정화된 경로는 &lt;code&gt;pg&lt;/code&gt;가 남을 수 있다. 다만 schema와 migration history는 Prisma Migrate를 통해 deploy gate에서 관리하도록 정리했다.&lt;/p&gt;
+&lt;p&gt;이 결정은 다음 효과를 만든다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;schema 변경의 책임자가 분명해진다.&lt;/li&gt;
+&lt;li&gt;운영 DB migration이 app startup에 숨어 실행되지 않는다.&lt;/li&gt;
+&lt;li&gt;점진적으로 Prisma read path를 늘릴 수 있다.&lt;/li&gt;
+&lt;li&gt;기존 API compatibility를 지키면서 내부 모델을 정리할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;데이터 관리 전략에서 중요한 것은 도구 자체가 아니라, 변경이 언제 누구의 승인으로 어떤 증거를 남기며 반영되는가였다.&lt;/p&gt;
+&lt;h3 id="5-다음-증명은-crawler-worker-artifactimport-smoke다"&gt;5. 다음 증명은 crawler worker artifact/import smoke다
+&lt;/h3&gt;&lt;p&gt;백엔드 서버의 기초 구성, 인프라 구성과 CI/CD를 자동화한 후 결론은 &amp;ldquo;서버 쪽 안전장치와 migration/scheduler 경계는 정리되었지만, 실제 crawler worker가 artifact를 만들고 importer가 고객 surface까지 반영하는 end-to-end proof는 아직 남아 있다&amp;quot;는 것이다.&lt;/p&gt;
+&lt;p&gt;다음 PoC 증명은 기능 추가보다 증거 연결에 가깝다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;승인된 crawler worker가 실행되거나 안정적인 blocker를 반환한다.&lt;/li&gt;
+&lt;li&gt;API job row, external run reference, CloudWatch log, artifact manifest가 하나의 job id로 연결된다.&lt;/li&gt;
+&lt;li&gt;manifest에 checksum, row count, redaction status, source window, created_at이 남는다.&lt;/li&gt;
+&lt;li&gt;importer가 artifact를 replay하거나 명시적으로 defer한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/leads&lt;/code&gt; 또는 debug/customer-safe surface에서 raw identifier 없이 evidence flow가 보인다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이 단계가 통과되면 파이프라인은 &amp;ldquo;수집한다&amp;quot;가 아니라 &amp;ldquo;수집 결과를 검증 가능한 고객 가치로 승격한다&amp;quot;는 말에 가까워진다.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;핵심은 BM 아이디어를 크게 말하는 것이 아니라, 고객이 믿고 다음 행동을 할 수 있는 최소 증거 흐름을 만드는 것이다. PoC는 기능을 많이 붙이는 단계가 아니라, 데이터가 source에서 artifact, import, canonical DB, lead evidence까지 안전하게 이동한다는 것을 증명하는 단계다.&lt;/p&gt;
+&lt;p&gt;그래서 지금의 우선순위는 명확하다. 더 많은 source를 붙이기 전에 crawler worker artifact/import smoke를 끝내고, 상위 lead가 설명 가능한지 확인해야 한다. 그 다음에야 BM, 가격, 고객군, 자동화 범위를 자신 있게 말할 수 있다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;PoC: 완성 제품이 아니라 핵심 가설을 검증하기 위한 최소 구현.&lt;/li&gt;
+&lt;li&gt;BM: Business Model. 고객에게 어떤 가치를 어떤 방식으로 판매할지에 대한 구조.&lt;/li&gt;
+&lt;li&gt;Canonical schema: 여러 source에서 온 데이터를 내부 기준 모델로 정리한 DB 구조.&lt;/li&gt;
+&lt;li&gt;Artifact: crawler나 batch가 만든 JSONL/CSV/manifest 같은 재처리 가능한 산출물.&lt;/li&gt;
+&lt;li&gt;Manifest: source window, checksum, row count, redaction status처럼 artifact의 신뢰성을 설명하는 메타데이터.&lt;/li&gt;
+&lt;li&gt;Readiness gate: 고객에게 보여주기 전 lineage, evidence, raw exposure, freshness를 확인하는 검증 절차.&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

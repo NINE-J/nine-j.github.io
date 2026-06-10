@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>권한-설정 on B9F1</title><link>https://blog.b9f1.com/tags/%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95/</link><description>Recent content in 권한-설정 on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 15 Oct 2025 18:30:33 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/%EA%B6%8C%ED%95%9C-%EC%84%A4%EC%A0%95/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 멀티 SSH 키 관리</title><link>https://blog.b9f1.com/p/b9f1-devlog-git-%EB%A9%80%ED%8B%B0-ssh-%ED%82%A4-%EA%B4%80%EB%A6%AC/</link><pubDate>Wed, 15 Oct 2025 18:30:33 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-git-%EB%A9%80%ED%8B%B0-ssh-%ED%82%A4-%EA%B4%80%EB%A6%AC/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;PC에서 여러 GitHub 계정과 프로젝트에서 SSH 키를 효율적으로 관리하는 방법을 정리한다.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="ssh-키-구성-예시"&gt;SSH 키 구성 예시
+&lt;/h3&gt;&lt;h4 id="ssh-키-파일들"&gt;SSH 키 파일들
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519 &lt;span class="c1"&gt;# 기본/개인 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519.pub &lt;span class="c1"&gt;# 기본/개인 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company &lt;span class="c1"&gt;# 회사 계정용 개인 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;├── id_ed25519_company.pub &lt;span class="c1"&gt;# 회사 계정용 공개 키&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;└── config &lt;span class="c1"&gt;# SSH 설정 파일&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="ssh-config-설정-sshconfig"&gt;SSH Config 설정 (&lt;code&gt;~/.ssh/config&lt;/code&gt;)
+&lt;/h4&gt;
+&lt;div class="admonition tip"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"&gt;&lt;path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Tip&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 경로는 대부분의 OS에서 사용자 폴더를 의미한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 GitHub 설정 (개인 계정용)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 설정 (기본과 동일, 필요 시 변경)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정용 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="사용-방법"&gt;사용 방법
+&lt;/h3&gt;&lt;h4 id="1-기본-사용"&gt;1. 기본 사용
+&lt;/h4&gt;&lt;p&gt;일반적인 GitHub URL을 그대로 사용:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com:username/my-project.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-명시적-개인-계정-사용"&gt;2. 명시적 개인 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-personal:username/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-회사-계정-사용"&gt;3. 회사 계정 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote add origin git@github.com-company:CompanyOrg/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="새로운-계정키-추가-방법"&gt;새로운 계정/키 추가 방법
+&lt;/h3&gt;&lt;h4 id="1-새-ssh-키-생성"&gt;1. 새 SSH 키 생성
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-keygen -t ed25519 -C &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt; -f ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="2-ssh-config에-설정-추가"&gt;2. SSH Config에 설정 추가
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# ~/.ssh/config에 추가&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_newaccount
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="3-github에-공개-키-등록"&gt;3. GitHub에 공개 키 등록
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 내용 복사&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;cat ~/.ssh/id_ed25519_newaccount.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;GitHub Settings &amp;gt; SSH and GPG keys&lt;/code&gt;에서 등록&lt;/p&gt;
+&lt;h4 id="4-사용"&gt;4. 사용
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone git@github.com-newaccount:NewAccount/repository-name.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ssh-연결-테스트"&gt;SSH 연결 테스트
+&lt;/h3&gt;&lt;p&gt;각 계정별로 SSH 연결을 테스트할 수 있다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 기본 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 계정 명시적 테스트&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-personal
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 회사 계정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com-company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;성공시 다음과 같은 메시지가 출력된다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Hi [계정명]! You&amp;#39;ve successfully authenticated, but GitHub does not provide shell access.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="프로젝트별-설정-확인"&gt;프로젝트별 설정 확인
+&lt;/h3&gt;&lt;p&gt;현재 프로젝트가 어떤 SSH 키를 사용하는지 확인&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git config --list &lt;span class="p"&gt;|&lt;/span&gt; grep remote.origin.url
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="권한-설정"&gt;권한 설정
+&lt;/h3&gt;&lt;p&gt;SSH 파일들의 올바른 권한 설정은 &lt;strong&gt;Unix/Linux 기반 시스템에서 필수&lt;/strong&gt;다.&lt;/p&gt;
+&lt;h4 id="권한-설정이-필요한-환경"&gt;권한 설정이 필요한 환경
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;✅ &lt;strong&gt;Linux/Ubuntu&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;macOS&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;WSL (Windows Subsystem for Linux)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;Docker 컨테이너&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;✅ &lt;strong&gt;개발 컨테이너 (Dev Container)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;❌ &lt;strong&gt;Windows 네이티브&lt;/strong&gt; (NTFS 권한으로 자동 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="windows-vs-unixlinux-차이점"&gt;Windows vs Unix/Linux 차이점
+&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;환경&lt;/th&gt;
+&lt;th&gt;권한 시스템&lt;/th&gt;
+&lt;th&gt;SSH 권한 설정&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Windows 네이티브&lt;/td&gt;
+&lt;td&gt;NTFS ACL&lt;/td&gt;
+&lt;td&gt;불필요 (자동)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WSL/Linux/macOS&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Docker/Dev Container&lt;/td&gt;
+&lt;td&gt;Unix 권한&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;필수&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id="windows에서-ssh-사용하기"&gt;Windows에서 SSH 사용하기
+&lt;/h4&gt;&lt;h5 id="windows-네이티브-환경"&gt;Windows 네이티브 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-powershell" data-lang="powershell"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# PowerShell 또는 Command Prompt에서&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키 생성&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;ssh-keygen&lt;/span&gt; &lt;span class="n"&gt;-t&lt;/span&gt; &lt;span class="n"&gt;ed25519&lt;/span&gt; &lt;span class="n"&gt;-C&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;your-email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# SSH 키는 보통 C:\Users\[username]\.ssh\ 에 저장&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# 권한 설정은 Windows가 자동으로 관리&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Windows 네이티브 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;chmod&lt;/code&gt; 명령어 없음&lt;/li&gt;
+&lt;li&gt;NTFS 권한으로 자동 관리&lt;/li&gt;
+&lt;li&gt;SSH 클라이언트가 적절한 권한 자동 설정&lt;/li&gt;
+&lt;li&gt;수동 권한 설정 불필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id="wsl-환경"&gt;WSL 환경
+&lt;/h5&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# WSL에서는 Linux와 동일하게 권한 설정 필요&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;WSL 특징:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linux 파일 시스템 사용&lt;/li&gt;
+&lt;li&gt;Unix 권한 모델 적용&lt;/li&gt;
+&lt;li&gt;권한 설정 필수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="macos-darwin"&gt;macOS: Darwin
+&lt;/h3&gt;&lt;h4 id="ssh가-권한을-엄격하게-요구하는-이유-unixlinux"&gt;SSH가 권한을 엄격하게 요구하는 이유 (Unix/Linux)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Unix/Linux 시스템에서 SSH가 엄격한 권한을 요구하는 이유:
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;보안 정책&lt;/strong&gt;: 개인 키가 다른 사용자에게 노출되는 것을 방지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;인증 무결성&lt;/strong&gt;: 권한이 올바르지 않으면 SSH 연결 자체가 거부됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;파일 보호&lt;/strong&gt;: 중요한 인증 정보의 무단 접근 차단&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="올바른-권한-설정"&gt;올바른 권한 설정
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# SSH 디렉토리 권한 (소유자만 접근 가능)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# config 파일 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 개인 키 파일들 권한 (소유자만 읽기/쓰기)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 공개 키 파일들 권한 (소유자 읽기/쓰기, 다른 사용자 읽기만)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 소유권 설정 (현재 사용자로 설정)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="권한-확인"&gt;권한 확인
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 권한 상태 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 올바른 출력 예시:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# drwx------ (700) 소유자만 SSH 디렉토리 접근&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw------- (600) 소유자만 개인 키/config 파일 접근 &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# -rw-r--r-- (644) 공개 키는 다른 사용자도 읽기 가능&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="문제-해결"&gt;문제 해결
+&lt;/h3&gt;&lt;h4 id="권한-오류-해결"&gt;권한 오류 해결
+&lt;/h4&gt;&lt;p&gt;오류 메시지&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Bad owner or permissions on /home/node/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;원인:&lt;/strong&gt; SSH 파일들의 권한이 너무 개방적이거나 소유권이 잘못됨&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해결 단계:&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;권한 확인&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ls -la ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한이 &lt;code&gt;777&lt;/code&gt; (rwxrwxrwx)인 경우 수정&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;소유권 문제인 경우&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;권한 설정 후 테스트&lt;/strong&gt;:
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="ssh-키가-인식되지-않는-경우"&gt;SSH 키가 인식되지 않는 경우
+&lt;/h4&gt;&lt;p&gt;SSH Agent에 키 추가&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;ssh-agent -s&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh-add ~/.ssh/id_ed25519_company
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="잘못된-키-사용"&gt;잘못된 키 사용
+&lt;/h4&gt;&lt;p&gt;원격 URL 확인 및 수정&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 현재 설정 확인&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 원격 URL 변경&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git remote set-url origin git@github.com-&lt;span class="o"&gt;[&lt;/span&gt;account&lt;span class="o"&gt;]&lt;/span&gt;:owner/repository.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="예시-프로젝트-설정"&gt;예시 프로젝트 설정
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;my-blog&lt;/strong&gt;: 기본 설정 사용 (&lt;code&gt;git@github.com:username/my-blog.git&lt;/code&gt;)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH 키: &lt;code&gt;~/.ssh/id_ed25519&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;GitHub 계정: 개인 계정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="확장-계획"&gt;확장 계획
+&lt;/h3&gt;&lt;p&gt;향후 새로운 계정이나 프로젝트가 추가될 때는 패턴으로 관리&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Host github.com-&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;User git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;IdentityFile ~/.ssh/id_ed25519_&lt;span class="o"&gt;[&lt;/span&gt;account-name&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이를 통해 체계적이고 확장 가능한 SSH 키 관리가 가능하다.&lt;/p&gt;
+&lt;h3 id="현재-구성-검증"&gt;현재 구성 검증
+&lt;/h3&gt;&lt;p&gt;현재 SSH 구성이 올바르게 작동하는지 확인해본다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;권한 설정 (필수!)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 모든 권한을 한 번에 설정&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;700&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;600&lt;/span&gt; ~/.ssh/config ~/.ssh/id_*
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chmod &lt;span class="m"&gt;644&lt;/span&gt; ~/.ssh/*.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo chown -R &lt;span class="nv"&gt;$USER&lt;/span&gt;:&lt;span class="nv"&gt;$USER&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;SSH 연결 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh -T git@github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 성공시: &amp;#34;Hi [username]! You&amp;#39;ve successfully authenticated...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Git push 테스트&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;⚠️ 중요:&lt;/strong&gt; 권한 설정 없이는 SSH가 작동하지 않을 수 있다.
+&lt;code&gt;Bad owner or permissions&lt;/code&gt; 오류가 발생하면 반드시 위의 권한 설정을 먼저 수행하자.&lt;/p&gt;
+&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;로컬/WSL/컨테이너 등에서 SSH 충돌 없이 깔끔하게 멀티 계정을 운용하는 방법을 정리해봤다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;새 계정 추가는 키 생성, &lt;code&gt;~/.ssh/config&lt;/code&gt;에 Host 추가, 공개키 등록, &lt;code&gt;ssh -T&lt;/code&gt; 테스트, 원격 URL 설정의 5단계&lt;/li&gt;
+&lt;li&gt;WSL은 &lt;strong&gt;리눅스 홈 경로&lt;/strong&gt;에 &lt;code&gt;.ssh&lt;/code&gt;를 두고, 필요 시 &lt;code&gt;includeIf&lt;/code&gt;/&lt;code&gt;url.insteadOf&lt;/code&gt;로 &lt;strong&gt;디렉터리별 자동 라우팅&lt;/strong&gt;을 적용하면 실수할 일이 줄어든다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SSH 키 쌍&lt;/strong&gt;: &lt;code&gt;ed25519&lt;/code&gt;가 권장(짧고 안전, 빠름). 공개키는 등록·공유, 개인키는 비밀 유지.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH 설정 파일&lt;/strong&gt;: &lt;code&gt;~/.ssh/config&lt;/code&gt;로 Host 단위 설정(별칭, &lt;code&gt;IdentityFile&lt;/code&gt;, &lt;code&gt;IdentitiesOnly&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퍼미션 기초&lt;/strong&gt;: &lt;code&gt;~/.ssh&lt;/code&gt;(700), 개인키(600), 공개키/&lt;code&gt;config&lt;/code&gt;(644~600).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WSL/NTFS 차이&lt;/strong&gt;: NTFS 마운트 경로는 퍼미션 판정이 달라 OpenSSH가 거부할 수 있음. &lt;strong&gt;리눅스 홈&lt;/strong&gt; 사용.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;: 메모리 상에 키를 보관·서명. 키가 많으면 인증 실패가 늘어남 → &lt;code&gt;IdentitiesOnly&lt;/code&gt;로 해결.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 원격 URL 형태&lt;/strong&gt;: &lt;code&gt;git@HOST:OWNER/REPO.git&lt;/code&gt;(SCP 구문) 또는 &lt;code&gt;ssh://git@HOST/OWNER/REPO.git&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Git 라우팅 자동화(선택)&lt;/strong&gt;: &lt;code&gt;~/.gitconfig&lt;/code&gt;의 &lt;code&gt;includeIf&lt;/code&gt;(디렉터리 기준 설정), &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;(호스트 치환).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;GitHub Docs: &lt;em&gt;Connecting to GitHub with SSH&lt;/em&gt;, &lt;em&gt;About SSH certificate authorities&lt;/em&gt;, &lt;em&gt;Managing multiple accounts&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;OpenSSH Manual: &lt;code&gt;ssh(1)&lt;/code&gt;, &lt;code&gt;ssh_config(5)&lt;/code&gt;, &lt;code&gt;ssh-agent(1)&lt;/code&gt;, &lt;code&gt;ssh-add(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git Documentation: &lt;code&gt;git-config(1)&lt;/code&gt;(특히 &lt;code&gt;includeIf&lt;/code&gt;, &lt;code&gt;url.&amp;lt;base&amp;gt;.insteadOf&lt;/code&gt;), &lt;code&gt;git-remote(1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Microsoft Docs: &lt;em&gt;WSL 파일 권한 &amp;amp; NTFS 상호작용&lt;/em&gt; 가이드&lt;/li&gt;
+&lt;li&gt;보안 심화: &lt;em&gt;ed25519-sk&lt;/em&gt;(FIDO2/보안키 기반), &lt;code&gt;ProxyJump&lt;/code&gt;(점프호스트), &lt;code&gt;KnownHosts&lt;/code&gt; 고급 설정&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

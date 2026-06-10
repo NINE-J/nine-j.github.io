@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SpringAOP on B9F1</title><link>https://blog.b9f1.com/tags/springaop/</link><description>Recent content in SpringAOP on B9F1</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 18 May 2025 15:20:00 +0900</lastBuildDate><atom:link href="https://blog.b9f1.com/tags/springaop/index.xml" rel="self" type="application/rss+xml"/><item><title>Spring에서 AOP란</title><link>https://blog.b9f1.com/p/b9f1-devlog-spring%EC%97%90%EC%84%9C-aop%EB%9E%80/</link><pubDate>Sun, 18 May 2025 15:20:00 +0900</pubDate><guid>https://blog.b9f1.com/p/b9f1-devlog-spring%EC%97%90%EC%84%9C-aop%EB%9E%80/</guid><description>&lt;h2 id="개요"&gt;📌개요
+&lt;/h2&gt;&lt;p&gt;Spring에서 OOP(Object Oriented Programming) 만큼이나 강조되는 AOP(Aspect Oriented Programming)은 언제, 왜 필요할까?&lt;/p&gt;
+&lt;p&gt;또한 AOP와 OOP는 대립되는 개념이 아니라는 것.
+서로를 보완하며 강력한 설계를 가능케 하는지 알아보자.&lt;/p&gt;
+&lt;h2 id="내용"&gt;📌내용
+&lt;/h2&gt;&lt;h3 id="왜-aop가-필요한가"&gt;왜 AOP가 필요한가?
+&lt;/h3&gt;&lt;p&gt;Spring Framework의 핵심 철학은 POJO와 OOP 기반의 설계다.
+하지만 서비스가 복잡해질수록 로깅, 트랜잭션, 보안 등 공통 관심사가 여기저기 흩어져 코드를 어지럽힌다.&lt;/p&gt;
+&lt;p&gt;예를 들어 다음과 같은 로직을 생각해보자.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Transactional&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;createUser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;UserRequest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;사용자 생성 시작&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;validate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;userRepository&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;toEntity&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;사용자 생성 완료&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이 메서드는 핵심 기능 외에도 트랜잭션 처리, 로깅이라는 &lt;strong&gt;횡단 관심사(cross-cutting concerns)&lt;/strong&gt; 를 포함하고 있다.&lt;/p&gt;
+&lt;p&gt;이러한 코드가 여러 메서드에 중복되면 유지보수와 확장성이 심각하게 저하된다.
+AOP는 이런 문제를 해결하기 위해 등장했다.&lt;/p&gt;
+&lt;h4 id="로그인-감사-로깅"&gt;로그인 감사 로깅
+&lt;/h4&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-java" data-lang="java"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Aspect&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nd"&gt;@Component&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;LoginLoggingAspect&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nd"&gt;@Around&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;@annotation(com.example.annotation.Auditable)&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;public&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;logLogin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ProceedingJoinPoint&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;joinPoint&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;throws&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Throwable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;long&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentTimeMillis&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;joinPoint&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;proceed&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;[AUDIT] {} executed in {}ms&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;joinPoint&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getSignature&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentTimeMillis&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;사용자 정의 어노테이션 &lt;code&gt;@Auditable&lt;/code&gt;을 붙인 메서드에 감사 로깅이 적용된다.
+핵심 로직과 분리되어 있기 때문에 유지보수가 쉬워지고 로직이 더 깔끔해진다.&lt;/p&gt;
+&lt;h3 id="aop-vs-oop"&gt;AOP VS OOP
+&lt;/h3&gt;&lt;p&gt;AOP와 OOP는 결코 대립하지 않는다.
+오히려 상호 보완적이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OOP는 모듈화를 통해 도메인 개념을 캡슐화한다.&lt;/li&gt;
+&lt;li&gt;AOP는 횡단 관심사를 모듈화하여 코드 중복을 제거한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;AOP는 OOP만으로는 분리하기 어려운 공통 로직을 흩어지지 않게 모듈화하는 방식이다.
+즉, AOP는 OOP의 약점을 보완한다.&lt;/p&gt;
+&lt;h3 id="-재미있는-일화"&gt;💡 재미있는 일화
+&lt;/h3&gt;&lt;p&gt;Spring 초창기에는 AOP가 XML 설정 기반으로 매우 복잡했지만 지금은 &lt;code&gt;@Aspect&lt;/code&gt; 어노테이션만으로 매우 간단하게 적용할 수 있다.&lt;/p&gt;
+&lt;p&gt;JPA 트랜잭션 설정 없이 &lt;code&gt;@Transactional&lt;/code&gt; 하나만 붙였는데도 실제로 프록시 기반으로 트랜잭션이 관리된다는 사실을 알게 되었을 때, 마치 &amp;ldquo;마법 같다&amp;quot;는 반응이 많다.&lt;/p&gt;
+&lt;h4 id="spring-aop의-초기-xml-설정의-복잡성"&gt;Spring AOP의 초기 XML 설정의 복잡성
+&lt;/h4&gt;&lt;p&gt;Spring AOP의 초기 버전에서는 XML을 통해 AOP 설정을 해야 했다.
+예를 들어 &lt;a class="link" href="https://www.digitalocean.com/community/tutorials/spring-aop-example-tutorial-aspect-advice-pointcut-joinpoint-annotations" target="_blank" rel="noopener"
+&gt;DigitalOcean의 튜토리얼 - By Pankaj Kumar&lt;/a&gt;에서는 XML 기반 AOP 설정의 예시를 다음과 같이 보여준다.&lt;/p&gt;
+&lt;p&gt;이러한 설정은 복잡하고 유지보수가 어려웠겠지.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-xml" data-lang="xml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;aop:config&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;aop:aspect&lt;/span&gt; &lt;span class="na"&gt;ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;employeeXMLConfigAspect&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;employeeXMLConfigAspectID&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;order=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;1&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;aop:pointcut&lt;/span&gt; &lt;span class="na"&gt;expression=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;execution(* com.journaldev.spring.model.Employee.getName())&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;getNamePointcut&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;aop:around&lt;/span&gt; &lt;span class="na"&gt;method=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;employeeAroundAdvice&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;pointcut-ref=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;getNamePointcut&amp;#34;&lt;/span&gt; &lt;span class="na"&gt;arg-names=&lt;/span&gt;&lt;span class="s"&gt;&amp;#34;proceedingJoinPoint&amp;#34;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;lt;/aop:aspect&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;&amp;lt;/aop:config&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id="transactional-어노테이션과-프록시-기반-트랜잭션-관리의-마법"&gt;&lt;code&gt;@Transactional&lt;/code&gt; 어노테이션과 프록시 기반 트랜잭션 관리의 &amp;ldquo;마법&amp;rdquo;
+&lt;/h4&gt;&lt;p&gt;&lt;code&gt;@Transactional&lt;/code&gt; 어노테이션을 사용하면 개발자는 명시적으로 트랜잭션을 시작하거나 종료하는 코드를 작성하지 않아도 된다.&lt;/p&gt;
+&lt;p&gt;Spring은 내부적으로 프록시를 생성하여 트랜잭션을 관리한다.
+이러한 동작은 개발자에게는 마치 &amp;ldquo;마법&amp;quot;처럼 느껴질 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://www.marcobehler.com/guides/spring-transaction-management-transactional-in-depth" target="_blank" rel="noopener"
+&gt;Marco Behler의 블로그&lt;/a&gt;에서는 이러한 동작을 다음과 같이 설명한다.&lt;/p&gt;
+&lt;link rel="stylesheet" href="https://blog.b9f1.com/css/vendors/admonitions.5c21d3611305826ca76e50bf22bdda6ed74f2f81d26216e9166f9ae104f2e27a.css" integrity="sha256-XCHTYRMFgmynblC/Ir3abtdPL4HSYhbpFm&amp;#43;a4QTy4no=" crossorigin="anonymous"&gt;
+&lt;div class="admonition quote"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"&gt;&lt;path d="M448 296c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72zm-256 0c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Quote&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&amp;ldquo;Now whenever you are using &lt;code&gt;@Transactional&lt;/code&gt; on a bean, Spring uses a tiny trick. It does not just instantiate a UserService, but also a transactional &lt;em&gt;proxy&lt;/em&gt; of that UserService.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;이제 빈에서 &lt;code&gt;@Transactional&lt;/code&gt;을 사용할 때마다 Spring은 작은 트릭을 사용합니다. 이는 단순히 사용자 서비스를 인스턴스화하는 것뿐만 아니라 해당 사용자 서비스의 트랜잭션 프록시도 사용합니다.&amp;rdquo;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;a class="link" href="https://stackoverflow.com/questions/1099025/spring-transactional-what-happens-in-background" target="_blank" rel="noopener"
+&gt;Stack Overflow의 질문: Spring - @Transactional - What happens in background?&lt;/a&gt;에서도 이와 유사한 설명을 확인할 수 있었다.
+무려 15년 전 질문이다.&lt;/p&gt;
+&lt;div class="admonition quote"&gt;
+&lt;div class="admonition-header"&gt;&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"&gt;&lt;path d="M448 296c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72zm-256 0c0 66.3-53.7 120-120 120l-8 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l8 0c30.9 0 56-25.1 56-56l0-8-64 0c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l64 0c35.3 0 64 28.7 64 64l0 32 0 32 0 72z"/&gt;&lt;/svg&gt;
+&lt;span&gt;Quote&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="admonition-content"&gt;
+&lt;p&gt;&amp;ldquo;But at a very high level, Spring creates proxies for classes that declare &lt;code&gt;@Transactional&lt;/code&gt; on the class itself or on members. The proxy is mostly invisible at runtime. It provides a way for Spring to inject behaviors before, after, or around method calls into the object being proxied.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;매우 높은 수준에서 Spring은 클래스 자체 또는 멤버에 &lt;code&gt;@Transactional&lt;/code&gt;을 선언하는 클래스에 대한 프록시를 생성합니다. 프록시는 런타임에 대부분 보이지 않습니다. 이 프록시는 Spring이 메서드 호출 전후 또는 주변의 동작을 프록시 대상 객체에 주입할 수 있는 방법을 제공합니다.&amp;rdquo;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="결론"&gt;🎯결론
+&lt;/h2&gt;&lt;p&gt;OOP는 설계의 뼈대, AOP는 설계의 윤활유다.
+AOP는 복잡한 애플리케이션에서 반드시 필요한 설계 전략이다.&lt;/p&gt;
+&lt;h2 id="endnote"&gt;⚙️EndNote
+&lt;/h2&gt;&lt;h3 id="사전-지식"&gt;사전 지식
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Java 언어 및 Spring Framework 기초&lt;/li&gt;
+&lt;li&gt;DI(의존성 주입)과 Proxy 패턴 개념&lt;/li&gt;
+&lt;li&gt;어노테이션 기반 설정 이해&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="더-알아보기"&gt;더 알아보기
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://docs.spring.io/spring-framework/reference/core/aop.html" target="_blank" rel="noopener"
+&gt;Spring AOP 공식 문서&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://eclipse.dev/aspectj/" target="_blank" rel="noopener"
+&gt;AspectJ 소개&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;핵심 키워드: &lt;code&gt;@Aspect&lt;/code&gt;, &lt;code&gt;@Around&lt;/code&gt;, &lt;code&gt;JoinPoint&lt;/code&gt;, &lt;code&gt;cross-cutting concern&lt;/code&gt;, &lt;code&gt;Proxy&lt;/code&gt;, &lt;code&gt;Advice&lt;/code&gt;, &lt;code&gt;Pointcut&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
